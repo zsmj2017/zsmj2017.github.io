@@ -653,7 +653,7 @@
         
           <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在C++并发编程中，保护共享数据最简单的方法是使用互斥量。</p>
 <p>在访问共享数据前，开发者可使用互斥量将相关数据锁住，并于访问结束后将数据解锁。因此，线程库需要保证当一个线程使用特定互斥量锁住共享数据时，其他线程仅可在数据被解锁后才能访问。</p>
-<p>互斥量是C++中最通用的一种数据保护机制，但它并非“银弹”；在使用互斥量的过程中，精心组织代码来保护正确的数据，并在接口内部避免竞争条件是非常重要的。此外，互斥量自身存在一定的问题，它可能会导致死锁，又或者将某些数据保护地太多或者太少。下文将针对上述情况逐一作出分析。</p>
+<p>互斥量是C++中最通用的一种数据保护机制，但它并非“银弹”，在使用互斥量时，需要精心组织代码来保护正确的数据，并在接口内部避免竞争条件。此外，互斥量自身存在一定的问题，它可能会导致死锁，又或者将某些数据保护地太多或者太少。下文将针对上述情况逐一作出分析。</p>
           <div class="post-more-link text-center">
             <a class="btn" href="/post/b5b0346b.html" rel="contents">
               阅读全文 &raquo;
@@ -771,7 +771,7 @@
         
 <!-- 自定义结束 -->
         
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>当并发编程涉及共享数据时，大多数问题都起因于共享数据被多个线程修改。如果共享数据具备只读属性，那么所有线程都将获得同样的数据，此时也将不再存在任何令人烦恼的问题。</p>
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>并发编程中的大多数数据问题都起因于共享数据被多个线程修改，读取只读属性的共享数据不会存在任何问题。</p>
           <div class="post-more-link text-center">
             <a class="btn" href="/post/29bd1a13.html" rel="contents">
               阅读全文 &raquo;
@@ -889,7 +889,7 @@
         
 <!-- 自定义结束 -->
         
-          <h1 id="hardware-concurrency"><a href="#hardware-concurrency" class="headerlink" title="hardware_concurrency"></a>hardware_concurrency</h1><p>&nbsp;<br>C++标准库提供了名为<code>std::thread::hardware_concurrency()</code>的函数，该函数将返回能同时并发在一个程序中的线程数量。举例而言，在多核系统返回值为CPU核芯数量；在无法获取系统信息时，该值为0。显然，该API是在运行期决定线程数量的重要提示。<br>
+          <h1 id="hardware-concurrency"><a href="#hardware-concurrency" class="headerlink" title="hardware_concurrency"></a>hardware_concurrency</h1><p>&nbsp;<br>C++标准库提供了名为<code>std::thread::hardware_concurrency()</code>的函数，该函数将返回能<strong>同时并发</strong>在一个程序中的线程数量。举例而言，在多核系统返回值为CPU核芯数量；在无法获取系统信息时，该值为0。显然，该API是在运行期决定线程数量的重要提示。<br>
           <div class="post-more-link text-center">
             <a class="btn" href="/post/53951e5a.html" rel="contents">
               阅读全文 &raquo;
