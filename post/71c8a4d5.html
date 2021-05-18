@@ -1,0 +1,1107 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;C++11中提供了许多初始化方法，以至于多的有点混乱。一般来说，初始化可以由小括号、等号、大括号完成：123int x(0);int y = 0;int z&amp;#123;0&amp;#125;;
+也可以等号与大括号并用：1int z = &amp;#123;0&amp;#125;;
+在本节接下来的内容中我们将不叙述这种并用的初始化方法，因为C++往往习惯于将其与仅使用大括号的情形等价。
+
+Braced in">
+<meta property="og:type" content="article">
+<meta property="og:title" content="7.在创建对象时区分()与{}">
+<meta property="og:url" content="https://zsmj2017.tech/post/71c8a4d5.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;C++11中提供了许多初始化方法，以至于多的有点混乱。一般来说，初始化可以由小括号、等号、大括号完成：123int x(0);int y = 0;int z&amp;#123;0&amp;#125;;
+也可以等号与大括号并用：1int z = &amp;#123;0&amp;#125;;
+在本节接下来的内容中我们将不叙述这种并用的初始化方法，因为C++往往习惯于将其与仅使用大括号的情形等价。
+
+Braced in">
+<meta property="og:updated_time" content="2018-06-27T08:53:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="7.在创建对象时区分()与{}">
+<meta name="twitter:description" content="前言&amp;nbsp;C++11中提供了许多初始化方法，以至于多的有点混乱。一般来说，初始化可以由小括号、等号、大括号完成：123int x(0);int y = 0;int z&amp;#123;0&amp;#125;;
+也可以等号与大括号并用：1int z = &amp;#123;0&amp;#125;;
+在本节接下来的内容中我们将不叙述这种并用的初始化方法，因为C++往往习惯于将其与仅使用大括号的情形等价。
+
+Braced in">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/71c8a4d5.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> 7.在创建对象时区分()与{} | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                7.在创建对象时区分()与{}
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-06-27T16:10:00+08:00" content="2018-06-27">
+              2018-06-27
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>C++11中提供了许多初始化方法，以至于多的有点混乱。一般来说，初始化可以由小括号、等号、大括号完成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">x</span><span class="params">(<span class="number">0</span>)</span></span>;</span><br><span class="line"><span class="keyword">int</span> y = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> z&#123;<span class="number">0</span>&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>也可以等号与大括号并用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> z = &#123;<span class="number">0</span>&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>在本节接下来的内容中我们将不叙述这种并用的初始化方法，因为C++往往习惯于将其与仅使用大括号的情形等价。</p>
+<hr>
+<h1 id="Braced-initialization"><a href="#Braced-initialization" class="headerlink" title="Braced initialization"></a>Braced initialization</h1><p>&nbsp;</p>
+<p>使用等号进行初始化经常会给C++新手带来困扰，因为这看起来像是一个赋值操作，但实际情况并非如此。对于内置类型而言可能没啥关系，但对于用户自定义类型而言，区分初始化与赋值是十分必要的，因为二者调用了完全不同的函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w1; <span class="comment">// call default constructor</span></span><br><span class="line">Widget w2 = w1; <span class="comment">// not an assignment; calls copy ctor</span></span><br><span class="line">w1 = w2; <span class="comment">// an assignment; calls copy operator=</span></span><br></pre></td></tr></table></figure></p>
+<p>C++ 98中尽管初始化语法不少，但仍然存在一些无法初始化的情况，例如没法在初始化时指定容器内部的元素值等等。C++11为了解决上述问题，引入了”uniform initialization”的概念：一个初始化表达式应该可以用于任何地方并且可以表达一切。由于该语法基于大括号（brace)，作者也将其称为”Braced initialization”，其使用实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v&#123; <span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span> &#125;; <span class="comment">// v's initial content is 1, 3, 5</span></span><br></pre></td></tr></table></figure></p>
+<p>大括号亦可用于指定非静态数据成员的默认初始值,C++11引入的这项新功能与operator=初始化语法共存，但小括号则不行:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> x&#123; <span class="number">0</span> &#125;; <span class="comment">// fine, x's default value is 0</span></span><br><span class="line">    <span class="keyword">int</span> y = <span class="number">0</span>; <span class="comment">// also fine</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">z</span><span class="params">(<span class="number">0</span>)</span></span>; <span class="comment">// error!</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>另一方面，无法被拷贝的对象只能够使用大括号或小括号初始化，无法通过operator=初始化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; ai1&#123;<span class="number">0</span>&#125;;</span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; ai2(<span class="number">0</span>); <span class="comment">// fine</span></span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; ai3 = <span class="number">0</span>; <span class="comment">// error!</span></span><br></pre></td></tr></table></figure></p>
+<p>将”Braced initialization”称为”uniform initialization”是十分自然的，因为只有brace可以在任何C++初始化表达式中正常使用。</p>
+<hr>
+<h2 id="Braced-initialization特性"><a href="#Braced-initialization特性" class="headerlink" title="Braced initialization特性"></a>Braced initialization特性</h2><h3 id="禁止narrow-conversion"><a href="#禁止narrow-conversion" class="headerlink" title="禁止narrow conversion"></a>禁止narrow conversion</h3><p>Braced initialization的特性之一在于其禁止在初始化过程中对内置类型作隐式narrow conversion，如果变量不能保证准确表达初始化器内部值，那么该代码将无法完成编译：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> x, y, z;</span><br><span class="line">…</span><br><span class="line"><span class="keyword">int</span> sum1&#123; x + y + z &#125;; <span class="comment">// error! sum of doubles may not be expressible as int</span></span><br></pre></td></tr></table></figure></p>
+<p>使用圆括号和operator=进行初始化则不会检查是否触发narrow conversion，因为这可能会对历史遗留代码造成破坏：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum2</span><span class="params">(x + y + z)</span></span>; <span class="comment">// okay (value of expression truncated to an int)</span></span><br><span class="line"><span class="keyword">int</span> sum3 = x + y + z; <span class="comment">// ditto</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="避免vexing-parse"><a href="#避免vexing-parse" class="headerlink" title="避免vexing parse"></a>避免vexing parse</h3><p>Braced initialization还有一大特性在于其对C++的vexing parse免疫。C++ vexing parse可以解释为：当你试图使用默认构造函数来构造对象时，却发现自己只是声明了一个函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Widget <span class="title">w2</span><span class="params">()</span></span>; <span class="comment">//vexing parse!declares a function named w2 that returns a Widget!</span></span><br></pre></td></tr></table></figure></p>
+<p>但如果你使用大括号进行初始化操作，则不会被认为是一个函数声明:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Widget w3&#123;&#125;; <span class="comment">// calls Widget ctor with no args</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="Braced-initialization缺陷"><a href="#Braced-initialization缺陷" class="headerlink" title="Braced initialization缺陷"></a>Braced initialization缺陷</h2><p>&nbsp;<br>Braced initialization并非完美无缺，它的存在也可能会导致一些你意料之外的错误。例如在Item2中我们曾经提及，auto会将经由Braced initialization初始化的变量推断为一个std::initializer_list.如此说来，可能你越喜欢auto，你对Braced initialization的兴趣就越少。</p>
+<h3 id="构造函数匹配"><a href="#构造函数匹配" class="headerlink" title="构造函数匹配"></a>构造函数匹配</h3><p>在调用构造函数时，只要不涉及std::initializer_list,小括号和大括号几乎没有区别：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">bool</span> b); <span class="comment">// ctors not declaring</span></span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">double</span> d); <span class="comment">// std::initializer_list params</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Widget <span class="title">w1</span><span class="params">(<span class="number">10</span>, <span class="literal">true</span>)</span></span>; <span class="comment">// calls first ctor</span></span><br><span class="line">Widget w2&#123;<span class="number">10</span>, <span class="literal">true</span>&#125;; <span class="comment">// also calls first ctor</span></span><br><span class="line"><span class="function">Widget <span class="title">w3</span><span class="params">(<span class="number">10</span>, <span class="number">5.0</span>)</span></span>; <span class="comment">// calls second ctor</span></span><br><span class="line">Widget w4&#123;<span class="number">10</span>, <span class="number">5.0</span>&#125;; <span class="comment">// also calls second ctor</span></span><br></pre></td></tr></table></figure></p>
+<p>但如果一个或多个构造函数声明其形参为std::initializer_list类型，则使用Braced initialization初始化对象时会几乎<strong>必然会调用形参类型为std::initializer_list的构造函数</strong>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">bool</span> b); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">double</span> d); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;<span class="keyword">long</span> <span class="keyword">double</span>&gt; il); <span class="comment">// added</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Widget <span class="title">w1</span><span class="params">(<span class="number">10</span>, <span class="literal">true</span>)</span></span>; <span class="comment">// uses parens and, as before,calls first ctor</span></span><br><span class="line">Widget w2&#123;<span class="number">10</span>, <span class="literal">true</span>&#125;; <span class="comment">// now calls std::initializer_list ctor(10 and true convert to long double)</span></span><br><span class="line"><span class="function">Widget <span class="title">w3</span><span class="params">(<span class="number">10</span>, <span class="number">5.0</span>)</span></span>; <span class="comment">// uses parens and, as before,calls second ctor</span></span><br><span class="line">Widget w4&#123;<span class="number">10</span>, <span class="number">5.0</span>&#125;; <span class="comment">// now calls std::initializer_list ctor(10 and 5.0 convert to long double)</span></span><br></pre></td></tr></table></figure></p>
+<p>显然，这里发生了严重的匹配错误，不仅如此，甚至拷贝和移动构造函数也可能会被std::initializer_list带偏：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">bool</span> b); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">double</span> d); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;<span class="keyword">long</span> <span class="keyword">double</span>&gt; il); <span class="comment">// as before</span></span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">float</span><span class="params">()</span> <span class="keyword">const</span></span>; <span class="comment">// convert to float</span></span><br><span class="line">    … </span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Widget <span class="title">w5</span><span class="params">(w4)</span></span>; <span class="comment">// uses parens, calls copy ctor</span></span><br><span class="line">Widget w6&#123;w4&#125;; <span class="comment">// call std::initializer_list ctor</span></span><br><span class="line">               <span class="comment">// (w4 converts to float, and float converts to long double)</span></span><br><span class="line">Widget w7(std::move(w4)); // uses parens, calls move ctor</span><br><span class="line">Widget w8&#123;<span class="built_in">std</span>::move(w4)&#125;; <span class="comment">// calls std::initializer_list ctor (for same reason as w6)</span></span><br></pre></td></tr></table></figure></p>
+<p>braced initializers与形参为std::initializer_list的ctor具备最高匹配度，当ctor无法被调用时，编译器甚至不会去理会别的构造函数(即使在类型上十分符合）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">bool</span> b); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">double</span> d); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;<span class="keyword">bool</span>&gt; il); <span class="comment">// element type is now bool</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line">Widget w&#123;<span class="number">10</span>, <span class="number">5.0</span>&#125;; <span class="comment">// error！narrowing conversions are prohibited inside braced initializers</span></span><br></pre></td></tr></table></figure></p>
+<p>只有在无法将braced initializer内的实参转换为std::initializer_list中的参数时编译器才会去调用其他构造函数(我认为本例是无法转换，而上一个例子说的是大括号内含有禁止narrow conversion语义，二者并不冲突），例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">bool</span> b); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="keyword">int</span> i, <span class="keyword">double</span> d); <span class="comment">// as before</span></span><br><span class="line">    Widget(<span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; il);</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Widget <span class="title">w1</span><span class="params">(<span class="number">10</span>, <span class="literal">true</span>)</span></span>; <span class="comment">// uses parens, still calls first ctor</span></span><br><span class="line">Widget w2&#123;<span class="number">10</span>, <span class="literal">true</span>&#125;; <span class="comment">// uses braces, now calls first ctor</span></span><br><span class="line"><span class="function">Widget <span class="title">w3</span><span class="params">(<span class="number">10</span>, <span class="number">5.0</span>)</span></span>; <span class="comment">// uses parens, still calls second ctor</span></span><br><span class="line">Widget w4&#123;<span class="number">10</span>, <span class="number">5.0</span>&#125;; <span class="comment">// uses braces, now calls second ctor</span></span><br></pre></td></tr></table></figure></p>
+<p>最后，我们讨论一种极端情况:Widget同时具备无参构造函数与带有std::initializer_list的构造函数，当我们写下<code>Widget w{}</code>时，调用的是哪一个呢？答案是调用无参构造函数，原因在于空大括号意味着没有参数，而非一个空的std::initializer_list对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(); <span class="comment">// default ctor</span></span><br><span class="line">    Widget(<span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;<span class="keyword">int</span>&gt; il); <span class="comment">// std::initializer_list ctor</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line">Widget w1; <span class="comment">// calls default ctor</span></span><br><span class="line">Widget w2&#123;&#125;; <span class="comment">// also calls default ctor</span></span><br><span class="line"><span class="function">Widget <span class="title">w3</span><span class="params">()</span></span>; <span class="comment">// most vexing parse! declares a function!</span></span><br></pre></td></tr></table></figure></p>
+<p>如果我们需要调用形参类型为std::initializer_list的构造函数，我们应当明确地指出参数为一个空std::initializer_list：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Widget <span class="title">w4</span><span class="params">(&#123;&#125;)</span></span>; <span class="comment">// calls std::initializer_list ctor with empty list</span></span><br><span class="line">Widget w5&#123;&#123;&#125;&#125;; <span class="comment">// ditto</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="实际问题"><a href="#实际问题" class="headerlink" title="实际问题"></a>实际问题</h3><p>作为类的开发者，我们应当明确：<strong>如果在类中存在形参为std::initializer_list的构造函数，那么客户在使用Braced initialization时只会看到initializer_list版本</strong>，因此，我们应当合理设计构造函数，以便客户不至于产生误解。</p>
+<p>如果你曾经的设计中不存在以std::initializer_list为参数的构造函数，当你添加了它之后，原本运行良好的客户端应用程序可能会匹配至新的构造函数然后发生雪崩。虽然别的重载函数更新后也会发生这种情况，但带有std::initializer_list的构造函数破坏性大得多，因为他并非与其他构造函数竞争，而是以一种近乎overshadow的方式抹杀了其余构造函数的存在（当然，如果不能发生转换它还是会乖乖交出构造权）。总之，在类中加入此类重载构造函数需要审慎。</p>
+<p>作为类的使用者，我们应当在创建对象时谨慎选择初始化方式。大多数人会从()、{}中选出一种作为惯用方式，并且只有在情非得已时才会去使用另外一种。这两种初始化方式并无优劣之分，因此我们应当选择一种作为自己开发的惯用方式，并在日常使用中不断加深对它的理解。</p>
+<p>如果你是一个模板的作者，可能你会发现自己并不确定在创建对象时应当使用哪一种初始化方式。例如，假设我们想从任意数量的参数中创建任意类型的对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="keyword">typename</span>... Ts&gt;<span class="comment">// type of object to create,types of arguments to use</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomeWork</span><span class="params">(Ts&amp;&amp;... params)</span></span>&#123;</span><br><span class="line">    create local T object from params...</span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>有两种方法可将上述伪代码实现（std::forward可见Item25）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">T localObject(std::forward&lt;Ts&gt;(params)...); // using parens</span><br><span class="line">T localObject&#123;<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...&#125;; <span class="comment">// using braces</span></span><br></pre></td></tr></table></figure></p>
+<p>考虑以下调用程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">…</span><br><span class="line">doSomeWork&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt;(<span class="number">10</span>, <span class="number">20</span>);</span><br></pre></td></tr></table></figure></p>
+<p>如果doSomeWork在创建localObject时使用小括号，那么将创建一个包含10个元素的std::vector。如果doSomeWork使用大括号，则结果是一个包含2个元素的std::vector。只有调用者而非开发者才知道哪一个是他想要的（正确的）结果。</p>
+<p>上述讨论正是标准库函数std :: make_unique和std :: make_shared所面临的问题（见Item21），这两个函数最终决定在template内部使用小括号，并在接口文档中加以注明。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>Braced initialization是使用最为广泛的初始化语法，它可以防止narrow conversion，并且不受vexing parse的影响。</strong></li>
+<li><strong>在构造函数重载解析期间，即使其他构造函数具备更高的匹配度， Braced initialization也不会放过任何一个与std :: initializer_list发生匹配的可能（除非真的无法转换）。</strong></li>
+<li><strong>即使是同样的参数，使用大括号和小括号进行初始化可能结果会天差地别（例如std::vector)。</strong></li>
+<li><strong>在template中创建对象时使用大括号还是小括号会很令人纠结。</strong></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"><i class="fa fa-tag"></i> Modern C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/b8d1bf01.html" rel="next" title="6.当auto推衍类型错误时，使用显式初始化">
+                <i class="fa fa-chevron-left"></i> 6.当auto推衍类型错误时，使用显式初始化
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/bf738798.html" rel="prev" title="8.使用nullptr而非0或NULL">
+                8.使用nullptr而非0或NULL <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Braced-initialization"><span class="nav-number">2.</span> <span class="nav-text">Braced initialization</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Braced-initialization特性"><span class="nav-number">2.1.</span> <span class="nav-text">Braced initialization特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#禁止narrow-conversion"><span class="nav-number">2.1.1.</span> <span class="nav-text">禁止narrow conversion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免vexing-parse"><span class="nav-number">2.1.2.</span> <span class="nav-text">避免vexing parse</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Braced-initialization缺陷"><span class="nav-number">2.2.</span> <span class="nav-text">Braced initialization缺陷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构造函数匹配"><span class="nav-number">2.2.1.</span> <span class="nav-text">构造函数匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实际问题"><span class="nav-number">2.2.2.</span> <span class="nav-text">实际问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>

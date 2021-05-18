@@ -1,0 +1,1095 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;在C++98中，异常规格是一个很麻烦的事情。你必须时刻关注函数可能抛出的异常，一旦函数的实现发生改变，其异常规格也需要发生变化。轻易更改异常规格可能会破坏客户端代码，因为调用者可能依赖于原始的异常规格。编译器并不能帮助你维持函数实现、异常规格、客户端代码之间的一致性。大多数程序员都认为C++98的异常规格实在是太不友善了。
+在长期的开发过程中人们逐渐产生了一项共识:函数的异常规格只">
+<meta property="og:type" content="article">
+<meta property="og:title" content="14.若函数不会发生异常，则将其声明为noexcept">
+<meta property="og:url" content="https://zsmj2017.tech/post/1bf831ca.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;在C++98中，异常规格是一个很麻烦的事情。你必须时刻关注函数可能抛出的异常，一旦函数的实现发生改变，其异常规格也需要发生变化。轻易更改异常规格可能会破坏客户端代码，因为调用者可能依赖于原始的异常规格。编译器并不能帮助你维持函数实现、异常规格、客户端代码之间的一致性。大多数程序员都认为C++98的异常规格实在是太不友善了。
+在长期的开发过程中人们逐渐产生了一项共识:函数的异常规格只">
+<meta property="og:updated_time" content="2018-07-01T13:00:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="14.若函数不会发生异常，则将其声明为noexcept">
+<meta name="twitter:description" content="前言&amp;nbsp;在C++98中，异常规格是一个很麻烦的事情。你必须时刻关注函数可能抛出的异常，一旦函数的实现发生改变，其异常规格也需要发生变化。轻易更改异常规格可能会破坏客户端代码，因为调用者可能依赖于原始的异常规格。编译器并不能帮助你维持函数实现、异常规格、客户端代码之间的一致性。大多数程序员都认为C++98的异常规格实在是太不友善了。
+在长期的开发过程中人们逐渐产生了一项共识:函数的异常规格只">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/1bf831ca.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> 14.若函数不会发生异常，则将其声明为noexcept | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                14.若函数不会发生异常，则将其声明为noexcept
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-01T16:42:00+08:00" content="2018-07-01">
+              2018-07-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在C++98中，异常规格是一个很麻烦的事情。你必须时刻关注函数可能抛出的异常，一旦函数的实现发生改变，其异常规格也需要发生变化。轻易更改异常规格可能会破坏客户端代码，因为调用者可能依赖于原始的异常规格。编译器并不能帮助你维持函数实现、异常规格、客户端代码之间的一致性。大多数程序员都认为C++98的异常规格实在是太不友善了。</p>
+<p>在长期的开发过程中人们逐渐产生了一项共识:函数的异常规格只需要告诉人们该函数是否可能会抛出一个异常即可。C++11以这种非黑即白式的异常规格取代了C++98中繁琐且易于出错的规格（不过它们现在仍然有效）。在C++11中，我们使用noexcept表征某个函数不会抛出任何异常。</p>
+<hr>
+<h1 id="noexcept声明"><a href="#noexcept声明" class="headerlink" title="noexcept声明"></a>noexcept声明</h1><p>&nbsp;<br>函数是否应当被声明为noexcept是一个接口设计问题。对于使用者来说，函数是否可能会抛出异常是一个关键问题。调用者理当了解被调用函数的异常状态，并且该状态会影响调用程序的异常安全性及效率。从这个角度而言，noexcept声明重要性不亚于const，如果一个不可能抛出异常的函数不声明为noexcept，那这个接口规范真是太失败了。</p>
+<p>不过声明noexcept还有额外的目的：促使编译器生成更加恰当的目标码。假设当前存在一个函数f承诺不会抛出任何异常，那么它们在C++98与C++11中分别表示为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> x)</span> <span class="title">throw</span><span class="params">()</span></span>; <span class="comment">// no exceptions from f: C++98 style</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> x)</span> <span class="keyword">noexcept</span></span>; <span class="comment">// no exceptions from f: C++11 style</span></span><br></pre></td></tr></table></figure></p>
+<p>如果在运行期间f抛出了异常，违背了其异常规格，C++98异常规格会展开调用堆栈给f的调用者，并且在执行完一些与当前无关的操作后终止程序。C++11异常规格则保证堆栈仅可能展开于程序结束运行之前。</p>
+<p>展开调用堆栈与可能展开调用堆栈对于代码生成有着极大影响，在noexcept函数中，如果异常传播到别处，那么优化器不需要保持运行期堆栈处于不可展开状态，也不必确保noexcept函数中的对象按照构造的相反顺序销毁。带有throw()或完全不具备异常规格的函数则不具备这种优化弹性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">RetType <span class="title">function</span><span class="params">(params)</span> <span class="keyword">noexcept</span></span>; <span class="comment">// most optimizable</span></span><br><span class="line"><span class="function">RetType <span class="title">function</span><span class="params">(params)</span> <span class="title">throw</span><span class="params">()</span></span>; <span class="comment">// less optimizable</span></span><br><span class="line"><span class="function">RetType <span class="title">function</span><span class="params">(params)</span></span>; <span class="comment">// less optimizable</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="移动语义、性能优化与noexcept"><a href="#移动语义、性能优化与noexcept" class="headerlink" title="移动语义、性能优化与noexcept"></a>移动语义、性能优化与noexcept</h1><p>&nbsp;</p>
+<p>在某些情况下，使用noexcept十分恰当，移动操作就是一个典型的例子。假设你有一个使用vector&lt;Widget&gt;的C++98代码库，widget通过push_back不断加入该vector::<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; vw;</span><br><span class="line">…</span><br><span class="line">Widget w;</span><br><span class="line">… <span class="comment">// work with w</span></span><br><span class="line">vw.push_back(w); <span class="comment">// add w to vw</span></span><br><span class="line">…</span><br></pre></td></tr></table></figure></p>
+<p>你希望利用C++11中的移动语义来提升程序性能，因此，你通过某种方式，例如自己撰写or自动生成（见Item17）来确保widget拥有移动操作。</p>
+<p>当一个新元素被添加到一个std::vector时，std::vector可能没有空间(及size==cap)。当发生这种情况时，std ::vector会分配一个新的，更大的内存块来保存它的元素，并将内存中的元素从旧内存块传送到新的内存块。C++98将每个元素从旧内存复制到新内存，然后销毁旧内存中的对象。这种方法使push_back能够提供strong异常安全保证：如果在复制元素期间抛出异常，则std::vector的状态保持不变。因为在将所有元素成功复制到新内存之前，旧内存中的元素都不会被销毁。</p>
+<p>C++11中存在一种针对上述情况的优化方法：以移动替换拷贝。不过这种优化策略破坏了push_back的异常安全保证，例如当前已完成n个元素的移动，但第n+1个元素在移动时抛出异常，此时push_back不得不被迫中止。在此情况下，原本的vector已经发生更改，并且将已经移动的元素再次移动回来并不现实，因为在此移动过程中可能会再次触发异常。因此，除非我们明确地了解移动操作不会抛出异常，否则C++11不会主动以移动代替拷贝。</p>
+<p>std::vector::push_back采用的策略是”move if you can，but copy if you must”,并且它不是标准库中唯一采取此策略的函数，std::vector::reverse、std::deque::insert也是一样。当移动操作明确不会抛出异常时，这些函数会以移动操作代替C++98中性能低下的复制操作。那么这些函数如何了解移动操作是否可能会抛出异常呢？答案十分显然：通过检查移动操作是否具备noexcept声明。</p>
+<hr>
+<h1 id="swap与noexcept"><a href="#swap与noexcept" class="headerlink" title="swap与noexcept"></a>swap与noexcept</h1><p>&nbsp;<br>swap是许多STL算法实现的关键组件，并且经常应用于对象的拷贝赋值运算符之中（见Effective C++ Item11）。由于它的广泛使用，因此对其使用noexcept是一件性价比极高的事情。有趣的是，标准库中swap的noexcept有时取决于用户自定义的swap是否noexcept。举例而言，标准库对于数组以及std::pair的swap函数有声明如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">size_t</span> <span class="title">N</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">swap</span>(<span class="title">T</span> (&amp;<span class="title">a</span>)[<span class="title">N</span>], <span class="title">T</span> (&amp;<span class="title">b</span>)[<span class="title">N</span>]) <span class="title">noexcept</span>(<span class="title">noexcept</span>(<span class="title">swap</span>(*<span class="title">a</span>, *<span class="title">b</span>)));</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T1</span>, <span class="title">class</span> <span class="title">T2</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">struct</span> <span class="title">pair</span> &#123;</span></span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(pair&amp; p)</span> <span class="title">noexcept</span><span class="params">(</span></span></span><br><span class="line">    noexcept(swap(first, p.first)) &amp;&amp; </span><br><span class="line">    <span class="keyword">noexcept</span>(swap(second, p.second)));</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出，这些函数是否noexcept取决于noexcept子句中的表达式是否为noexcept。例如，假设当前存在两个vector&lt;Widget&gt;,swap这两个数组是否noexpt取决于swap其中单个元素是否这一行为（即swap Widget）是否noexcept。类似地，交换两个含有Widget的std::pair是否为noexcept亦取决于交换Widget是否noexcept。一言以蔽，交换高层数据数据这一行为是否noexcept取决于交换底层数据是否noexcept。</p>
+<h2 id="noexcept承诺"><a href="#noexcept承诺" class="headerlink" title="noexcept承诺"></a>noexcept承诺</h2><p>在讲优化之前，我们需要明确的是：优化固然重要，但程序的正确性更加重要，在前文中我们曾提及noexcept是接口的一部分，仅在你愿意付出长期维持某函数noexcept的代价时你才应当声明此函数为noexcept。如果你声明了一个函数noexcept然后发现noexcept无法维系，你的选择和下场十分惨烈：或冒着破坏客户端代码的风险从函数的声明中删除noexcept（即更改接口）；或更改实现以使异常可以转义，从而保留原始但不正确的异常规格。</p>
+<p>从实际情况而言，大部分函数都不会抛出异常，但其调用的子程序则未必尽然。当这种情况发生时，这些函数允许被抛出的异常越过自己直接到达调用链中的异常处理程序。这种不会自己抛出异常的函数不会被声明为noexcept，因为它们会抛出这种“just passing through”的异常。</p>
+<p>但也存在一些函数，其本质而言不可能抛出异常，又或者其一旦不抛出异常会带来显著的性能提升，因此将其实现为noexcept性价比很高。如果你可以保证一个函数永不抛出异常，那你应当放心大胆地将其声明为noexcept。值得强调的是，我们这里所说的本质上不可能抛出异常，而非你通过种种手段强行吞下或处理了所有异常。</p>
+<p>对于某些函数而言，其默认状态即为noexcept。在C++98中，允许内存释放函数（诸如operator delete、operator delete[])或析构函数抛出异常被视为非常恶劣的编码风格，而在C++11中，这几乎成为了一种语言规则：在默认情况下，所有的内存释放函数与析构函数均被隐式声明为noexcept（也就是说没必要去特意强调它们是noexcept，尽管没有任何坏处）。仅有在类的数据成员明确声明自身析构函数为noexcept(false)时类的析构函数才会不再隐式声明为noexcept。</p>
+<hr>
+<h1 id="wide-contracts-and-narrow-contracts"><a href="#wide-contracts-and-narrow-contracts" class="headerlink" title="wide contracts and narrow contracts"></a>wide contracts and narrow contracts</h1><p>&nbsp;<br>值得注意的是，某些库接口设计者将函数区分为”wide contracts”与”narrow contracts”。”wide contracts”函数没有任何先决条件，无论当前程序运行状态如何它都能够正常运行，且对传给它的参数没有任何限制，在任何情况下”wide contracts”均不会导致未定义行为。不具备”wide contracts”的函数被称为”narrow contracts”函数，对于此类函数，如果违反了其先决条件，则将触发未定义行为</p>
+<p>如果你正在编写一个”wide contracts”函数且明确其不会抛出异常，那么自然可以轻易遵循本节原则将其声明为noexcept。对于”narrow contracts”则相对麻烦，举例而言，假设当前你正在编写一个函数f，其参数为std::string,理论上其不会抛出异常，这意味着f应当被声明为noexcept。现在我们假设f存在一个先决条件：string对象的长度不得超过32个字符，一旦超过则触发未定义行为。f并没有义务检查其先决条件是否满足，因为那是调用者该做的事。即使当前函数存在一个先决条件，将f声明为noexcept似乎也没毛病：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; s)</span> <span class="keyword">noexcept</span></span>; <span class="comment">// precondition: s.length() &lt;= 32</span></span><br></pre></td></tr></table></figure></p>
+<p>但假设当前f的实现者决定检查其先决条件是否违背，那么如何在发现先决条件不成立的情况下向测试程序或客户端处理发出报告？一种直接方法是抛出异常，但我们已经声明该函数为noexcept了，抛出异常只会导致程序直接终止。出于这个理由，库设计者通常仅仅保留”wide contracts”函数的noexcept属性。</p>
+<hr>
+<h1 id="函数实现与异常规格"><a href="#函数实现与异常规格" class="headerlink" title="函数实现与异常规格"></a>函数实现与异常规格</h1><p>&nbsp;</p>
+<p>编译器通常无法识别函数实现与其异常规格之间的不一致。考虑这一段完全合法的代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setup</span><span class="params">()</span></span>; <span class="comment">// functions defined elsewhere</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">cleanup</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doWork</span><span class="params">()</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    setup(); <span class="comment">// set up work to be done</span></span><br><span class="line">    … <span class="comment">// do the actual work</span></span><br><span class="line">    cleanup(); <span class="comment">// perform cleanup actions</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>显然，noexcept函数doWork调用了non-except setup、cleanup。看起来很矛盾，但这并不意味着程序必然存在问题。例如，setup与cleanup在其文档中表示不会抛出异常，只不过它们没有用noexcept声明。又或者它们是用C语言编写的程序库的一部分（即使是已经移入std命名空间的C标准库中函数也没有声明异常规格，例如，std::strlen未声明为noexcept）。又或者它们是C++98库的一部分，刚刚决定不再使用C++98中的异常规格，并且尚未来得及针对C++11作出修订。</p>
+<p>由于上述种种原因，C++允许noexcept函数调用non-noexcept函数，并且编译器不会对此发出任何警告。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>noexcept是函数接口的一部分。</strong></li>
+<li><strong>noexcept函数比non-noexcept函数具备更高的优化弹性</strong>。</li>
+<li><strong>noexcept对移动操作，交换，内存释放函数及析构函数性价比极高。</strong></li>
+<li><strong>大部分函数都是excepttion—neutral而非noexcept。</strong></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"><i class="fa fa-tag"></i> Modern C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/43ba0b0d.html" rel="next" title="13.以const_iterator代替iterator">
+                <i class="fa fa-chevron-left"></i> 13.以const_iterator代替iterator
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/d33ba423.html" rel="prev" title="15.尽量使用constexpr">
+                15.尽量使用constexpr <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#noexcept声明"><span class="nav-number">2.</span> <span class="nav-text">noexcept声明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#移动语义、性能优化与noexcept"><span class="nav-number">3.</span> <span class="nav-text">移动语义、性能优化与noexcept</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#swap与noexcept"><span class="nav-number">4.</span> <span class="nav-text">swap与noexcept</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#noexcept承诺"><span class="nav-number">4.1.</span> <span class="nav-text">noexcept承诺</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#wide-contracts-and-narrow-contracts"><span class="nav-number">5.</span> <span class="nav-text">wide contracts and narrow contracts</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#函数实现与异常规格"><span class="nav-number">6.</span> <span class="nav-text">函数实现与异常规格</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>

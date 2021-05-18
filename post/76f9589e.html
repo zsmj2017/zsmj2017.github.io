@@ -1,0 +1,1147 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,设计模式," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;引用计数允许多个具有相同值的对象共享这个值的实现，其作用大致有二：
+
+简化跟踪堆中对象。在使用引用计数后，对象明确自己拥有自己的资源，当没人使用时自动销毁，可以算是一个简单的垃圾回收。
+Lazy evaluation如果很多对象拥有相同的值，我们不应该存储这个值，而是让所有对象共享其实现。
+
+
+引用计数实例&amp;nbsp;我们首先复习一下Lazy evaluation。12345678">
+<meta property="og:type" content="article">
+<meta property="og:title" content="29.引用计数">
+<meta property="og:url" content="https://zsmj2017.tech/post/76f9589e.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;引用计数允许多个具有相同值的对象共享这个值的实现，其作用大致有二：
+
+简化跟踪堆中对象。在使用引用计数后，对象明确自己拥有自己的资源，当没人使用时自动销毁，可以算是一个简单的垃圾回收。
+Lazy evaluation如果很多对象拥有相同的值，我们不应该存储这个值，而是让所有对象共享其实现。
+
+
+引用计数实例&amp;nbsp;我们首先复习一下Lazy evaluation。12345678">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/qts3knjxll0lza2h7vmqh5lp/image_1cc7oo06d1n3v1sjt1omc1h6b15gc9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/pl4h5tdvws1z0tz8zc03d9ax/image_1cc7opfrj1avv1hha5ub1sdu84tm.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/4mds08expzujjkkyd5janclh/image_1cc7oqndik0j1i0h1ue21mmkgue13.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/a8xpqnsww9an00wvqr4fn6r4/image_1cc7qinp41b8b1pd851p11dd1gv61t.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/a5r77zx2z4bb6n94dyjdlz7m/image_1cc7qpffq11lo13nkif8m84r0d2a.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/q5z8n5l245jbml5g9c7xaoq9/image_1cc7skm1scn5emb6i1d1tsno2n.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/e5xeg3q7myaib4p73vr1dqy0/image_1cc7smvc4e04147p1dml1tb757s34.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/xfk39ev9qbd2xhu4q4slsrpg/image_1cc813plr5sq19f6cqi19mviu3h.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/za7vr0i7hw24a9ie3eba1ppd/image_1cc81soqn1pls1vmttmu3c2ukg4b.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ebw6lpwidbhlsn78bd4c78la/image_1cc81h7851qt1182q2fdffkmci3u.png">
+<meta property="og:updated_time" content="2018-04-29T06:54:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="29.引用计数">
+<meta name="twitter:description" content="前言&amp;nbsp;引用计数允许多个具有相同值的对象共享这个值的实现，其作用大致有二：
+
+简化跟踪堆中对象。在使用引用计数后，对象明确自己拥有自己的资源，当没人使用时自动销毁，可以算是一个简单的垃圾回收。
+Lazy evaluation如果很多对象拥有相同的值，我们不应该存储这个值，而是让所有对象共享其实现。
+
+
+引用计数实例&amp;nbsp;我们首先复习一下Lazy evaluation。12345678">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/qts3knjxll0lza2h7vmqh5lp/image_1cc7oo06d1n3v1sjt1omc1h6b15gc9.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/76f9589e.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> 29.引用计数 | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                29.引用计数
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-29T11:56:00+08:00" content="2018-04-29">
+              2018-04-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>引用计数允许多个具有相同值的对象共享这个值的实现，其作用大致有二：</p>
+<ol>
+<li>简化跟踪堆中对象。<br>在使用引用计数后，对象明确自己拥有自己的资源，当没人使用时自动销毁，可以算是一个简单的垃圾回收。</li>
+<li>Lazy evaluation<br>如果很多对象拥有相同的值，我们不应该存储这个值，而是让所有对象共享其实现。</li>
+</ol>
+<hr>
+<h1 id="引用计数实例"><a href="#引用计数实例" class="headerlink" title="引用计数实例"></a>引用计数实例</h1><p>&nbsp;<br>我们首先复习一下Lazy evaluation。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span><span class="comment">//自定义string类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    String(<span class="keyword">const</span> <span class="keyword">char</span> *value = <span class="string">""</span>);</span><br><span class="line">    String&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> String&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> *data;</span><br><span class="line">&#125;;</span><br><span class="line">String a, b, c, d, e;</span><br><span class="line">a = b = c = d = e = <span class="string">"Hello"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>a到e的具体值形态其实取决于string类的实现。如果不作特殊化处理，每一个string对象均应具有一个值的拷贝，此时有赋值操作符实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String&amp; String::<span class="keyword">operator</span>=(<span class="keyword">const</span> String&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span> == &amp;rhs) <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">delete</span> [] data;</span><br><span class="line">    data = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="built_in">strlen</span>(rhs.data) + <span class="number">1</span>];</span><br><span class="line">    <span class="built_in">strcpy</span>(data, rhs.data);</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>显然，在这种实现下，abcde如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/qts3knjxll0lza2h7vmqh5lp/image_1cc7oo06d1n3v1sjt1omc1h6b15gc9.png" alt="image_1cc7oo06d1n3v1sjt1omc1h6b15gc9.png-48.3kB"><br>​这无疑是冗余的，我们希望的理想情况是这样：<br><img src="http://static.zybuluo.com/zsmj2017/pl4h5tdvws1z0tz8zc03d9ax/image_1cc7opfrj1avv1hha5ub1sdu84tm.png" alt="image_1cc7opfrj1avv1hha5ub1sdu84tm.png-30.9kB"><br>但这种情况是不现实的，我们<strong>至少应该记录当前有多少对象在使用该资源</strong>，增设计数器之后的效果如下：<img src="http://static.zybuluo.com/zsmj2017/4mds08expzujjkkyd5janclh/image_1cc7oqndik0j1i0h1ue21mmkgue13.png" alt="image_1cc7oqndik0j1i0h1ue21mmkgue13.png-35.5kB"></p>
+<hr>
+<h1 id="实现引用计数"><a href="#实现引用计数" class="headerlink" title="实现引用计数"></a>实现引用计数</h1><p>&nbsp;<br>仍以String为例。首先我们应当明确需要空间来存储计数值。该空间不可能存在于string内部，因为引用计数的本质是每一个资源一个计数，而非一个对象一个计数，这也表明了资源和引用计数之间存在一种耦合关系。<br>我们使用一个名为StringValue的struct帮助我们实现上述功能。它不仅仅保存计数器，同时也保存资源。我们将其置于String的private部分(<strong>将一个struct内嵌在类的私有区内，能便于这个类的所有成员访问这个结构，但阻止了其它任何人对它的访问</strong>)其设计与实现如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">StringValue</span> &#123;</span></span><br><span class="line">        <span class="keyword">int</span> refCount;</span><br><span class="line">        <span class="keyword">char</span> *data;</span><br><span class="line">        StringValue(<span class="keyword">const</span> <span class="keyword">char</span> *initValue);</span><br><span class="line">        ~StringValue();</span><br><span class="line">    &#125;;</span><br><span class="line">    StringValue* value;</span><br><span class="line">&#125;;</span><br><span class="line">String::StringValue::StringValue(<span class="keyword">const</span> <span class="keyword">char</span> *initValue)</span><br><span class="line">:refCount(<span class="number">1</span>)&#123;</span><br><span class="line">    data = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="built_in">strlen</span>(initValue) + <span class="number">1</span>];</span><br><span class="line">    <span class="built_in">strcpy</span>(data, initValue);</span><br><span class="line">&#125;</span><br><span class="line">String::StringValue::~StringValue()&#123;</span><br><span class="line">    <span class="keyword">delete</span> [] data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这便是引用计数的全部，你所认为缺少的功能将由String类提供。StringValue的功能主要就是：将一个特殊的值与共享此值的对象的数目联系起来。</p>
+<hr>
+<h2 id="String的构造"><a href="#String的构造" class="headerlink" title="String的构造"></a>String的构造</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    String(<span class="keyword">const</span> <span class="keyword">char</span> *initValue = <span class="string">""</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">String::String(<span class="keyword">const</span> <span class="keyword">char</span> *initValue)</span><br><span class="line">: value(<span class="keyword">new</span> StringValue(initValue))&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，String对象是独立构造的，有同样初始化值的对象并不共享数据：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">String <span class="title">s1</span><span class="params">(<span class="string">"More Effective C++"</span>)</span></span>;</span><br><span class="line"><span class="function">String <span class="title">s2</span><span class="params">(<span class="string">"More Effective C++"</span>)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>产生的数据结构如下所示：<img src="http://static.zybuluo.com/zsmj2017/a8xpqnsww9an00wvqr4fn6r4/image_1cc7qinp41b8b1pd851p11dd1gv61t.png" alt="image_1cc7qinp41b8b1pd851p11dd1gv61t.png-42kB"><br>消除这样的副本是可能的：通过让String或StringValue对象跟踪已存在的StringValue对象，并只在不同串时才创建新的对象。</p>
+<hr>
+<h2 id="String的拷贝"><a href="#String的拷贝" class="headerlink" title="String的拷贝"></a>String的拷贝</h2><p>String 的拷贝构造函数效率很高，新生成的String对象与被拷贝的对象共享相同的StringValue对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String::String(<span class="keyword">const</span> String&amp; rhs)</span><br><span class="line">: value(rhs.value)&#123;</span><br><span class="line">    ++value-&gt;refCount;<span class="comment">//需要注意value在heap中，为对象所共有</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如下代码产生的数据结构如图所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">String <span class="title">s1</span><span class="params">(<span class="string">"More Effective C++"</span>)</span></span>;</span><br><span class="line">String s2 = s1;</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://static.zybuluo.com/zsmj2017/a5r77zx2z4bb6n94dyjdlz7m/image_1cc7qpffq11lo13nkif8m84r0d2a.png" alt="image_1cc7qpffq11lo13nkif8m84r0d2a.png-25.3kB"><br>这必然比值拷贝系列效率要高，在本次拷贝中，我们只不过是拷贝了一个指针并增加了一次引用计数。</p>
+<hr>
+<h2 id="String的析构"><a href="#String的析构" class="headerlink" title="String的析构"></a>String的析构</h2><p>析构函数实现较为容易：只要引用计数值不为0，也就是当前至少存在一个String对象使用这个值，这个值就不可以被销毁：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~String();</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">String::~String()&#123;</span><br><span class="line">    <span class="keyword">if</span> (--value-&gt;refCount == <span class="number">0</span>) <span class="keyword">delete</span> value;<span class="comment">//先执行自减</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="String的赋值"><a href="#String的赋值" class="headerlink" title="String的赋值"></a>String的赋值</h2><p>当用户写下这样的代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s1 = s2;</span><br></pre></td></tr></table></figure></p>
+<p>其结果应该是s1和s2指向相同的StringValue对象,对象的引用计数在赋值时被增加。并且，s1原来指向的 StringValue对象的引用计数应该减少，如果s1是拥有原来的值的唯一对象，这个值销毁。上述功能实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">String&amp; String::<span class="keyword">operator</span>=(<span class="keyword">const</span> String&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">if</span> (value == rhs.value) &#123;<span class="comment">//类似于自赋值，这里指的是已经指向相同对象</span></span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (--value-&gt;refCount == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">delete</span> value;</span><br><span class="line">    &#125;</span><br><span class="line">    value = rhs.value;</span><br><span class="line">    ++value-&gt;refCount;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="写时拷贝"><a href="#写时拷贝" class="headerlink" title="写时拷贝"></a>写时拷贝</h1><p>&nbsp;<br>数组下标操作符[]允许字符串中的单个字符被读或写:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">int</span> index) <span class="keyword">const</span>; <span class="comment">// for const Strings</span></span><br><span class="line">    <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">int</span> index); <span class="comment">// for non-const Strings</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>const成员函数很容易实现，因为它仅仅提供读操作。但non-const则较为繁琐，因为它需要分别处理读和写的情况：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String s;</span><br><span class="line">...</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; s[<span class="number">3</span>];<span class="comment">//read</span></span><br><span class="line">s[<span class="number">5</span>] = <span class="string">'x'</span>;<span class="comment">//write</span></span><br></pre></td></tr></table></figure></p>
+<p>当我们试图修改一个String对象的值时，必须确保没有修改和它共享StringValue的对象。但我们无法确定operator[]执行的是何种操作（proxy class可以帮助区分读写，详见More Effective C++ 30），所以我们必须假设所有operator[]都在执行写操作。<br>为了安全地实现non-const operator[]，我们必须确保资源被当前String对象独占。简而言之，当我们返回StringValue对象中的一个字符的引用时，必须确保这个StringValue的引用计数是1：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span>&amp; String::<span class="keyword">operator</span>[](<span class="keyword">int</span> index)&#123;</span><br><span class="line">    <span class="keyword">if</span> (value-&gt;refCount &gt; <span class="number">1</span>) &#123;</span><br><span class="line">        --value-&gt;refCount;<span class="comment">//脱离当前资源共享阶段</span></span><br><span class="line">        value = <span class="keyword">new</span> StringValue(value-&gt;data);<span class="comment">//生成一个新资源</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> value-&gt;data[index];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>写时拷贝是这么一种情况：一个对象永远与其他等值对象共享资源，直到它需要修改自身时才迅速拷贝一份资源，你可以把它视为lazy-evacuation的一个应用特例。</p>
+<hr>
+<h1 id="指针、引用与写时拷贝"><a href="#指针、引用与写时拷贝" class="headerlink" title="指针、引用与写时拷贝"></a>指针、引用与写时拷贝</h1><p>&nbsp;<br>多数情况下上文所实现的写时拷贝兼具正确性与高效性，但加入了指针后正确性可能会因此失效：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String s1 = <span class="string">"Hello"</span>;</span><br><span class="line"><span class="keyword">char</span> *p = &amp;s1[<span class="number">1</span>];</span><br></pre></td></tr></table></figure></p>
+<p>其数据结构如下所示：<img src="http://static.zybuluo.com/zsmj2017/q5z8n5l245jbml5g9c7xaoq9/image_1cc7skm1scn5emb6i1d1tsno2n.png" alt="image_1cc7skm1scn5emb6i1d1tsno2n.png-15.3kB"><br>现增加一条语句：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s2 = s1;</span><br></pre></td></tr></table></figure></p>
+<p>由于资源共享的原因，当前数据结构如下所示：<img src="http://static.zybuluo.com/zsmj2017/e5xeg3q7myaib4p73vr1dqy0/image_1cc7smvc4e04147p1dml1tb757s34.png" alt="image_1cc7smvc4e04147p1dml1tb757s34.png-21.5kB"><br>如果我们试图通过p去更改s1，就会发现s2也遭到了更改。并非只有指针会造成这种情况，non-conts-reference也是如此。<br>解决方案不难实现，但我们付出了代价：降低一个值共享于对象间的次数。解决方案原理是：在每个StringValue对象中增加一个标志以指出它是否具备共享性，一开始标志位设置为可共享，一旦有operator[]被调用，标志位翻转为不可共享状态，并且永久保持为不可共享：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">StringValue</span> &#123;</span></span><br><span class="line">        <span class="keyword">int</span> refCount;</span><br><span class="line">        <span class="keyword">bool</span> shareable; <span class="comment">// add this</span></span><br><span class="line">        <span class="keyword">char</span> *data;</span><br><span class="line">        StringValue(<span class="keyword">const</span> <span class="keyword">char</span> *initValue);</span><br><span class="line">        ~StringValue();</span><br><span class="line">    &#125;;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">String::StringValue::StringValue(<span class="keyword">const</span> <span class="keyword">char</span> *initValue)</span><br><span class="line">: refCount(<span class="number">1</span>),shareable(<span class="literal">true</span>)&#123;</span><br><span class="line">    data = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="built_in">strlen</span>(initValue) + <span class="number">1</span>];</span><br><span class="line">    <span class="built_in">strcpy</span>(data, initValue);</span><br><span class="line">&#125;</span><br><span class="line">String::StringValue::~StringValue()&#123;</span><br><span class="line">    <span class="keyword">delete</span> [] data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在标志位增加后，String的成员函数也需要修改保持配合：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">String::String(<span class="keyword">const</span> String&amp; rhs)&#123;<span class="comment">//以拷贝构造举例</span></span><br><span class="line">    <span class="keyword">if</span> (rhs.value-&gt;shareable) &#123;</span><br><span class="line">        value = rhs.value;</span><br><span class="line">        ++value-&gt;refCount;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        value = <span class="keyword">new</span> StringValue(rhs.value-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>non-const operator[]是唯一一个可以更改标志位的函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span>&amp; String::<span class="keyword">operator</span>[](<span class="keyword">int</span> index)&#123;</span><br><span class="line">    <span class="keyword">if</span> (value-&gt;refCount &gt; <span class="number">1</span>) &#123;</span><br><span class="line">        --value-&gt;refCount;</span><br><span class="line">        value = <span class="keyword">new</span> StringValue(value-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">    value-&gt;shareable = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">return</span> value-&gt;data[index];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="引用计数与mixin-class"><a href="#引用计数与mixin-class" class="headerlink" title="引用计数与mixin class"></a>引用计数与mixin class</h1><p>&nbsp;<br>不仅仅只有String需要引用计数，但我们不可能为所有需要引用计数的类都添加对应的struct，为了把引用计数功能抽象到与运行环境无关，我们想到了mixin class。</p>
+<h2 id="RCObject"><a href="#RCObject" class="headerlink" title="RCObject"></a>RCObject</h2><p>首先构建一个基类RCObject，任何需要引用计数的类都必须继承自它，其具体定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RCObject</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    RCObject();</span><br><span class="line">    RCObject(<span class="keyword">const</span> RCObject&amp; rhs);</span><br><span class="line">    RCObject&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> RCObject&amp; rhs);</span><br><span class="line">    <span class="keyword">virtual</span> ~RCObject() = <span class="number">0</span>;<span class="comment">//纯虚析构函数，表明该类仅能作为基类</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addReference</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">removeReference</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">markUnshareable</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isShareable</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isShared</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> refCount;</span><br><span class="line">    <span class="keyword">bool</span> shareable;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>RCObject的具体实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">RCObject::RCObject():refCount(<span class="number">0</span>), shareable(<span class="literal">true</span>) &#123;&#125;</span><br><span class="line">RCObject::RCObject(<span class="keyword">const</span> RCObject&amp;):refCount(<span class="number">0</span>), shareable(<span class="literal">true</span>) &#123;&#125;</span><br><span class="line">RCObject&amp; RCObject::<span class="keyword">operator</span>=(<span class="keyword">const</span> RCObject&amp;)&#123;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>; </span><br><span class="line">&#125;</span><br><span class="line">RCObject::~RCObject() &#123;&#125;<span class="comment">//虚析构函数必须被定义</span></span><br><span class="line"><span class="keyword">void</span> RCObject::addReference() &#123; ++refCount; &#125;</span><br><span class="line"><span class="keyword">void</span> RCObject::removeReference()&#123; </span><br><span class="line">    <span class="keyword">if</span> (--refCount == <span class="number">0</span>) </span><br><span class="line">    <span class="keyword">delete</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">void</span> RCObject::markUnshareable()&#123; </span><br><span class="line">    shareable = <span class="literal">false</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">bool</span> RCObject::isShareable() <span class="keyword">const</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> shareable; </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">bool</span> RCObject::isShared() <span class="keyword">const</span>&#123; </span><br><span class="line">    <span class="keyword">return</span> refCount &gt; <span class="number">1</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所有的构造函数都把refCount设为了0，因为我们会在构造完毕后把构造它的这个对象的count设为1。赋值操作也很奇怪，它什么都没做，因为我们不可能把计数对象从一个赋予另外一个。就算真的被赋值，它也什么都没变。removeReference函数不仅仅负责减少count值，还负责析构对象，因此这里我们必须要保证对象只被构建于堆中。（More Effective C++ 27）</p>
+<hr>
+<h2 id="使用实例"><a href="#使用实例" class="headerlink" title="使用实例"></a>使用实例</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">StringValue</span>:</span> <span class="keyword">public</span> RCObject &#123;</span><br><span class="line">        <span class="keyword">char</span> *data;</span><br><span class="line">        StringValue(<span class="keyword">const</span> <span class="keyword">char</span> *initValue);</span><br><span class="line">        ~StringValue();</span><br><span class="line">    &#125;;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">String::StringValue::StringValue(<span class="keyword">const</span> <span class="keyword">char</span> *initValue)&#123;</span><br><span class="line">        data = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="built_in">strlen</span>(initValue) + <span class="number">1</span>];</span><br><span class="line">        <span class="built_in">strcpy</span>(data, initValue);</span><br><span class="line">&#125;</span><br><span class="line">String::StringValue::~StringValue()&#123;</span><br><span class="line">    <span class="keyword">delete</span> [] data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在的StringValue什么都不用管，其基类接管了所有行为。</p>
+<hr>
+<h1 id="引用计数自动化处理"><a href="#引用计数自动化处理" class="headerlink" title="引用计数自动化处理"></a>引用计数自动化处理</h1><p>&nbsp;<br>RCObject并没有提供自动化操作，一切关于refcount的行为都必须手动完成，比如在String的拷贝构造函数和赋值运算函数中，我们需要调用StringValue的addReference和removeReference函数。我们寄希望于某种操作，能够将大部分与引用计数相关的工作从所有具象类中移出。确实存在这种东西：智能指针。</p>
+<h2 id="计数对象所使用的智能指针"><a href="#计数对象所使用的智能指针" class="headerlink" title="计数对象所使用的智能指针"></a>计数对象所使用的智能指针</h2><p>以下是计数对象所使用的智能指针模版：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">RCPtr</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    RCPtr(T* realPtr = <span class="number">0</span>);</span><br><span class="line">    RCPtr(<span class="keyword">const</span> RCPtr&amp; rhs);</span><br><span class="line">    ~RCPtr();</span><br><span class="line">    RCPtr&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> RCPtr&amp; rhs);</span><br><span class="line">    T* <span class="keyword">operator</span>-&gt;() <span class="keyword">const</span>; <span class="comment">// see Item 28</span></span><br><span class="line">    T&amp; <span class="keyword">operator</span>*() <span class="keyword">const</span>; <span class="comment">// see Item 28</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T *pointee;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>该模板允许了我们自定义构造、赋值、析构时执行的操作。当这些事件发生时，智能指针对象可以自动执行正确的操作来处理它们指向的对象（引用计数对象）的refCount字段。其具体实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCPtr</span>&lt;T&gt;:</span>:RCPtr(T* realPtr): pointee(realPtr)&#123;</span><br><span class="line">    init();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCPtr</span>&lt;T&gt;:</span>:RCPtr(<span class="keyword">const</span> RCPtr&amp; rhs): pointee(rhs.pointee)&#123;</span><br><span class="line">    init();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">RCPtr</span>&lt;T&gt;:</span>:init()&#123;</span><br><span class="line">    <span class="keyword">if</span> (pointee == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (pointee-&gt;isShareable() == <span class="literal">false</span>) &#123;<span class="comment">//如果计数对象所指向的资源不可共享</span></span><br><span class="line">        pointee = <span class="keyword">new</span> T(*pointee);</span><br><span class="line">    &#125;</span><br><span class="line">    pointee-&gt;addReference();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="init存在的问题"><a href="#init存在的问题" class="headerlink" title="init存在的问题"></a>init存在的问题</h2><p>当init()函数中发现拷贝构造的rhs处于不可共享状态，它会构建一个新的T型的对象，并且使用T对象的拷贝构造完成了初始化。对于一个String来说，T型对象是StringValue，我们没有对它声明拷贝构造函数，因此编译器选择调用默认版本，只拷贝了StringValue的数据pointer，而没有拷贝所指向的char*字符串。<br>正确的做法是令T含有正确的值拷贝行为(如深拷贝），以StringValue举例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">StringValue</span>:</span> <span class="keyword">public</span> RCObject &#123;</span><br><span class="line">        StringValue(<span class="keyword">const</span> StringValue&amp; rhs);</span><br><span class="line">        ...</span><br><span class="line">    &#125;;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">String::StringValue::StringValue(<span class="keyword">const</span> StringValue&amp; rhs)&#123;</span><br><span class="line">    data = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="built_in">strlen</span>(rhs.data) + <span class="number">1</span>];</span><br><span class="line">    <span class="built_in">strcpy</span>(data, rhs.data);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>深copy并非唯一选择，我们应该将具体拷贝实现类型写于文档，告知用户。</p>
+<h2 id="智能指针的指向对象"><a href="#智能指针的指向对象" class="headerlink" title="智能指针的指向对象"></a>智能指针的指向对象</h2><p>RCPtr<t>假设智能指针永远指向T型对象，但实际上我们知道可以指向T的派生类，为了防止一些奇怪的问题，建议使用虚拷贝构造等手段（More Effective C++ 25）。</t></p>
+<h2 id="智能指针的赋值与析构"><a href="#智能指针的赋值与析构" class="headerlink" title="智能指针的赋值与析构"></a>智能指针的赋值与析构</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//赋值操作</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCPtr</span>&lt;T&gt;&amp; <span class="title">RCPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>=(<span class="keyword">const</span> RCPtr&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">if</span> (pointee != rhs.pointee) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pointee) &#123;</span><br><span class="line">            pointee-&gt;removeReference();</span><br><span class="line">        &#125;</span><br><span class="line">        pointee = rhs.pointee;</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//析构操作</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCPtr</span>&lt;T&gt;:</span>:~RCPtr()&#123;</span><br><span class="line">    <span class="keyword">if</span> (pointee)</span><br><span class="line">        pointee-&gt;removeReference();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="解引用操作符"><a href="#解引用操作符" class="headerlink" title="解引用操作符"></a>解引用操作符</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">T</span>* <span class="title">RCPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>-&gt;() <span class="keyword">const</span> &#123; <span class="keyword">return</span> pointee; &#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">T</span>&amp; <span class="title">RCPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>*() <span class="keyword">const</span> &#123; <span class="keyword">return</span> *pointee; &#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="最终实现"><a href="#最终实现" class="headerlink" title="最终实现"></a>最终实现</h1><p>&nbsp;<br>将之前提到的所有东西合在一起，真正的带有引用计数的String对象数据结构如下：<br><img src="http://static.zybuluo.com/zsmj2017/xfk39ev9qbd2xhu4q4slsrpg/image_1cc813plr5sq19f6cqi19mviu3h.png" alt="image_1cc813plr5sq19f6cqi19mviu3h.png-120.6kB"><br>String类有定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">RCPtr</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    RCPtr(T* realPtr = <span class="number">0</span>);</span><br><span class="line">    RCPtr(<span class="keyword">const</span> RCPtr&amp; rhs);</span><br><span class="line">    ~RCPtr();</span><br><span class="line">    RCPtr&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> RCPtr&amp; rhs);</span><br><span class="line">    T* <span class="keyword">operator</span>-&gt;() <span class="keyword">const</span>;</span><br><span class="line">    T&amp; <span class="keyword">operator</span>*() <span class="keyword">const</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T *pointee;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RCObject</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addReference</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">removeReference</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">markUnshareable</span><span class="params">()</span></span>;<span class="function"><span class="keyword">bool</span> <span class="title">isShareable</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isShared</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    RCObject();</span><br><span class="line">    RCObject(<span class="keyword">const</span> RCObject&amp; rhs);</span><br><span class="line">    RCObject&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> RCObject&amp; rhs);</span><br><span class="line">    <span class="keyword">virtual</span> ~RCObject() = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> refCount;</span><br><span class="line">    <span class="keyword">bool</span> shareable;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">String</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    String(<span class="keyword">const</span> <span class="keyword">char</span> *value = <span class="string">""</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">int</span> index) <span class="keyword">const</span>;</span><br><span class="line">    <span class="keyword">char</span>&amp; <span class="keyword">operator</span>[](<span class="keyword">int</span> index);</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">StringValue</span>:</span> <span class="keyword">public</span> RCObject &#123;</span><br><span class="line">        <span class="keyword">char</span> *data;</span><br><span class="line">        StringValue(<span class="keyword">const</span> <span class="keyword">char</span> *initValue);</span><br><span class="line">        StringValue(<span class="keyword">const</span> StringValue&amp; rhs);</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *initValue)</span></span>;</span><br><span class="line">        ~StringValue();</span><br><span class="line">    &#125;;</span><br><span class="line">    RCPtr&lt;StringValue&gt; value;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>String class没有声明拷贝构造、赋值运算、析构函数，但这并不是因为操作失误，而是这些函数均可以使用编译器自动生成的版本，真正本质上的上述操作均已在智能指针类及引用计数类中实现。<br>通过完美的封装，我们在没有更改String接口的同时增加了功能。</p>
+<hr>
+<h1 id="在现存类上增加引用计数"><a href="#在现存类上增加引用计数" class="headerlink" title="在现存类上增加引用计数"></a>在现存类上增加引用计数</h1><p>&nbsp;<br>假设我们有一个不可更改的class Widget（不该更改的原因可能是其位于支持库中），如何给它添加引用计数功能？<br>首先从刚才已实现的思路入手，我们应该会建立一个RCWidget class，内部嵌套有一个struct public继承自RCObject，RCWidget内持有一个智能指针RCPtr指向Count对象：<br><img src="http://static.zybuluo.com/zsmj2017/za7vr0i7hw24a9ie3eba1ppd/image_1cc81soqn1pls1vmttmu3c2ukg4b.png" alt="image_1cc81soqn1pls1vmttmu3c2ukg4b.png-107.6kB"><br>我们当前自然无法修改Widget内部，但我们可以试图构造一个中间层，然后完成这份任务：<img src="http://static.zybuluo.com/zsmj2017/ebw6lpwidbhlsn78bd4c78la/image_1cc81h7851qt1182q2fdffkmci3u.png" alt="image_1cc81h7851qt1182q2fdffkmci3u.png-122.9kB"><br>其中，CountHolder是人为构造的class，其内部有一个指针指向了Widget资源，我们用一个智能指针指向CountHolder。</p>
+<h2 id="PCIPtr与CountHolder"><a href="#PCIPtr与CountHolder" class="headerlink" title="PCIPtr与CountHolder"></a>PCIPtr与CountHolder</h2><p>我们可以认为CountHolder是RCIPtr的实现细节，所以将其嵌套在该类中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;<span class="title">class</span> <span class="title">RCIPtr</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    RCIPtr(T* realPtr = <span class="number">0</span>);</span><br><span class="line">    RCIPtr(<span class="keyword">const</span> RCIPtr&amp; rhs);</span><br><span class="line">    ~RCIPtr();</span><br><span class="line">    RCIPtr&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> RCIPtr&amp; rhs);</span><br><span class="line">    <span class="keyword">const</span> T* <span class="keyword">operator</span>-&gt;() <span class="keyword">const</span>;</span><br><span class="line">    T* <span class="keyword">operator</span>-&gt;();</span><br><span class="line">    <span class="keyword">const</span> T&amp; <span class="keyword">operator</span>*() <span class="keyword">const</span>;</span><br><span class="line">    T&amp; <span class="keyword">operator</span>*();</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">CountHolder</span>:</span> <span class="keyword">public</span> RCObject &#123;</span><br><span class="line">        ~CountHolder() &#123; <span class="keyword">delete</span> pointee; &#125;</span><br><span class="line">        T *pointee;</span><br><span class="line">    &#125;;</span><br><span class="line">    CountHolder *counter;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">makeCopy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">RCIPtr</span>&lt;T&gt;:</span>:init()&#123;</span><br><span class="line">    <span class="keyword">if</span> (counter-&gt;isShareable() == <span class="literal">false</span>) &#123;</span><br><span class="line">        T *oldValue = counter-&gt;pointee;</span><br><span class="line">        counter = <span class="keyword">new</span> CountHolder;</span><br><span class="line">        counter-&gt;pointee = <span class="keyword">new</span> T(*oldValue);</span><br><span class="line">    &#125;</span><br><span class="line">    counter-&gt;addReference();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCIPtr</span>&lt;T&gt;:</span>:RCIPtr(T* realPtr)</span><br><span class="line">:counter(<span class="keyword">new</span> CountHolder)&#123;</span><br><span class="line">    counter-&gt;pointee = realPtr;init();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCIPtr</span>&lt;T&gt;:</span>:RCIPtr(<span class="keyword">const</span> RCIPtr&amp; rhs)</span><br><span class="line">:counter(rhs.counter)&#123;</span><br><span class="line">    init(); </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCIPtr</span>&lt;T&gt;:</span>:~RCIPtr()&#123; </span><br><span class="line">    counter-&gt;removeReference(); </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">RCIPtr</span>&lt;T&gt;&amp; <span class="title">RCIPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>=(<span class="keyword">const</span> RCIPtr&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">if</span> (counter != rhs.counter) &#123;</span><br><span class="line">        counter-&gt;removeReference();</span><br><span class="line">        counter = rhs.counter;</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">RCIPtr</span>&lt;T&gt;:</span>:makeCopy()&#123;</span><br><span class="line">    <span class="keyword">if</span> (counter-&gt;isShared()) &#123;</span><br><span class="line">        T *oldValue = counter-&gt;pointee;</span><br><span class="line">        counter-&gt;removeReference();</span><br><span class="line">        counter = <span class="keyword">new</span> CountHolder;</span><br><span class="line">        counter-&gt;pointee = <span class="keyword">new</span> T(*oldValue);</span><br><span class="line">        counter-&gt;addReference();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">const</span> <span class="title">T</span>* <span class="title">RCIPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>-&gt;() <span class="keyword">const</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> counter-&gt;pointee; </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt; // <span class="title">non</span>-<span class="title">constT</span>* <span class="title">RCIPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>-&gt;() &#123;</span><br><span class="line">    makeCopy(); </span><br><span class="line">    <span class="keyword">return</span> counter-&gt;pointee; </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">const</span> <span class="title">T</span>&amp; <span class="title">RCIPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>*() <span class="keyword">const</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> *(counter-&gt;pointee); </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">T</span>&amp; <span class="title">RCIPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>*()&#123; </span><br><span class="line">    makeCopy(); </span><br><span class="line">    <span class="keyword">return</span> *(counter-&gt;pointee); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="RCwidget"><a href="#RCwidget" class="headerlink" title="RCwidget"></a>RCwidget</h2><p>有了RCIPtr，RCWidget很容易实现，因为RCWidget的每个函数都是将操作RCIPtr以完成对Widget对象的操作。若有Widget class有实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">int</span> size);</span><br><span class="line">    Widget(<span class="keyword">const</span> Widget&amp; rhs);</span><br><span class="line">    ~Widget();</span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs);</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">doThis</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">showThat</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>那么RCWidget将被定义为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RCWidget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    RCWidget(<span class="keyword">int</span> size): value(<span class="keyword">new</span> Widget(size)) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">doThis</span><span class="params">()</span> </span>&#123; value-&gt;doThis(); &#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">showThat</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> value-&gt;showThat(); &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    RCIPtr&lt;Widget&gt; value;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是，RcWidget没有拷贝，析构，赋值函数，因为RCIPtr将自动地执行这些行为。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/设计模式/" rel="tag"><i class="fa fa-tag"></i> 设计模式</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/2199d0c8.html" rel="next" title="28.智能指针">
+                <i class="fa fa-chevron-left"></i> 28.智能指针
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/12ece0f8.html" rel="prev" title="30.Proxy Class">
+                30.Proxy Class <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引用计数实例"><span class="nav-number">2.</span> <span class="nav-text">引用计数实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现引用计数"><span class="nav-number">3.</span> <span class="nav-text">实现引用计数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#String的构造"><span class="nav-number">3.1.</span> <span class="nav-text">String的构造</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#String的拷贝"><span class="nav-number">3.2.</span> <span class="nav-text">String的拷贝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#String的析构"><span class="nav-number">3.3.</span> <span class="nav-text">String的析构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#String的赋值"><span class="nav-number">3.4.</span> <span class="nav-text">String的赋值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#写时拷贝"><span class="nav-number">4.</span> <span class="nav-text">写时拷贝</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#指针、引用与写时拷贝"><span class="nav-number">5.</span> <span class="nav-text">指针、引用与写时拷贝</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引用计数与mixin-class"><span class="nav-number">6.</span> <span class="nav-text">引用计数与mixin class</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RCObject"><span class="nav-number">6.1.</span> <span class="nav-text">RCObject</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用实例"><span class="nav-number">6.2.</span> <span class="nav-text">使用实例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引用计数自动化处理"><span class="nav-number">7.</span> <span class="nav-text">引用计数自动化处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#计数对象所使用的智能指针"><span class="nav-number">7.1.</span> <span class="nav-text">计数对象所使用的智能指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#init存在的问题"><span class="nav-number">7.2.</span> <span class="nav-text">init存在的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#智能指针的指向对象"><span class="nav-number">7.3.</span> <span class="nav-text">智能指针的指向对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#智能指针的赋值与析构"><span class="nav-number">7.4.</span> <span class="nav-text">智能指针的赋值与析构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解引用操作符"><span class="nav-number">7.5.</span> <span class="nav-text">解引用操作符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最终实现"><span class="nav-number">8.</span> <span class="nav-text">最终实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在现存类上增加引用计数"><span class="nav-number">9.</span> <span class="nav-text">在现存类上增加引用计数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PCIPtr与CountHolder"><span class="nav-number">9.1.</span> <span class="nav-text">PCIPtr与CountHolder</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RCwidget"><span class="nav-number">9.2.</span> <span class="nav-text">RCwidget</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>

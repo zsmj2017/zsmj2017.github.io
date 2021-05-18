@@ -1,0 +1,1078 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,并发编程," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;保护共享数据并非只有互斥量一种机制(尽管它是最通用的)，有很多替代方案可以在特定情况下提供比互斥量更合适的保护。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程间共享数据——保护共享数据的替代设施">
+<meta property="og:url" content="https://zsmj2017.tech/post/4d77413b.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;保护共享数据并非只有互斥量一种机制(尽管它是最通用的)，有很多替代方案可以在特定情况下提供比互斥量更合适的保护。">
+<meta property="og:updated_time" content="2019-04-19T13:56:52.162Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线程间共享数据——保护共享数据的替代设施">
+<meta name="twitter:description" content="前言&amp;nbsp;保护共享数据并非只有互斥量一种机制(尽管它是最通用的)，有很多替代方案可以在特定情况下提供比互斥量更合适的保护。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/4d77413b.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> 线程间共享数据——保护共享数据的替代设施 | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                线程间共享数据——保护共享数据的替代设施
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-04-17T15:14:00+08:00" content="2019-04-17">
+              2019-04-17
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/C-并发编程实战/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>保护共享数据并非只有互斥量一种机制(尽管它是最通用的)，有很多替代方案可以在特定情况下提供比互斥量更合适的保护。<br><a id="more"></a></p>
+<hr>
+<h1 id="保护共享数据的初始化过程"><a href="#保护共享数据的初始化过程" class="headerlink" title="保护共享数据的初始化过程"></a>保护共享数据的初始化过程</h1><p>&nbsp;<br>一个非常极端却很常见的使用场景是：共享数据仅在初始化过程中需要得到保护，之后便不再需要显式同步。造成这种场景的原因很多，比如说数据一旦创建完成后即具备只读属性(因此不再存在同步问题)，又或者共享数据的日常操作过程已经隐式地包含了保护(因此在初始化完毕后不再需要显式保护)。不管如何，出于保护共享数据初始化过程的目的而在数据初始化完毕后锁住互斥量是一种不必要且影响性能的操作。因此，C++标准库提供了一种专门用于保护共享数据初始化过程的机制。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>假设当前存在一个构造代价十分昂贵的共享数据(该对象需要配置大量内存或者打开数据库连接)。在单线程环境中，<code>lazy initialization</code>是一种常规操作：任何需要该数据的操作都必须首先判断该源是否已经初始化完毕，若未完毕则执行初始化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;some_resource&gt; resource_ptr; </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(!resource_ptr) &#123; </span><br><span class="line">    resource_ptr.reset(<span class="keyword">new</span> some_resource); <span class="comment">// 在并发环境下需要被保护</span></span><br><span class="line">  &#125; </span><br><span class="line">  resource_ptr-&gt;do_something();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="解决方案1"><a href="#解决方案1" class="headerlink" title="解决方案1"></a>解决方案1</h2><p>如果共享数据本身在并发环境下具备安全性，那么在将该函数转为多线程代码时需要保护的仅有初始化部分，那么某些开发人员可能会将其改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;some_resource&gt; resource_ptr; </span><br><span class="line"><span class="built_in">std</span>::mutex resource_mutex;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123; </span><br><span class="line">  <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; lk(resource_mutex); <span class="comment">// 时间点1</span></span><br><span class="line">  <span class="keyword">if</span>(!resource_ptr) &#123; </span><br><span class="line">    resource_ptr.reset(<span class="keyword">new</span> some_resource);</span><br><span class="line">  &#125; </span><br><span class="line">  lk.unlock(); </span><br><span class="line">  resource_ptr-&gt;do_something(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上述程序显然造成了性能损耗：大多数线程被迫停在时间点1处排队，即使线程已经完成了初始化(即根本无需进入if语句)。</p>
+<h2 id="双重检查锁"><a href="#双重检查锁" class="headerlink" title="双重检查锁"></a>双重检查锁</h2><p>部分开发者不满于解决方案1的低效，于是声名狼藉的双重检查锁模式(<code>double-checked locking pattern</code>）应运而生：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">undefined_behaviour_with_double_checked_locking</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(!resource_ptr) &#123; <span class="comment">// 时间点1</span></span><br><span class="line">    <span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; lk(resource_mutex); <span class="comment">// 时间点2</span></span><br><span class="line">    <span class="keyword">if</span>(!resource_ptr) &#123; </span><br><span class="line">      resource_ptr.reset(<span class="keyword">new</span> some_resource); <span class="comment">// 时间点3</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125; </span><br><span class="line">  resource_ptr-&gt;do_something();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在双重检查锁模式下，仅仅在资源指针为nullptr时才执行上锁操作，并在上锁后再次检查当前指针(以防止存在另一个线程在时间点1与时间点2之间完成了初始化操作）。</p>
+<p>之所以说该模式声名狼藉，是因为它存在触发条件竞争的风险。未被锁保护的读取操作(时间点1)并没有与数据写入操作(时间点3)同步，这将导致条件竞争，并且该条件竞争不仅涉及指针，还涉及指针指向的对象。即使某个线程明确了解当前指针正在被另一个线程执行写入操作，它也不一定明确了解刚刚创建的对象实例，从而造成<code>dp_something()</code>在一个不正确的数据上执行操作。这是典型的数据竞争，将会造成未定义行为。</p>
+<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>C++标准委员会也认为该应用场景十分重要，因此提供了<code>std::once_flag</code>与<code>std::call_once</code>来处理这种情况。比起锁住互斥量后显式地检查指针，线程只需要调用<code>std::call_once</code>即可安全可靠地了解到资源是否已被初始化。所有必需的同步数据均被存储于<code>std::once_flag</code>内，,每一个<code>std::once_flag</code>实例均与一个初始化相关联。<code>std::call_once</code>的使用成本要小于互斥量(尤其是在初始化操作已经完成后)，因此我们应当在条件适宜的情况下优先使用前者。下述代码将展示如何用<code>std::call_once</code>实现<code>lazy initialization</code>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;some_resource&gt; resource_ptr;</span><br><span class="line"><span class="built_in">std</span>::once_flag resource_flag;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_resource</span><span class="params">()</span> </span>&#123; </span><br><span class="line">  resource_ptr.reset(<span class="keyword">new</span> some_resource); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">std</span>::call_once(resource_flag,init_resource);</span><br><span class="line">  resource_ptr-&gt;do_something(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>类似于标准库里的同行们，<code>std::call_once</code>既可以接受一个函数也可以接受一个可调用对象，此外，<code>std::call_once</code>也可用于类内成员的<code>lazy initialization</code>:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">X</span> &#123;</span> </span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  connection_info connection_details; </span><br><span class="line">  connection_handle connection; </span><br><span class="line">  <span class="built_in">std</span>::once_flag connection_init_flag; </span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">open_connection</span><span class="params">()</span> </span>&#123;   </span><br><span class="line">    connection=connection_manager.open(connection_details); </span><br><span class="line">  &#125; </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  X(connection_info <span class="keyword">const</span>&amp; connection_details_):</span><br><span class="line">    connection_details(connection_details_) &#123;&#125; </span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">send_data</span><span class="params">(data_packet <span class="keyword">const</span>&amp; data)</span> </span>&#123;   </span><br><span class="line">    <span class="built_in">std</span>::call_once(connection_init_flag,&amp;X::open_connection,<span class="keyword">this</span>);    </span><br><span class="line">    connection.send_data(data); </span><br><span class="line">  &#125; </span><br><span class="line">  <span class="function">data_packet <span class="title">receive_data</span><span class="params">()</span> </span>&#123; </span><br><span class="line">    <span class="built_in">std</span>::call_once(connection_init_flag,&amp;X::open_connection,<span class="keyword">this</span>); </span><br><span class="line">    <span class="keyword">return</span> connection.receive_data(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>在上述代码中，仅有第一次在调用<code>send_data</code>或<code>receive_data</code>时才会执行初始化操作。此外还有老生常谈的一点：<code>std::once</code>调用成员函数时需要传入<code>this</code>指针，就像<code>std::thread</code>的构造函数或<code>std::bind</code>一样。</p>
+<p>与<code>std::mutex</code>不同，<code>std::once_flag</code>是一个<code>move only object</code>，因此持有它的类必须为此设计特定的接口(即保持同样的<code>uncopyable</code>属性)。</p>
+<h2 id="static成员"><a href="#static成员" class="headerlink" title="static成员"></a>static成员</h2><p>除去<code>lazy initialization</code>以外，类内含有static成员时也将引发条件竞争。众所周知，static成员在声明后即完成初始化操作，在并发编程环境下这意味着条件竞争——存在多个线程抢着定义该变量。在一些旧版本编译器（不支持C++11）中这种条件竞争确实存在，不过C++11标准一劳永逸地解决了这个难题：初始化操作永远只在一个线程内完成，在初始化结束之前不会有任何线程能够继续执行。在需要单个全局实例的应用场景中，static对象可以作为<code>std::call_once</code>的一种替代：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">my_class</span>;</span> <span class="function">my_class&amp; <span class="title">get_my_class_instance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> my_class instance;</span><br><span class="line">  <span class="keyword">return</span> instance; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="保护很少更新的数据结构"><a href="#保护很少更新的数据结构" class="headerlink" title="保护很少更新的数据结构"></a>保护很少更新的数据结构</h1><p>&nbsp;<br>仅在初始化期间需要保护的数据结构只是一个特例，本节将重点讨论如何保护很少更新的数据结构。</p>
+<p>假设当前存在这样一个应用场景：为了将域名解析为ip地址，我们在缓存中存放了一张DNS入口表。显然DNS入口表很少会发生变动，但我们明确了解它存在更新的可能性(当用户访问一个新网站时)。因此，我们需要在该数据结构更新时执行保护，以确保所有线程均可读取正确数据。</p>
+<p>如果我们没有为此情况设定特殊的数据结构，那么势必需要执行更新的线程独占数据结构读取权限，直到更新操作完成，在此情况下使用互斥量无疑造成了性能上的浪费。我们需要的是一种新的名为“读写锁”(<code>read-write mutex</code>)的互斥量，该互斥量允许两种不同的操作：<code>writer</code>具备对数据的并发读写权限，而<code>reader</code>仅有对数据的读取权限。</p>
+<p>遗憾的是，C++标准库并没有提供这样的互斥量，但Boost库有。在此类使用环境下，与其使用<code>std::mutex</code>，倒不如使用<code>boost::shared_mutex</code>来完成同步，即以<code>std::lock_guard&lt;boost::shared_mutex&gt;</code>和<code>std::unique_lock&lt;boost::shared_mutex&gt;</code>完成上锁操作，如此即可保证仅有当前线程可对数据执行修改，而其他线程可通过<code>boost::shared_lock&lt;boost::shared_mutex&gt;</code>获得读取访问权。值得注意的是，若存在n（n&gt;=1）个线程具备共享锁，那么任何试图独占该锁的线程将阻塞至共享锁使用权被其所有拥有者抛弃。</p>
+<p>下述程序展示了如何使用<code>boost::shared_mutex</code>完成DNS入口表：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;map&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mutex&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;boost/thread/shared_mutex.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">dns_entry</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">dns_cache</span> &#123;</span> </span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>,dns_entry&gt; entries; </span><br><span class="line">  <span class="keyword">mutable</span> boost::shared_mutex entry_mutex;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function">dns_entry <span class="title">find_entry</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> <span class="keyword">const</span>&amp; domain)</span> <span class="keyword">const</span> </span>&#123;   </span><br><span class="line">    boost::shared_lock&lt;boost::shared_mutex&gt; lk(entry_mutex);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>,dns_entry&gt;::const_iterator <span class="keyword">const</span> it= entries.find(domain); </span><br><span class="line">    <span class="keyword">return</span> (it==entries.end())?dns_entry():it-&gt;second;</span><br><span class="line">&#125; </span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">update_or_add_entry</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> <span class="keyword">const</span>&amp; domain, dns_entry <span class="keyword">const</span>&amp; dns_details)</span> </span>&#123; </span><br><span class="line">    <span class="built_in">std</span>::lock_guard&lt;boost::shared_mutex&gt; lk(entry_mutex);   </span><br><span class="line">    entries[domain]=dns_details; </span><br><span class="line">  &#125; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="嵌套锁"><a href="#嵌套锁" class="headerlink" title="嵌套锁"></a>嵌套锁</h1><p>&nbsp;<br>在一般情况下，<code>mutex</code>被锁住后扔对其反复执行上锁操作将产生未定义行为，但某些情况我们不得不这么做，于是标准库提供了<code>std::recursive_mutex</code>。它的行为与<code>std::mutex</code>非常类似，需要注意的是调用3次<code>lock</code>后必然需要调用3次<code>unlock</code>，当然，合理地使用<code>std::lock_guard&lt;std::recursive_mutex&gt;</code> 和 <code>std::unique_lock&lt;std::recursive_mutex&gt;</code>可以规避许多此类烦恼。</p>
+<p>嵌套锁的使用并不常见，如果你觉得当前存在使用的必要，那么很有可能表明你的数据结构需要重新设计。嵌套锁一般应用于某种并发数据结构内，由于每个成员函数在执行前都执行了上锁操作，并且成员函数内调用了另一个成员函数，此时不得不进行多次上锁，使用<code>std::recursive_mutex</code>能够保证此类程序成功运行。当然这种做法非常草率，常规写法是将被调用成员函数设为私有，并在其内部不执行上锁操作(但需要检查是否已经上锁)，然后仔细斟酌该函数被调用时的上下文以及可能的数据状态。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/并发编程/" rel="tag"><i class="fa fa-tag"></i> 并发编程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/b5b0346b.html" rel="next" title="线程间共享数据——使用互斥量保护共享数据">
+                <i class="fa fa-chevron-left"></i> 线程间共享数据——使用互斥量保护共享数据
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/25e05113.html" rel="prev" title="同步并发操作——等待事件或条件">
+                同步并发操作——等待事件或条件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#保护共享数据的初始化过程"><span class="nav-number">2.</span> <span class="nav-text">保护共享数据的初始化过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题实例"><span class="nav-number">2.1.</span> <span class="nav-text">问题实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案1"><span class="nav-number">2.2.</span> <span class="nav-text">解决方案1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双重检查锁"><span class="nav-number">2.3.</span> <span class="nav-text">双重检查锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最终方案"><span class="nav-number">2.4.</span> <span class="nav-text">最终方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#static成员"><span class="nav-number">2.5.</span> <span class="nav-text">static成员</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#保护很少更新的数据结构"><span class="nav-number">3.</span> <span class="nav-text">保护很少更新的数据结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#嵌套锁"><span class="nav-number">4.</span> <span class="nav-text">嵌套锁</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>

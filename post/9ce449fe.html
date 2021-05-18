@@ -1,0 +1,1082 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,并发编程," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;使用本节描述的同步操作构建代码块，可以保证开发者将注意力集中至同步操作本身。在这种环境下，你可以更多地使用函数式编程技法实现并发编程。相较于在多个线程间直接共享数据，每个任务均拥有自己的数据似乎更为优雅，并且任务结果可广播至其它线程——这需要使用future实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="同步并发操作——使用同步操作简化代码">
+<meta property="og:url" content="https://zsmj2017.tech/post/9ce449fe.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;使用本节描述的同步操作构建代码块，可以保证开发者将注意力集中至同步操作本身。在这种环境下，你可以更多地使用函数式编程技法实现并发编程。相较于在多个线程间直接共享数据，每个任务均拥有自己的数据似乎更为优雅，并且任务结果可广播至其它线程——这需要使用future实现。">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/e5r8d5ks0f6byo41atcomapj/WX20200311-123528@2x.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/xmg1nmjyq6q4v07r1pefkq0g/WX20200311-204143@2x.png">
+<meta property="og:updated_time" content="2020-03-13T06:19:26.237Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="同步并发操作——使用同步操作简化代码">
+<meta name="twitter:description" content="前言&amp;nbsp;使用本节描述的同步操作构建代码块，可以保证开发者将注意力集中至同步操作本身。在这种环境下，你可以更多地使用函数式编程技法实现并发编程。相较于在多个线程间直接共享数据，每个任务均拥有自己的数据似乎更为优雅，并且任务结果可广播至其它线程——这需要使用future实现。">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2019/e5r8d5ks0f6byo41atcomapj/WX20200311-123528@2x.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/9ce449fe.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> 同步并发操作——使用同步操作简化代码 | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                同步并发操作——使用同步操作简化代码
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2020-03-13T12:50:00+08:00" content="2020-03-13">
+              2020-03-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/C-并发编程实战/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>使用本节描述的同步操作构建代码块，可以保证开发者将注意力集中至同步操作本身。在这种环境下，你可以更多地使用函数式编程技法实现并发编程。相较于在多个线程间直接共享数据，每个任务均拥有自己的数据似乎更为优雅，并且任务结果可广播至其它线程——这需要使用future实现。</p>
+<a id="more"></a>
+<h1 id="使用future的函数式编程"><a href="#使用future的函数式编程" class="headerlink" title="使用future的函数式编程"></a>使用future的函数式编程</h1><p>&nbsp;<br>函数式编程(functional programming)指的是一种编程方式，在该方式下函数结果仅依赖于传入参数，并不依赖外部状态，其命名与数学概念相关。函数式编程意味着只要传入参数相同，该函数结果必然保持一致。C++标准库中很多与数学相关的函数都有这个特性，例如sin,cos,sqrt以及简单算术运算。一个纯粹的函数不会改变任何外部状态，正是这种特性确定了函数输出仅与输入有关。</p>
+<p>鉴于此，在第三章提及的许多关于共享内存的问题都不再是问题。如果不存在任何试图修改共享数据的行为，数据竞争也就不复存在，那么我们也就不需要使用诸如mutex之类的数据保护机制。因此，HasKell这类函数式语言日益流行于并发编程。由于大多数操作都无需修改数据，因此那些需要修改数据的操作则显得较为突出，开发者也可以在工程中更为轻松地理解，查询与撰写这些操作。</p>
+<p>future是我们攻克函数式并发编程的最后一个难点。我们可以在线程间传递future，以此来保证某一次计算结果取决于另一次计算结果，并且无需任何对共享数据的显式访问。</p>
+<hr>
+<h2 id="快排实例"><a href="#快排实例" class="headerlink" title="快排实例"></a>快排实例</h2><h3 id="函数式快排"><a href="#函数式快排" class="headerlink" title="函数式快排"></a>函数式快排</h3><p>下图是一张快排实例图。<br><img src="http://static.zybuluo.com/zsmj2019/e5r8d5ks0f6byo41atcomapj/WX20200311-123528@2x.png" alt="WX20200311-123528@2x.png-186.3kB"><br>快排的函数式编程实例如下文所示，需要注意的是，其返回值是一个<code>list</code>，而非像<code>std::sort</code>一样就地排序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; sequential_quick_sort(<span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; input) &#123;</span><br><span class="line">	<span class="keyword">if</span>(input.empty())&#123;</span><br><span class="line">		<span class="keyword">return</span> input;     </span><br><span class="line">	&#125;     </span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; result;</span><br><span class="line">	result.splice(result.begin(),input,input.begin());</span><br><span class="line">	T <span class="keyword">const</span>&amp; pivot=*result.begin();</span><br><span class="line">	<span class="keyword">auto</span> divide_point=<span class="built_in">std</span>::partition(input.begin(),input.end(),[&amp;](T <span class="keyword">const</span>&amp; t)&#123;<span class="keyword">return</span> t&lt;pivot;&#125;);</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; lower_part;</span><br><span class="line">	lower_part.splice(lower_part.end(),input,input.begin(),divide_point);</span><br><span class="line">	auto new_lower(sequential_quick_sort(std::move(lower_part)));</span><br><span class="line">	auto new_higher(sequential_quick_sort(std::move(input)));</span><br><span class="line">	result.splice(result.end(),new_higher);<span class="comment">// end is the pivot</span></span><br><span class="line">	result.splice(result.begin(),new_lower);</span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先，我们通过splice操作指定input的首个元素为基准点（由于并非选取了最优基准点，因此比较次数与交换次数相有所提升，但为了选取最优基准点引入的list遍历操作也同样耗时）。由于我们知道基准点必然出现在res中，因此使用splice将其添加进来是合理的。在lambda（比较函数）中，我们采取引用捕获的方式以避免不必要的拷贝。接着使用<code>partition</code>确保了list被按照大小分为2部分，并同样通过splice将其拆分为两个list，接着递归执行排序。最终，我们通过splice操作将排序完成的两个区间拼接在一起，至此快排完成。</p>
+<hr>
+<h3 id="并发函数式快排"><a href="#并发函数式快排" class="headerlink" title="并发函数式快排"></a>并发函数式快排</h3><p>以下是使用了<code>future</code>的并发函数式快排实例。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; parallel_quick_sort(<span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; input)&#123;</span><br><span class="line">	<span class="keyword">if</span>(input.empty())&#123;</span><br><span class="line">		<span class="keyword">return</span> input;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; result;</span><br><span class="line">	result.splice(result.begin(),input,input.begin());</span><br><span class="line">	T <span class="keyword">const</span>&amp; pivot=*result.begin();</span><br><span class="line">	<span class="keyword">auto</span> divide_point=<span class="built_in">std</span>::partition(input.begin(),input.end(),[&amp;](T <span class="keyword">const</span>&amp; t)&#123;<span class="keyword">return</span> t&lt;pivot;&#125;);</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; lower_part;</span><br><span class="line">	lower_part.splice(lower_part.end(),input,input.begin(),divide_point);</span><br><span class="line">	<span class="built_in">std</span>::future&lt;<span class="built_in">std</span>::<span class="built_in">list</span>&lt;T&gt; &gt; new_lower(<span class="built_in">std</span>::async(&amp;parallel_quick_sort&lt;T&gt;,<span class="built_in">std</span>::move(lower_part)));</span><br><span class="line">	auto new_higher(parallel_quick_sort(std::move(input)));</span><br><span class="line">	result.splice(result.end(),new_higher);</span><br><span class="line">	result.splice(result.begin(),new_lower.get());</span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>和上个实例相比，二者最大的区别是本例使用<code>std::async</code>在另一个线程排序lower_part，upper_part则与原来一致。使用<code>std::async</code>的一大优势在于充分利用了硬件并发性，举例而言，如果向下执行3次递归，则将启动八个线程执行计算任务，如果执行10次递归（当list规模在1000左右时），将启动1024个线程执行计算。如果当前待执行的任务已经超出了硬件并发资源，则子任务（spawn_task）将被同步执行。这些子任务将在调用get()的线程中运行，从而避免于事无补地将任务传递至另一个线程。需要注意的是，若无std::launch::async的显式指定，std::async将为每一个任务启动一个新线程（即使当前已经超出了硬件最大并发量），有关std::async的启动机制，具体可见<a href="https://zsmj2017.tech/post/61b11a8d.html">https://zsmj2017.tech/post/61b11a8d.html</a> 。此外，由于new_lower是一个future，因此我们必须通过get来等待后台任务运行完成，接着执行splice。get的返回值是一个右值，可以直接move。最后，在此实例中<code>std::partition</code>依然是同步的，因此可以继续改进。</p>
+<p>除了使用<code>std::async</code>自动生成<code>spawn_task</code>,开发者也可以通过简单封装<code>std::packaged_task</code>与<code>std::thread</code>,撰写自己的<code>spawn_task()</code>（如下述代码所示）。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> F,<span class="keyword">typename</span> A&gt; </span><br><span class="line"><span class="built_in">std</span>::future&lt;<span class="built_in">std</span>::result_of&lt;F(A&amp;&amp;)&gt;::type&gt; spawn_task(F&amp;&amp; f,A&amp;&amp; a) &#123;</span><br><span class="line">	<span class="keyword">typedef</span> <span class="built_in">std</span>::result_of&lt;F(A&amp;&amp;)&gt;::type result_type;</span><br><span class="line">	<span class="built_in">std</span>::packaged_task&lt;result_type(A&amp;&amp;)&gt;  task(<span class="built_in">std</span>::move(f)));     </span><br><span class="line">	<span class="built_in">std</span>::future&lt;result_type&gt; res(task.get_future());     </span><br><span class="line">	std::thread t(std::move(task),std::move(a));     </span><br><span class="line">	t.detach();     </span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种做法相较于<code>std::async</code>并无优势可言（并且会导致大量的<code>massive oversubcription</code>），但却为“将精密事务迁移入由线程池维护的队列”——这一任务铺平了康庄大道（我们将在第九章详细论述）。事实上，仅在我们明确任务本身，和需要完全控制线程池构建与其内部任务执行方式时才应当使用<code>std::async</code>。</p>
+<hr>
+<h1 id="CSP编程范式"><a href="#CSP编程范式" class="headerlink" title="CSP编程范式"></a>CSP编程范式</h1><p>在并发世界中，函数式编程并非是规避共享数据的唯一途径。CSP(Communicating Sequential Processes)范式具备同样的能力。在此编程范式中，线程是完全独立的，不再共享数据，但依旧支持线程间通信。</p>
+<h2 id="通过信息传递机制实现同步"><a href="#通过信息传递机制实现同步" class="headerlink" title="通过信息传递机制实现同步"></a>通过信息传递机制实现同步</h2><p>CSP范式的理念非常简单：如果不再存在共享数据，那么我们完全可以通过某一线程对传入信息的响应方式来推断线程状态。在此情形下，每一个线程实际上都是一个状态机：线程将根据接受到的信息更新自身状态，并将一条或多条信息发送至别的线程，这些行为完全取决于线程自身的初始状态。当然，我们并不一定需要去真正的撰写一个有限自动状态机，它完全可以隐式地蕴藏于应用程序的结构中。无论如何实现，共享数据的消除都必然会导致代码结构的可读性提高与bug率降低。</p>
+<p>由于C++ thread共享地址空间，因此无法从语言层面保证不存在共享数据，开发者必须从实现层面保证thread间不具备任何数据的共享。当然，消息队列必须为各线程所共享，但细节可以被封装至库内。</p>
+<h3 id="设计实例"><a href="#设计实例" class="headerlink" title="设计实例"></a>设计实例</h3><p>设想现在正在为一台ATM机撰写程序，我们不仅需要处理与使用者的交互，还需要处理与银行后台系统的交互，同样，我们还需要操作物理设备以便让使用者能够自如地完成插卡，取钱，拔卡等操作。</p>
+<p>该系统的一种实现方式是拆分任务，使其在三个独立的线程上运行：一个操作物理设备，一个处理ATM逻辑，一个与银行后台通信。这些线程完全可以仅通过信息传递完成通信，根本不需要共享数据。举例而言，当使用者按下按键后，操作物理设备的线程将发送信息至处理ATM逻辑的线程，后者又将发送信息至前者，指示应该吐出多少钱。</p>
+<p>ATM 逻辑可以抽象为一个状态机，该线程内部维护一个状态，并根据下一次传入的信息更新自身状态，并反复循环，下图即为一次简单的状态流转。<br><img src="http://static.zybuluo.com/zsmj2019/xmg1nmjyq6q4v07r1pefkq0g/WX20200311-204143@2x.png" alt="WX20200311-204143@2x.png-288.2kB"><br>表征ATM逻辑的类具备一些展现自身状态的成员函数。每一个成员函数都与特定的传入信息相关，并根据传入信息更新内部状态，与此同时，每一种信息类型都表现为一种特定的结构体。具体而言，ATM机等待插卡的逻辑可以简化为下述代码。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">card_inserted</span> &#123;</span></span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">string</span> account; </span><br><span class="line">&#125;; </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">atm</span> &#123;</span></span><br><span class="line">	messaging::receiver incoming;</span><br><span class="line">	messaging::sender bank;</span><br><span class="line">	messaging::sender interface_hardware;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">void</span> (atm::*state)();</span><br><span class="line"></span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">string</span> account; </span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">string</span> pin;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">waiting_for_card</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		interface_hardware.send(display_enter_card()); </span><br><span class="line">		incoming.wait().</span><br><span class="line">			handle&lt;card_inserted&gt;([&amp;](card_inserted <span class="keyword">const</span>&amp; msg)&#123;</span><br><span class="line">				<span class="comment">// handle仅接受类型为card_inserted的信息</span></span><br><span class="line">				<span class="comment">// 别的信息传入将导致丢弃</span></span><br><span class="line">				account=msg.account; </span><br><span class="line">				pin=<span class="string">""</span>;</span><br><span class="line">				interface_hardware.send(display_enter_pin()); </span><br><span class="line">				state=&amp;atm::getting_pin;</span><br><span class="line">				<span class="comment">// 执行结束后更新状态</span></span><br><span class="line">				<span class="comment">// run()内将执行新状态函数</span></span><br><span class="line">			&#125; </span><br><span class="line">		);</span><br><span class="line">	&#125; </span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">getting_pin</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123; </span><br><span class="line">		state=&amp;atm::waiting_for_card; </span><br><span class="line">		<span class="keyword">try</span> &#123; </span><br><span class="line">			<span class="keyword">for</span>(;;) &#123;</span><br><span class="line">				(<span class="keyword">this</span>-&gt;*state)(); </span><br><span class="line">			&#125; </span><br><span class="line">		&#125; <span class="keyword">catch</span>(messaging::close_queue <span class="keyword">const</span>&amp;) &#123;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>getting_pin</code>的设计要较为复杂一些，有简化版实例如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> atm::getting_pin() &#123;</span><br><span class="line">	incoming.wait()</span><br><span class="line">	<span class="comment">// 存在三种可传入信息</span></span><br><span class="line">	<span class="comment">// 因此handle呈链状</span></span><br><span class="line">	<span class="comment">// 每一次对handle的调用都会将消息类型特化为模板参数</span></span><br><span class="line">	.handle&lt;digit_pressed&gt;([&amp;](digit_pressed <span class="keyword">const</span>&amp; msg)&#123; </span><br><span class="line">		<span class="keyword">unsigned</span> <span class="keyword">const</span> pin_length=<span class="number">4</span>;</span><br><span class="line">		pin+=msg.digit;</span><br><span class="line">		<span class="comment">// 密码尚未输入完时不会改变状态，因此可以持续输入</span></span><br><span class="line">		<span class="keyword">if</span>(pin.length()==pin_length) &#123;</span><br><span class="line">			bank.send(verify_pin(account,pin,incoming));</span><br><span class="line">			state=&amp;atm::verifying_pin; </span><br><span class="line">		&#125;</span><br><span class="line">	&#125; </span><br><span class="line">	)</span><br><span class="line">	.handle&lt;clear_last_pressed&gt;([&amp;](clear_last_pressed <span class="keyword">const</span>&amp; msg)&#123;</span><br><span class="line">		<span class="keyword">if</span>(!pin.empty()) &#123;</span><br><span class="line">			pin.resize(pin.length()<span class="number">-1</span>);</span><br><span class="line">		&#125; </span><br><span class="line">	&#125;</span><br><span class="line">	)</span><br><span class="line">	.handle&lt;cancel_pressed&gt;([&amp;](cancel_pressed <span class="keyword">const</span>&amp; msg)&#123; </span><br><span class="line">		state=&amp;atm::done_processing; </span><br><span class="line">	&#125; </span><br><span class="line">	);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由上文可见，代码中根本不存在同步和并发，ATM logic和系统的其他组件分别运行在独立的线程上。这种设计手法被称为Actor moel——系统内存在多个运行于独立线程上的actor，每一个都通过发送和接受消息来处理当前任务，除了直接通过信息传入的状态外，彼此没有任何共享状态。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/并发编程/" rel="tag"><i class="fa fa-tag"></i> 并发编程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/6deee5ee.html" rel="next" title="clang-format配置">
+                <i class="fa fa-chevron-left"></i> clang-format配置
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/ce4f2b69.html" rel="prev" title="C++内存模型与原子类型操作——内存模型基础">
+                C++内存模型与原子类型操作——内存模型基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用future的函数式编程"><span class="nav-number">2.</span> <span class="nav-text">使用future的函数式编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#快排实例"><span class="nav-number">2.1.</span> <span class="nav-text">快排实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#函数式快排"><span class="nav-number">2.1.1.</span> <span class="nav-text">函数式快排</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并发函数式快排"><span class="nav-number">2.1.2.</span> <span class="nav-text">并发函数式快排</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CSP编程范式"><span class="nav-number">3.</span> <span class="nav-text">CSP编程范式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#通过信息传递机制实现同步"><span class="nav-number">3.1.</span> <span class="nav-text">通过信息传递机制实现同步</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设计实例"><span class="nav-number">3.1.1.</span> <span class="nav-text">设计实例</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>

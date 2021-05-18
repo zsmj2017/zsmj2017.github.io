@@ -1,0 +1,1177 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,对象模型," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。
+
+运行期类型判断&amp;nbsp;为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Function语义学——Virtual Member Function">
+<meta property="og:url" content="https://zsmj2017.tech/post/bb5cc408.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。
+
+运行期类型判断&amp;nbsp;为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/9vsxcigr9ham7p8mc2l5y3w9/image_1cdha351o116i11o21cr67nojva9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/3k4rtxf4owdv3ldih5gi6rqj/image_1cdhf6elj1btn1ocfv1n19tgjucm.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/t692yspb77s1ta8evg4ysyzt/image_1cdhlsdfr1406v33m71ipd1pej13.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/o41pbxhobsbgk79prj3jpwvl/image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png">
+<meta property="og:updated_time" content="2018-05-15T13:04:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Function语义学——Virtual Member Function">
+<meta name="twitter:description" content="前言&amp;nbsp;我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。
+
+运行期类型判断&amp;nbsp;为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/9vsxcigr9ham7p8mc2l5y3w9/image_1cdha351o116i11o21cr67nojva9.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/bb5cc408.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> Function语义学——Virtual Member Function | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Function语义学——Virtual Member Function
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-05-15T12:42:00+08:00" content="2018-05-15">
+              2018-05-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。</p>
+<hr>
+<h1 id="运行期类型判断"><a href="#运行期类型判断" class="headerlink" title="运行期类型判断"></a>运行期类型判断</h1><p>&nbsp;<br>为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实体。</p>
+<h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><p>考虑下述语句：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure></p>
+<p>最直接了当的做法就是把必要的信息加上ptr身上，如此一来，pointer或者reference至少包含两个信息：</p>
+<ol>
+<li>内容（它所指向的object的地址）</li>
+<li>对象的动态类型</li>
+</ol>
+<p>这个方法有两个缺点：</p>
+<ol>
+<li>增加了空间负担，即使程序并不体现出多态性</li>
+<li>破坏了与C的兼容性</li>
+</ol>
+<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>如果不能在pointer或erference中加入信息，那么势必只能在对象中添加信息。显然并非所有的对象都应该被加入信息，我们应该在“可能会运行期多态”的class中加入RTTI信息。识别一个class是否支持多态，只需要去看他是否具备任何virtual function即可。</p>
+<hr>
+<h1 id="单一继承下virtual-function的实现"><a href="#单一继承下virtual-function的实现" class="headerlink" title="单一继承下virtual function的实现"></a>单一继承下virtual function的实现</h1><p>&nbsp;<br>在明确了需要有信息插入class object之后，我们需要明确：哪些信息需要被插入class？仍以下述语句为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure></p>
+<p>我们需要了解：</p>
+<ol>
+<li>ptr的动态类型，以方便调用正确的z()实体。</li>
+<li>z()实体位置</li>
+</ol>
+<p>落实到具体实现，我们需要在每一个具备多态的class object身上增加两个members：</p>
+<ol>
+<li>一个用以表示动态类型的字符串或者数字</li>
+<li>一个指向某个table的指针，该table内部存放着virtual functions的执行期地址</li>
+</ol>
+<p>上述工作均由编译器完成，执行期只是按图索骥而已。</p>
+<p>一个class只会有一个vtbl，每一个vtbl内部含有所有virtual functions函数实体的地址，这些virtual functions包括：</p>
+<ul>
+<li>该class定义的函数实体，它可能会overriding一个可能存在的base class virtual function函数实体。</li>
+<li>继承自base class的函数实体，这是在derived class不覆写时发生的情况。</li>
+<li>一个pure_virtual_called函数实体，它既可以扮演pure virtual function的空间保卫者，也可以当做执行期异常处理函数。</li>
+</ul>
+<h2 id="具体实例"><a href="#具体实例" class="headerlink" title="具体实例"></a>具体实例</h2><p>考虑下述定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Point&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>=<span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现有Point2d derived from Point:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function">Point2d&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>;<span class="comment">//override</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//override</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>并有Point3d derived from Point2d:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line">     ...</span><br><span class="line">    <span class="function">Point2d&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>;<span class="comment">//override</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//override</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其具体的vtbl如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/9vsxcigr9ham7p8mc2l5y3w9/image_1cdha351o116i11o21cr67nojva9.png" alt="image_1cdha351o116i11o21cr67nojva9.png-369.9kB"><br>当一个class派生自另一个class，一共具备三种可能性：</p>
+<ol>
+<li><strong>继承声明与实现</strong><br>在该情况下virtual functions的地址将会被拷贝到derived class的vtbl中，且保持原有的slot。</li>
+<li><strong>只继承声明</strong><br>此时函数实体的地址被置于对应的slot中。</li>
+<li><strong>增加新的virtual function</strong><br>此时derived class的vtbl会被扩充，新的virtual function会对应于新的slot。</li>
+</ol>
+<p>当我们遇到<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure></p>
+<p>如何完成运行期virtual function的调用呢？</p>
+<ol>
+<li>尽管我们并不了解ptr的动态类型，但我们了解其vptr的位置，并由vptr找到vtbl</li>
+<li>尽管并不明确哪一个z()实体会被调用，但我们明确了解z()必然位于slot4</li>
+</ol>
+<p>因此，上述语句被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(*ptr-&gt;vptr[<span class="number">4</span>])(ptr);</span><br></pre></td></tr></table></figure></p>
+<p>尽管该语句的效果在执行期才能被确定（调用哪个z实体），但至少在编译期我们完成了正确的转化。</p>
+<p>在单一继承体系中，virtual function运转良好，但在多继承和虚继承中实际情况却较为麻烦。</p>
+<hr>
+<h1 id="多重继承下的virtual-function"><a href="#多重继承下的virtual-function" class="headerlink" title="多重继承下的virtual function"></a>多重继承下的virtual function</h1><p>&nbsp;<br>多重继承下支持virtual function的难点在于后继base class，以及在执行期调整this指针。<br>以下述继承体系为例：<br><img src="http://static.zybuluo.com/zsmj2017/3k4rtxf4owdv3ldih5gi6rqj/image_1cdhf6elj1btn1ocfv1n19tgjucm.png" alt="image_1cdhf6elj1btn1ocfv1n19tgjucm.png-15.9kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base1</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Base1();</span><br><span class="line">    <span class="keyword">virtual</span> ~Base1();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">speakClearly</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Base1 *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Base1;<span class="comment">//抽象工厂</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base2</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Base2();</span><br><span class="line">    <span class="keyword">virtual</span> ~Base2();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mumble</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Base2 *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Base2;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>：<span class="title">public</span> <span class="title">Base1</span>,<span class="title">public</span> <span class="title">Base2</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived();</span><br><span class="line">    <span class="keyword">virtual</span> ~Derived();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Derived *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Derived;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>Derived支持virtual function的难点统统落在Base2 subobject上，其中大致有三个问题：</p>
+<ol>
+<li>virtual destructor</li>
+<li>被继承的Base2::mumble()</li>
+<li>一组clone()函数实体</li>
+</ol>
+<hr>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>首先，我们将一个从heap中配置得到的Derived对象的地址指定给一个Base2指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base2 *pbase2 = <span class="keyword">new</span> Derived;</span><br></pre></td></tr></table></figure></p>
+<p>新的Derived对象的地址必须调整，以指向Base2 subobject。在编译期间会有如下代码产生：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Derived *temp = <span class="keyword">new</span> Derived;</span><br><span class="line">Base2* pbase2 = temp?temp+<span class="keyword">sizeof</span>(Base1):<span class="number">0</span>;</span><br></pre></td></tr></table></figure></p>
+<p>当开发者需要释放pbase2所指向的对象时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> pbase2;</span><br></pre></td></tr></table></figure></p>
+<p>指针必须被再一次调整，以指向Derived对象的起始处。但在这里我们并不能像绑定操作那样在编译期完成offset添加，因为我们只有在运行期才能明确对象的真正类型。</p>
+<p>如果我们经由类型为后继base class的指针或者引用来调用virtual function，该调用所连带的this指针调整操作必须在执行期完成，也就是说，编译器所做的关于扩充代码的操作，必须在某个地方插入。关键问题便是在哪里插入。</p>
+<h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>cfront编译器的做法是将vtbl增大，使它容纳此处所需要的this指针。每一个virtual table slot不再是一个指针，而是一个struct，内含可能的offset以及地址。于是调用操作由：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*(pbase2-&gt;vptr[<span class="number">1</span>])(pbase2);</span><br></pre></td></tr></table></figure></p>
+<p>转变为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*(pbase2-&gt;vptr[<span class="number">1</span>].faddr)(pbase2+pbase2-&gt;vptr[<span class="number">1</span>].offset)</span><br></pre></td></tr></table></figure></p>
+<p>这方法的缺点是增加了间接性，无论是否需要offset都需要去执行上述语句，并且vtbl的大小也扩大了。</p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>比较有效率的解决方案是使用thunk。所谓thunk是一小段assembly码，用来完成以下两个任务：</p>
+<ol>
+<li>以适当的offset调整this指针</li>
+<li>跳转至virtual function</li>
+</ol>
+<p>举例而言，经由一个Base2指针调用Derived destructor，其相关的thunk大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pbase2_dtor_thunk:</span><br><span class="line">    <span class="keyword">this</span>+=<span class="keyword">sizeof</span>(base1);</span><br><span class="line">    Derived::~Derived(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure></p>
+<p>thunk技术保证了vtbl继续内含一个简单的指针，因此多重继承不再需要任何空间上的额外负担。slots中的地址可以指向virtual function，也可以指向一个相关的thunk（如果需要调整this指针）。</p>
+<p>调整this指针的第二个额外负担是，函数的调用由于两种不同的可能：</p>
+<ol>
+<li>经由derived class或第一base class调用</li>
+<li>经由后继base class调用</li>
+</ol>
+<p>同一函数需要在vtbl中存放多笔对应的slots,例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Base1* pbase1 = <span class="keyword">new</span> Derived;</span><br><span class="line">Base2* pbase2 = <span class="keyword">new</span> Derived;</span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> pbase1;</span><br><span class="line"><span class="keyword">delete</span> pbase2;</span><br></pre></td></tr></table></figure></p>
+<p>虽然两个delete操作导致相同的derived destructor，但它们需要两个不同的vtbl slots：</p>
+<ol>
+<li>pbase1不需要调整this指针，其vtbl放置的是真正的destructor地址</li>
+<li>pbase2需要调整指针，其vtbl slot需要放置相关的thunk地址。</li>
+</ol>
+<p>在多重继承下，一个derived class内含n-1个额外的vtbl，n表示上一层base classes的数目。对于实例中的Derived，它会有两个vtbl：</p>
+<ol>
+<li>一个主要实体，与Base1共享</li>
+<li>一个次要实体，与Base2有关</li>
+</ol>
+<p>针对每一个vtbl，derived对象中有相应的vptr。具体内存结构如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/t692yspb77s1ta8evg4ysyzt/image_1cdhlsdfr1406v33m71ipd1pej13.png" alt="image_1cdhlsdfr1406v33m71ipd1pej13.png-379.6kB"></p>
+<hr>
+<h2 id="后继base-class对virtual-function的影响"><a href="#后继base-class对virtual-function的影响" class="headerlink" title="后继base class对virtual function的影响"></a>后继base class对virtual function的影响</h2><p>在三种情况下后继base class会影响对virtual function的支持：</p>
+<ul>
+<li><p><strong>通过指向后继base class的指针来调用derived virtual function</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Base2 *ptr = <span class="keyword">new</span> Derived;</span><br><span class="line"><span class="comment">//ptr必须向后调整sizeof(Base1)</span></span><br><span class="line"><span class="keyword">delete</span> ptr;</span><br></pre></td></tr></table></figure>
+<p>显然，ptr初始情况下指向了base2 subobject，为了能够正确执行，ptr必须调整指向Derived对象的起始处。</p>
+</li>
+<li><p><strong>通过一个指向derived class的指针调用继承自后继base class的virtual function</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Derived *pder = <span class="keyword">new</span> Derived;</span><br><span class="line"><span class="comment">//pder必须向前调整sizeof(Base1)</span></span><br><span class="line">pder-&gt;mumble();</span><br></pre></td></tr></table></figure>
+<p>此时，指针必须再次调整。</p>
+</li>
+<li><p>返回值不相同</p>
+<p>具体来说就是clone的实现原理。</p>
+</li>
+</ul>
+<hr>
+<h1 id="虚继承下的virtual-functions"><a href="#虚继承下的virtual-functions" class="headerlink" title="虚继承下的virtual functions"></a>虚继承下的virtual functions</h1><p>&nbsp;<br>考虑下述继承体系：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">virtual</span> ~Point2d();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mumble</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~Point3d();</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>Point3d和Point2d的起始部分并不和“非虚拟的单一继承”一致。由于Point2d和Point3d的对象不再相符，两者之间的转换也就需要调整this指针。它们的内存布局：<br><img src="http://static.zybuluo.com/zsmj2017/o41pbxhobsbgk79prj3jpwvl/image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png" alt="image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png-283.1kB"><br>（这个图似乎有点问题，右下角发生了错误）</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/对象模型/" rel="tag"><i class="fa fa-tag"></i> 对象模型</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/3d305b2.html" rel="next" title="Function语义学——Member的各种调用方式">
+                <i class="fa fa-chevron-left"></i> Function语义学——Member的各种调用方式
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/def98e8a.html" rel="prev" title="Function语义学——函数的效能">
+                Function语义学——函数的效能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#运行期类型判断"><span class="nav-number">2.</span> <span class="nav-text">运行期类型判断</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法一"><span class="nav-number">2.1.</span> <span class="nav-text">方法一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法二"><span class="nav-number">2.2.</span> <span class="nav-text">方法二</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单一继承下virtual-function的实现"><span class="nav-number">3.</span> <span class="nav-text">单一继承下virtual function的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#具体实例"><span class="nav-number">3.1.</span> <span class="nav-text">具体实例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多重继承下的virtual-function"><span class="nav-number">4.</span> <span class="nav-text">多重继承下的virtual function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">4.1.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方案一"><span class="nav-number">4.1.1.</span> <span class="nav-text">方案一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案二"><span class="nav-number">4.1.2.</span> <span class="nav-text">方案二</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后继base-class对virtual-function的影响"><span class="nav-number">4.2.</span> <span class="nav-text">后继base class对virtual function的影响</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#虚继承下的virtual-functions"><span class="nav-number">5.</span> <span class="nav-text">虚继承下的virtual functions</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>

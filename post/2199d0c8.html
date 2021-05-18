@@ -1,0 +1,1139 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,设计模式," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;智能指针在多个领域都具备使用价值，例如资源管理与重复代码任务的自动化。
+
+智能指针相对于raw pointer的优点&amp;nbsp;
+
+构造、析构智能指针将完美初始化，并且智能指针的析构会负责对象的释放。
+拷贝与赋值操作可以自由地深拷贝，或者指针拷贝，又或者禁止这些行为。
+解引用自行决定解引用功能，比如用它来实现lazy-fetching.
+
+
+智能指针的实现雏形&amp;nbsp;智能指针从">
+<meta property="og:type" content="article">
+<meta property="og:title" content="28.智能指针">
+<meta property="og:url" content="https://zsmj2017.tech/post/2199d0c8.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;智能指针在多个领域都具备使用价值，例如资源管理与重复代码任务的自动化。
+
+智能指针相对于raw pointer的优点&amp;nbsp;
+
+构造、析构智能指针将完美初始化，并且智能指针的析构会负责对象的释放。
+拷贝与赋值操作可以自由地深拷贝，或者指针拷贝，又或者禁止这些行为。
+解引用自行决定解引用功能，比如用它来实现lazy-fetching.
+
+
+智能指针的实现雏形&amp;nbsp;智能指针从">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/wuswa468p8neq5lz5881824f/image_1cc655eos1cq45b81l021alv1kj49.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/n7npu89nb9veidxhtnv1wnkn/image_1cc661nbnnb27o7m5i5rj17egm.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/8v5j11i9bdlqapt9gfgptqmk/image_1cc66ffmd52a1u2f15vkhp81b7u1j.png">
+<meta property="og:updated_time" content="2018-04-28T13:29:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="28.智能指针">
+<meta name="twitter:description" content="前言&amp;nbsp;智能指针在多个领域都具备使用价值，例如资源管理与重复代码任务的自动化。
+
+智能指针相对于raw pointer的优点&amp;nbsp;
+
+构造、析构智能指针将完美初始化，并且智能指针的析构会负责对象的释放。
+拷贝与赋值操作可以自由地深拷贝，或者指针拷贝，又或者禁止这些行为。
+解引用自行决定解引用功能，比如用它来实现lazy-fetching.
+
+
+智能指针的实现雏形&amp;nbsp;智能指针从">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/wuswa468p8neq5lz5881824f/image_1cc655eos1cq45b81l021alv1kj49.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/2199d0c8.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> 28.智能指针 | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                28.智能指针
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-28T19:56:00+08:00" content="2018-04-28">
+              2018-04-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>智能指针在多个领域都具备使用价值，例如资源管理与重复代码任务的自动化。</p>
+<hr>
+<h1 id="智能指针相对于raw-pointer的优点"><a href="#智能指针相对于raw-pointer的优点" class="headerlink" title="智能指针相对于raw pointer的优点"></a>智能指针相对于raw pointer的优点</h1><p>&nbsp;</p>
+<ol>
+<li>构造、析构<br>智能指针将完美初始化，并且智能指针的析构会负责对象的释放。</li>
+<li>拷贝与赋值操作<br>可以自由地深拷贝，或者指针拷贝，又或者禁止这些行为。</li>
+<li>解引用<br>自行决定解引用功能，比如用它来实现lazy-fetching.</li>
+</ol>
+<hr>
+<h1 id="智能指针的实现雏形"><a href="#智能指针的实现雏形" class="headerlink" title="智能指针的实现雏形"></a>智能指针的实现雏形</h1><p>&nbsp;<br>智能指针从模版中生成，因为要与内置指针一致，所以它们是strong-typed:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SmartPtr</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    SmartPtr(T* realPtr = <span class="number">0</span>);</span><br><span class="line">    SmartPtr(<span class="keyword">const</span> SmartPtr&amp; rhs);</span><br><span class="line">    ~SmartPtr();</span><br><span class="line">    SmartPtr&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> SmartPtr&amp; rhs);</span><br><span class="line">    T* <span class="keyword">operator</span>-&gt;() <span class="keyword">const</span>;<span class="comment">//解引用</span></span><br><span class="line">    T&amp; <span class="keyword">operator</span>*() <span class="keyword">const</span>; <span class="comment">//解引用</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T *pointee;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果不允许copy与赋值，那就应该把拷贝构造与operator=设为private。解引用对象的两个操作符设为const，因为解引用并不能改变对象本身。</p>
+<hr>
+<h1 id="用户如何使用智能指针"><a href="#用户如何使用智能指针" class="headerlink" title="用户如何使用智能指针"></a>用户如何使用智能指针</h1><p>&nbsp;<br>假设存在一个分布式系统（对象一些在本地一些在远程），采用不同的方法分别处理本地对象和远程对象相当麻烦，我们试图让所有东西看起来在一个地方：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">DBPtr</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    DBPtr(T *realPtr = <span class="literal">nullptr</span>);</span><br><span class="line">    DBPtr(DataBaseID id);<span class="comment">//指向DB id对象</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Tuple</span>&#123;</span><span class="comment">// 数据库元组类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">displayEditDialog</span><span class="params">()</span></span>;<span class="comment">//显示一个图形对话框，允许用户编辑</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isValid</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//返回合法性检验</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">LogEntry</span> &#123;</span><span class="comment">//修改T对象时完成日志登记</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    LogEntry(<span class="keyword">const</span> T&amp; objectToBeModified);</span><br><span class="line">    ~LogEntry();</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">editTuple</span><span class="params">(DBPtr&lt;Tuple&gt;&amp; pt)</span></span>&#123;</span><br><span class="line">    LogEntry&lt;Tuple&gt; entry(*pt);</span><br><span class="line">    <span class="keyword">do</span>&#123;<span class="comment">//重复显示对话框，直到数值合法</span></span><br><span class="line">        pt-&gt;displayEditDialog();</span><br><span class="line">    &#125; <span class="keyword">while</span> (pt-&gt;isValid() == <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>被编辑的元祖既可以位于本地也可以位于远程，在编写程序时我们感受不到他们的区别。Logentry的构造函数负责了启动日志记录，析构函数负责关闭记录。这在含有异常时能让程序更加robust，并且建立对象本身也比调用记录函数要直观。</p>
+<p>如我们所见，使用智能指针与使用raw pointer区别不大，在了解了这一特性之后，我们开始编写智能指针。</p>
+<hr>
+<h1 id="构造、赋值、析构"><a href="#构造、赋值、析构" class="headerlink" title="构造、赋值、析构"></a>构造、赋值、析构</h1><p>&nbsp;<br>一般来说构造较为简单：找到需要指向的对象，令raw pointer指向它，如果没有则将raw pointer指向nullptr或者抛出一个异常。<br>拷贝、赋值、析构由于对象所有权的问题，所以导致略微复杂。我们默认智能指针被释放时需要析构指向的对象，当然，这里的对象说的是动态分配得到的对象。<br>以STL中的auto_ptr为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">auto_ptr</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">auto_ptr</span>(T *ptr = <span class="number">0</span>): pointee(ptr) &#123;&#125;</span><br><span class="line">    ~<span class="built_in">auto_ptr</span>() &#123; <span class="keyword">delete</span> pointee; &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T *pointee;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>当auto_ptr被拷贝或被赋值时，会发生什么情况？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">auto_ptr</span>&lt;TreeNode&gt; ptn1(<span class="keyword">new</span> TreeNode);</span><br><span class="line"><span class="built_in">auto_ptr</span>&lt;TreeNode&gt; ptn2 = ptn1;<span class="comment">//拷贝构造</span></span><br><span class="line"><span class="built_in">auto_ptr</span>&lt;TreeNode&gt; ptn3;</span><br><span class="line">ptn3 = ptn2;<span class="comment">//赋值</span></span><br></pre></td></tr></table></figure></p>
+<p>如果我们只拷贝内部的raw pointer，则会有两个智能指针指向一个对象，如果两个智能指针依次释放，我们会试图析构一个已经被析构的东西，结果未定义。<br>另一种方法是new一个新的对象，但这本身带有性能损耗，更何况我们也不知道建立什么对象，万一是派生类而非基类呢。<br>STL定义：“当auto_ptr被拷贝和赋值时，对象所有权随之传递”：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">auto_ptr</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="built_in">auto_ptr</span>(<span class="built_in">auto_ptr</span>&lt;T&gt;&amp; rhs);</span><br><span class="line">    <span class="built_in">auto_ptr</span>&lt;T&gt;&amp; <span class="keyword">operator</span>=(<span class="built_in">auto_ptr</span>&lt;T&gt;&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">auto_ptr</span>&lt;T&gt;:</span>:<span class="built_in">auto_ptr</span>(<span class="built_in">auto_ptr</span>&lt;T&gt;&amp; rhs)&#123;</span><br><span class="line">    pointee = rhs.pointee;</span><br><span class="line">    rhs.pointee = <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">auto_ptr</span>&lt;T&gt;&amp; <span class="title">auto_ptr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>=(<span class="built_in">auto_ptr</span>&lt;T&gt;&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span> == &amp;rhs)<span class="comment">//处理自赋值,此处内容建议翻阅Effective C++ 12</span></span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">delete</span> pointee;</span><br><span class="line">    pointee = rhs.pointee;</span><br><span class="line">    rhs.pointee = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一般来说，拷贝构造和赋值运算符的形参都是const，但是auto_ptr的就不是，原因在于rhs被改变了。</p>
+<p>最后，其析构函数如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">SmartPtr</span>&lt;T&gt;:</span>:~SmartPtr()&#123;</span><br><span class="line">    <span class="keyword">if</span> (*<span class="keyword">this</span> owns *pointee) &#123;</span><br><span class="line">        <span class="keyword">delete</span> pointee;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>不同的智能指针析构函数各有不同，比如说shared_ptr就需要检查引用计数。</p>
+<hr>
+<h1 id="解引用操作符"><a href="#解引用操作符" class="headerlink" title="解引用操作符"></a>解引用操作符</h1><h2 id="operator"><a href="#operator" class="headerlink" title="operator*"></a>operator*</h2><p>operator*返回所指向的对象，理论上来说这好像很简单：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">T</span>&amp; <span class="title">SmartPtr</span>&lt;T&gt;:</span>:<span class="keyword">operator</span>*() <span class="keyword">const</span>&#123;</span><br><span class="line">    perform <span class="string">"smart pointer"</span> processing;</span><br><span class="line">    <span class="keyword">return</span> *pointee;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先，我们必须初始化指针或者让raw pointer合法(例如Lazy evaluation中构建对象）。<br>其次，我们必须返回引用而非对象，因为在引入继承体系后，如果返回对象会导致slicing，而且智能指针也因此丧失了虚函数的功能，此外返回引用效率也高。</p>
+<h2 id="operator-gt"><a href="#operator-gt" class="headerlink" title="operator-&gt;"></a>operator-&gt;</h2><p>operator-&gt;与operator*差不多，我们先回头看用户使用实例中调用-&gt;的语句：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-&gt;displayEditDialog();</span><br></pre></td></tr></table></figure></p>
+<p>该语句被编译器解释为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(pt.<span class="keyword">operator</span>-&gt;())-&gt;displayEditDialog();</span><br></pre></td></tr></table></figure></p>
+<p>这意味着不论operator-&gt;返回什么，它必须在返回结果上使用-&gt;，那也就是说operator-&gt;仅能返回一个指针或类指针对象，一般来说，我们把一个raw pointer作为其返回值。</p>
+<hr>
+<h1 id="测试智能指针是否为nullptr"><a href="#测试智能指针是否为nullptr" class="headerlink" title="测试智能指针是否为nullptr"></a>测试智能指针是否为nullptr</h1><p>&nbsp;<br>为了保证智能指针的行为与raw pointer完全一致，比如保证下述表达式能够编译：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SmartPtr&lt;TreeNode&gt; ptn;</span><br><span class="line"><span class="keyword">if</span> (ptn == <span class="literal">nullptr</span>)</span><br><span class="line"><span class="keyword">if</span> (ptn)</span><br><span class="line"><span class="keyword">if</span> (!ptn)</span><br></pre></td></tr></table></figure></p>
+<p>为了谨慎和保险，我们在智能指针类中重载operator！，当且仅当其为空指针时返回true:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">SmartPtr</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:...</span><br><span class="line">    <span class="keyword">bool</span> <span class="keyword">operator</span>!() <span class="keyword">const</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="把智能指针转为raw-pointer"><a href="#把智能指针转为raw-pointer" class="headerlink" title="把智能指针转为raw pointer"></a>把智能指针转为raw pointer</h1><p>&nbsp;<br>有时我们需要作出类似的转换，因为有些接口只接受raw pointer，可能你会写出&amp;*sp之类的东西，但这无疑太丑了。所以某些人更倾向于隐式类型转换符：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">operator</span> T*() &#123; <span class="keyword">return</span> pointee; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种设计看起来很好，但实际上完全不行，如果直接可以让用户操纵raw pointer，那我们设计智能指针的意义何在？并且引用计数等功能也遭到了破坏。<br>此外，这种隐式转换编译器同一时间只能使用一次，比如说智能指针和raw pointer之间存在隐式转换，raw pointer又和A之间存在转换，智能指针无法隐式转为A，也就是说其行为与raw pointer不符。<br>这种写法还会诱导用户写下delete sp这种天理难容的东西，要知道智能指针是一个对象…<br>编译器不会报错，但你的对象会被删除两次（一次是delete，一次是sp被析构）<br>总之，智能指针应该拒绝提供隐式转换操作符，最好的操作就是提供显示接口，例如get。</p>
+<hr>
+<h1 id="智能指针与基于继承的类型转换（Effective-C-46）"><a href="#智能指针与基于继承的类型转换（Effective-C-46）" class="headerlink" title="智能指针与基于继承的类型转换（Effective C++ 46）"></a>智能指针与基于继承的类型转换（Effective C++ 46）</h1><p>&nbsp;<br>下图是模型化音乐商店商品的一个继承体系，其大致实现如下：<img src="http://static.zybuluo.com/zsmj2017/wuswa468p8neq5lz5881824f/image_1cc655eos1cq45b81l021alv1kj49.png" alt="image_1cc655eos1cq45b81l021alv1kj49.png-39.2kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MusicProduct</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    MusicProduct(<span class="keyword">const</span> <span class="built_in">string</span>&amp; title);</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">play</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">displayTitle</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cassette</span>:</span> <span class="keyword">public</span> MusicProduct &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cassette(<span class="keyword">const</span> <span class="built_in">string</span>&amp; title);</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">play</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">displayTitle</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CD</span>:</span> <span class="keyword">public</span> MusicProduct &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    CD(<span class="keyword">const</span> <span class="built_in">string</span>&amp; title);</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">play</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">displayTitle</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>更进一步地假设存在一个函数，它对于任何一个Musicproduct对象都会显示标题并播放指定次数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">displayAndPlay</span><span class="params">(<span class="keyword">const</span> MusicProduct* pmp, <span class="keyword">int</span> numTimes)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= numTimes; ++i) &#123;</span><br><span class="line">        pmp-&gt;displayTitle();</span><br><span class="line">        pmp-&gt;play();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>显然该函数本身具备多态性，但如果我们使用智能指针，则无法具备多态性，原因在于sp派生出的这几个class根本不具备任何相关性。</p>
+<h2 id="隐式转换"><a href="#隐式转换" class="headerlink" title="隐式转换"></a>隐式转换</h2><p>我们想到的第一个解决方案是令每一个sp class具备隐式类型转换符：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SmartPtr</span>&lt;Cassette&gt; &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">operator</span> SmartPtr&lt;MusicProduct&gt;()&#123;<span class="keyword">return</span> SmartPtr&lt;MusicProduct&gt;(pointee);&#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Cassette *pointee;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SmartPtr</span>&lt;CD&gt; &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">operator</span> SmartPtr&lt;MusicProduct&gt;()&#123;<span class="keyword">return</span> SmartPtr&lt;MusicProduct&gt;(pointee);&#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CD *pointee;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>此方法缺点十分明显：</p>
+<ol>
+<li>对于每一个sp class都需要加入大量的隐式类型转换符，这对template是一大讽刺。</li>
+<li>如果当前对象位于继承体系的底层，那你必须为每一个直接或者间接继承的基类提供隐式类型转换，因为编译器无法执行多次转换。</li>
+</ol>
+<h2 id="非虚成员函数模板"><a href="#非虚成员函数模板" class="headerlink" title="非虚成员函数模板"></a>非虚成员函数模板</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">SmartPtr</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    SmartPtr(T* realPtr = <span class="number">0</span>);</span><br><span class="line">    T* <span class="keyword">operator</span>-&gt;() <span class="keyword">const</span>;</span><br><span class="line">    T&amp; <span class="keyword">operator</span>*() <span class="keyword">const</span>;</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">newType</span>&gt;</span></span><br><span class="line"><span class="class">    <span class="title">operator</span> <span class="title">SmartPtr</span>&lt;newType&gt;()&#123;</span></span><br><span class="line">        <span class="keyword">return</span> SmartPtr&lt;newType&gt;(pointee);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其具体工作原理如下：<br>假设编译器持有一个指向T对象的智能指针，它需要把该指针转换成指向T的基类的智能指针.<br>编译器检查了一番SmartPtr&lt;T&gt;,但并没有找到明确的类型转换符，然后检查有没有一个成员函数模板，通过该模板实例化一个对象完成类型转换。最终它构建了这么一个对象，完成了隐式转换。<br>结合具体实例而言，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">displayAndPlay</span><span class="params">(<span class="keyword">const</span> SmartPtr&lt;MusicProduct&gt;&amp; pmp,<span class="keyword">int</span> howMany)</span></span>;</span><br><span class="line">SmartPtr&lt;Cassette&gt; funMusic(<span class="keyword">new</span> Cassette(<span class="string">"Alapalooza"</span>));</span><br><span class="line">SmartPtr&lt;CD&gt; nightmareMusic(<span class="keyword">new</span> CD(<span class="string">"Disco Hits of the 70s"</span>));</span><br><span class="line">displayAndPlay(funMusic, <span class="number">10</span>);</span><br><span class="line">displayAndPlay(nightmareMusic, <span class="number">0</span>);</span><br></pre></td></tr></table></figure></p>
+<p>函数在调用时本质上使用了Smart&lt;music&gt;的构造函数，将新的对象作为参数传递给了函数，最终完成多态。</p>
+<p>不要觉得这种方法只能用于继承体系中的相互转换，事实上，这是一种通用的、安全的智能指针转换操作，只要你能够把T*隐式地转为NT*，那我们就一定能安全直接地转换它们的智能指针。假设我们修改了继承体系：<br><img src="http://static.zybuluo.com/zsmj2017/n7npu89nb9veidxhtnv1wnkn/image_1cc661nbnnb27o7m5i5rj17egm.png" alt="image_1cc661nbnnb27o7m5i5rj17egm.png-53.5kB"><br>并有如下代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">SmartPtr</span> &#123;</span> ... &#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">displayAndPlay</span><span class="params">(<span class="keyword">const</span> SmartPtr&lt;MusicProduct&gt;&amp; pmp,<span class="keyword">int</span> howMany)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">displayAndPlay</span><span class="params">(<span class="keyword">const</span> SmartPtr&lt;Cassette&gt;&amp; pc,<span class="keyword">int</span> howMany)</span></span>;</span><br><span class="line">SmartPtr&lt;CasSingle&gt; dumbMusic(<span class="keyword">new</span> CasSingle(<span class="string">"Achy Breaky Heart"</span>));</span><br><span class="line">displayAndPlay(dumbMusic, <span class="number">1</span>);<span class="comment">//error!</span></span><br></pre></td></tr></table></figure></p>
+<p>这里错误的原因很简单，二义性，所有类型的转换符具有同等地位，编译器无法知道该使用哪一个（这种行为与内置指针不符，内置指针会直接匹配继承体系最接近的重载）。</p>
+<hr>
+<h1 id="智能指针与const"><a href="#智能指针与const" class="headerlink" title="智能指针与const"></a>智能指针与const</h1><p>&nbsp;<br>对于raw pointer，我们的const属性分为顶层和底层，详见C++ Primer。<br>我们希望智能指针也拥有const属性，但实际上好像不太行，我们可以令智能指针自身const，无法让指向的对象也const.有一个简单的补救方法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SmartPtr&lt;<span class="keyword">const</span> Sth&gt;;</span><br></pre></td></tr></table></figure></p>
+<p>但该类型的对象与SmartPtr&lt;Sth&gt;不具备任何相关性，所以需要再次使用上文所提到的成员模板。需要注意的是，const的类型转换是单向的，就像public继承一样，non-const可以做const的事，反之则不行.既然如此，我们不如把它设为继承关系：<img src="http://static.zybuluo.com/zsmj2017/8v5j11i9bdlqapt9gfgptqmk/image_1cc66ffmd52a1u2f15vkhp81b7u1j.png" alt="image_1cc66ffmd52a1u2f15vkhp81b7u1j.png-66.2kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">SmartPtrToConst</span> &#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> T* constPointee;</span><br><span class="line">        T* pointee;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">SmartPtr</span>:</span><span class="keyword">public</span> SmartPtrToConst&lt;T&gt; &#123;</span><br><span class="line">    ...<span class="comment">//没有数据成员</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>使用这种设计方法，指向non-const-T对象的智能指针包含一个指向const-T的raw pointer。union的特点是节约空间，但我们需要手动约束两个类各自使用专属指针。其使用大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SmartPtr&lt;CD&gt; pCD = <span class="keyword">new</span> CD(<span class="string">"Famous Movie Themes"</span>);</span><br><span class="line">SmartPtrToConst&lt;CD&gt; pConstCD = pCD;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/设计模式/" rel="tag"><i class="fa fa-tag"></i> 设计模式</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/805b975e.html" rel="next" title="27.要求或禁止在堆中产生对象">
+                <i class="fa fa-chevron-left"></i> 27.要求或禁止在堆中产生对象
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/76f9589e.html" rel="prev" title="29.引用计数">
+                29.引用计数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#智能指针相对于raw-pointer的优点"><span class="nav-number">2.</span> <span class="nav-text">智能指针相对于raw pointer的优点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#智能指针的实现雏形"><span class="nav-number">3.</span> <span class="nav-text">智能指针的实现雏形</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户如何使用智能指针"><span class="nav-number">4.</span> <span class="nav-text">用户如何使用智能指针</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构造、赋值、析构"><span class="nav-number">5.</span> <span class="nav-text">构造、赋值、析构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解引用操作符"><span class="nav-number">6.</span> <span class="nav-text">解引用操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#operator"><span class="nav-number">6.1.</span> <span class="nav-text">operator*</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#operator-gt"><span class="nav-number">6.2.</span> <span class="nav-text">operator-></span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试智能指针是否为nullptr"><span class="nav-number">7.</span> <span class="nav-text">测试智能指针是否为nullptr</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#把智能指针转为raw-pointer"><span class="nav-number">8.</span> <span class="nav-text">把智能指针转为raw pointer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#智能指针与基于继承的类型转换（Effective-C-46）"><span class="nav-number">9.</span> <span class="nav-text">智能指针与基于继承的类型转换（Effective C++ 46）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#隐式转换"><span class="nav-number">9.1.</span> <span class="nav-text">隐式转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非虚成员函数模板"><span class="nav-number">9.2.</span> <span class="nav-text">非虚成员函数模板</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#智能指针与const"><span class="nav-number">10.</span> <span class="nav-text">智能指针与const</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>

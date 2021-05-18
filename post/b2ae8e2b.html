@@ -1,0 +1,1109 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ZSMJ's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/0f81ff2f.js","daovoice")
+  daovoice('init', {
+      app_id: "36f8f044"
+    });
+  daovoice('update');
+  </script>
+
+
+
+<meta name="description" content="前言&amp;nbsp;上一节描述了针对universal reference作重载的函数可能出现的各种问题，本节将在上一节讨论的基础之上将提出各种解决方案。
+
+Abandon overloading&amp;nbsp;简单地来说，可以根据参数名设置不同的函数，例如将logAndAdd写为logAndAddName与logAndAddNameIdx，不过这种方法并不适用于Person，此外，放弃重载并不明智。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="27.universal reference的替代方案与修正">
+<meta property="og:url" content="https://zsmj2017.tech/post/b2ae8e2b.html">
+<meta property="og:site_name" content="ZSMJ's Blog">
+<meta property="og:description" content="前言&amp;nbsp;上一节描述了针对universal reference作重载的函数可能出现的各种问题，本节将在上一节讨论的基础之上将提出各种解决方案。
+
+Abandon overloading&amp;nbsp;简单地来说，可以根据参数名设置不同的函数，例如将logAndAdd写为logAndAddName与logAndAddNameIdx，不过这种方法并不适用于Person，此外，放弃重载并不明智。">
+<meta property="og:updated_time" content="2018-08-26T10:05:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="27.universal reference的替代方案与修正">
+<meta name="twitter:description" content="前言&amp;nbsp;上一节描述了针对universal reference作重载的函数可能出现的各种问题，本节将在上一节讨论的基础之上将提出各种解决方案。
+
+Abandon overloading&amp;nbsp;简单地来说，可以根据参数名设置不同的函数，例如将logAndAdd写为logAndAddName与logAndAddNameIdx，不过这种方法并不适用于Person，此外，放弃重载并不明智。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: undefined,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://zsmj2017.tech/post/b2ae8e2b.html"/>
+
+
+<!-- 网页加载条 -->
+<script src="/js/src/pace.min.js"></script>
+  <title> 27.universal reference的替代方案与修正 | ZSMJ's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ZSMJ's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">诸行无常，诸法无我</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      <!-- 自定义High一下的功能 -->
+      <li class="menu-item"> <a title="而我一无所获" href='javascript:(
+    function go() {
+
+
+    var songs = [
+                "http://music.163.com/song/media/outer/url?id=28987151.mp3",
+                ""
+    ];
+
+    
+    function c() {
+        var e = document.createElement("link");
+        e.setAttribute("type", "text/css");
+        e.setAttribute("rel", "stylesheet");
+        e.setAttribute("href", f);
+        e.setAttribute("class", l);
+        document.body.appendChild(e)
+    }
+ 
+    function h() {
+        var e = document.getElementsByClassName(l);
+        for (var t = 0; t < e.length; t++) {
+            document.body.removeChild(e[t])
+        }
+    }
+ 
+    function p() {
+        var e = document.createElement("div");
+        e.setAttribute("class", a);
+        document.body.appendChild(e);
+        setTimeout(function() {
+            document.body.removeChild(e)
+        }, 100)
+    }
+ 
+    function d(e) {
+        return {
+            height : e.offsetHeight,
+            width : e.offsetWidth
+        }
+    }
+ 
+    function v(i) {
+        var s = d(i);
+        return s.height > e && s.height < n && s.width > t && s.width < r
+    }
+ 
+    function m(e) {
+        var t = e;
+        var n = 0;
+        while (!!t) {
+            n += t.offsetTop;
+            t = t.offsetParent
+        }
+        return n
+    }
+ 
+    function g() {
+        var e = document.documentElement;
+        if (!!window.innerWidth) {
+            return window.innerHeight
+        } else if (e && !isNaN(e.clientHeight)) {
+            return e.clientHeight
+        }
+        return 0
+    }
+ 
+    function y() {
+        if (window.pageYOffset) {
+            return window.pageYOffset
+        }
+        return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    }
+ 
+    function E(e) {
+        var t = m(e);
+        return t >= w && t <= b + w
+    }
+
+    function S() {
+        var e = document.getElementById("audio_element_id");
+        if(e != null){
+            var index = parseInt(e.getAttribute("curSongIndex"));
+            if(index > songs.length - 2) {
+                index = 0;
+            } else {
+                index++;
+            }
+            e.setAttribute("curSongIndex", index);
+            N();
+        }
+
+        e.src = i;
+        e.play()
+    }
+ 
+    function x(e) {
+        e.className += " " + s + " " + o
+    }
+ 
+    function T(e) {
+        e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
+    }
+ 
+    function N() {
+        var e = document.getElementsByClassName(s);
+        var t = new RegExp("\\b" + s + "\\b");
+        for (var n = 0; n < e.length; ) {
+            e[n].className = e[n].className.replace(t, "")
+        }
+    }
+
+    function initAudioEle() {
+        var e = document.getElementById("audio_element_id");
+        if(e === null){
+            e = document.createElement("audio");
+            e.setAttribute("class", l);
+            e.setAttribute("curSongIndex", 0);
+            e.id = "audio_element_id";
+            e.loop = false;
+            e.bgcolor = 0;
+            e.addEventListener("canplay", function() {
+            setTimeout(function() {
+                x(k)
+            }, 500);
+            setTimeout(function() {
+                N();
+                p();
+                for (var e = 0; e < O.length; e++) {
+                    T(O[e])
+                }
+            }, 15500)
+        }, true);
+        e.addEventListener("ended", function() {
+            N();
+            h();
+            go();
+        }, true);
+        e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
+        document.body.appendChild(e);
+        }
+    }
+    
+    initAudioEle();
+    var e = 30;
+    var t = 30;
+    var n = 350;
+    var r = 350;
+
+    var curSongIndex = parseInt(document.getElementById("audio_element_id").getAttribute("curSongIndex"));
+    var i = songs[curSongIndex];
+    
+    var s = "mw-harlem_shake_me";
+    var o = "im_first";
+    var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
+    var a = "mw-strobe_light";
+    var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
+    
+    var l = "mw_added_css";
+    var b = g();
+    var w = y();
+    var C = document.getElementsByTagName("*");
+    var k = null;
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            if (E(A)) {
+                k = A;
+                break
+            }
+        }
+    }
+    if (A === null) {
+        console.warn("Could not find a node of the right size. Please try a different page.");
+        return
+    }
+    c();
+    S();
+    var O = [];
+    for (var L = 0; L < C.length; L++) {
+        var A = C[L];
+        if (v(A)) {
+            O.push(A)
+        }
+    }
+    })()'><i class="menu-item-icon fa fa-music fa-fw"></i> 如果时光流逝</a> </li>
+      <!-- end  如果时光流逝 -->
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search fa-lg"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                27.universal reference的替代方案与修正
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-14T19:25:00+08:00" content="2018-07-14">
+              2018-07-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>上一节描述了针对universal reference作重载的函数可能出现的各种问题，本节将在上一节讨论的基础之上将提出各种解决方案。</p>
+<hr>
+<h1 id="Abandon-overloading"><a href="#Abandon-overloading" class="headerlink" title="Abandon overloading"></a>Abandon overloading</h1><p>&nbsp;<br>简单地来说，可以根据参数名设置不同的函数，例如将logAndAdd写为logAndAddName与logAndAddNameIdx，不过这种方法并不适用于Person，此外，放弃重载并不明智。</p>
+<hr>
+<h1 id="Pass-by-const-T-amp"><a href="#Pass-by-const-T-amp" class="headerlink" title="Pass by const T&amp;"></a>Pass by const T&amp;</h1><p>&nbsp;<br>事实上Item26中提出过这种写法，不过对于string来说它可能会生成一个临时对象从而降低效率，权衡利弊后这不失为一种解决方案。</p>
+<hr>
+<h1 id="Pass-by-value"><a href="#Pass-by-value" class="headerlink" title="Pass by value"></a>Pass by value</h1><p>&nbsp;<br>Itemn41建议说，如果你明确知道会发生copy操作，请使用pass by value。因此我们试以Person为例执行pass by value：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    explicit Person(std::string n): name(std::move(n)) &#123;&#125; // Item 41 for use of std::move</span><br><span class="line">    explicit Person(int idx):name(nameFromIdx(idx))&#123;&#125;</span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>因为没有std::string构造函数只接受一个整数，因此传递给Person构造函数的所有int和intlike参数（例如，std::size_t，short，long）都会触发int重载函数调用。类似地，类型为std::string的所有参数（以及可以创建std::strings的东西，例如const char *）都会触发string重载函数调用。</p>
+<hr>
+<h1 id="Use-Tag-dispatch"><a href="#Use-Tag-dispatch" class="headerlink" title="Use Tag dispatch"></a>Use Tag dispatch</h1><p>&nbsp;<br>无论是pass by const T&amp;还是pass by value均不支持forward。如果我们需要使用forward，那么必须配合使用universal reference。有什么方法可以在不放弃使用universal reference的前提下使用重载吗？</p>
+<p>解决方法是，查看所有可能使用的实参类型，然后根据它们的类型依次建立最佳重载版本。universal reference通常可以为所有实参提供精确匹配，但如果universal reference是包含非universal refence的其他参数的参数列表的一部分，其匹配优先级将会降低（此即是Tag dispath的技术基础），下文将以实例举证。</p>
+<p>首先，这是logAndAdd的实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">multiset</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; names; <span class="comment">// global data structure</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">logAndAdd</span><span class="params">(T&amp;&amp; name)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> now = <span class="built_in">std</span>::chrono::system_clock::now();</span><br><span class="line">    <span class="built_in">log</span>(now, <span class="string">"logAndAdd"</span>);</span><br><span class="line">    names.emplace(<span class="built_in">std</span>::forward&lt;T&gt;(name));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个函数能够正常运行，但如果需要增加int型重载则将陷入Item26所述困境，本节我们将重新实现logAndAdd，以委托两个其他函数的方式（一个接受int，一个接受别的），logAndAdd本身可以接受一切类型的参数。</p>
+<p>执行实际工作的两个函数将命名为logAndAddImpl（依然使用了重载），其中一个以universal reference作为参数，因此我们仍然在执行重载与universal reference并行的策略。但本次每个函数都存在一个第二参数，该存在用以表征传入参数是否是一个int类型。也就是说，logAndAddImpl大概长这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">logAndAdd</span><span class="params">(T&amp;&amp; name)</span></span>&#123;</span><br><span class="line">    logAndAddImpl(<span class="built_in">std</span>::forward&lt;T&gt;(name),</span><br><span class="line">    <span class="built_in">std</span>::is_integral&lt;T&gt;()); <span class="comment">// not quite correct</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该代码并不保证正确，原因在于当一个左值被传递至universal reference name，那么T将被推衍成为一个左值引用，因此如果一个int型左值作为实参传入，当导致T被推衍为int&amp;,这并非是一个int类型，因此is_integral将永远返回false。当我们意识到这个问题的时候就等价于解决了这个问题，Item9中提及的type trait（std::remove_reference)几乎为此而生(C++14可以使用std::remove_reference_t&lt;T&gt;）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">logAndAdd</span><span class="params">(T&amp;&amp; name)</span></span>&#123;</span><br><span class="line">    logAndAddImpl(</span><br><span class="line">        <span class="built_in">std</span>::forward&lt;T&gt;(name),</span><br><span class="line">        <span class="built_in">std</span>::is_integral&lt;<span class="keyword">typename</span> <span class="built_in">std</span>::remove_reference&lt;T&gt;::type&gt;()</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>至此，我们可以将注意力集中至logAndAddImpl，针对非整数类型的重载版本如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">logAndAddImpl</span><span class="params">(T&amp;&amp; name, <span class="built_in">std</span>::false_type)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> now = <span class="built_in">std</span>::chrono::system_clock::now();</span><br><span class="line">    <span class="built_in">log</span>(now, <span class="string">"logAndAdd"</span>);</span><br><span class="line">    names.emplace(<span class="built_in">std</span>::forward&lt;T&gt;(name));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中的一大难点在于true和false都是运行期值，而我们需要在编译期明确调用函数，这意味着我们需要一个对应于true的类型和一个对应于false的类型，针对这种常见需求，标准库提供了std::true_type和std::false_type。<br>第二个重载版本如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">nameFromIdx</span><span class="params">(<span class="keyword">int</span> idx)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">logAndAddImpl</span><span class="params">(<span class="keyword">int</span> idx, <span class="built_in">std</span>::true_type)</span></span>&#123;</span><br><span class="line">    logAndAdd(nameFromIdx(idx));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在此实现中，我们避免了在logAndAddImpl中执行log（这一设计十分巧妙）。</p>
+<p>在此设计中，类型std::true_type和std::false_type是“tag”，其唯一目的在于强制执行我们需要的重载函数。为了优化性能，我们甚至没有给这些参数命名。这种设计常见于TMP之中，当代C++库函数源码中经常出现这种设计。</p>
+<hr>
+<h1 id="抑制带有universal-references的模板实例化"><a href="#抑制带有universal-references的模板实例化" class="headerlink" title="抑制带有universal references的模板实例化"></a>抑制带有universal references的模板实例化</h1><p>&nbsp;<br>Tag dispatch的使用前提是客户端具备单一（非重载）函数，这些非重载函数内涵某些重载函数。但在Item26中的Person类中，默认生成的函数将自发与开发者定义的函数形成重载，因此tag dispatch并非完美无缺。针对这种universal refernce总被触发的情况，我们还有一招：std::enable_if。</p>
+<p>std::enable_if可以强制令编译器认为某个特化模板并不存在（视作被禁用）。在默认情况下，所有模板都已启用，但仅当满足std::enable_if指定的条件时，才会启用使用std::enable_if的模板。以上一节的实例而言，只有当传递的类型不是Person时，我们才想启用Person forward构造函数。如果传递的类型是Person，我们则需要禁用forward构造函数（即令编译器忽视该函数），以copy ctor或move ctor触发调用。std::enable_if的使用范例如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="keyword">typename</span> = <span class="keyword">typename</span> <span class="built_in">std</span>::enable_if&lt;condition&gt;::type&gt;</span><br><span class="line">    <span class="keyword">explicit</span> Person(T&amp;&amp; n);</span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>本书并不介绍关于std::enable_if的具体细节，而是将注意力转向其启用条件表达式。我们需要指定的条件是：仅在T并非Person类型时才会触发模板实例化。type traits能够表征两个类型是否相同:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!<span class="built_in">std</span>::is_same&lt;Person,T&gt;::value</span><br></pre></td></tr></table></figure></p>
+<p>但这并不正确，如果universal refernce被左值初始化，那么T必然是一个左值引用，这导致下述代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Person <span class="title">p</span><span class="params">(<span class="string">"Nancy"</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">cloneOfP</span><span class="params">(p)</span></span>; <span class="comment">// initialize from lvalue</span></span><br></pre></td></tr></table></figure></p>
+<p>此时T将会被推衍为Person&amp;，从而导致is_same返回false。</p>
+<p>显然，针对推衍得到的T类型，我们应当忽略其：</p>
+<ol>
+<li><strong>reference</strong><br>为了确定是否应当启用universal reference构造函数，我们应当将Person&amp;、Person&amp;&amp;统一视为Person。</li>
+<li><strong>const and volatile</strong><br>我们应当将const Person、volatile Person以及const volatile Person都视为Person。</li>
+</ol>
+<p>type traits再一次立了大功，它提供了std::decay&lt;T&gt;以消去refernce、cv限定符（实际上它还能负责将数组、函数退化为指针）。综上，我们可以得到condition表达式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!<span class="built_in">std</span>::is_same&lt;Person, <span class="keyword">typename</span> <span class="built_in">std</span>::decay&lt;T&gt;::type&gt;::value</span><br></pre></td></tr></table></figure></p>
+<p>最终，我们得到转发函数如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;</span><br><span class="line">        <span class="keyword">typename</span> T,</span><br><span class="line">        <span class="keyword">typename</span> = <span class="keyword">typename</span> <span class="built_in">std</span>::enable_if&lt;</span><br><span class="line">            !<span class="built_in">std</span>::is_same&lt;Person,<span class="keyword">typename</span> <span class="built_in">std</span>::decay&lt;T&gt;::type&gt;::value</span><br><span class="line">        &gt;::type</span><br><span class="line">    &gt;</span><br><span class="line">    <span class="keyword">explicit</span> Person(T&amp;&amp; n);</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>假设派生自Person的类以常规方式实现copy与move操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialPerson</span>:</span> <span class="keyword">public</span> Person &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    SpecialPerson(<span class="keyword">const</span> SpecialPerson&amp; rhs):Person(rhs)&#123; … &#125;</span><br><span class="line">    SpecialPerson(SpecialPerson&amp;&amp; rhs):Person(<span class="built_in">std</span>::move(rhs))&#123; … &#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>在Item26中我们曾经提及，上述copy、move操作可能并不调用基类对应的函数，而是会选择调用转发函数，原因在于universal reference具备更高的匹配程度（足以匹配const）。对于这种情况，发生在基类之中，确切地来说，我们当前认定Person将仅在传入参数不为Person或其派生类型时才会触发forward构造函数。</p>
+<p>type traits再次发挥了作用，std::std::is_base_of&amp;T1, T2&gt;::value将在T2为T1的派生类时返回true（T自身亦可视为T的派生类），因此，我们可以利用它改写刚才的condition：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;</span><br><span class="line">        <span class="keyword">typename</span> T,</span><br><span class="line">        <span class="keyword">typename</span> = <span class="keyword">typename</span> <span class="built_in">std</span>::enable_if&lt;</span><br><span class="line">            !<span class="built_in">std</span>::is_base_of&lt;Person,<span class="keyword">typename</span> <span class="built_in">std</span>::decay&lt;T&gt;::type&gt;::value</span><br><span class="line">        &gt;::type</span><br><span class="line">    &gt;</span><br><span class="line">    <span class="keyword">explicit</span> Person(T&amp;&amp; n);</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>利用C++14可以保证我们的代码更加优雅：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;</span><br><span class="line">        <span class="keyword">typename</span> T,</span><br><span class="line">        <span class="keyword">typename</span> = <span class="built_in">std</span>::<span class="keyword">enable_if_t</span>&lt;</span><br><span class="line">            !<span class="built_in">std</span>::is_base_of&lt;Person,<span class="built_in">std</span>::<span class="keyword">decay_t</span>&lt;T&gt; &gt;::value</span><br><span class="line">        &gt;</span><br><span class="line">    &gt;</span><br><span class="line">    <span class="keyword">explicit</span> Person(T&amp;&amp; n);</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="区分int与non-int"><a href="#区分int与non-int" class="headerlink" title="区分int与non-int"></a>区分int与non-int</h2><p>&nbsp;<br>最终，我们将实践如何用enable_if区分int与non-int，我们需要做的只有两步：</p>
+<ol>
+<li><strong>添加一个Person构造函数以处理int类型（以重载的形式）</strong></li>
+<li><strong>限制模板实例化，对某些参数禁用该模板</strong></li>
+</ol>
+<p>实践效果如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;</span><br><span class="line">        <span class="keyword">typename</span> T,</span><br><span class="line">        <span class="keyword">typename</span> = <span class="built_in">std</span>::<span class="keyword">enable_if_t</span>&lt;</span><br><span class="line">            !<span class="built_in">std</span>::is_base_of&lt;Person, <span class="built_in">std</span>::<span class="keyword">decay_t</span>&lt;T&gt;&gt;::value &amp;&amp;</span><br><span class="line">            !<span class="built_in">std</span>::is_integral&lt;<span class="built_in">std</span>::<span class="keyword">remove_reference_t</span>&lt;T&gt;&gt;::value</span><br><span class="line">        &gt;</span><br><span class="line">    &gt;</span><br><span class="line">    <span class="keyword">explicit</span> Person(T&amp;&amp; n):name(<span class="built_in">std</span>::forward&lt;T&gt;(n))&#123; … &#125;</span><br><span class="line">    <span class="keyword">explicit</span> Person(<span class="keyword">int</span> idx):name(nameFromIdx(idx))&#123; … &#125;</span><br><span class="line">    … <span class="comment">// copy and move ctors, etc.</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h1><p>&nbsp;<br>本节所介绍的前三种技术：abandoning overloading, passing by const T&amp;, and passing by value都需要明确为被调用的函数指明所有潜在参数类型，而后两种技术：tag dispatch,constraining template eligibility则使用转发函数，因此不必说明参数类型。是否说明参数类型这一行为直接决定了这些技术的特性。</p>
+<p>一般而言，forward函数更为高效，因为它不必创建临时对象，但它亦存在缺点，例如并非所有参数都能做到完美转发（Item30见对此作出详细探讨），此外，forward函数可能会误将错误信息传递至对应的构造函数，举例而言，假设创建Person对象的客户端传递由char16_t（C++11中引入的类型，代表16位字符）而不是char组成的字符串常量：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Person <span class="title">p</span><span class="params">(<span class="string">u"Konrad Zuse"</span>)</span></span>; <span class="comment">// "Konrad Zuse" consists of characters of type const char16_t</span></span><br></pre></td></tr></table></figure></p>
+<p>前三种技术将会发现当前仅可采用int或string构造Person，因此产生明确的错误信息。而forward函数会自发将char16_t传入string构造函数，从而导致雪崩。一般来说，系统越复杂，转发层级越多，因此故障的排查也将愈加困难，一般而言，保留univeral reference的原因往往在于当前需要效率至上。</p>
+<p>对于Person而言，我们明确universal reference应当构成string的初始化器，因此我们可以使用static_assert配合type traits std::is_constructible加以判断，最终形成的判断句如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;</span><br><span class="line">        <span class="keyword">typename</span> T,</span><br><span class="line">        <span class="keyword">typename</span> = <span class="built_in">std</span>::<span class="keyword">enable_if_t</span>&lt;</span><br><span class="line">            !<span class="built_in">std</span>::is_base_of&lt;Person, <span class="built_in">std</span>::<span class="keyword">decay_t</span>&lt;T&gt;&gt;::value &amp;&amp;</span><br><span class="line">            !<span class="built_in">std</span>::is_integral&lt;<span class="built_in">std</span>::<span class="keyword">remove_reference_t</span>&lt;T&gt;&gt;::value</span><br><span class="line">        &gt;</span><br><span class="line">    &gt;</span><br><span class="line">    <span class="keyword">explicit</span> Person(T&amp;&amp; n):name(<span class="built_in">std</span>::forward&lt;T&gt;(n))&#123;</span><br><span class="line">        <span class="keyword">static_assert</span>(</span><br><span class="line">            <span class="built_in">std</span>::is_constructible&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, T&gt;::value,</span><br><span class="line">            <span class="string">"Parameter n can't be used to construct a std::string"</span></span><br><span class="line">        );</span><br><span class="line">        … <span class="comment">// the usual ctor work goes here</span></span><br><span class="line">    &#125;</span><br><span class="line">    … <span class="comment">// remainder of Person class (as before)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"><i class="fa fa-tag"></i> Modern C++</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/3614370e.html" rel="next" title="26.避免针对universal reference作出重载">
+                <i class="fa fa-chevron-left"></i> 26.避免针对universal reference作出重载
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post/db3a64cc.html" rel="prev" title="29.不必高估move语义">
+                29.不必高估move语义 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/avatar.png"
+               alt="ZSMJ" />
+          <p class="site-author-name" itemprop="name">ZSMJ</p>
+          <p class="site-description motion-element" itemprop="description">Stay Hungry,Stay Foolish</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zsmj2017" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Abandon-overloading"><span class="nav-number">2.</span> <span class="nav-text">Abandon overloading</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-by-const-T-amp"><span class="nav-number">3.</span> <span class="nav-text">Pass by const T&</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-by-value"><span class="nav-number">4.</span> <span class="nav-text">Pass by value</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Use-Tag-dispatch"><span class="nav-number">5.</span> <span class="nav-text">Use Tag dispatch</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#抑制带有universal-references的模板实例化"><span class="nav-number">6.</span> <span class="nav-text">抑制带有universal references的模板实例化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#继承"><span class="nav-number">6.1.</span> <span class="nav-text">继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#区分int与non-int"><span class="nav-number">6.2.</span> <span class="nav-text">区分int与non-int</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#比较"><span class="nav-number">7.</span> <span class="nav-text">比较</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+        <div class="copyright" >
+  
+  &copy;  2018 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZSMJ</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">
+    NexT.Pisces
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count" style="color: #e90f92;">全站共 793k 字</span>
+</div>
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+  
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+<script type="text/javascript" async src="//push.zhanzhang.baidu.com/push.js">
+</script>
+
+
+  <!-- 按需加载背景 -->
+  <!-- 按需加载背景 -->
+<!-- 识别手机或电脑的js开始 -->  
+<script type="text/javascript">   
+(function(){  
+var res = GetRequest();  
+var par = res['index'];  
+if(par!='gfan'){  
+  var ua=navigator.userAgent.toLowerCase();  
+  var contains=function (a, b){  
+      if(a.indexOf(b)!=-1){return true;}  
+  };   
+  if((contains(ua,"android") && contains(ua,"mobile"))||(contains(ua,"android") && contains(ua,"mozilla"))||(contains(ua,"android") && contains(ua,"opera"))||contains(ua,"ucweb7")||contains(ua,"iphone")){
+    return false;
+  } else {
+    $.getScript("/js/src/particle.js?v=5.0.1");
+  }
+}  
+})();  
+function GetRequest() {  
+var url = location.search;
+var theRequest = new Object();  
+if (url.indexOf("?") != -1) {  
+  var str = url.substr(1);  
+  strs = str.split("&");  
+  for(var i = 0; i < strs.length; i ++) {  
+    theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);  
+  }  
+}  
+return theRequest;  
+}  
+</script>  
+<!-- 识别手机或电脑的js结束 -->  
+  <!-- 页面点击小红心 -->
+  <!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js?v=5.0.1"></script>
+  <!-- 页面移动stars -->
+  <!-- 鼠标移动特效 -->
+<script type="text/javascript" src="/js/src/jquery-stars.js?v=5.0.1"></script>
+<script type="text/javascript">
+jQuery('body').jstars({
+	image_path: '/images',
+	image: 'candy-cane-stars.png',
+	style: 'white',
+	width: 34,
+	height: 34,
+	delay: 700,
+	frequency: 5
+});
+</script>
+  ﻿<!-- 页面 title 进入/离开 效果 -->
+<script type="text/javascript">var OriginTitile=document.title,st;document.addEventListener("visibilitychange",function(){document.hidden?(document.title="≡[。。]≡ 回不去了吗？!",clearTimeout(st)):(document.title="(ฅ>ω<*ฅ) Thank You~ "+OriginTitile,st=setTimeout(function(){document.title=OriginTitile},4e3))})</script>
+</body>
+</html>
