@@ -1359,13 +1359,13 @@
         
 <!-- 自定义结束 -->
         
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在本章前文所述的各项等待操作中，线程阻塞的时间并不确定（因为事件发生时间并不确定）。在实际应用中也存在这样的需求：限制线程等待时间。在线程等待特定的一段时间后，开发者既可以向用户发出“该事件仍未完成”的提示，也可以接受由于用户放弃等待从而关闭线程的命令。</p>
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在本章前文所述的各项等待操作中，线程阻塞的时间并不确定，但在实际应用中存在这样的需求：限制线程等待时间——在线程等待特定的一段时间后，开发者既可以向用户发出“该事件仍未完成”的提示，也可以接受由于用户放弃等待从而关闭线程的命令。</p>
 <p>判断程序运行超时有两种方式：</p>
 <ol>
 <li>duration-based<br>该方式需要用户指定一段时间，例如30ms。</li>
 <li>absolute<br>该方式需要用户提供一个时间点，例如17:30:15.045987023 UTC on November 30, 2011。</li>
 </ol>
-<p>大多数等待函数均支持这两种方式，处理<code>duration-based</code>的后缀为<code>_for</code>，处理<code>absolute</code>的后缀为<code>_until</code>。举例而言，<code>std::condition_variable</code>的成员函数<code>wait_for()</code>和<code>wait_until()</code>均具备2种重载，第一种重载形式等待着信号触发或虚假唤醒。另一种则在唤醒时检查谓词，并仅在结果为<code>true</code>的情况下返回，或直接超时返回，更多相关信息可见本节末尾的图表。</p>
+<p>大多数等待函数均支持这两种方式，处理<code>duration-based</code>的后缀为<code>_for</code>，处理<code>absolute</code>的后缀为<code>_until</code>。举例而言，<code>std::condition_variable</code>的成员函数<code>wait_for()</code>和<code>wait_until()</code>。此外，这些函数具备2种重载，第一种重载形式等待着信号触发或虚假唤醒，另一种则在唤醒时检查谓词，并仅在结果为<code>true</code>的情况下返回，或直接超时返回。更多相关信息可见本节末尾的图表。</p>
           <div class="post-more-link text-center">
             <a class="btn" href="/post/7f000deb.html" rel="contents">
               阅读全文 &raquo;
