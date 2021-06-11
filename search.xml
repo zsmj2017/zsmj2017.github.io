@@ -4,6 +4,41 @@
   
     
     <entry>
+      <title><![CDATA[C++内存模型与原子类型操作——原子操作与原子类型]]></title>
+      <url>https://zsmj2017.tech/post/25897c79.html</url>
+      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。</p>
+<p>如若某线程正在以原子操作load一个对象的值（对该对象的所有修改都由原子操作完成），那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。</p>
+<a id="more"></a>
+<hr>
+<h1 id="标准原子类型"><a href="#标准原子类型" class="headerlink" title="标准原子类型"></a>标准原子类型</h1><p>&nbsp;<br>所有标准原子类型都可以在<code>&lt;atomic&gt;</code>头文件中找到。尽管从理论角度出发，开发者可以使用互斥锁保证任何数据类型均对外展现出原子性，但从C++语言定义而言，仅有这些类型是真正的原子类型。</p>
+<p>事实上，可能标准原子类型也是通过使用锁实现了原子性。为了探究这一点，几乎所有标准原子类型（特例为<code>std::atomic_flag</code>）都具备这样一个接口<code>is_lock_free()</code>，开发者可以通过调用此接口来判断，当前行为究竟是语义上的原子行为（此时该接口返回true）还是编译器或者函数库内部在执行加锁操作模拟原子性（此时该接口返回false）。了解原子类型是否具备语义上的原子性在性能优化领域较为重要：如果某类型内部同样使用了mutex，那么可能将无法带来期望的性能收益。</p>
+<p>除了直接使用<code>std::atomic</code>类模板外，标准库也提供了一系列名称来引用原子类型。但由于历史原因，在较老的编译器上，这些替代类型名称可能引用对应 std::atomic&lt;&gt;的特化类或这个特化类的一个基类，支持C++17的编译器则不存在此问题。因此，如果混合使用类型名与<code>std::atomic&lt;&gt;</code>特化类，可能导致代码不可移植。</p>
+<p>类型名与<code>std::atomic&lt;&gt;</code>特化类映射表如下：<br><img src="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png" alt="WechatIMG13.png-417kB"></p>
+<p>除此以外，C++标准库还针对<code>std::size_t</code>等非基本原子类型提供typedef，其映射表如下：<br><img src="http://static.zybuluo.com/zsmj2017/jut87ru9vyn16t0qv66fsr0w/image-20210610152408616.png" alt="image-20210610152408616.png-298.2kB"></p>
+<p>标准原子类型理论上不可复制或赋值，因为它们没有<code>copy ctor</code>或<code>copy assignment operator</code>。但它们支持通过诸如<code>load()</code>,<code>store</code>，<code>exchange</code>等被相应的内置类型赋值或隐式转换。此外，它们也支持相应的相关计算符，例如<code>+=</code>,<code>-=</code>等等。整形与指针的原子类型还支持<code>++</code>，<code>--</code>。这些计算符同样具备实现同样功能的成员函数，如<code>fetch_add()</code>、<code>fetch_or()</code>等等。<br>一般而言，对象的赋值运算符往往返回引用，如果将该惯例应用于原子类型，则获取存储数据时程序中势必存在一个特殊的读操作，这可能导致数据竞争（在assign和read之间可能存在一个线程正在修改数据）。因此，对于赋值运算符而言，其返回值是被存储的数据，而对于命名成员函数而言，返回值是操作前的数据。</p>
+<p><code>std::atomic&lt;&gt;</code>类模板不仅仅是一组特化。它确实存在一个主模板，可用于创建用户自定义类型的原子变体。其操作被限定为<code>load()</code>、<code>store()</code>、<code>exchange()</code>、<code>compare_exchange_weak()</code>和<code>compare_exchange_strong()</code>。</p>
+<p>每个原子类型上操作都有一个可选的内存顺序参数，它是<code>std::memory_order</code>枚举类型的某个值，可以用来指定所需的内存顺序语义。<code>std::memory_order</code>枚举值分别为：<br>1.std::memory_order_relaxed<br>2.std::memory_order_acquire<br>3.std::memory_order_consume<br>4.std::memory_order_acq_rel<br>5.std::memory_order_release<br>6.std::memory_order_seq_cst</p>
+<p>该内存顺序参数依赖于操作的类别，在不指定的情况下，默认使用<code>std::memory_order_seq_cst</code>。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> C++并发编程实战 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> 并发编程 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[VimTutor小结]]></title>
       <url>https://zsmj2017.tech/post/177312ea.html</url>
       <content type="html"><![CDATA[<p>本文为vimtutor总结，仅摘录部分常用vim语句以供复习。<br><a id="more"></a></p>
@@ -251,32 +286,6 @@
         <tags>
             
             <tag> Computer Network </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[C++内存模型与原子类型操作——原子操作与原子类型]]></title>
-      <url>https://zsmj2017.tech/post/25897c79.html</url>
-      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种情况。如若某线程在正在读取一个原子类型对象的值，那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。此外需要关注的是，在C++中，大多数原子操作仅能施加于原子类型。</p>
-<a id="more"></a>
-<hr>
-<h1 id="标准原子类型"><a href="#标准原子类型" class="headerlink" title="标准原子类型"></a>标准原子类型</h1><p>&nbsp;<br>所有标准原子类型都可以在<atomic>头文件中找到。尽管从理论角度出发，开发者可以使用互斥锁保证任何数据类型均对外展现出原子性，但从C++语言定义而言，仅有这些类型是真正的原子类型。事实上，可能标准原子类型也是通过使用锁实现了原子性。为了探究这一点，几乎所有标准原子类型都具备这样一个接口<code>is_lock_free()</code>，开发者可以通过调用此接口来判断当前行为究竟是语义上的原子行为（此时该接口返回true）还是编译器或者函数库内部在执行加锁操作模拟原子性（此时该接口返回false）。</atomic></p>
-]]></content>
-      
-        <categories>
-            
-            <category> C++并发编程实战 </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> 并发编程 </tag>
             
         </tags>
         
