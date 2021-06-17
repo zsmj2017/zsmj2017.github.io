@@ -99,7 +99,7 @@
 如若某线程正在以原子操作load一个对象的值（对该对象的所有修改都由原子操作完成），那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/jut87ru9vyn16t0qv66fsr0w/image-20210610152408616.png">
-<meta property="og:updated_time" content="2021-06-11T04:19:54.919Z">
+<meta property="og:updated_time" content="2021-06-17T08:35:38.296Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++内存模型与原子类型操作——原子操作与原子类型">
 <meta name="twitter:description" content="前言&amp;nbsp;原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。
@@ -544,6 +544,14 @@
 <p><code>std::atomic&lt;&gt;</code>类模板不仅仅是一组特化。它确实存在一个主模板，可用于创建用户自定义类型的原子变体。其操作被限定为<code>load()</code>、<code>store()</code>、<code>exchange()</code>、<code>compare_exchange_weak()</code>和<code>compare_exchange_strong()</code>。</p>
 <p>每个原子类型上操作都有一个可选的内存顺序参数，它是<code>std::memory_order</code>枚举类型的某个值，可以用来指定所需的内存顺序语义。<code>std::memory_order</code>枚举值分别为：<br>1.std::memory_order_relaxed<br>2.std::memory_order_acquire<br>3.std::memory_order_consume<br>4.std::memory_order_acq_rel<br>5.std::memory_order_release<br>6.std::memory_order_seq_cst</p>
 <p>该内存顺序参数依赖于操作的类别，在不指定的情况下，默认使用<code>std::memory_order_seq_cst</code>。</p>
+<hr>
+<h1 id="std-atomic-flag"><a href="#std-atomic-flag" class="headerlink" title="std::atomic_flag"></a>std::atomic_flag</h1><p>&nbsp;<br><code>std::atomic_flag</code>是最简单的标准原子类型，表征布尔量，此类型的对象仅有两种状态:set或clear。实际上，它被设计为一种基础构建模块，很少应用于实际工程。以下将简称<code>std::atomic_flag</code>类型对象为flag对象。</p>
+<p>flag对象必须用<code>ATOMIC_FLAG_INIT</code>初始化，即初始化为clear状态，这也意味着它无法被初始化为set状态。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic_flag f = ATOMIC_FLAG_INIT;</span><br></pre></td></tr></table></figure></p>
+<p>它是唯一在初始化时需要这种特殊处理的原子类型，也是唯一保证无锁的原子类型。此外，static flag对象保证其具备静态初始化特性，即该对象总在首次使用前完成初始化。</p>
+<p>flag对象在完成初始化后，仅能对其施加三种操作：destroy，clear，test_and_set（读取值后set），分别对应着析构函数，<code>clear()</code>成员函数以及<code>test_and_set()</code>成员函数。<code>clear()</code>和<code>test_and_set()</code>都可以指定内存顺序。</p>
+<p>所有原子类型均不支持copy ctor &amp;&amp; copy assignment，flag对象也不例外。原因很简单：应用于原子类型的所有操作均应具备原子性，但赋值和拷贝构造涉及到两个独立对象。在执行拷贝构造或拷贝赋值操作时，必须先从一个对象读取值，然后将其写入另一个对象，这一组合行为不可能具备原子性。</p>
+<p><code>std::atomic_flag</code>所具备的特性使其非常适合实现自旋互斥锁，具体实现如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">spinlock_mutex</span> &#123;</span></span><br><span class="line">  <span class="built_in">std</span>::atomic_flag flag; </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  spinlock_mutex(): flag(ATOMIC_FLAG_INIT) &#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(flag.test_and_set(<span class="built_in">std</span>::memory_order_acquire)); <span class="comment">// 忙-等待</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    flag.clear(<span class="built_in">std</span>::memory_order_release); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>flag对象类似于bool，但其未提供标准get接口（C++20引入<code>test()</code>成员函数），因此如存在相关需求，请使用<code>std::atomic&lt;bool&gt;</code>。</p>
 
       
     </div>
@@ -727,7 +735,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li></ol></div>
             
           </div>
         </section>
@@ -767,7 +775,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 794k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 795k 字</span>
 </div>
         
       </div>
