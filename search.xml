@@ -27,6 +27,17 @@
 <p>所有原子类型均不支持copy ctor &amp;&amp; copy assignment，flag对象也不例外。原因很简单：应用于原子类型的所有操作均应具备原子性，但赋值和拷贝构造涉及到两个独立对象。在执行拷贝构造或拷贝赋值操作时，必须先从一个对象读取值，然后将其写入另一个对象，这一组合行为不可能具备原子性。</p>
 <p><code>std::atomic_flag</code>所具备的特性使其非常适合实现自旋互斥锁，具体实现如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">spinlock_mutex</span> &#123;</span></span><br><span class="line">  <span class="built_in">std</span>::atomic_flag flag; </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  spinlock_mutex(): flag(ATOMIC_FLAG_INIT) &#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(flag.test_and_set(<span class="built_in">std</span>::memory_order_acquire)); <span class="comment">// 忙-等待</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    flag.clear(<span class="built_in">std</span>::memory_order_release); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
 <p>flag对象类似于bool，但其未提供标准get接口（C++20引入<code>test()</code>成员函数），因此如存在相关需求，请使用<code>std::atomic&lt;bool&gt;</code>。</p>
+<hr>
+<h1 id="std-atomic-lt-bool-gt"><a href="#std-atomic-lt-bool-gt" class="headerlink" title="std::atomic&lt;bool&gt;"></a>std::atomic&lt;bool&gt;</h1><p>&nbsp;<br>相较于flag对象，<code>std::atomic&lt;bool&gt;</code>的灵活程度大为提高。尽管不支持copy ctor与copy assign，但可以使用内置的bool类型构造它——这意味着它可以被初始化为true或false。此外，<code>std::atomic&lt;bool&gt;</code>对象亦可接受来自内置bool类型的赋值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; b(<span class="literal">true</span>);</span><br><span class="line">b=<span class="literal">false</span>;</span><br></pre></td></tr></table></figure>
+<p>这里需要注意一点：不同于常规赋值操作，原子类型的赋值操作返回的并非引用，而是被赋予的值。原因很简单，返回引用可能会导致另一个线程修改当前存储数据，这将导致数据竞争。</p>
+<p><code>std::atomic&lt;bool&gt;</code>使用<code>strore()</code>成员函数写入true或false值，使用<code>exchange()</code>成员函数完成对原始值的检索与替换，读取操作使用的是成员函数<code>load()</code>。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; b;</span><br><span class="line"><span class="keyword">bool</span> x=b.load(<span class="built_in">std</span>::memory_order_acquire);</span><br><span class="line">b.store(<span class="literal">true</span>);</span><br><span class="line">x=b.exchange(<span class="literal">false</span>, <span class="built_in">std</span>::memory_order_acq_rel);</span><br></pre></td></tr></table></figure></p>
+<p>除<code>exchange</code>外，<code>std::atomic&lt;bool&gt;</code>还有两个”read-change-write”操作，分别是<code>compare_exchange_weak()</code>和<code>compare_exchange_strong()</code>。</p>
+<p>compare-exchange操作是使用原子类型进行编程的基石——它将原子变量的值与提供的预期值进行比较，若相等，则存储提供的值。如果值不相等，则预期值将被更新为原子变量存储的值。该操作返回布尔量，若执行了存储操作（值相等）且存储成功则为true，否则为false。</p>
+<p><code>compare_exchange_weak()</code>的weak之处在于，即使原始值与预期值一致时，存储也可能会不成功，此时原始值不变，<code>compare_exchange_weak()</code>返回false。这种情况多见于当前机器不支持compare-exchange指令（意味着无法保证操作原子性），若此时执行操作的线程在必要的指令序列中被切换出去，而操作系统在其位置调度了另一个线程，将导致数据存储失败。因此<code>compare_exchange_weak()</code>通常应用于循环内：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> expected=<span class="literal">false</span>;</span><br><span class="line"><span class="keyword">extern</span> atomic&lt;<span class="keyword">bool</span>&gt; b; <span class="comment">// 在其他某个地方设置</span></span><br><span class="line"><span class="comment">// b内部数据为存储值</span></span><br><span class="line"><span class="comment">// expected为期待值</span></span><br><span class="line"><span class="comment">// true为提供值</span></span><br><span class="line"><span class="keyword">while</span>(!b.compare_exchange_weak(expected,<span class="literal">true</span>) &amp;&amp; !expected); <span class="comment">// 若存储失败，将持续执行</span></span><br></pre></td></tr></table></figure></p>
+<p><code>compare_exchange_strong()</code>的strong之处在于，当存储值等于期待值时，该函数返回ture（即使存储失败），否则返回false。</p>
+<p>若当前提供值依赖于存储值，则开发者可以利用期待值被更新为存储值的特性，利用期待值计算提供值。这里需要注意，若这种计算过程非常耗时，则使用strong优于weak，因为strong不会在期待值未发生变更时重新计算提供值。</p>
+<p>除flag外，原子类型并不保证无锁性，若有需要，<code>std::atomic&lt;bool&gt;</code>可以通过<code>is_lock_free()</code>成员函数检查其操作是否具备无锁性。</p>
 ]]></content>
       
         <categories>
@@ -3259,45 +3270,6 @@
     </entry>
     
     <entry>
-      <title><![CDATA[29.不必高估move语义]]></title>
-      <url>https://zsmj2017.tech/post/db3a64cc.html</url>
-      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>移动语义可以被认为是C++11的首要特性。它不仅允许编译器用相对便宜的移动替换昂贵的拷贝操作，并且在实际中要求编译器如此运转（在条件满足时），但本节要叙述的是：不要过高地看待移动语义。</p>
-<hr>
-<h1 id="类型支持"><a href="#类型支持" class="headerlink" title="类型支持"></a>类型支持</h1><p>&nbsp;<br>首先，并非所有类型均支持移动语义。在实际使用过程中，可能你当前使用的类型（历史遗留代码）并不支持移动语义。确实，C++11愿意为缺少它们的类生成move操作，但这只发生在声明没有copy操作，移动操作或析构函数的类中（见Item17）。此外，不支持move的data member或base class）也将抑制编译器生成move操作。</p>
-<hr>
-<h1 id="支持也未必高效"><a href="#支持也未必高效" class="headerlink" title="支持也未必高效"></a>支持也未必高效</h1><p>&nbsp;<br>其次，即使该类型明确具备移动语义，它也未必如你所想般高效。举例而言，C++标准库中的所有容器均支持移动语义，但对于某些容器来说，它们的移动语义并不具备真正的低开销，又或者由于容器元素类型的限制，它们无法采用真正高效的move操作。</p>
-<h2 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h2><p>以std::array为例，该容器是C++11中的一个新容器。std::array本质上是一个带有STL接口的内置数组。一般而言，STL容器倾向于将其所有元素均保存在堆上，内部元素仅仅是一个指向堆中内容的指针（真实情况较为复杂，但其差异不影响本次讨）。这些指针的存在为移动容器提供了便利：只需要将现有指针指向对应内容，然后将指针置为nullptr即可，现以移动vector为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; vw1;</span><br><span class="line"><span class="comment">// put data into vw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move vw1 into vw2. Runs in constant time. Only ptrs in vw1 and vw2 are modified</span></span><br><span class="line"><span class="keyword">auto</span> vw2 = <span class="built_in">std</span>::move(vw1);</span><br></pre></td></tr></table></figure></p>
-<p><img src="http://static.zybuluo.com/zsmj2017/wnoy6o8pegwe0lyzll516et1/image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png" alt="image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png-21kB"><br>但std::array将元素直接存储于对象内部，因此其move操作看起来如下所示：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;Widget, 10000&gt; aw1;</span><br><span class="line"><span class="comment">// put data into aw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move aw1 into aw2. Runs in</span></span><br><span class="line"><span class="comment">// linear time. All elements in</span></span><br><span class="line"><span class="comment">// aw1 are moved into aw2</span></span><br><span class="line"><span class="keyword">auto</span> aw2 = <span class="built_in">std</span>::move(aw1);</span><br></pre></td></tr></table></figure>
-<p><img src="http://static.zybuluo.com/zsmj2017/6vb9j6bgrv0q0j6wk4fy4tt1/image_1cie5kqjo1pjm150r12rer3g1979m.png" alt="image_1cie5kqjo1pjm150r12rer3g1979m.png-22.1kB"></p>
-<p>这里需要注意的是，我们必须移动aw1中每一个Widget至aw2，也就是说当前仍然需要线性的时间，可能这快于copy，但也绝非像某些人所说的“移动容器只需要执行拷贝一个指针的时间”。</p>
-<h2 id="SSO-std-string"><a href="#SSO-std-string" class="headerlink" title="SSO std::string"></a>SSO std::string</h2><p>又例如，std::string提供常数时间的移动操作与线性时间的拷贝操作，这让我们感觉移动必然快于拷贝，但情况可能并非如此。许多字符串实现采用小字符串优化（SSO）。对于SSO，“小”字符串（例如，容量不超过15个字符的字符串）存储于std::string对象内的buffer中，而并非使用堆中的内存。移动基于SSO技术实现的字符串并不快于拷贝，因为传统仅拷贝一个指针的行为对其并不适用（内容存储于对象内，因此必须对对象有所操作），对于此类对象，copy并不慢于move。</p>
-<hr>
-<h1 id="异常安全性"><a href="#异常安全性" class="headerlink" title="异常安全性"></a>异常安全性</h1><p>&nbsp;<br>即使一切安好，move操作最终也可能会导致copy操作。在Item14中曾经提及，为了不破坏历史遗留代码，C++11中的异常规格必然与C++98中相容，因此，对于某些容器，只有在move操作明确不会抛出异常时才可能会取代copy操作。因此，即使move操作确实优于copy操作且当前环境适用于move（例如参数为右值），编译器在move操作并未声明为noexcept的情况下依然会选择对move视而不见。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>在撰写代码时务必谨慎假设move语义并未发挥作用，但如果你明确当前类型必然支持移动语义，那自然可以大胆使用。</strong></li>
-</ol>
-]]></content>
-      
-        <categories>
-            
-            <category> Effective Modern C++ </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> Modern C++ </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[28.了解引用塌缩]]></title>
       <url>https://zsmj2017.tech/post/ae03537d.html</url>
       <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>众所周知，当一个左值或右值初始化universal reference时将触发类型推衍，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(T&amp;&amp; param)</span></span>;</span><br></pre></td></tr></table></figure></p>
@@ -3341,6 +3313,45 @@
 <li><strong>引用塌缩触发于四种特定环境：模板实例化、auto类型生成、typedef与alias declaration以及decltype推衍。</strong></li>
 <li><strong>在引用塌缩过程中，只要存在左值引用，则最终结果为左值引用，否则即为右值引用。</strong></li>
 <li><strong>universal reference可视为特定环境下的右值引用。</strong></li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> Effective Modern C++ </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> Modern C++ </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[29.不必高估move语义]]></title>
+      <url>https://zsmj2017.tech/post/db3a64cc.html</url>
+      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>移动语义可以被认为是C++11的首要特性。它不仅允许编译器用相对便宜的移动替换昂贵的拷贝操作，并且在实际中要求编译器如此运转（在条件满足时），但本节要叙述的是：不要过高地看待移动语义。</p>
+<hr>
+<h1 id="类型支持"><a href="#类型支持" class="headerlink" title="类型支持"></a>类型支持</h1><p>&nbsp;<br>首先，并非所有类型均支持移动语义。在实际使用过程中，可能你当前使用的类型（历史遗留代码）并不支持移动语义。确实，C++11愿意为缺少它们的类生成move操作，但这只发生在声明没有copy操作，移动操作或析构函数的类中（见Item17）。此外，不支持move的data member或base class）也将抑制编译器生成move操作。</p>
+<hr>
+<h1 id="支持也未必高效"><a href="#支持也未必高效" class="headerlink" title="支持也未必高效"></a>支持也未必高效</h1><p>&nbsp;<br>其次，即使该类型明确具备移动语义，它也未必如你所想般高效。举例而言，C++标准库中的所有容器均支持移动语义，但对于某些容器来说，它们的移动语义并不具备真正的低开销，又或者由于容器元素类型的限制，它们无法采用真正高效的move操作。</p>
+<h2 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h2><p>以std::array为例，该容器是C++11中的一个新容器。std::array本质上是一个带有STL接口的内置数组。一般而言，STL容器倾向于将其所有元素均保存在堆上，内部元素仅仅是一个指向堆中内容的指针（真实情况较为复杂，但其差异不影响本次讨）。这些指针的存在为移动容器提供了便利：只需要将现有指针指向对应内容，然后将指针置为nullptr即可，现以移动vector为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; vw1;</span><br><span class="line"><span class="comment">// put data into vw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move vw1 into vw2. Runs in constant time. Only ptrs in vw1 and vw2 are modified</span></span><br><span class="line"><span class="keyword">auto</span> vw2 = <span class="built_in">std</span>::move(vw1);</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://static.zybuluo.com/zsmj2017/wnoy6o8pegwe0lyzll516et1/image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png" alt="image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png-21kB"><br>但std::array将元素直接存储于对象内部，因此其move操作看起来如下所示：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;Widget, 10000&gt; aw1;</span><br><span class="line"><span class="comment">// put data into aw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move aw1 into aw2. Runs in</span></span><br><span class="line"><span class="comment">// linear time. All elements in</span></span><br><span class="line"><span class="comment">// aw1 are moved into aw2</span></span><br><span class="line"><span class="keyword">auto</span> aw2 = <span class="built_in">std</span>::move(aw1);</span><br></pre></td></tr></table></figure>
+<p><img src="http://static.zybuluo.com/zsmj2017/6vb9j6bgrv0q0j6wk4fy4tt1/image_1cie5kqjo1pjm150r12rer3g1979m.png" alt="image_1cie5kqjo1pjm150r12rer3g1979m.png-22.1kB"></p>
+<p>这里需要注意的是，我们必须移动aw1中每一个Widget至aw2，也就是说当前仍然需要线性的时间，可能这快于copy，但也绝非像某些人所说的“移动容器只需要执行拷贝一个指针的时间”。</p>
+<h2 id="SSO-std-string"><a href="#SSO-std-string" class="headerlink" title="SSO std::string"></a>SSO std::string</h2><p>又例如，std::string提供常数时间的移动操作与线性时间的拷贝操作，这让我们感觉移动必然快于拷贝，但情况可能并非如此。许多字符串实现采用小字符串优化（SSO）。对于SSO，“小”字符串（例如，容量不超过15个字符的字符串）存储于std::string对象内的buffer中，而并非使用堆中的内存。移动基于SSO技术实现的字符串并不快于拷贝，因为传统仅拷贝一个指针的行为对其并不适用（内容存储于对象内，因此必须对对象有所操作），对于此类对象，copy并不慢于move。</p>
+<hr>
+<h1 id="异常安全性"><a href="#异常安全性" class="headerlink" title="异常安全性"></a>异常安全性</h1><p>&nbsp;<br>即使一切安好，move操作最终也可能会导致copy操作。在Item14中曾经提及，为了不破坏历史遗留代码，C++11中的异常规格必然与C++98中相容，因此，对于某些容器，只有在move操作明确不会抛出异常时才可能会取代copy操作。因此，即使move操作确实优于copy操作且当前环境适用于move（例如参数为右值），编译器在move操作并未声明为noexcept的情况下依然会选择对move视而不见。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>在撰写代码时务必谨慎假设move语义并未发挥作用，但如果你明确当前类型必然支持移动语义，那自然可以大胆使用。</strong></li>
 </ol>
 ]]></content>
       
