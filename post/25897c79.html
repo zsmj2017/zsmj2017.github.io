@@ -99,7 +99,7 @@
 如若某线程正在以原子操作load一个对象的值（对该对象的所有修改都由原子操作完成），那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/jut87ru9vyn16t0qv66fsr0w/image-20210610152408616.png">
-<meta property="og:updated_time" content="2021-06-22T10:21:31.729Z">
+<meta property="og:updated_time" content="2021-06-23T07:33:36.548Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++内存模型与原子类型操作——原子操作与原子类型">
 <meta name="twitter:description" content="前言&amp;nbsp;原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。
@@ -561,8 +561,16 @@
 <p>compare-exchange操作是使用原子类型进行编程的基石——它将原子变量的值与提供的预期值进行比较，若相等，则存储提供的值。如果值不相等，则预期值将被更新为原子变量存储的值。该操作返回布尔量，若执行了存储操作（值相等）且存储成功则为true，否则为false。</p>
 <p><code>compare_exchange_weak()</code>的weak之处在于，即使原始值与预期值一致时，存储也可能会不成功，此时原始值不变，<code>compare_exchange_weak()</code>返回false。这种情况多见于当前机器不支持compare-exchange指令（意味着无法保证操作原子性），若此时执行操作的线程在必要的指令序列中被切换出去，而操作系统在其位置调度了另一个线程，将导致数据存储失败。因此<code>compare_exchange_weak()</code>通常应用于循环内：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> expected=<span class="literal">false</span>;</span><br><span class="line"><span class="keyword">extern</span> atomic&lt;<span class="keyword">bool</span>&gt; b; <span class="comment">// 在其他某个地方设置</span></span><br><span class="line"><span class="comment">// b内部数据为存储值</span></span><br><span class="line"><span class="comment">// expected为期待值</span></span><br><span class="line"><span class="comment">// true为提供值</span></span><br><span class="line"><span class="keyword">while</span>(!b.compare_exchange_weak(expected,<span class="literal">true</span>) &amp;&amp; !expected); <span class="comment">// 若存储失败，将持续执行</span></span><br></pre></td></tr></table></figure></p>
 <p><code>compare_exchange_strong()</code>的strong之处在于，当存储值等于期待值时，该函数返回ture（即使存储失败），否则返回false。</p>
-<p>若当前提供值依赖于存储值，则开发者可以利用期待值被更新为存储值的特性，利用期待值计算提供值。这里需要注意，若这种计算过程非常耗时，则使用strong优于weak，因为strong不会在期待值未发生变更时重新计算提供值。</p>
+<p>若当前提供值依赖于存储值，则开发者可以利用期待值被更新为存储值的特性，利用期待值计算提供值。这里需要注意，若这种计算过程非常耗时，则使用strong优于weak，因为weak所在的循环将导致提供值被反复计算，即使期待值未发生变更。</p>
 <p>除flag外，原子类型并不保证无锁性，若有需要，<code>std::atomic&lt;bool&gt;</code>可以通过<code>is_lock_free()</code>成员函数检查其操作是否具备无锁性。</p>
+<hr>
+<h1 id="std-atomic-lt-T-gt"><a href="#std-atomic-lt-T-gt" class="headerlink" title="std::atomic&lt;T*&gt;"></a>std::atomic&lt;T*&gt;</h1><p>&nbsp;<br>std::atomic&lt;T*&gt;具备所有std::atomic<bool>的接口与性质，本节主要描述其特性。</bool></p>
+<p>std::atomic<t*>支持指针运算，类似于普通指针，其行为是在存储的地址上做原子加法与减法，其接口也类似与普通指针类型，有+=，-=，++(前置&amp;&amp;后置)， —(前置&amp;&amp;后置)，它们的返回值是一个普通的T*，指向增加/减少后的内存地址。</t*></p>
+<p>除上述接口外，std::atomic<t*>还提供了接口<code>fetch_add()</code>与<code>fetch_sub()</code>，其返回值与上述接口不同，返回执行加/减操作前的原始值。</t*></p>
+<p>std::atomic<t*>具体使用示例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>&#123;</span>&#125;;</span><br><span class="line">Foo some_array[<span class="number">5</span>];</span><br><span class="line"><span class="built_in">std</span>::atomic&lt;Foo*&gt; p(some_array); </span><br><span class="line">Foo*x=p.fetch_add(<span class="number">2</span>); <span class="comment">//p加2，并返回老的值 </span></span><br><span class="line">assert(x==some_array); </span><br><span class="line">assert(p.load()==&amp;some_array[<span class="number">2</span>]);</span><br><span class="line">x=(p-=<span class="number">1</span>); <span class="comment">//p减1，并返回新的值 </span></span><br><span class="line">assert(x==&amp;some_array[<span class="number">1</span>]); </span><br><span class="line">assert(p.load()==&amp;some_array[<span class="number">1</span>]);</span><br></pre></td></tr></table></figure></t*></p>
+<hr>
+<h1 id="标准整形原子类型"><a href="#标准整形原子类型" class="headerlink" title="标准整形原子类型"></a>标准整形原子类型</h1><p>&nbsp;<br>除load(), store(), exchange(), compare_exchange_weak(),compare_exchange_strong()接口外，原子整形类型如std::atomic<int>和 std::atomic<unsigned long="">有相当全面的一整套运算接口:fetch_add(), fetch_sub(), fetch_and(), fetch_or(), fetch_xor()，以及复合赋值形式的操作((+=, -=, &amp;=, |=和^=)，++和—(前置&amp;&amp;后置)。因为原子整数值通常用作计数器或位掩码，因此缺失乘法，除法，移位操作符也许并不能算作遗憾。如有需要，在循环内反复调用compare_exchange_weak()即可。</unsigned></int></p>
+<p>类似于指针操作，<code>fetch()</code>接口均返回修改前的旧值，前置操作符返回修改后的新值，后置操作符返回修改前的旧值。</p>
 
       
     </div>
@@ -746,7 +754,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-bool-gt"><span class="nav-number">4.</span> <span class="nav-text">std::atomic<bool></span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-bool-gt"><span class="nav-number">4.</span> <span class="nav-text">std::atomic<bool></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt"><span class="nav-number">5.</span> <span class="nav-text">std::atomic<T*></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准整形原子类型"><span class="nav-number">6.</span> <span class="nav-text">标准整形原子类型</span></a></li></ol></div>
             
           </div>
         </section>
@@ -786,7 +794,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 797k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 798k 字</span>
 </div>
         
       </div>
