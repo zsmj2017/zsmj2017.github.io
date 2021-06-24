@@ -100,7 +100,7 @@
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/jut87ru9vyn16t0qv66fsr0w/image-20210610152408616.png">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/l5jxrrnhm2mvnxa1cda7vzhj/image.png">
-<meta property="og:updated_time" content="2021-06-24T06:22:37.256Z">
+<meta property="og:updated_time" content="2021-06-24T07:00:09.258Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++内存模型与原子类型操作——原子操作与原子类型">
 <meta name="twitter:description" content="前言&amp;nbsp;原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。
@@ -579,6 +579,8 @@
 <p>这些限制意味着开发者不能创建一些较为复杂的原子数据类型，例如<code>std::atomic&lt;std::vector&lt;int&gt;&gt;</code>(它有一个特殊的拷贝构造和拷贝赋值操作符)。但这并不算大问题——数据结构越复杂，对其进行复杂操作的可能性越高，而不只是原子操作里简单的赋值和比较，此类数据最好使用<code>std::mutex</code>，以确保为所需操作适当地保护数据。</p>
 <p>如果UDT的大小 &lt;= int或void*，那么大多数平台都能够对std::atomic&lt;UDT&gt;使用原子指令。一些平台还能对两倍于int或void*大小的用户自定义类型使用原子指令。这些平台通常支持所谓的双字比较-交换(double-word-compare-and-swap)指令，该指令对应于compare_exchange_xxx函数。</p>
 <p>综上，下表展示了std::atomic&lt;T&gt;上可使用的各项操作：<br><img src="http://static.zybuluo.com/zsmj2017/l5jxrrnhm2mvnxa1cda7vzhj/image.png" alt="image.png-224.6kB"></p>
+<hr>
+<h1 id="应用于原子操作的自由函数"><a href="#应用于原子操作的自由函数" class="headerlink" title="应用于原子操作的自由函数"></a>应用于原子操作的自由函数</h1><p>TODO::不甚重要，日后补充</p>
 
       
     </div>
@@ -762,7 +764,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-bool-gt"><span class="nav-number">4.</span> <span class="nav-text">std::atomic<bool></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt"><span class="nav-number">5.</span> <span class="nav-text">std::atomic<T*></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准整形原子类型"><span class="nav-number">6.</span> <span class="nav-text">标准整形原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt-1"><span class="nav-number">7.</span> <span class="nav-text">std::atomic<T></span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-bool-gt"><span class="nav-number">4.</span> <span class="nav-text">std::atomic<bool></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt"><span class="nav-number">5.</span> <span class="nav-text">std::atomic<T*></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准整形原子类型"><span class="nav-number">6.</span> <span class="nav-text">标准整形原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt-1"><span class="nav-number">7.</span> <span class="nav-text">std::atomic<T></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用于原子操作的自由函数"><span class="nav-number">8.</span> <span class="nav-text">应用于原子操作的自由函数</span></a></li></ol></div>
             
           </div>
         </section>
