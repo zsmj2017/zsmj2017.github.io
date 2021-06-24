@@ -99,7 +99,8 @@
 如若某线程正在以原子操作load一个对象的值（对该对象的所有修改都由原子操作完成），那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png">
 <meta property="og:image" content="http://static.zybuluo.com/zsmj2017/jut87ru9vyn16t0qv66fsr0w/image-20210610152408616.png">
-<meta property="og:updated_time" content="2021-06-23T07:33:36.548Z">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/l5jxrrnhm2mvnxa1cda7vzhj/image.png">
+<meta property="og:updated_time" content="2021-06-24T06:22:37.256Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++内存模型与原子类型操作——原子操作与原子类型">
 <meta name="twitter:description" content="前言&amp;nbsp;原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。
@@ -571,6 +572,13 @@
 <hr>
 <h1 id="标准整形原子类型"><a href="#标准整形原子类型" class="headerlink" title="标准整形原子类型"></a>标准整形原子类型</h1><p>&nbsp;<br>除load(), store(), exchange(), compare_exchange_weak(),compare_exchange_strong()接口外，原子整形类型如std::atomic<int>和 std::atomic<unsigned long="">有相当全面的一整套运算接口:fetch_add(), fetch_sub(), fetch_and(), fetch_or(), fetch_xor()，以及复合赋值形式的操作((+=, -=, &amp;=, |=和^=)，++和—(前置&amp;&amp;后置)。因为原子整数值通常用作计数器或位掩码，因此缺失乘法，除法，移位操作符也许并不能算作遗憾。如有需要，在循环内反复调用compare_exchange_weak()即可。</unsigned></int></p>
 <p>类似于指针操作，<code>fetch()</code>接口均返回修改前的旧值，前置操作符返回修改后的新值，后置操作符返回修改前的旧值。</p>
+<hr>
+<h1 id="std-atomic-lt-T-gt-1"><a href="#std-atomic-lt-T-gt-1" class="headerlink" title="std::atomic&lt;T&gt;"></a>std::atomic&lt;T&gt;</h1><p>&nbsp;<br>给定用户自定义的类型UDT，std::atomic&lt;UDT&gt;提供了与std::atomic&lt;bool&gt;相同的接口，当然，与存储值相关的返回类型为UDT，而非bool。</p>
+<p>并非任意UDT均可与std::atomic&lt;&gt;搭配使用：UDT必须具备一个trivial拷贝赋值操作符，这意味着该类型必须没有虚函数和虚基类，并且必须使用编译器生成的拷贝赋值操作符——这一要求对其基类和非静态数据成员同样生效。这保证了编译器可以使用memcpy（或一个等价操作）来完成赋值。此外，compare_exchange使用的是memcmp式的比较操作，因此不支持bitwise相等的UDT实例在执行compare_exchange操作时将会不符合预期，即使比较值满足自定义operator==（顺带提一嘴，std::atomic&lt;double&gt;与std::atomic&lt;float&gt;尽管是标准类型，使用<code>compare_exchange_strong</code>时也存在同样的坑，原因在于数据的存储形式不同）。</p>
+<p>这些限制背后的原因前文已经提及——不要将指针和引用作为参数传递给用户提供的函数，从而在锁范围外传递受保护数据。一般来说，编译器无法为std::atomic&lt;UDT生成无锁代码，因此它必须生成和使用一个内部锁。如果允许用户提供自定义拷贝赋值或比较操作符，则需要将对受保护数据的引用作为参数传递给用户提供的函数，这可能导致数据竞争。此外，这些限制增加了编译器直接为 std::atomic&lt;UDT&gt;使用原子指令的机会，因为它可以直接将UDT实例视为一组原始字节。</p>
+<p>这些限制意味着开发者不能创建一些较为复杂的原子数据类型，例如<code>std::atomic&lt;std::vector&lt;int&gt;&gt;</code>(它有一个特殊的拷贝构造和拷贝赋值操作符)。但这并不算大问题——数据结构越复杂，对其进行复杂操作的可能性越高，而不只是原子操作里简单的赋值和比较，此类数据最好使用<code>std::mutex</code>，以确保为所需操作适当地保护数据。</p>
+<p>如果UDT的大小 &lt;= int或void*，那么大多数平台都能够对std::atomic&lt;UDT&gt;使用原子指令。一些平台还能对两倍于int或void*大小的用户自定义类型使用原子指令。这些平台通常支持所谓的双字比较-交换(double-word-compare-and-swap)指令，该指令对应于compare_exchange_xxx函数。</p>
+<p>综上，下表展示了std::atomic&lt;T&gt;上可使用的各项操作：<br><img src="http://static.zybuluo.com/zsmj2017/l5jxrrnhm2mvnxa1cda7vzhj/image.png" alt="image.png-224.6kB"></p>
 
       
     </div>
@@ -754,7 +762,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-bool-gt"><span class="nav-number">4.</span> <span class="nav-text">std::atomic<bool></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt"><span class="nav-number">5.</span> <span class="nav-text">std::atomic<T*></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准整形原子类型"><span class="nav-number">6.</span> <span class="nav-text">标准整形原子类型</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-bool-gt"><span class="nav-number">4.</span> <span class="nav-text">std::atomic<bool></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt"><span class="nav-number">5.</span> <span class="nav-text">std::atomic<T*></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准整形原子类型"><span class="nav-number">6.</span> <span class="nav-text">标准整形原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt-1"><span class="nav-number">7.</span> <span class="nav-text">std::atomic<T></span></a></li></ol></div>
             
           </div>
         </section>
@@ -794,7 +802,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 798k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 799k 字</span>
 </div>
         
       </div>

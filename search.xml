@@ -46,6 +46,13 @@
 <hr>
 <h1 id="标准整形原子类型"><a href="#标准整形原子类型" class="headerlink" title="标准整形原子类型"></a>标准整形原子类型</h1><p>&nbsp;<br>除load(), store(), exchange(), compare_exchange_weak(),compare_exchange_strong()接口外，原子整形类型如std::atomic<int>和 std::atomic<unsigned long="">有相当全面的一整套运算接口:fetch_add(), fetch_sub(), fetch_and(), fetch_or(), fetch_xor()，以及复合赋值形式的操作((+=, -=, &amp;=, |=和^=)，++和—(前置&amp;&amp;后置)。因为原子整数值通常用作计数器或位掩码，因此缺失乘法，除法，移位操作符也许并不能算作遗憾。如有需要，在循环内反复调用compare_exchange_weak()即可。</unsigned></int></p>
 <p>类似于指针操作，<code>fetch()</code>接口均返回修改前的旧值，前置操作符返回修改后的新值，后置操作符返回修改前的旧值。</p>
+<hr>
+<h1 id="std-atomic-lt-T-gt-1"><a href="#std-atomic-lt-T-gt-1" class="headerlink" title="std::atomic&lt;T&gt;"></a>std::atomic&lt;T&gt;</h1><p>&nbsp;<br>给定用户自定义的类型UDT，std::atomic&lt;UDT&gt;提供了与std::atomic&lt;bool&gt;相同的接口，当然，与存储值相关的返回类型为UDT，而非bool。</p>
+<p>并非任意UDT均可与std::atomic&lt;&gt;搭配使用：UDT必须具备一个trivial拷贝赋值操作符，这意味着该类型必须没有虚函数和虚基类，并且必须使用编译器生成的拷贝赋值操作符——这一要求对其基类和非静态数据成员同样生效。这保证了编译器可以使用memcpy（或一个等价操作）来完成赋值。此外，compare_exchange使用的是memcmp式的比较操作，因此不支持bitwise相等的UDT实例在执行compare_exchange操作时将会不符合预期，即使比较值满足自定义operator==（顺带提一嘴，std::atomic&lt;double&gt;与std::atomic&lt;float&gt;尽管是标准类型，使用<code>compare_exchange_strong</code>时也存在同样的坑，原因在于数据的存储形式不同）。</p>
+<p>这些限制背后的原因前文已经提及——不要将指针和引用作为参数传递给用户提供的函数，从而在锁范围外传递受保护数据。一般来说，编译器无法为std::atomic&lt;UDT生成无锁代码，因此它必须生成和使用一个内部锁。如果允许用户提供自定义拷贝赋值或比较操作符，则需要将对受保护数据的引用作为参数传递给用户提供的函数，这可能导致数据竞争。此外，这些限制增加了编译器直接为 std::atomic&lt;UDT&gt;使用原子指令的机会，因为它可以直接将UDT实例视为一组原始字节。</p>
+<p>这些限制意味着开发者不能创建一些较为复杂的原子数据类型，例如<code>std::atomic&lt;std::vector&lt;int&gt;&gt;</code>(它有一个特殊的拷贝构造和拷贝赋值操作符)。但这并不算大问题——数据结构越复杂，对其进行复杂操作的可能性越高，而不只是原子操作里简单的赋值和比较，此类数据最好使用<code>std::mutex</code>，以确保为所需操作适当地保护数据。</p>
+<p>如果UDT的大小 &lt;= int或void*，那么大多数平台都能够对std::atomic&lt;UDT&gt;使用原子指令。一些平台还能对两倍于int或void*大小的用户自定义类型使用原子指令。这些平台通常支持所谓的双字比较-交换(double-word-compare-and-swap)指令，该指令对应于compare_exchange_xxx函数。</p>
+<p>综上，下表展示了std::atomic&lt;T&gt;上可使用的各项操作：<br><img src="http://static.zybuluo.com/zsmj2017/l5jxrrnhm2mvnxa1cda7vzhj/image.png" alt="image.png-224.6kB"></p>
 ]]></content>
       
         <categories>
@@ -3278,45 +3285,6 @@
     </entry>
     
     <entry>
-      <title><![CDATA[29.不必高估move语义]]></title>
-      <url>https://zsmj2017.tech/post/db3a64cc.html</url>
-      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>移动语义可以被认为是C++11的首要特性。它不仅允许编译器用相对便宜的移动替换昂贵的拷贝操作，并且在实际中要求编译器如此运转（在条件满足时），但本节要叙述的是：不要过高地看待移动语义。</p>
-<hr>
-<h1 id="类型支持"><a href="#类型支持" class="headerlink" title="类型支持"></a>类型支持</h1><p>&nbsp;<br>首先，并非所有类型均支持移动语义。在实际使用过程中，可能你当前使用的类型（历史遗留代码）并不支持移动语义。确实，C++11愿意为缺少它们的类生成move操作，但这只发生在声明没有copy操作，移动操作或析构函数的类中（见Item17）。此外，不支持move的data member或base class）也将抑制编译器生成move操作。</p>
-<hr>
-<h1 id="支持也未必高效"><a href="#支持也未必高效" class="headerlink" title="支持也未必高效"></a>支持也未必高效</h1><p>&nbsp;<br>其次，即使该类型明确具备移动语义，它也未必如你所想般高效。举例而言，C++标准库中的所有容器均支持移动语义，但对于某些容器来说，它们的移动语义并不具备真正的低开销，又或者由于容器元素类型的限制，它们无法采用真正高效的move操作。</p>
-<h2 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h2><p>以std::array为例，该容器是C++11中的一个新容器。std::array本质上是一个带有STL接口的内置数组。一般而言，STL容器倾向于将其所有元素均保存在堆上，内部元素仅仅是一个指向堆中内容的指针（真实情况较为复杂，但其差异不影响本次讨）。这些指针的存在为移动容器提供了便利：只需要将现有指针指向对应内容，然后将指针置为nullptr即可，现以移动vector为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; vw1;</span><br><span class="line"><span class="comment">// put data into vw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move vw1 into vw2. Runs in constant time. Only ptrs in vw1 and vw2 are modified</span></span><br><span class="line"><span class="keyword">auto</span> vw2 = <span class="built_in">std</span>::move(vw1);</span><br></pre></td></tr></table></figure></p>
-<p><img src="http://static.zybuluo.com/zsmj2017/wnoy6o8pegwe0lyzll516et1/image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png" alt="image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png-21kB"><br>但std::array将元素直接存储于对象内部，因此其move操作看起来如下所示：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;Widget, 10000&gt; aw1;</span><br><span class="line"><span class="comment">// put data into aw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move aw1 into aw2. Runs in</span></span><br><span class="line"><span class="comment">// linear time. All elements in</span></span><br><span class="line"><span class="comment">// aw1 are moved into aw2</span></span><br><span class="line"><span class="keyword">auto</span> aw2 = <span class="built_in">std</span>::move(aw1);</span><br></pre></td></tr></table></figure>
-<p><img src="http://static.zybuluo.com/zsmj2017/6vb9j6bgrv0q0j6wk4fy4tt1/image_1cie5kqjo1pjm150r12rer3g1979m.png" alt="image_1cie5kqjo1pjm150r12rer3g1979m.png-22.1kB"></p>
-<p>这里需要注意的是，我们必须移动aw1中每一个Widget至aw2，也就是说当前仍然需要线性的时间，可能这快于copy，但也绝非像某些人所说的“移动容器只需要执行拷贝一个指针的时间”。</p>
-<h2 id="SSO-std-string"><a href="#SSO-std-string" class="headerlink" title="SSO std::string"></a>SSO std::string</h2><p>又例如，std::string提供常数时间的移动操作与线性时间的拷贝操作，这让我们感觉移动必然快于拷贝，但情况可能并非如此。许多字符串实现采用小字符串优化（SSO）。对于SSO，“小”字符串（例如，容量不超过15个字符的字符串）存储于std::string对象内的buffer中，而并非使用堆中的内存。移动基于SSO技术实现的字符串并不快于拷贝，因为传统仅拷贝一个指针的行为对其并不适用（内容存储于对象内，因此必须对对象有所操作），对于此类对象，copy并不慢于move。</p>
-<hr>
-<h1 id="异常安全性"><a href="#异常安全性" class="headerlink" title="异常安全性"></a>异常安全性</h1><p>&nbsp;<br>即使一切安好，move操作最终也可能会导致copy操作。在Item14中曾经提及，为了不破坏历史遗留代码，C++11中的异常规格必然与C++98中相容，因此，对于某些容器，只有在move操作明确不会抛出异常时才可能会取代copy操作。因此，即使move操作确实优于copy操作且当前环境适用于move（例如参数为右值），编译器在move操作并未声明为noexcept的情况下依然会选择对move视而不见。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>在撰写代码时务必谨慎假设move语义并未发挥作用，但如果你明确当前类型必然支持移动语义，那自然可以大胆使用。</strong></li>
-</ol>
-]]></content>
-      
-        <categories>
-            
-            <category> Effective Modern C++ </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> Modern C++ </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[28.了解引用塌缩]]></title>
       <url>https://zsmj2017.tech/post/ae03537d.html</url>
       <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>众所周知，当一个左值或右值初始化universal reference时将触发类型推衍，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(T&amp;&amp; param)</span></span>;</span><br></pre></td></tr></table></figure></p>
@@ -3360,6 +3328,45 @@
 <li><strong>引用塌缩触发于四种特定环境：模板实例化、auto类型生成、typedef与alias declaration以及decltype推衍。</strong></li>
 <li><strong>在引用塌缩过程中，只要存在左值引用，则最终结果为左值引用，否则即为右值引用。</strong></li>
 <li><strong>universal reference可视为特定环境下的右值引用。</strong></li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> Effective Modern C++ </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> Modern C++ </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[29.不必高估move语义]]></title>
+      <url>https://zsmj2017.tech/post/db3a64cc.html</url>
+      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>移动语义可以被认为是C++11的首要特性。它不仅允许编译器用相对便宜的移动替换昂贵的拷贝操作，并且在实际中要求编译器如此运转（在条件满足时），但本节要叙述的是：不要过高地看待移动语义。</p>
+<hr>
+<h1 id="类型支持"><a href="#类型支持" class="headerlink" title="类型支持"></a>类型支持</h1><p>&nbsp;<br>首先，并非所有类型均支持移动语义。在实际使用过程中，可能你当前使用的类型（历史遗留代码）并不支持移动语义。确实，C++11愿意为缺少它们的类生成move操作，但这只发生在声明没有copy操作，移动操作或析构函数的类中（见Item17）。此外，不支持move的data member或base class）也将抑制编译器生成move操作。</p>
+<hr>
+<h1 id="支持也未必高效"><a href="#支持也未必高效" class="headerlink" title="支持也未必高效"></a>支持也未必高效</h1><p>&nbsp;<br>其次，即使该类型明确具备移动语义，它也未必如你所想般高效。举例而言，C++标准库中的所有容器均支持移动语义，但对于某些容器来说，它们的移动语义并不具备真正的低开销，又或者由于容器元素类型的限制，它们无法采用真正高效的move操作。</p>
+<h2 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h2><p>以std::array为例，该容器是C++11中的一个新容器。std::array本质上是一个带有STL接口的内置数组。一般而言，STL容器倾向于将其所有元素均保存在堆上，内部元素仅仅是一个指向堆中内容的指针（真实情况较为复杂，但其差异不影响本次讨）。这些指针的存在为移动容器提供了便利：只需要将现有指针指向对应内容，然后将指针置为nullptr即可，现以移动vector为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; vw1;</span><br><span class="line"><span class="comment">// put data into vw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move vw1 into vw2. Runs in constant time. Only ptrs in vw1 and vw2 are modified</span></span><br><span class="line"><span class="keyword">auto</span> vw2 = <span class="built_in">std</span>::move(vw1);</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://static.zybuluo.com/zsmj2017/wnoy6o8pegwe0lyzll516et1/image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png" alt="image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png-21kB"><br>但std::array将元素直接存储于对象内部，因此其move操作看起来如下所示：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;Widget, 10000&gt; aw1;</span><br><span class="line"><span class="comment">// put data into aw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move aw1 into aw2. Runs in</span></span><br><span class="line"><span class="comment">// linear time. All elements in</span></span><br><span class="line"><span class="comment">// aw1 are moved into aw2</span></span><br><span class="line"><span class="keyword">auto</span> aw2 = <span class="built_in">std</span>::move(aw1);</span><br></pre></td></tr></table></figure>
+<p><img src="http://static.zybuluo.com/zsmj2017/6vb9j6bgrv0q0j6wk4fy4tt1/image_1cie5kqjo1pjm150r12rer3g1979m.png" alt="image_1cie5kqjo1pjm150r12rer3g1979m.png-22.1kB"></p>
+<p>这里需要注意的是，我们必须移动aw1中每一个Widget至aw2，也就是说当前仍然需要线性的时间，可能这快于copy，但也绝非像某些人所说的“移动容器只需要执行拷贝一个指针的时间”。</p>
+<h2 id="SSO-std-string"><a href="#SSO-std-string" class="headerlink" title="SSO std::string"></a>SSO std::string</h2><p>又例如，std::string提供常数时间的移动操作与线性时间的拷贝操作，这让我们感觉移动必然快于拷贝，但情况可能并非如此。许多字符串实现采用小字符串优化（SSO）。对于SSO，“小”字符串（例如，容量不超过15个字符的字符串）存储于std::string对象内的buffer中，而并非使用堆中的内存。移动基于SSO技术实现的字符串并不快于拷贝，因为传统仅拷贝一个指针的行为对其并不适用（内容存储于对象内，因此必须对对象有所操作），对于此类对象，copy并不慢于move。</p>
+<hr>
+<h1 id="异常安全性"><a href="#异常安全性" class="headerlink" title="异常安全性"></a>异常安全性</h1><p>&nbsp;<br>即使一切安好，move操作最终也可能会导致copy操作。在Item14中曾经提及，为了不破坏历史遗留代码，C++11中的异常规格必然与C++98中相容，因此，对于某些容器，只有在move操作明确不会抛出异常时才可能会取代copy操作。因此，即使move操作确实优于copy操作且当前环境适用于move（例如参数为右值），编译器在move操作并未声明为noexcept的情况下依然会选择对move视而不见。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>在撰写代码时务必谨慎假设move语义并未发挥作用，但如果你明确当前类型必然支持移动语义，那自然可以大胆使用。</strong></li>
 </ol>
 ]]></content>
       
@@ -6756,51 +6763,6 @@
     </entry>
     
     <entry>
-      <title><![CDATA[关于对象——前言]]></title>
-      <url>https://zsmj2017.tech/post/2b1ff2b2.html</url>
-      <content type="html"><![CDATA[<h1 id="C语言"><a href="#C语言" class="headerlink" title="C语言"></a>C语言</h1><p>&nbsp;<br>在C语言中，“数据”及“处理数据的操作”是分开声明的，这种处理方式被称为procedural：一组“分布在各个以功能为导向的函数中”的算法驱动和处理外部数据。</p>
-<h2 id="C-struct实例"><a href="#C-struct实例" class="headerlink" title="C struct实例"></a>C struct实例</h2><p>假设我们当前存在一个struct Point3d：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">point3d</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x;</span><br><span class="line">    <span class="keyword">float</span> y;</span><br><span class="line">    <span class="keyword">float</span> z;</span><br><span class="line">&#125; Point3d;</span><br></pre></td></tr></table></figure></p>
-<p>如果我们需要打印该Point3d，则必须定义这样一个函数：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d_print</span><span class="params">(<span class="keyword">const</span> Point3d *pd)</span></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>又或者为了追求效率，直接使用函数宏：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Point3d_print(pd)   printf(<span class="meta-string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span></span><br></pre></td></tr></table></figure></p>
-<p>同样地，某个点的特定坐标可以直接存取：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Point3d pt;</span><br><span class="line">pt.x = <span class="number">0.0</span>;</span><br><span class="line"><span class="comment">//宏操作</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> SetX(p,xval) (p.x)=(xval);</span></span><br><span class="line">SetX(pt,<span class="number">0.0</span>);</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h1><h2 id="ADT"><a href="#ADT" class="headerlink" title="ADT"></a>ADT</h2><p>C++中实现Point3d可能会使用独立的“抽象数据类型”（abstract data type,ADT)来实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">inline</span> </span><br><span class="line">ostream&amp; <span class="keyword">operator</span>&lt;&lt;(ostream &amp;os,<span class="keyword">const</span> Point3d &amp;pt)&#123;...&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="继承体系"><a href="#继承体系" class="headerlink" title="继承体系"></a>继承体系</h2><p>又或者以一个两层到三层的继承体系完成：<img src="http://static.zybuluo.com/zsmj2017/wqlsxrhsul1mirhq8dtrp1xk/image_1ccad3v788kbnc78s3bg4bfb9.png" alt="image_1ccad3v788kbnc78s3bg4bfb9.png-9.4kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<h2 id="模板化"><a href="#模板化" class="headerlink" title="模板化"></a>模板化</h2><p>我们甚至可以更进一步地抽象，将坐标值类型甚至坐标数量参数化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> type,<span class="keyword">int</span> dim&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...<span class="comment">//内含数组或容器</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>&nbsp;<br>仅从Point来看，C与C++处理问题的方式截然不同，这并非是语言间的区别，而是过程式与面向对象的差别。<br>从软件工程的角度而言，封装性比全局数据要好，但也付出了编写和使用上的代价。</p>
-<hr>
-<h1 id="封装的成本"><a href="#封装的成本" class="headerlink" title="封装的成本"></a>封装的成本</h1><p>&nbsp;<br>从Point的角度而言，封装并未带来任何成本：</p>
-<ol>
-<li>data<br>所有的数据均存储于Object内，就如同struct中的情况一样。</li>
-<li>member function<br>成员函数虽然包含于class的声明之内，但却不会出现在object中。每一个non-inline成员函数都只会生成一个函数实体。</li>
-</ol>
-<p>C++在内存布局以及存储时间上的额外负担主要由virtual引起：</p>
-<ul>
-<li>virtual function<br>实现函数执行期绑定。</li>
-<li>virtual base class<br>实现“多次出现在继承体系中的base class在派生类中只存在一个可共享的实体”。</li>
-</ul>
-<p>一般而言，我们没有理由认为C++就一定会比C庞大且迟缓。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> Inside the C++ object model </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> 对象模型 </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[关于对象——C++对象模式]]></title>
       <url>https://zsmj2017.tech/post/8fc7a146.html</url>
       <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在C++对象中，data member分为两种：</p>
@@ -6843,6 +6805,51 @@
 <h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>假设现有class X，定义有copy constructor，virtual destructor，以及一个virtual function foo，考虑如下函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">X <span class="title">foobar</span><span class="params">()</span></span>&#123;</span><br><span class="line">    X xx;</span><br><span class="line">    X *px = <span class="keyword">new</span> X;</span><br><span class="line">    xx.foo();</span><br><span class="line">    px-&gt;foo();</span><br><span class="line">    <span class="keyword">delete</span> px;</span><br><span class="line">    <span class="keyword">return</span> xx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>该函数可能会在内部被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foobar</span><span class="params">(X &amp;_result)</span></span>&#123;</span><br><span class="line">    <span class="comment">//构造_result并取代local xx</span></span><br><span class="line">    _result.X::X();</span><br><span class="line">    <span class="comment">//转化new语句</span></span><br><span class="line">    px = _new(<span class="keyword">sizeof</span>(X));</span><br><span class="line">    <span class="keyword">if</span>(px)</span><br><span class="line">        px-&gt;X::X();</span><br><span class="line">    <span class="comment">//执行非虚函数</span></span><br><span class="line">    foo(&amp;_result);</span><br><span class="line">    <span class="comment">//执行虚函数</span></span><br><span class="line">    （*px-&gt;vtbl[<span class="number">2</span>])(px);</span><br><span class="line">    <span class="comment">//转化delete语句</span></span><br><span class="line">    <span class="keyword">if</span>(px)&#123;</span><br><span class="line">        (*px-&gt;vtbl[<span class="number">1</span>](px));</span><br><span class="line">        _delete(px);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//不需要摧毁local object xx</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>这就是对象模型将实际代码转化后的一个可能实例，其解释可见后续诸章，下图给出了部分注解：<img src="http://static.zybuluo.com/zsmj2017/u26nsqg4ilx8hibbk83hobft/image_1ccb4gg0fogo1ee2fm6k1enrmm.png" alt="image_1ccb4gg0fogo1ee2fm6k1enrmm.png-250.6kB"></p>
+]]></content>
+      
+        <categories>
+            
+            <category> Inside the C++ object model </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> 对象模型 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[关于对象——前言]]></title>
+      <url>https://zsmj2017.tech/post/2b1ff2b2.html</url>
+      <content type="html"><![CDATA[<h1 id="C语言"><a href="#C语言" class="headerlink" title="C语言"></a>C语言</h1><p>&nbsp;<br>在C语言中，“数据”及“处理数据的操作”是分开声明的，这种处理方式被称为procedural：一组“分布在各个以功能为导向的函数中”的算法驱动和处理外部数据。</p>
+<h2 id="C-struct实例"><a href="#C-struct实例" class="headerlink" title="C struct实例"></a>C struct实例</h2><p>假设我们当前存在一个struct Point3d：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">point3d</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x;</span><br><span class="line">    <span class="keyword">float</span> y;</span><br><span class="line">    <span class="keyword">float</span> z;</span><br><span class="line">&#125; Point3d;</span><br></pre></td></tr></table></figure></p>
+<p>如果我们需要打印该Point3d，则必须定义这样一个函数：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d_print</span><span class="params">(<span class="keyword">const</span> Point3d *pd)</span></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>又或者为了追求效率，直接使用函数宏：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Point3d_print(pd)   printf(<span class="meta-string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span></span><br></pre></td></tr></table></figure></p>
+<p>同样地，某个点的特定坐标可以直接存取：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Point3d pt;</span><br><span class="line">pt.x = <span class="number">0.0</span>;</span><br><span class="line"><span class="comment">//宏操作</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> SetX(p,xval) (p.x)=(xval);</span></span><br><span class="line">SetX(pt,<span class="number">0.0</span>);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h1><h2 id="ADT"><a href="#ADT" class="headerlink" title="ADT"></a>ADT</h2><p>C++中实现Point3d可能会使用独立的“抽象数据类型”（abstract data type,ADT)来实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">inline</span> </span><br><span class="line">ostream&amp; <span class="keyword">operator</span>&lt;&lt;(ostream &amp;os,<span class="keyword">const</span> Point3d &amp;pt)&#123;...&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="继承体系"><a href="#继承体系" class="headerlink" title="继承体系"></a>继承体系</h2><p>又或者以一个两层到三层的继承体系完成：<img src="http://static.zybuluo.com/zsmj2017/wqlsxrhsul1mirhq8dtrp1xk/image_1ccad3v788kbnc78s3bg4bfb9.png" alt="image_1ccad3v788kbnc78s3bg4bfb9.png-9.4kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="模板化"><a href="#模板化" class="headerlink" title="模板化"></a>模板化</h2><p>我们甚至可以更进一步地抽象，将坐标值类型甚至坐标数量参数化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> type,<span class="keyword">int</span> dim&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...<span class="comment">//内含数组或容器</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>&nbsp;<br>仅从Point来看，C与C++处理问题的方式截然不同，这并非是语言间的区别，而是过程式与面向对象的差别。<br>从软件工程的角度而言，封装性比全局数据要好，但也付出了编写和使用上的代价。</p>
+<hr>
+<h1 id="封装的成本"><a href="#封装的成本" class="headerlink" title="封装的成本"></a>封装的成本</h1><p>&nbsp;<br>从Point的角度而言，封装并未带来任何成本：</p>
+<ol>
+<li>data<br>所有的数据均存储于Object内，就如同struct中的情况一样。</li>
+<li>member function<br>成员函数虽然包含于class的声明之内，但却不会出现在object中。每一个non-inline成员函数都只会生成一个函数实体。</li>
+</ol>
+<p>C++在内存布局以及存储时间上的额外负担主要由virtual引起：</p>
+<ul>
+<li>virtual function<br>实现函数执行期绑定。</li>
+<li>virtual base class<br>实现“多次出现在继承体系中的base class在派生类中只存在一个可共享的实体”。</li>
+</ul>
+<p>一般而言，我们没有理由认为C++就一定会比C庞大且迟缓。</p>
 ]]></content>
       
         <categories>
@@ -11846,9 +11853,9 @@
             
             <tag> STL </tag>
             
-            <tag> 容器 </tag>
-            
             <tag> 多线程 </tag>
+            
+            <tag> 容器 </tag>
             
         </tags>
         
