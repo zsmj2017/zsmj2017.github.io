@@ -468,6 +468,129 @@
             
               
                 
+                <a class="post-title-link" href="/post/38ee2de3.html" itemprop="url">
+                  25.虚拟工厂模式
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-28T09:03:00+08:00" content="2018-04-28">
+              2018-04-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;工厂模式在C++中体现为构造函数虚拟化，即针对不同的已知对象，调用不同的构造函数，生成不同的新对象。
+
+问题实例&nbsp;假设现有一个程序负责生成新闻报道，每篇报道由文字或者图片组成:123456789101112131415161718class NLComponent &#123;//abstract classpublic:    ...&#125;;class TextBlock:public NLComponent &#123;public:    ...&#125;;class Graphic: public NLComponent &#123;public:  
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/38ee2de3.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/8e0de6eb.html" itemprop="url">
                   24.了解虚函数、多继承、虚基类、RTTI所带来的成本
                 </a>
@@ -1559,135 +1682,6 @@ profiler有助于洞察性能，虽然并非每一次都能被你发现，为了
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/8e2690b5.html" itemprop="url">
-                  15.了解异常处理的成本
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-26T12:53:00+08:00" content="2018-04-26">
-              2018-04-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          为了处理异常，程序必须做到：
-
-无论执行至何处，都应该明确此时如果抛出异常将释放哪个对象
-知晓每一个入口点，以便从try块退出
-对于每一个try，继续跟踪catch子句以及其能够捕获的异常类型
-
-如果你确保你的程序根本不使用异常，链接的程序库里也没有异常，那你可以使用不支持异常处理的方法进行编译，从而缩小程序尺寸和提高速度。
-一般来说，每一个try块都降低了速度并且增大代码尺寸，因此应该避免使用无用的try块。同样的，异常明细的成本和try块相差不大。
-总的来说，真正处理异常的开销仅仅发生于异常出现，（异常本身就是难于出现的）因此我们无需在效率上顾虑太多，遵循之前所提及的各项要求即可。（Mor
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/8e2690b5.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1732,7 +1726,7 @@ profiler有助于洞察性能，虽然并非每一次都能被你发现，为了
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">256</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1833,7 +1827,7 @@ profiler有助于洞察性能，虽然并非每一次都能被你发现，为了
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 799k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 800k 字</span>
 </div>
         
       </div>

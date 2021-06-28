@@ -468,6 +468,130 @@
             
               
                 
+                <a class="post-title-link" href="/post/3c235cad.html" itemprop="url">
+                  3.尽量以const，enum，inline替换#define
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-06T19:21:00+08:00" content="2018-04-06">
+              2018-04-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          众所周知，使用const来替换#define定义的常量是一个不错的选择，当我们以常量替换预处理时，有两点值得注意：
+
+1.常量指针在定义常量指针时，由于常量定义式通常置于头文件内，同时在多次调用时为了避免不必要的修改，因此有必要将指针声明为const，而非指针所指的对象。如果你需要将指向对象也声明为const，则需要两个const.举例而言：1const char* const authorname = “mie”；
+当然，这里使用string比使用char*-based字符串更合适。2.class的专属常量在定义class的专属常量时，为了将变量的作用域仅仅局限在class内，我们将其作为c
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/3c235cad.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/5c36e117.html" itemprop="url">
                   3.确保容器中的对象副本正确且高效
                 </a>
@@ -1138,7 +1262,7 @@ rhs：right-hand side lhs亦是如此
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">256</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1239,7 +1363,7 @@ rhs：right-hand side lhs亦是如此
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 799k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 800k 字</span>
 </div>
         
       </div>

@@ -468,6 +468,125 @@
             
               
                 
+                <a class="post-title-link" href="/post/6a732eae.html" itemprop="url">
+                  C++内存模型与原子类型操作——同步操作与强制顺序
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2021-06-24T15:00:00+08:00" content="2021-06-24">
+              2021-06-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/C-并发编程实战/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>一段经典的生产-消费场景代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; data; </span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; data_ready(<span class="literal">false</span>);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reader_thread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(!data_ready.load()) &#123;</span><br><span class="line">    <span class="built_in">std</span>::this_thread::sleep(<span class="built_in">std</span>::milliseconds(<span class="number">1</span>)); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"The answer="</span>&lt;&lt;data[<span class="number">0</span>]&lt;&lt;<span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">writer_thread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  data.push_back(<span class="number">42</span>);</span><br><span class="line">  data_ready=<span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里我们利用原子操作，保证了写入操作必然“先发生于”读取操作。不过，原子操作对顺序要求还有其他选项，它们构成了原子操作间的各种关系，下文将一一说明。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/6a732eae.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/25897c79.html" itemprop="url">
                   C++内存模型与原子类型操作——原子操作与原子类型
                 </a>
@@ -1519,134 +1638,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/25e05113.html" itemprop="url">
-                  同步并发操作——等待事件或条件
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2019-04-20T12:27:00+08:00" content="2019-04-20">
-              2019-04-20
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/C-并发编程实战/" itemprop="url" rel="index">
-                    <span itemprop="name">C++并发编程实战</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在线程运行过程中经常发生如下场景：线程A需要等待线程B完成某操作。有三种方案可以解决这一需求：</p>
-<ol>
-<li><p>反复检查共享标志位(例如mutex)，直到某线程完成操作后将其置位。<br>这将造成两点浪费：首先，线程不得不耗费宝贵的运行时间循环检查数据；其次，如果mutex被线程A上锁（它需要锁住互斥量以查看被其保护的标志位），那么其他线程将无法获得该锁，甚至连已完成任务的线程B也无法锁住互斥量以重置该标志位。</p>
-</li>
-<li><p>使用<code>std::this_thread::sleep_for()</code>令线程在等待间隙短暂休眠</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> flag; </span><br><span class="line"><span class="built_in">std</span>::mutex m;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">wait_for_flag</span><span class="params">()</span> </span>&#123; </span><br><span class="line">  <span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; lk(m); </span><br><span class="line">  <span class="keyword">while</span>(!flag) &#123; </span><br><span class="line">    lk.unlock();</span><br><span class="line">    <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::milliseconds(<span class="number">100</span>)); <span class="comment">// 休眠100ms </span></span><br><span class="line">    <span class="comment">//....此时可以保证其他线程获取该锁，重置flag</span></span><br><span class="line">    lk.lock();</span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>方案2优于方案1，但缺憾在于开发者无法确定休眠时间取多少合适。过少的休眠时间等于没有，过多的休眠时间又会造成任务必须等待线程苏醒。尽管休眠时间过长很少会对程序运行产生直接影响，但在对实时性较高的场景中（例如游戏画面绘制），这意味着一场灾难。</p>
-</li>
-<li><p>使用C++标准库提供的工具<br>最基本的处理等待事件机制为条件变量(condition variable)。从本质而言，条件变量的存在与事件或条件相关联，并且必须存在一些等待该变量被满足的线程。若当前执行线程确定条件已被满足，那么它将通知一个或多个等待该条件变量被满足的线程，以便唤醒它们接着执行任务。</p>
-</li>
-</ol>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/25e05113.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1691,7 +1682,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">256</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1792,7 +1783,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 799k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 800k 字</span>
 </div>
         
       </div>

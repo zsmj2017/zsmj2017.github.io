@@ -468,6 +468,129 @@
             
               
                 
+                <a class="post-title-link" href="/post/d33ba423.html" itemprop="url">
+                  15.尽量使用constexpr
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-02T18:42:00+08:00" content="2018-07-02">
+              2018-07-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;constexpr应用于对象时，其类似于const的加强版，但其应用于函数时的意义却与此大相径庭。从概念而言，constexpr不仅仅表示一个常量，也表示该量在编译期即可明确。然而，在constexpr function中，constexpr未必代表着编译期取值，甚至未必能保证const。
+
+constexpr objects&nbsp;constexpr对象具备const属性，其值在编译期已知。（从技术层面来说，其值决定于translation时期，也就是编译期和链接期，但这一点并不重要，除非你需要自己写一个C++的编译器和链接器，不然你总可以认为constexpr对象的值在
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/d33ba423.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/1bf831ca.html" itemprop="url">
                   14.若函数不会发生异常，则将其声明为noexcept
                 </a>
@@ -1557,135 +1680,6 @@ Braced initialization&nbsp;
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/495039e4.html" itemprop="url">
-                  5.用auto代替显式类型声明
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-06-26T11:10:00+08:00" content="2018-06-26">
-              2018-06-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;通过使用auto技术，我们省下了打字的时间，但可能会带来一些手动声明类型所不会造成的错误或性能问题。作为C++开发者，我们应当尽力掌握auto以期获取正确结果。
-
-问题实例&nbsp;在C++11中未曾出现之前，声明一个变量可能会出现三种令人厌恶的情况：
-
-忘记初始化
-1int x;//x's value depends on the context
-
-类型名过长
-1234567template&lt;typename It&gt;void dwim(It b, It e)&#123;   while (b != e) &#123;       typename std::it
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/495039e4.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1730,7 +1724,7 @@ Braced initialization&nbsp;
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">256</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1831,7 +1825,7 @@ Braced initialization&nbsp;
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 799k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 800k 字</span>
 </div>
         
       </div>

@@ -468,6 +468,137 @@
             
               
                 
+                <a class="post-title-link" href="/post/e4d7d09.html" itemprop="url">
+                  52.内存管理定式
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-24T13:33:00+08:00" content="2018-04-24">
+              2018-04-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;上一节描述了何时需要自定义operator new与operator delete，但并没有描述自定义时应当遵循何种规则。实际上这些规则并不难奉行，只是不太直观。
+
+operator new&nbsp;operator new共有四个要求：
+
+返回正确的值
+内存不足时必须调用new-handling函数
+考虑0内存需求
+避免掩盖global new（虽然这更偏近class接口要求）。
+
+
+operator new 返回值一般而言，operator new返回值很简单，分配成功则返回一个指向那块内存的指针，反之则遵循Effective C++ 50的约定，并抛出一个bad_all
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/e4d7d09.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/9af3aba1.html" itemprop="url">
                   6.自增，自减操作符前置与后置的区别
                 </a>
@@ -1568,129 +1699,6 @@ dynamic_castdynamic_cast可以把指向bc的指针或者引用改为指
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/68a33ee4.html" itemprop="url">
-                  47.在需要类型转换时请为模板定义非成员函数
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-23T07:59:00+08:00" content="2018-04-23">
-              2018-04-23
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;Effective C++ 25已经描述过为何仅有non-member函数才有能力对所有实参执行隐式转换。本节我们将类型转换拓展到template范围。
-
-问题实例&nbsp;在上一次的实例中，我们以Rational class与operator*讨论了在所有实参身上执行隐式转换。本次实例则将它们模板化。123456789template&lt;typename T&gt;class Rational&#123;public:    Rational(const T&amp; numerator = 0,const T&amp; denominator = 1);    con
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/68a33ee4.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1735,7 +1743,7 @@ dynamic_castdynamic_cast可以把指向bc的指针或者引用改为指
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">256</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1836,7 +1844,7 @@ dynamic_castdynamic_cast可以把指向bc的指针或者引用改为指
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 799k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 800k 字</span>
 </div>
         
       </div>

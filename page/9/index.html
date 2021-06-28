@@ -468,6 +468,135 @@
             
               
                 
+                <a class="post-title-link" href="/post/495039e4.html" itemprop="url">
+                  5.用auto代替显式类型声明
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-06-26T11:10:00+08:00" content="2018-06-26">
+              2018-06-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;通过使用auto技术，我们省下了打字的时间，但可能会带来一些手动声明类型所不会造成的错误或性能问题。作为C++开发者，我们应当尽力掌握auto以期获取正确结果。
+
+问题实例&nbsp;在C++11中未曾出现之前，声明一个变量可能会出现三种令人厌恶的情况：
+
+忘记初始化
+1int x;//x's value depends on the context
+
+类型名过长
+1234567template&lt;typename It&gt;void dwim(It b, It e)&#123;   while (b != e) &#123;       typename std::it
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/495039e4.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/a418faf4.html" itemprop="url">
                   4.了解如何查看类型推衍结果
                 </a>
@@ -1563,131 +1692,6 @@ template声明可以理解为当你声明一个template class或template class m
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/1e2b80e7.html" itemprop="url">
-                  执行期语义学——临时性对象
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-05-30T12:05:00+08:00" content="2018-05-30">
-              2018-05-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          临时对象的生成&nbsp;如果我们有函数如下：1T operator+(const T&amp;,const T&amp;);
-那么在执行该函数时，可能会生成一个临时对象以存储需要传回的对象。是否会产生临时对象由很多因素决定，其中我们需要的知识点是NRV。
-由于市场竞争的关系，大多数编译器均采取了一系列优化策略，以至于如下表达式：1T c = a+b;
-几乎不可能产生临时对象。但值得注意的是下一种情况——与表达式意义相当的assignment statement：1c = a+b;
-它会直接导致临时对象的生成：1234T temp;temp.operator+(a,b);c.operator=
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/1e2b80e7.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1732,7 +1736,7 @@ template声明可以理解为当你声明一个template class或template class m
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">256</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1833,7 +1837,7 @@ template声明可以理解为当你声明一个template class或template class m
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 799k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 800k 字</span>
 </div>
         
       </div>
