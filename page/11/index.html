@@ -468,134 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/32950146.html" itemprop="url">
-                  Function语义学——Inline Function
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-05-16T15:27:00+08:00" content="2018-05-16">
-              2018-05-16
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;众所周知，inline只是对编译器提出的申请，如果该请求被接受，则会使用某个expression合理地将该函数扩展开来。
-
-处理inline函数&nbsp;一般而言，处理一个inline函数有两个阶段：
-
-分析函数定义以确定函数的intrinsic inline ability如果一个函数因为其复杂度或建构问题，被编译器判断为无法inline，则会被转为一个static函数，并在“被编译模块”内产生对应的函数定义。理想情况下链接器会将产生出来的重复代码清除，但实际情况视编译环境而定。
-真正的inline函数扩展操作是在调用的哪一点上，这会带来参数求值操作及临时对象管理等问题
-
-
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/32950146.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/3142cc0a.html" itemprop="url">
                   Function语义学——指向Member Function的指针
                 </a>
@@ -1683,6 +1555,128 @@ Nonstatic Member Functions&nbsp;C++的一大设计准则是：nonstatic member f
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/effb6f96.html" itemprop="url">
+                  Data语义学——Data Member的布局
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-05-12T11:16:00+08:00" content="2018-05-12">
+              2018-05-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          已知下面一组data member：12345678910class Point3d&#123;public:    ...private:    float x;    static List&lt;Point3d*&gt; *freeList;    float y;    static const int chunkSize = 250;    float z;&#125;
+Nonstatic data members在class object中的排列顺序将与其被声明的顺序一致，任何中间介入的static data member不计入对象布局，它们被置于程序的data segment之中
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/effb6f96.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1727,7 +1721,7 @@ Nonstatic Member Functions&nbsp;C++的一大设计准则是：nonstatic member f
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">256</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1828,7 +1822,7 @@ Nonstatic Member Functions&nbsp;C++的一大设计准则是：nonstatic member f
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 803k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 804k 字</span>
 </div>
         
       </div>

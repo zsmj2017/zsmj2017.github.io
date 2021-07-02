@@ -468,131 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/1e2b80e7.html" itemprop="url">
-                  执行期语义学——临时性对象
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-05-30T12:05:00+08:00" content="2018-05-30">
-              2018-05-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          临时对象的生成&nbsp;如果我们有函数如下：1T operator+(const T&amp;,const T&amp;);
-那么在执行该函数时，可能会生成一个临时对象以存储需要传回的对象。是否会产生临时对象由很多因素决定，其中我们需要的知识点是NRV。
-由于市场竞争的关系，大多数编译器均采取了一系列优化策略，以至于如下表达式：1T c = a+b;
-几乎不可能产生临时对象。但值得注意的是下一种情况——与表达式意义相当的assignment statement：1c = a+b;
-它会直接导致临时对象的生成：1234T temp;temp.operator+(a,b);c.operator=
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/1e2b80e7.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/7a0731d7.html" itemprop="url">
                   执行期语义学——new与delete运算符
                 </a>
@@ -1693,6 +1568,134 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/32950146.html" itemprop="url">
+                  Function语义学——Inline Function
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-05-16T15:27:00+08:00" content="2018-05-16">
+              2018-05-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;众所周知，inline只是对编译器提出的申请，如果该请求被接受，则会使用某个expression合理地将该函数扩展开来。
+
+处理inline函数&nbsp;一般而言，处理一个inline函数有两个阶段：
+
+分析函数定义以确定函数的intrinsic inline ability如果一个函数因为其复杂度或建构问题，被编译器判断为无法inline，则会被转为一个static函数，并在“被编译模块”内产生对应的函数定义。理想情况下链接器会将产生出来的重复代码清除，但实际情况视编译环境而定。
+真正的inline函数扩展操作是在调用的哪一点上，这会带来参数求值操作及临时对象管理等问题
+
+
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/32950146.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1737,7 +1740,7 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">256</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1838,7 +1841,7 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 803k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 804k 字</span>
 </div>
         
       </div>

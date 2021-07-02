@@ -468,128 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/156daf9c.html" itemprop="url">
-                  41.Consider pass by value for copyable parameters that are cheap to move and always copied.
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-07-19T12:15:00+08:00" content="2018-07-19">
-              2018-07-19
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          （本节标题完美揭示了全部主旨，不宜翻译）
-问题实例&nbsp;假定当前存在一个Widget class，其成员函数addName接受一个string并将其添加到内部容器中。一般为了保证效率，我们通常会对左值string执行pass-by-const-reference，对右值执行move：12345678910class Widget &#123;public:    void addName(const std::string&amp; newName) // take lvalue;    &#123; names.push_back(newName); &#125; // copy it
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/156daf9c.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/506268e4.html" itemprop="url">
                   40.对并发应用std::atomic,对special memory使用volatile
                 </a>
@@ -1680,6 +1558,128 @@ std::launch::deferred launch policy意味着f只有在std::asy
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/531d36bf.html" itemprop="url">
+                  32.使用init捕获将对象移动到闭包中
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-16T15:41:00+08:00" content="2018-07-16">
+              2018-07-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;可能在某时你会发现无论是按值捕获还是按引用捕获均非最佳选择。例如C++11无法将一个move-only对象（std::unique_ptr、std::future)移动进入闭包.又或者当前存在一个copy成本极高但move成本极低的对象（例如STL中的大部分容器），C++11也无法将其移动进入闭包。
+这项C++14引入的新功能被称为init capture，它几乎可以完成C++11捕获表单可以执行的所有操作，以及更多功能，唯一的缺点是它无法表现地如同默认捕获，但前一节我们介绍了最好不要使用它们。此外，init捕获的语法略显冗长，因此如果C++11中别的捕获模式已经能够完成任务，
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/531d36bf.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1724,7 +1724,7 @@ std::launch::deferred launch policy意味着f只有在std::asy
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">256</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1825,7 +1825,7 @@ std::launch::deferred launch policy意味着f只有在std::asy
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 803k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 804k 字</span>
 </div>
         
       </div>

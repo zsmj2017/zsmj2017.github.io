@@ -468,129 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/8fdd156.html" itemprop="url">
-                  13. 复制对象务必尽善尽美
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-09T12:01:00+08:00" content="2018-04-09">
-              2018-04-09
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&lt;/br&gt;设计良好的OO System一般只留有两个函数负责对象拷贝，那就是copy构造函数和copy assignment操作符，暂称它们为copying函数。正如前文所说，编译器会在必要的时候为我们的classes创建copying函数，其行为是：将被copy对象的所有成员变量都做一份拷贝。
-
-手动处理拷贝可能存在的风险&lt;/br&gt;如果我们自己声明和实现了copying函数，但却并没有完全拷贝成员变量，造成了partial copy，此时编译器根本不会报错，所以需要仔细地排查：12345678class Widget&#123;public:    Widget(
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/8fdd156.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/54a14355.html" itemprop="url">
                   13. vector与string相较于动态数组的优越性
                 </a>
@@ -1704,6 +1581,127 @@ listlist也可以用erase_remove，但是最好直接使用remove：1c.remove(19
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/1e5c6668.html" itemprop="url">
+                  8.为多态基类生成virtual析构函数
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-08T09:33:00+08:00" content="2018-04-08">
+              2018-04-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          问题描述假设我们定义了一个base class，并随之延伸出一些derived class。用户只需要在程序中使用某个功能，并不关心其实现。因此，我们可以设计一个factory函数。(工厂模式详见More Effective C++ 25）factory函数返回一个base clsss指针，指向新生成的derived class对象。 返回的对象必须位于heap，因此为了避免泄漏内存和其他资源，factory返回的每一个对象都应该被适当的delete。举例而言：123456789101112class TimeKeeper&#123;//计时器基类public:    TimeKeeper()
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/1e5c6668.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1748,7 +1746,7 @@ listlist也可以用erase_remove，但是最好直接使用remove：1c.remove(19
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">256</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1849,7 +1847,7 @@ listlist也可以用erase_remove，但是最好直接使用remove：1c.remove(19
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 803k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 804k 字</span>
 </div>
         
       </div>

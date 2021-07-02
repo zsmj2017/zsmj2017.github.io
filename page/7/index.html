@@ -468,129 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/f5ff06d2.html" itemprop="url">
-                  23.理解std::move与std::forward
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-07-11T19:02:00+08:00" content="2018-07-11">
-              2018-07-11
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;在开始叙述之前，我们首先需要明确，std::move并不执行移动，std::forward也并不转发，它们在运行期并不执行任何操作，也不生成任何代码。std::move和std::forward只是执行强制转换的函数（实际上是函数模板）。std::move无条件地将其参数转换为rvalue，而std::forward仅在满足特定条件时才执行此转换，这就是关于它们的全部解释。
-
-std::move&nbsp;C++11中std::move的大致实现如下所示：123456template&lt;typename T&gt; // in namespace stdtypename r
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/f5ff06d2.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/c66efa80.html" itemprop="url">
                   右值引用、移动语义、完美转发
                 </a>
@@ -1688,6 +1565,129 @@ default copy assignment operator
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/d33ba423.html" itemprop="url">
+                  15.尽量使用constexpr
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-02T18:42:00+08:00" content="2018-07-02">
+              2018-07-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;constexpr应用于对象时，其类似于const的加强版，但其应用于函数时的意义却与此大相径庭。从概念而言，constexpr不仅仅表示一个常量，也表示该量在编译期即可明确。然而，在constexpr function中，constexpr未必代表着编译期取值，甚至未必能保证const。
+
+constexpr objects&nbsp;constexpr对象具备const属性，其值在编译期已知。（从技术层面来说，其值决定于translation时期，也就是编译期和链接期，但这一点并不重要，除非你需要自己写一个C++的编译器和链接器，不然你总可以认为constexpr对象的值在
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/d33ba423.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1732,7 +1732,7 @@ default copy assignment operator
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">256</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1833,7 +1833,7 @@ default copy assignment operator
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 803k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 804k 字</span>
 </div>
         
       </div>
