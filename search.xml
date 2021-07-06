@@ -66,6 +66,27 @@
 <p>那么上一个实例的输出就很容易理解了——<code>write_x_then_y</code>函数就类似于A通知x办事员写下 true，之后又通知y办事员写下true。线程反复运行<code>read_y_then_x</code>就类似于B反复向y要值，直到它说true，然后再向x要值。x没必要告诉B最新值true，它完全有可能告诉B false。</p>
 <p>除此之外，该办事员也支持一些其他操作，例如“写下这个数字，并且告诉我现在列表中的最后一个数字”(exchange)，或“当列表的最后一个数字为某值则写下这个数字;否则的话，告诉我我试图去猜的值（此时已经未必是列表最后一个）是多少”(compare_exchange_strong)。</p>
 <hr>
+<h2 id="获取—释放"><a href="#获取—释放" class="headerlink" title="获取—释放"></a>获取—释放</h2><p>“获得-释放”是“宽松”的增强版——在不存在全序操作的前提下引入了同步。在这种顺序模型中，原子加载是获得(acquire)操作(memory_order_acquire)，原子存储是释放(memory_order_release)操作，原子读-改-写操作(如<code>fetch_add</code>或<code>exchange</code>可以是“获得”/“释放”中的任意一个，或者两者兼备 (memory_order_acq_rel)，一个“释放”操作同步于一个“获取”操作。</p>
+<h3 id="代码实例1"><a href="#代码实例1" class="headerlink" title="代码实例1"></a>代码实例1</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; x,y; </span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; z;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_x</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  x.store(<span class="literal">true</span>,<span class="built_in">std</span>::memory_order_release); </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_y</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  y.store(<span class="literal">true</span>,<span class="built_in">std</span>::memory_order_release); </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_x_then_y</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(!x.load(<span class="built_in">std</span>::memory_order_acquire));</span><br><span class="line">  <span class="keyword">if</span>(y.load(<span class="built_in">std</span>::memory_order_acquire))</span><br><span class="line">    ++z; </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_y_then_x</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(!y.load(<span class="built_in">std</span>::memory_order_acquire));</span><br><span class="line">  <span class="keyword">if</span>(x.load(<span class="built_in">std</span>::memory_order_acquire))</span><br><span class="line">    ++z; </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  x=<span class="literal">false</span>;</span><br><span class="line">  y=<span class="literal">false</span>;</span><br><span class="line">  z=<span class="number">0</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">a</span><span class="params">(write_x)</span></span>; </span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">b</span><span class="params">(write_y)</span></span>; </span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">c</span><span class="params">(read_x_then_y)</span></span>; </span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">d</span><span class="params">(read_y_then_x)</span></span>; </span><br><span class="line">  a.join();</span><br><span class="line">  b.join();</span><br><span class="line">  c.join();</span><br><span class="line">  d.join(); </span><br><span class="line">  assert(z.load()!=<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里assert可能会触发，因为可能加载x和y的时候都读取到的是false。下图展示了程序的一种可能运行流程：<br><img src="http://static.zybuluo.com/zsmj2017/ky9ttwheysxdkh241sxnq327/image.png" alt="image.png-174.3kB"></p>
+<h3 id="代码实例2"><a href="#代码实例2" class="headerlink" title="代码实例2"></a>代码实例2</h3><p>获取-释放的正确使用实例如下文所示——将两次存储由一个线程来完成，存储y时使用<code>std::memory_order_release</code>，读取y时使用<code>std::memory_order_acquire</code>:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; x,y; </span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; z;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_x_then_y</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  x.store(<span class="literal">true</span>,<span class="built_in">std</span>::memory_order_relaxed);</span><br><span class="line">  y.store(<span class="literal">true</span>,<span class="built_in">std</span>::memory_order_release);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_y_then_x</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(!y.load(<span class="built_in">std</span>::memory_order_acquire)); <span class="comment">// 自旋，等待y被设置为true</span></span><br><span class="line">  <span class="keyword">if</span>(x.load(<span class="built_in">std</span>::memory_order_relaxed)) </span><br><span class="line">    ++z;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  x=<span class="literal">false</span>;</span><br><span class="line">  y=<span class="literal">false</span>;</span><br><span class="line">  z=<span class="number">0</span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">a</span><span class="params">(write_x_then_y)</span></span>; </span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">b</span><span class="params">(read_y_then_x)</span></span>; </span><br><span class="line">  a.join();</span><br><span class="line">  b.join();</span><br><span class="line">  assert(z.load()!=<span class="number">0</span>); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于y的存储/读取操作存在“同步于关系”，而x，y的存储操作又在一个线程，存在”先序于”关系，因此，当<code>read_y_then_x</code>中的y被读取为true时，x必然为true，此时将导致z自增，此时assert将不会触发。为了提供同步，<code>std::memory_order_acquire</code>与<code>std::memory_order_release</code>必须成对进行。</p>
+<h3 id="类比分析-1"><a href="#类比分析-1" class="headerlink" title="类比分析"></a>类比分析</h3><p>同样以办事员举例，获取-释放操作需要在此前的建模中引入“批次”的概念。具体而言，每个已经完成的存储都是某一批次更新的一部分，因此，你在告诉办事员数值时，必须提及“请记下99，作为第423批的一部分”，一个批次中的末尾存储需要说明为“请记下127，作为第423批的最后存储”。此后的存储将变为424批次。</p>
+<p>获取值则分为2种情况：</p>
+<ol>
+<li>简单请求一个值（宽松），此时办事员给你提供一个值</li>
+<li>请求一个值，并且希望了解它是否是某批次中的最后一个（获取-释放）。若该值不是批次中的最后一个，办事员会说它是个普通值，否则它将提供如下信息：“数字为987，该值是956批次的最后一个，来源于Anne”。这即是获取-释放的核心操作：当你向办事员提供了你所了解的批次后，它会在其列表中查找该批次的最后一个值，然后要么给你该值，要么给予更靠后的值。</li>
+</ol>
+<p>那么我们将根据上述原则分析代码实例——首先，线程a运行<code>write_x_then_y</code>，告知办事员x“请写下true作为来自线程a的批次1的一部分”，然后，线程a告诉办事员y，“请写下true，这是来自线程a的批次1的最后一个写”。与此同时，线程b正在运行<code>read_y_then_x</code>，线程b持续向办事员y请求一个带批次信息的值(<code>std::memory_order_acquire</code>)，直到获取true，此时办事员y将告诉线程b，该值为来自线程a批次1的最后一次写。线程b继续向办事员x请求一个值，但这次他会说“请给我一个值，并且我从线程a了解到了批次1”。 此时办事员x将不得不查看它的记事本，从中找到批次1的最后一个写入操作——true。</p>
+<h3 id="用“获得-释放”传递同步"><a href="#用“获得-释放”传递同步" class="headerlink" title="用“获得-释放”传递同步"></a>用“获得-释放”传递同步</h3><p>正如前文所述，若A“线程间先发生于”B，且B“线程间先发生于”C，则有A“线程间先发生于”C。这意味着“获得-释放”可用于在若干线程间同步数据，即使“中间”线程没有接触到数据。</p>
+<p>具体而言，若当前存在三个线程:线程A修改一些共享变量，并对同步变量a执行“存储-释放”(store-release)。线程B使用“加载-获得”(load-acquire)读取“存储-释放”的同步变量a，并对第中同步变量b执行“存储-释放”。线程C对变量b执行“加载-获得”，若线程C确保自己读取到了b“存储-释放”后的值，则线程C此时对共享变量的读取必然也是“存储-释放”后的值：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> data[<span class="number">3</span>];</span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; sync1(<span class="literal">false</span>),sync2(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thread_1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  data[<span class="number">0</span>] = <span class="number">42</span>;</span><br><span class="line">  data[<span class="number">1</span>] = <span class="number">97</span>;</span><br><span class="line">  data[<span class="number">2</span>] = <span class="number">17</span>;</span><br><span class="line">  sync1.store(<span class="literal">true</span>,<span class="built_in">std</span>::memory_order_release);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thread_2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(!sync1.load(<span class="built_in">std</span>::memory_order_acquire));</span><br><span class="line">  sync2.store(<span class="literal">true</span>,<span class="built_in">std</span>::memory_order_release);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thread_3</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(!sync2.load(<span class="built_in">std</span>::memory_order_acquire));</span><br><span class="line">  assert(data[<span class="number">0</span>]==<span class="number">42</span>);</span><br><span class="line">  assert(data[<span class="number">1</span>]==<span class="number">97</span>);</span><br><span class="line">  assert(data[<span class="number">2</span>]==<span class="number">17</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; ++i) &#123;</span><br><span class="line">    <span class="built_in">memset</span>(data, <span class="number">0</span> ,<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">3</span>);</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">a</span><span class="params">(thread_1)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">b</span><span class="params">(thread_2)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="function">thread <span class="title">c</span><span class="params">(thread_3)</span></span>;</span><br><span class="line">    a.join();</span><br><span class="line">    b.join();</span><br><span class="line">    c.join();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实际上，我们可以对上述实例做进一步的改进，利用<code>std::memory_order_acq_rel</code>特性使得同步变量仅需要一个即可：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; sync(<span class="number">0</span>); </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thread_1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// </span></span><br><span class="line">  sync.store(<span class="number">1</span>, <span class="built_in">std</span>::memory_order_release);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thread_2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> expected=<span class="number">1</span>;</span><br><span class="line">  <span class="comment">// 反复查看sync是否为1，否则以其值更新expected，是则存入2</span></span><br><span class="line">  <span class="keyword">while</span>(!sync.compare_exchange_strong(expected, <span class="number">2</span>, <span class="built_in">std</span>::memory_order_acq_rel)) </span><br><span class="line">    expected=<span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thread_3</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(sync.load(<span class="built_in">std</span>::memory_order_acquire) &lt; <span class="number">2</span>);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="“获得-释放”与memory-order-consume的数据相关性"><a href="#“获得-释放”与memory-order-consume的数据相关性" class="headerlink" title="“获得-释放”与memory_order_consume的数据相关性"></a>“获得-释放”与memory_order_consume的数据相关性</h3><p>（C++17明确建议不要使用memory_order_consume, 若有兴趣，可直接查阅原文）</p>
+<hr>
+<h2 id="“释放序列”与“同步于”"><a href="#“释放序列”与“同步于”" class="headerlink" title="“释放序列”与“同步于”"></a>“释放序列”与“同步于”</h2><p>释放序列定义：若存储操作被标记为<code>memory_order_release</code>，<code>memory_order_acq_rel</code>或<code>memory_order_seq_cst</code>，加载操作被标记为<code>memory_order_consum</code>， <code>memory_order_acquire</code>或<code>memory_order_sqy_cst</code>，并且操作链上的每个操作加载的值是由前面的操作写入的，那么操作链就构成了一个释放序列(release sequence)。</p>
+<p>释放序列性质：最初的存储“同步于”最终的加载操作，操作链上的任何原子“读-改-写”操作可以拥有任意的内存顺序(memory_order_relaxed)。</p>
+<h3 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h3><p>考虑以<code>atomic&lt;int&gt;</code>对象作为对共享队列内条目数的计数器：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; queue_data; </span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; count;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">populate_queue</span><span class="params">()</span> </span>&#123; <span class="comment">// init</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">const</span> number_of_items=<span class="number">20</span>;</span><br><span class="line">  queue_data.clear();</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">unsigned</span> i = <span class="number">0</span>; i &lt; number_of_items; ++i) &#123;</span><br><span class="line">    queue_data.push_back(i); </span><br><span class="line">  &#125;</span><br><span class="line">  count.store(number_of_items, <span class="built_in">std</span>::memory_order_release);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">consume_queue_items</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">int</span> item_index;</span><br><span class="line">    <span class="comment">// fetch返回操作前的值</span></span><br><span class="line">    <span class="keyword">if</span>((item_index = count.fetch_sub(<span class="number">1</span>, <span class="built_in">std</span>::memory_order_acquire)) &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">      wait_for_more_items();</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    process(queue_data[item_index - <span class="number">1</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">a</span><span class="params">(populate_queue)</span></span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">b</span><span class="params">(consume_queue_items)</span></span>;</span><br><span class="line">  <span class="built_in">std</span>::<span class="function">thread <span class="title">c</span><span class="params">(consume_queue_items)</span></span>; </span><br><span class="line">  a.join();</span><br><span class="line">  b.join();</span><br><span class="line">  c.join(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>重点关注<code>fetch_sub</code>的内存顺序是<code>std::memory_order_acquire</code>，这意味着该加载操作与之前的存储操作构成了同步关系, 显然，若仅有一个消费者线程时不会发生任何问题。若存在两个消费线程，第二个<code>fetch_sub</code>操作将看到第一个线程写入的值，而不是<code>store</code>写入的值。若没有释放序列的性质，第二个线程与第一个线程不会存在“先发生于”关系，因此可能读到错误的count值，除非第一个<code>fetch_sub</code>具备<code>memory_order_release</code>语义，但这为两个消费者线程引入了不必要的同步关系。不过，第一个<code>fetch_sub()</code>存在于“释放序列”中，所以<code>store</code>能同步于第二个<code>fetch_sub</code>操作，两个消费者线程间仍然不存在“同步于”关系。下图虚线展示了“释放序列”，实线展示了“先发生于”关系：<br><img src="http://static.zybuluo.com/zsmj2017/x6l8hb72r6u91c7c4qfpnhr4/image.png" alt="image.png-478.1kB"></p>
 ]]></content>
       
         <categories>
@@ -3353,6 +3374,45 @@
     </entry>
     
     <entry>
+      <title><![CDATA[29.不必高估move语义]]></title>
+      <url>https://zsmj2017.tech/post/db3a64cc.html</url>
+      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>移动语义可以被认为是C++11的首要特性。它不仅允许编译器用相对便宜的移动替换昂贵的拷贝操作，并且在实际中要求编译器如此运转（在条件满足时），但本节要叙述的是：不要过高地看待移动语义。</p>
+<hr>
+<h1 id="类型支持"><a href="#类型支持" class="headerlink" title="类型支持"></a>类型支持</h1><p>&nbsp;<br>首先，并非所有类型均支持移动语义。在实际使用过程中，可能你当前使用的类型（历史遗留代码）并不支持移动语义。确实，C++11愿意为缺少它们的类生成move操作，但这只发生在声明没有copy操作，移动操作或析构函数的类中（见Item17）。此外，不支持move的data member或base class）也将抑制编译器生成move操作。</p>
+<hr>
+<h1 id="支持也未必高效"><a href="#支持也未必高效" class="headerlink" title="支持也未必高效"></a>支持也未必高效</h1><p>&nbsp;<br>其次，即使该类型明确具备移动语义，它也未必如你所想般高效。举例而言，C++标准库中的所有容器均支持移动语义，但对于某些容器来说，它们的移动语义并不具备真正的低开销，又或者由于容器元素类型的限制，它们无法采用真正高效的move操作。</p>
+<h2 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h2><p>以std::array为例，该容器是C++11中的一个新容器。std::array本质上是一个带有STL接口的内置数组。一般而言，STL容器倾向于将其所有元素均保存在堆上，内部元素仅仅是一个指向堆中内容的指针（真实情况较为复杂，但其差异不影响本次讨）。这些指针的存在为移动容器提供了便利：只需要将现有指针指向对应内容，然后将指针置为nullptr即可，现以移动vector为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; vw1;</span><br><span class="line"><span class="comment">// put data into vw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move vw1 into vw2. Runs in constant time. Only ptrs in vw1 and vw2 are modified</span></span><br><span class="line"><span class="keyword">auto</span> vw2 = <span class="built_in">std</span>::move(vw1);</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://static.zybuluo.com/zsmj2017/wnoy6o8pegwe0lyzll516et1/image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png" alt="image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png-21kB"><br>但std::array将元素直接存储于对象内部，因此其move操作看起来如下所示：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;Widget, 10000&gt; aw1;</span><br><span class="line"><span class="comment">// put data into aw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move aw1 into aw2. Runs in</span></span><br><span class="line"><span class="comment">// linear time. All elements in</span></span><br><span class="line"><span class="comment">// aw1 are moved into aw2</span></span><br><span class="line"><span class="keyword">auto</span> aw2 = <span class="built_in">std</span>::move(aw1);</span><br></pre></td></tr></table></figure>
+<p><img src="http://static.zybuluo.com/zsmj2017/6vb9j6bgrv0q0j6wk4fy4tt1/image_1cie5kqjo1pjm150r12rer3g1979m.png" alt="image_1cie5kqjo1pjm150r12rer3g1979m.png-22.1kB"></p>
+<p>这里需要注意的是，我们必须移动aw1中每一个Widget至aw2，也就是说当前仍然需要线性的时间，可能这快于copy，但也绝非像某些人所说的“移动容器只需要执行拷贝一个指针的时间”。</p>
+<h2 id="SSO-std-string"><a href="#SSO-std-string" class="headerlink" title="SSO std::string"></a>SSO std::string</h2><p>又例如，std::string提供常数时间的移动操作与线性时间的拷贝操作，这让我们感觉移动必然快于拷贝，但情况可能并非如此。许多字符串实现采用小字符串优化（SSO）。对于SSO，“小”字符串（例如，容量不超过15个字符的字符串）存储于std::string对象内的buffer中，而并非使用堆中的内存。移动基于SSO技术实现的字符串并不快于拷贝，因为传统仅拷贝一个指针的行为对其并不适用（内容存储于对象内，因此必须对对象有所操作），对于此类对象，copy并不慢于move。</p>
+<hr>
+<h1 id="异常安全性"><a href="#异常安全性" class="headerlink" title="异常安全性"></a>异常安全性</h1><p>&nbsp;<br>即使一切安好，move操作最终也可能会导致copy操作。在Item14中曾经提及，为了不破坏历史遗留代码，C++11中的异常规格必然与C++98中相容，因此，对于某些容器，只有在move操作明确不会抛出异常时才可能会取代copy操作。因此，即使move操作确实优于copy操作且当前环境适用于move（例如参数为右值），编译器在move操作并未声明为noexcept的情况下依然会选择对move视而不见。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>在撰写代码时务必谨慎假设move语义并未发挥作用，但如果你明确当前类型必然支持移动语义，那自然可以大胆使用。</strong></li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> Effective Modern C++ </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> Modern C++ </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[28.了解引用塌缩]]></title>
       <url>https://zsmj2017.tech/post/ae03537d.html</url>
       <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>众所周知，当一个左值或右值初始化universal reference时将触发类型推衍，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(T&amp;&amp; param)</span></span>;</span><br></pre></td></tr></table></figure></p>
@@ -3396,45 +3456,6 @@
 <li><strong>引用塌缩触发于四种特定环境：模板实例化、auto类型生成、typedef与alias declaration以及decltype推衍。</strong></li>
 <li><strong>在引用塌缩过程中，只要存在左值引用，则最终结果为左值引用，否则即为右值引用。</strong></li>
 <li><strong>universal reference可视为特定环境下的右值引用。</strong></li>
-</ol>
-]]></content>
-      
-        <categories>
-            
-            <category> Effective Modern C++ </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> Modern C++ </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[29.不必高估move语义]]></title>
-      <url>https://zsmj2017.tech/post/db3a64cc.html</url>
-      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>移动语义可以被认为是C++11的首要特性。它不仅允许编译器用相对便宜的移动替换昂贵的拷贝操作，并且在实际中要求编译器如此运转（在条件满足时），但本节要叙述的是：不要过高地看待移动语义。</p>
-<hr>
-<h1 id="类型支持"><a href="#类型支持" class="headerlink" title="类型支持"></a>类型支持</h1><p>&nbsp;<br>首先，并非所有类型均支持移动语义。在实际使用过程中，可能你当前使用的类型（历史遗留代码）并不支持移动语义。确实，C++11愿意为缺少它们的类生成move操作，但这只发生在声明没有copy操作，移动操作或析构函数的类中（见Item17）。此外，不支持move的data member或base class）也将抑制编译器生成move操作。</p>
-<hr>
-<h1 id="支持也未必高效"><a href="#支持也未必高效" class="headerlink" title="支持也未必高效"></a>支持也未必高效</h1><p>&nbsp;<br>其次，即使该类型明确具备移动语义，它也未必如你所想般高效。举例而言，C++标准库中的所有容器均支持移动语义，但对于某些容器来说，它们的移动语义并不具备真正的低开销，又或者由于容器元素类型的限制，它们无法采用真正高效的move操作。</p>
-<h2 id="std-array"><a href="#std-array" class="headerlink" title="std::array"></a>std::array</h2><p>以std::array为例，该容器是C++11中的一个新容器。std::array本质上是一个带有STL接口的内置数组。一般而言，STL容器倾向于将其所有元素均保存在堆上，内部元素仅仅是一个指向堆中内容的指针（真实情况较为复杂，但其差异不影响本次讨）。这些指针的存在为移动容器提供了便利：只需要将现有指针指向对应内容，然后将指针置为nullptr即可，现以移动vector为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; vw1;</span><br><span class="line"><span class="comment">// put data into vw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move vw1 into vw2. Runs in constant time. Only ptrs in vw1 and vw2 are modified</span></span><br><span class="line"><span class="keyword">auto</span> vw2 = <span class="built_in">std</span>::move(vw1);</span><br></pre></td></tr></table></figure></p>
-<p><img src="http://static.zybuluo.com/zsmj2017/wnoy6o8pegwe0lyzll516et1/image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png" alt="image_1cie5hhbvcjm1ukp1m0c1a4713rh9.png-21kB"><br>但std::array将元素直接存储于对象内部，因此其move操作看起来如下所示：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;Widget, 10000&gt; aw1;</span><br><span class="line"><span class="comment">// put data into aw1</span></span><br><span class="line">…</span><br><span class="line"><span class="comment">// move aw1 into aw2. Runs in</span></span><br><span class="line"><span class="comment">// linear time. All elements in</span></span><br><span class="line"><span class="comment">// aw1 are moved into aw2</span></span><br><span class="line"><span class="keyword">auto</span> aw2 = <span class="built_in">std</span>::move(aw1);</span><br></pre></td></tr></table></figure>
-<p><img src="http://static.zybuluo.com/zsmj2017/6vb9j6bgrv0q0j6wk4fy4tt1/image_1cie5kqjo1pjm150r12rer3g1979m.png" alt="image_1cie5kqjo1pjm150r12rer3g1979m.png-22.1kB"></p>
-<p>这里需要注意的是，我们必须移动aw1中每一个Widget至aw2，也就是说当前仍然需要线性的时间，可能这快于copy，但也绝非像某些人所说的“移动容器只需要执行拷贝一个指针的时间”。</p>
-<h2 id="SSO-std-string"><a href="#SSO-std-string" class="headerlink" title="SSO std::string"></a>SSO std::string</h2><p>又例如，std::string提供常数时间的移动操作与线性时间的拷贝操作，这让我们感觉移动必然快于拷贝，但情况可能并非如此。许多字符串实现采用小字符串优化（SSO）。对于SSO，“小”字符串（例如，容量不超过15个字符的字符串）存储于std::string对象内的buffer中，而并非使用堆中的内存。移动基于SSO技术实现的字符串并不快于拷贝，因为传统仅拷贝一个指针的行为对其并不适用（内容存储于对象内，因此必须对对象有所操作），对于此类对象，copy并不慢于move。</p>
-<hr>
-<h1 id="异常安全性"><a href="#异常安全性" class="headerlink" title="异常安全性"></a>异常安全性</h1><p>&nbsp;<br>即使一切安好，move操作最终也可能会导致copy操作。在Item14中曾经提及，为了不破坏历史遗留代码，C++11中的异常规格必然与C++98中相容，因此，对于某些容器，只有在move操作明确不会抛出异常时才可能会取代copy操作。因此，即使move操作确实优于copy操作且当前环境适用于move（例如参数为右值），编译器在move操作并未声明为noexcept的情况下依然会选择对move视而不见。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>在撰写代码时务必谨慎假设move语义并未发挥作用，但如果你明确当前类型必然支持移动语义，那自然可以大胆使用。</strong></li>
 </ol>
 ]]></content>
       
@@ -7883,6 +7904,31 @@
     </entry>
     
     <entry>
+      <title><![CDATA[16.80-20准则]]></title>
+      <url>https://zsmj2017.tech/post/b28612a4.html</url>
+      <content type="html"><![CDATA[<p>80－20准则说的是大约20％的代码使用了80％的程序资源；大约20%的代码耗用了大约80％的运行时间；大约20％的代码使用了 80％的内存；大约20％的代码执行80％的磁盘访问；80％的维护投入于大约20％的代码上；通过无数台机器、操作系统和应用程序上的实验，这条准则已经被再三地验证过。</p>
+<p>80－20准则不只是一条好记的惯用语，它更是一条有关系统性能的指导方针，有着广泛的适用性和坚实的实验基础。不要在具体数字上纠缠不清，不管准确地数字是多少，基本的观点是一样的：<strong>软件整体的性能取决于代码组成中的一小部分。</strong></p>
+<p>profiler有助于洞察性能，虽然并非每一次都能被你发现，为了保证开发者能够明晰低效的症结位于何处，最好的方法是用尽可能多的数据profile应用程序。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> More Effective C++ </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> 效率 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[15.了解异常处理的成本]]></title>
       <url>https://zsmj2017.tech/post/8e2690b5.html</url>
       <content type="html"><![CDATA[<p>为了处理异常，程序必须做到：</p>
@@ -7908,31 +7954,6 @@
             <tag> C++ </tag>
             
             <tag> 异常 </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[16.80-20准则]]></title>
-      <url>https://zsmj2017.tech/post/b28612a4.html</url>
-      <content type="html"><![CDATA[<p>80－20准则说的是大约20％的代码使用了80％的程序资源；大约20%的代码耗用了大约80％的运行时间；大约20％的代码使用了 80％的内存；大约20％的代码执行80％的磁盘访问；80％的维护投入于大约20％的代码上；通过无数台机器、操作系统和应用程序上的实验，这条准则已经被再三地验证过。</p>
-<p>80－20准则不只是一条好记的惯用语，它更是一条有关系统性能的指导方针，有着广泛的适用性和坚实的实验基础。不要在具体数字上纠缠不清，不管准确地数字是多少，基本的观点是一样的：<strong>软件整体的性能取决于代码组成中的一小部分。</strong></p>
-<p>profiler有助于洞察性能，虽然并非每一次都能被你发现，为了保证开发者能够明晰低效的症结位于何处，最好的方法是用尽可能多的数据profile应用程序。</p>
-]]></content>
-      
-        <categories>
-            
-            <category> More Effective C++ </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> 效率 </tag>
             
         </tags>
         
