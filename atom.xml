@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zsmj2017.tech/"/>
-  <updated>2021-07-07T10:24:31.056Z</updated>
+  <updated>2021-07-08T09:09:07.388Z</updated>
   <id>https://zsmj2017.tech/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>设计基于锁的并发数据结构——并发设计纲要</title>
+    <link href="https://zsmj2017.tech/post/a561c589.html"/>
+    <id>https://zsmj2017.tech/post/a561c589.html</id>
+    <published>2021-07-08T07:00:00.000Z</published>
+    <updated>2021-07-08T09:09:07.388Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>选择与设计正确的数据结构是解决方案设计的重中之重，并发编程亦不例外。若某种数据结构存在被多线程访问的可能性，除非其具备只读属性，否则必然需要保证数据变化在线程间被正确同步，对于此，一般有两种设计方案：</p><ol><li>使用独立的互斥锁以及外部加锁来保护数据</li><li>设计自身支持并发访问的数据结构</li></ol><p>本章将重点论述第二点。<br><a id="more"></a></p><hr><h1 id="何谓并发设计"><a href="#何谓并发设计" class="headerlink" title="何谓并发设计"></a>何谓并发设计</h1><p>&nbsp;<br>线程安全(thread-safe)：若存在某种数据结构，支持多线程并发访问，所有线程均可观察到该结构<strong>前后一致</strong>的视图，施加于该数据结构的任意操作均保证不会造成数据丢失或损坏，且不会造成数据竞争，则称该数据结构线程安全。通常场景下，数据结构可能仅需要保证特定的并发访问“安全”即可，例如“保证在多线程读与单线程写的情景下安全”，或者“多线程执行不同操作时安全”。</p><p>前文曾提及的互斥锁可以为数据结构提供保护(一次仅能有一个线程获得互斥锁)，究其本质，即显式阻止对被保护数据的真正并发访问。这被称为串行化(serialization)——各线程轮流，以串行而非并行的方式访问保护数据。</p><p>使用互斥锁包裹<strong>全部</strong>数据显然不是并发设计——真正的设计意味着需要为多线程提供并发访问保护数据的机会。尽管不同场景，不同数据结构所需要的并发范围大小各有差异，但基本设计思想是一致的：保护区越小，串行化操作就越少，并发的潜力就越大。</p><hr><h1 id="并发设计纲要"><a href="#并发设计纲要" class="headerlink" title="并发设计纲要"></a>并发设计纲要</h1><p>&nbsp;</p><p>如上文所说，并发设计主要需要考虑2点：</p><ol><li>确保访问安全</li><li>允许真正的并发访问</li></ol><h2 id="访问安全"><a href="#访问安全" class="headerlink" title="访问安全"></a>访问安全</h2><p>在<code>线程间共享数据</code>一章中曾对保证数据结构线程安全的基础要点有所介绍：</p><ul><li>除修改线程外，没有线程能看到数据被修改时的中间状态。</li><li>提供完整操作（而非一个个操作步骤）的函数以避免接口固有的竞争条件。</li><li>避免异常行为暴露数据的中间状态。</li><li>限制锁的范围，避免嵌套锁，尽力避免死锁。</li></ul><p>同时，我们也需要考虑对数据结构的使用者施加何种约束：若当前存在线程A通过一个特定函数对数据结构进行访问，那么其他线程能安全使用哪些函数？<br>通常，构造函数和析构函数需要互斥地访问数据结构，但需要用户保证不会在构造函数完成前/析构函数完成后访问数据结构。若该数据结构支持<code>copy assignment</code>，<code>swap</code>或<code>copy ctor</code>，则我们必须决定这些操作与其他操作并发调用时使用安全，或者它们是否必须要求用户保证互斥访问。</p><h2 id="并发访问"><a href="#并发访问" class="headerlink" title="并发访问"></a>并发访问</h2><p>在设计数据结构之前，我们必须扪心自问</p><ul><li>是否可以限制锁的作用范围，以允许操作的某些部分在锁外执行？</li><li>数据结构不同部分能否被不同的互斥锁保护?</li><li>所有的操作需要同一级别的保护吗?</li><li>是否可以在不影响操作语义的前提下修改数据结构，增加其得以被并发访问的可能？</li></ul><p>上述问题的核心是——如何最小化必须的串行操作，使真实的并发最大化?<br>就实际使用场景而言，只读线程并发访问，修改线程互斥访问的案例较为常见（可以通过使用<code>std::shared_thread</code>实现）。后文将提及另一种常见场景:串行执行执行同一操作，并发执行不同操作。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;br&gt;选择与设计正确的数据结构是解决方案设计的重中之重，并发编程亦不例外。若某种数据结构存在被多线程访问的可能性，除非其具备只读属性，否则必然需要保证数据变化在线程间被正确同步，对于此，一般有两种设计方案：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用独立的互斥锁以及外部加锁来保护数据&lt;/li&gt;
+&lt;li&gt;设计自身支持并发访问的数据结构&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;本章将重点论述第二点。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="C++并发编程实战" scheme="https://zsmj2017.tech/categories/C-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/"/>
+    
+    
+      <category term="C++" scheme="https://zsmj2017.tech/tags/C/"/>
+    
+      <category term="并发编程" scheme="https://zsmj2017.tech/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>C++内存模型与原子类型操作——同步操作与强制顺序</title>
@@ -158,26 +187,6 @@
       <category term="C++" scheme="https://zsmj2017.tech/tags/C/"/>
     
       <category term="并发编程" scheme="https://zsmj2017.tech/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>macOS环境zsh配置</title>
-    <link href="https://zsmj2017.tech/post/a60a6893.html"/>
-    <id>https://zsmj2017.tech/post/a60a6893.html</id>
-    <published>2019-07-16T12:28:00.000Z</published>
-    <updated>2021-06-23T07:44:08.073Z</updated>
-    
-    <content type="html"><![CDATA[<p>本篇记录了目前笔者的zsh配置文件（将长期保持更新）。</p><a id="more"></a><h1 id="zshrc内容"><a href="#zshrc内容" class="headerlink" title=".zshrc内容"></a>.zshrc内容</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> If you come from bash you might have to change your $PATH.</span><br><span class="line"><span class="meta">#</span> export PATH=$HOME/bin:/usr/local/bin:$PATH</span><br><span class="line"><span class="meta">#</span> Path to your oh-my-zsh installation.</span><br><span class="line">export ZSH="/Users/zsmj/.oh-my-zsh"</span><br><span class="line">export PATH="usr/local/opt/llvm/bin:$PATH"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Set name of the theme to load --- if set to "random", it will</span><br><span class="line"><span class="meta">#</span> load a random theme each time oh-my-zsh is loaded, in which case,</span><br><span class="line"><span class="meta">#</span> to know which specific one was loaded, run: echo $RANDOM_THEME</span><br><span class="line"><span class="meta">#</span> See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes</span><br><span class="line">ZSH_THEME="agnoster"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Set list of themes to pick from when loading at random</span><br><span class="line"><span class="meta">#</span> Setting this variable when ZSH_THEME=random will cause zsh to load</span><br><span class="line"><span class="meta">#</span> a theme from this variable instead of looking in ~/.oh-my-zsh/themes/</span><br><span class="line"><span class="meta">#</span> If set to an empty array, this variable will have no effect.</span><br><span class="line"><span class="meta">#</span> ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to use case-sensitive completion.</span><br><span class="line"><span class="meta">#</span> CASE_SENSITIVE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to use hyphen-insensitive completion.</span><br><span class="line"><span class="meta">#</span> Case-sensitive completion must be off. _ and - will be interchangeable.</span><br><span class="line"><span class="meta">#</span> HYPHEN_INSENSITIVE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to disable bi-weekly auto-update checks.</span><br><span class="line"><span class="meta">#</span> DISABLE_AUTO_UPDATE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to change how often to auto-update (in days).</span><br><span class="line"><span class="meta">#</span> export UPDATE_ZSH_DAYS=13</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to disable colors in ls.</span><br><span class="line"><span class="meta">#</span> DISABLE_LS_COLORS="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to disable auto-setting terminal title.</span><br><span class="line"><span class="meta">#</span> DISABLE_AUTO_TITLE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to enable command auto-correction.</span><br><span class="line"><span class="meta">#</span> ENABLE_CORRECTION="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to display red dots whilst waiting for completion.</span><br><span class="line"><span class="meta">#</span> COMPLETION_WAITING_DOTS="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line if you want to disable marking untracked files</span><br><span class="line"><span class="meta">#</span> under VCS as dirty. This makes repository status check for large repositories</span><br><span class="line"><span class="meta">#</span> much, much faster.</span><br><span class="line"><span class="meta">#</span> DISABLE_UNTRACKED_FILES_DIRTY="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line if you want to change the command execution time</span><br><span class="line"><span class="meta">#</span> stamp shown in the history command output.</span><br><span class="line"><span class="meta">#</span> You can set one of the optional three formats:</span><br><span class="line"><span class="meta">#</span> "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"</span><br><span class="line"><span class="meta">#</span> or set a custom format using the strftime function format specifications,</span><br><span class="line"><span class="meta">#</span> see 'man strftime' for details.</span><br><span class="line"><span class="meta">#</span> HIST_STAMPS="mm/dd/yyyy"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Would you like to use another custom folder than $ZSH/custom?</span><br><span class="line"><span class="meta">#</span> ZSH_CUSTOM=/path/to/new-custom-folder</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Which plugins would you like to load?</span><br><span class="line"><span class="meta">#</span> Standard plugins can be found in ~/.oh-my-zsh/plugins/*</span><br><span class="line"><span class="meta">#</span> Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/</span><br><span class="line"><span class="meta">#</span> Example format: plugins=(rails git textmate ruby lighthouse)</span><br><span class="line"><span class="meta">#</span> Add wisely, as too many plugins slow down shell startup.</span><br><span class="line">plugins=(git)</span><br><span class="line"></span><br><span class="line">source $ZSH/oh-my-zsh.sh</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> User configuration</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> export MANPATH="/usr/local/man:$MANPATH"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> You may need to manually set your language environment</span><br><span class="line"><span class="meta">#</span> export LANG=en_US.UTF-8</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Preferred editor for local and remote sessions</span><br><span class="line"><span class="meta">#</span> if [[ -n $SSH_CONNECTION ]]; then</span><br><span class="line"><span class="meta">#</span>   export EDITOR='vim'</span><br><span class="line"><span class="meta">#</span> else</span><br><span class="line"><span class="meta">#</span>   export EDITOR='mvim'</span><br><span class="line"><span class="meta">#</span> fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Compilation flags</span><br><span class="line"><span class="meta">#</span> export ARCHFLAGS="-arch x86_64"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> ssh</span><br><span class="line"><span class="meta">#</span> export SSH_KEY_PATH="~/.ssh/rsa_id"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Set personal aliases, overriding those provided by oh-my-zsh libs,</span><br><span class="line"><span class="meta">#</span> plugins, and themes. Aliases can be placed here, though oh-my-zsh</span><br><span class="line"><span class="meta">#</span> users are encouraged to define aliases within the ZSH_CUSTOM folder.</span><br><span class="line"><span class="meta">#</span> For a full list of active aliases, run `alias`.</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span> Example aliases</span><br><span class="line"><span class="meta">#</span> alias zshconfig="mate ~/.zshrc"</span><br><span class="line"><span class="meta">#</span> alias ohmyzsh="mate ~/.oh-my-zsh"</span><br><span class="line"></span><br><span class="line">source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh</span><br><span class="line"></span><br><span class="line">if brew list | grep coreutils &gt; /dev/null ; then</span><br><span class="line">  PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"</span><br><span class="line">  alias ls='ls -F --show-control-chars --color=auto'</span><br><span class="line">  eval `gdircolors -b $HOME/.dir_colors`</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">export PATH="/usr/local/opt/e2fsprogs/bin:$PATH"</span><br><span class="line">export PATH="/usr/local/opt/e2fsprogs/sbin:$PATH"</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本篇记录了目前笔者的zsh配置文件（将长期保持更新）。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="杂项" scheme="https://zsmj2017.tech/categories/%E6%9D%82%E9%A1%B9/"/>
-    
     
   </entry>
   
@@ -441,26 +450,6 @@
   </entry>
   
   <entry>
-    <title>macOS环境下vscode插件及配置文件</title>
-    <link href="https://zsmj2017.tech/post/370cbc26.html"/>
-    <id>https://zsmj2017.tech/post/370cbc26.html</id>
-    <published>2019-04-03T13:57:00.000Z</published>
-    <updated>2021-06-23T07:44:08.057Z</updated>
-    
-    <content type="html"><![CDATA[<p>本文用于记录vscode插件及配置文件，将长期保持更新。</p><a id="more"></a><h1 id="vscode插件"><a href="#vscode插件" class="headerlink" title="vscode插件"></a>vscode插件</h1><p>&nbsp;<br>截至目前，使用插件如下：</p><blockquote><ul><li>C/C++</li><li>One Dark Pro</li><li>Vim</li><li>Better C++ Syntax</li><li>CMake</li><li>Python</li></ul></blockquote><h1 id="全局设置"><a href="#全局设置" class="headerlink" title="全局设置"></a>全局设置</h1><p>&nbsp;<br><code>setting.json</code>：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "editor.fontSize": 16,</span><br><span class="line">    "C_Cpp.autocomplete": "Default",</span><br><span class="line">    "C_Cpp.clang_format_sortIncludes": true,</span><br><span class="line">    "C_Cpp.intelliSenseEngine": "Default",</span><br><span class="line">    "C_Cpp.errorSquiggles": "Disabled",</span><br><span class="line">    "C_Cpp.clang_format_path": "/Users/zsmj/.vscode/extensions/ms-vscode.cpptools-0.24.1/LLVM/bin/clang-format.darwin" # 长期保持更新,</span><br><span class="line">    "workbench.colorTheme": "One Dark Pro",</span><br><span class="line">    "C_Cpp.clang_format_fallbackStyle": "Google",</span><br><span class="line">    "editor.formatOnSave": true,</span><br><span class="line">    "editor.formatOnPaste": true,</span><br><span class="line">    "terminal.integrated.fontFamily": "Menlo for Powerline",</span><br><span class="line">    "terminal.external.osxExec": "iTerm.app",</span><br><span class="line">    "C_Cpp.updateChannel": "Insiders",</span><br><span class="line">    "http.proxySupport": "off",</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><h1 id="cpp设置"><a href="#cpp设置" class="headerlink" title="cpp设置"></a>cpp设置</h1><p>&nbsp;<br><code>c_cpp_properties.json</code>：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "configurations": [</span><br><span class="line">        &#123;</span><br><span class="line">            "name": "Mac",</span><br><span class="line">            "includePath": [</span><br><span class="line">                "$&#123;workspaceFolder&#125;/**"</span><br><span class="line">            ],</span><br><span class="line">            "defines": [],</span><br><span class="line">            "macFrameworkPath": [],</span><br><span class="line">            "compilerPath": "/usr/local/Cellar/gcc/9.1.0/bin/gcc-9",</span><br><span class="line">            "cStandard": "c11",</span><br><span class="line">            "cppStandard": "c++17",</span><br><span class="line">            "intelliSenseMode": "clang-x64"</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    "version": 4</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><h1 id="debug设定"><a href="#debug设定" class="headerlink" title="debug设定"></a>debug设定</h1><p>&nbsp;<br><code>launch.json</code>:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "version": "0.2.0",</span><br><span class="line">    "configurations": [</span><br><span class="line">        &#123;</span><br><span class="line">            "name": "(lldb) Launch",</span><br><span class="line">            "type": "cppdbg",</span><br><span class="line">            "request": "launch",</span><br><span class="line">            "program": "$&#123;workspaceFolder&#125;/a.out",</span><br><span class="line">            "args": [],</span><br><span class="line">            "stopAtEntry": false,</span><br><span class="line">            "cwd": "$&#123;workspaceFolder&#125;",</span><br><span class="line">            "environment": [],</span><br><span class="line">            "externalConsole": true,</span><br><span class="line">            "MIMode": "lldb"</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本文用于记录vscode插件及配置文件，将长期保持更新。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="杂项" scheme="https://zsmj2017.tech/categories/%E6%9D%82%E9%A1%B9/"/>
-    
-    
-  </entry>
-  
-  <entry>
     <title>macOS环境下gtest框架的使用</title>
     <link href="https://zsmj2017.tech/post/ebe14806.html"/>
     <id>https://zsmj2017.tech/post/ebe14806.html</id>
@@ -492,6 +481,29 @@
     <summary type="html">
     
       &lt;p&gt;macOS默认C++编译工具为clang，下文将具体描述如何将编译工具改为gcc7.4.0。(截至目前，笔者已更新至gcc8.3.0)&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="杂项" scheme="https://zsmj2017.tech/categories/%E6%9D%82%E9%A1%B9/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>vultr科学上网脚本备份</title>
+    <link href="https://zsmj2017.tech/post/51204a59.html"/>
+    <id>https://zsmj2017.tech/post/51204a59.html</id>
+    <published>2019-03-21T14:24:00.000Z</published>
+    <updated>2021-06-23T07:44:07.991Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="SSR脚本"><a href="#SSR脚本" class="headerlink" title="SSR脚本"></a>SSR脚本</h1><p>&nbsp;<br><code>CentOS6</code> ,<code>Debian6</code> ,<code>Ubuntu14</code> 一建部署SSR脚本:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum -y install wget</span><br><span class="line">wget -N --no-check-certificate https://raw.githubusercontent.com/hombo125/doubi/master/ssr.sh &amp;&amp; chmod +x ssr.sh &amp;&amp; bash ssr.sh</span><br></pre></td></tr></table></figure></p><h1 id="BBR加速"><a href="#BBR加速" class="headerlink" title="BBR加速"></a>BBR加速</h1><p>&nbsp;<br><code>CentOS 6+</code>,<code>Debian 8+</code>,<code>Ubuntu 14+</code> BBR加速脚本：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh" &amp;&amp; chmod +x tcp.sh &amp;&amp; ./tcp.sh</span><br></pre></td></tr></table></figure></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;SSR脚本&quot;&gt;&lt;a href=&quot;#SSR脚本&quot; class=&quot;headerlink&quot; title=&quot;SSR脚本&quot;&gt;&lt;/a&gt;SSR脚本&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;br&gt;&lt;code&gt;CentOS6&lt;/code&gt; ,&lt;code&gt;Debian6&lt;/code&gt; ,&lt;cod
+      
     
     </summary>
     

@@ -468,128 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/2fbbdcbd.html" itemprop="url">
-                  Data语义学——Data Member的绑定
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-05-12T09:16:00+08:00" content="2018-05-12">
-              2018-05-12
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          考虑以下程序：12345678910extern float x;//外部的x变量class Point3d&#123;public:    Point3d(float,float,float);    float X() const &#123;return x;&#125;    void X(float new_x) const &#123;x=new_x;&#125;    ...private:    float x,y,z;&#125;;
-如果我们调用Point3d::X(),那么它返回的是Point3d::x还是extern x？熟悉C++的人都明白是前者，但并非一直以来都是前者
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/2fbbdcbd.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/8b00a49b.html" itemprop="url">
                   Data语义学——前言
                 </a>
@@ -1711,6 +1589,130 @@ C struct实例假设我们当前存在一个struct Point3d：12345typedef struct
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/2525af9c.html" itemprop="url">
+                  34.混合使用C与C++
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-30T07:12:00+08:00" content="2018-04-30">
+              2018-04-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;在混合编程前，首先确保你的C++编译器和C编译器兼容。确认兼容后，还有四个需要考虑的问题：名变换、静态初始化、内存动态分配、数据结构兼容。
+
+名变换&nbsp;名变换，就是C++编译器给程序的每个函数换一个独一无二的名字。C没有函数重载，因此不需要该过程。重载不兼容于绝大部分链接程序，因为链接程序通常无法分辨同名的函数，它坚持函数名必须独一无二。名变换是C++对编译器的妥协。在C++使用范围内用户无需考虑名变换，但在C运行库中，那么情况截然不同。
+问题实例举例而言，在Cpp包含的头文件中，drawline被声明为：1void drawLine(int x1, int y1, i
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/2525af9c.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1755,7 +1757,7 @@ C struct实例假设我们当前存在一个struct Point3d：12345typedef struct
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1856,7 +1858,7 @@ C struct实例假设我们当前存在一个struct Point3d：12345typedef struct
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

@@ -468,127 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/5c36e117.html" itemprop="url">
-                  3.确保容器中的对象副本正确且高效
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-06T14:55:00+08:00" content="2018-04-06">
-              2018-04-06
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          容器中保存的对象并不是你放进去的对象，取出的对象也不是容器内的对象，它们都是副本。这种copy in，copy out就是STL 容器的工作方式。一旦对象放入容器，它们可能会遭遇更多的复制，比如顺序容器内遭遇排序或者插入，删除，它们元素都会进行一次复制操作。复制操作由拷贝构造函数与拷贝构造运算符完成。那么问题来了，如果对象的复制操作很费时，填充对象这个操作可能会降低程序性能，而且放入的副本如果有特殊含义，可能会导致出错。在存在继承关系的情况下，copy会导致slicing，举例而言，容器元素类型是bc，但我们试图放入dc对象，那么它的特有部分将会丢失。总之，使copy操作高效且正确的方法是在容
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/5c36e117.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/6eb9f492.html" itemprop="url">
                   2.视C++为语言联邦
                 </a>
@@ -1138,7 +1017,7 @@ rhs：right-hand side lhs亦是如此
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1239,7 +1118,7 @@ rhs：right-hand side lhs亦是如此
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

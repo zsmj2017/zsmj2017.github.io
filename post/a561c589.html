@@ -61,7 +61,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT, ZSMJ, Blog, C++" />
+  <meta name="keywords" content="C++,并发编程," />
 
 
 
@@ -89,16 +89,31 @@
 
 
 
-<meta name="description" content="本文用于记录vscode插件及配置文件，将长期保持更新。">
+<meta name="description" content="前言&amp;nbsp;选择与设计正确的数据结构是解决方案设计的重中之重，并发编程亦不例外。若某种数据结构存在被多线程访问的可能性，除非其具备只读属性，否则必然需要保证数据变化在线程间被正确同步，对于此，一般有两种设计方案：
+
+使用独立的互斥锁以及外部加锁来保护数据
+设计自身支持并发访问的数据结构
+
+本章将重点论述第二点。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="macOS环境下vscode插件及配置文件">
-<meta property="og:url" content="https://zsmj2017.tech/post/370cbc26.html">
+<meta property="og:title" content="设计基于锁的并发数据结构——并发设计纲要">
+<meta property="og:url" content="https://zsmj2017.tech/post/a561c589.html">
 <meta property="og:site_name" content="ZSMJ's Blog">
-<meta property="og:description" content="本文用于记录vscode插件及配置文件，将长期保持更新。">
-<meta property="og:updated_time" content="2021-06-23T07:44:08.057Z">
+<meta property="og:description" content="前言&amp;nbsp;选择与设计正确的数据结构是解决方案设计的重中之重，并发编程亦不例外。若某种数据结构存在被多线程访问的可能性，除非其具备只读属性，否则必然需要保证数据变化在线程间被正确同步，对于此，一般有两种设计方案：
+
+使用独立的互斥锁以及外部加锁来保护数据
+设计自身支持并发访问的数据结构
+
+本章将重点论述第二点。">
+<meta property="og:updated_time" content="2021-07-08T09:09:07.388Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="macOS环境下vscode插件及配置文件">
-<meta name="twitter:description" content="本文用于记录vscode插件及配置文件，将长期保持更新。">
+<meta name="twitter:title" content="设计基于锁的并发数据结构——并发设计纲要">
+<meta name="twitter:description" content="前言&amp;nbsp;选择与设计正确的数据结构是解决方案设计的重中之重，并发编程亦不例外。若某种数据结构存在被多线程访问的可能性，除非其具备只读属性，否则必然需要保证数据变化在线程间被正确同步，对于此，一般有两种设计方案：
+
+使用独立的互斥锁以及外部加锁来保护数据
+设计自身支持并发访问的数据结构
+
+本章将重点论述第二点。">
 
 
 
@@ -119,12 +134,12 @@
 
 
 
-  <link rel="canonical" href="https://zsmj2017.tech/post/370cbc26.html"/>
+  <link rel="canonical" href="https://zsmj2017.tech/post/a561c589.html"/>
 
 
 <!-- 网页加载条 -->
 <script src="/js/src/pace.min.js"></script>
-  <title> macOS环境下vscode插件及配置文件 | ZSMJ's Blog </title>
+  <title> 设计基于锁的并发数据结构——并发设计纲要 | ZSMJ's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -466,7 +481,7 @@
             
             
               
-                macOS环境下vscode插件及配置文件
+                设计基于锁的并发数据结构——并发设计纲要
               
             
           </h1>
@@ -478,8 +493,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2019-04-03T21:57:00+08:00" content="2019-04-03">
-              2019-04-03
+            <time itemprop="dateCreated" datetime="2021-07-08T15:00:00+08:00" content="2021-07-08">
+              2021-07-08
             </time>
           </span>
 
@@ -492,8 +507,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/杂项/" itemprop="url" rel="index">
-                    <span itemprop="name">杂项</span>
+                  <a href="/categories/C-并发编程实战/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
                   </a>
                 </span>
 
@@ -525,22 +540,39 @@
       
 
       
-        <p>本文用于记录vscode插件及配置文件，将长期保持更新。</p>
-<a id="more"></a>
-<h1 id="vscode插件"><a href="#vscode插件" class="headerlink" title="vscode插件"></a>vscode插件</h1><p>&nbsp;<br>截至目前，使用插件如下：</p>
-<blockquote>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>选择与设计正确的数据结构是解决方案设计的重中之重，并发编程亦不例外。若某种数据结构存在被多线程访问的可能性，除非其具备只读属性，否则必然需要保证数据变化在线程间被正确同步，对于此，一般有两种设计方案：</p>
+<ol>
+<li>使用独立的互斥锁以及外部加锁来保护数据</li>
+<li>设计自身支持并发访问的数据结构</li>
+</ol>
+<p>本章将重点论述第二点。<br><a id="more"></a></p>
+<hr>
+<h1 id="何谓并发设计"><a href="#何谓并发设计" class="headerlink" title="何谓并发设计"></a>何谓并发设计</h1><p>&nbsp;<br>线程安全(thread-safe)：若存在某种数据结构，支持多线程并发访问，所有线程均可观察到该结构<strong>前后一致</strong>的视图，施加于该数据结构的任意操作均保证不会造成数据丢失或损坏，且不会造成数据竞争，则称该数据结构线程安全。通常场景下，数据结构可能仅需要保证特定的并发访问“安全”即可，例如“保证在多线程读与单线程写的情景下安全”，或者“多线程执行不同操作时安全”。</p>
+<p>前文曾提及的互斥锁可以为数据结构提供保护(一次仅能有一个线程获得互斥锁)，究其本质，即显式阻止对被保护数据的真正并发访问。这被称为串行化(serialization)——各线程轮流，以串行而非并行的方式访问保护数据。</p>
+<p>使用互斥锁包裹<strong>全部</strong>数据显然不是并发设计——真正的设计意味着需要为多线程提供并发访问保护数据的机会。尽管不同场景，不同数据结构所需要的并发范围大小各有差异，但基本设计思想是一致的：保护区越小，串行化操作就越少，并发的潜力就越大。</p>
+<hr>
+<h1 id="并发设计纲要"><a href="#并发设计纲要" class="headerlink" title="并发设计纲要"></a>并发设计纲要</h1><p>&nbsp;</p>
+<p>如上文所说，并发设计主要需要考虑2点：</p>
+<ol>
+<li>确保访问安全</li>
+<li>允许真正的并发访问</li>
+</ol>
+<h2 id="访问安全"><a href="#访问安全" class="headerlink" title="访问安全"></a>访问安全</h2><p>在<code>线程间共享数据</code>一章中曾对保证数据结构线程安全的基础要点有所介绍：</p>
 <ul>
-<li>C/C++</li>
-<li>One Dark Pro</li>
-<li>Vim</li>
-<li>Better C++ Syntax</li>
-<li>CMake</li>
-<li>Python</li>
+<li>除修改线程外，没有线程能看到数据被修改时的中间状态。</li>
+<li>提供完整操作（而非一个个操作步骤）的函数以避免接口固有的竞争条件。</li>
+<li>避免异常行为暴露数据的中间状态。</li>
+<li>限制锁的范围，避免嵌套锁，尽力避免死锁。</li>
 </ul>
-</blockquote>
-<h1 id="全局设置"><a href="#全局设置" class="headerlink" title="全局设置"></a>全局设置</h1><p>&nbsp;<br><code>setting.json</code>：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "editor.fontSize": 16,</span><br><span class="line">    "C_Cpp.autocomplete": "Default",</span><br><span class="line">    "C_Cpp.clang_format_sortIncludes": true,</span><br><span class="line">    "C_Cpp.intelliSenseEngine": "Default",</span><br><span class="line">    "C_Cpp.errorSquiggles": "Disabled",</span><br><span class="line">    "C_Cpp.clang_format_path": "/Users/zsmj/.vscode/extensions/ms-vscode.cpptools-0.24.1/LLVM/bin/clang-format.darwin" # 长期保持更新,</span><br><span class="line">    "workbench.colorTheme": "One Dark Pro",</span><br><span class="line">    "C_Cpp.clang_format_fallbackStyle": "Google",</span><br><span class="line">    "editor.formatOnSave": true,</span><br><span class="line">    "editor.formatOnPaste": true,</span><br><span class="line">    "terminal.integrated.fontFamily": "Menlo for Powerline",</span><br><span class="line">    "terminal.external.osxExec": "iTerm.app",</span><br><span class="line">    "C_Cpp.updateChannel": "Insiders",</span><br><span class="line">    "http.proxySupport": "off",</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="cpp设置"><a href="#cpp设置" class="headerlink" title="cpp设置"></a>cpp设置</h1><p>&nbsp;<br><code>c_cpp_properties.json</code>：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "configurations": [</span><br><span class="line">        &#123;</span><br><span class="line">            "name": "Mac",</span><br><span class="line">            "includePath": [</span><br><span class="line">                "$&#123;workspaceFolder&#125;/**"</span><br><span class="line">            ],</span><br><span class="line">            "defines": [],</span><br><span class="line">            "macFrameworkPath": [],</span><br><span class="line">            "compilerPath": "/usr/local/Cellar/gcc/9.1.0/bin/gcc-9",</span><br><span class="line">            "cStandard": "c11",</span><br><span class="line">            "cppStandard": "c++17",</span><br><span class="line">            "intelliSenseMode": "clang-x64"</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    "version": 4</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="debug设定"><a href="#debug设定" class="headerlink" title="debug设定"></a>debug设定</h1><p>&nbsp;<br><code>launch.json</code>:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "version": "0.2.0",</span><br><span class="line">    "configurations": [</span><br><span class="line">        &#123;</span><br><span class="line">            "name": "(lldb) Launch",</span><br><span class="line">            "type": "cppdbg",</span><br><span class="line">            "request": "launch",</span><br><span class="line">            "program": "$&#123;workspaceFolder&#125;/a.out",</span><br><span class="line">            "args": [],</span><br><span class="line">            "stopAtEntry": false,</span><br><span class="line">            "cwd": "$&#123;workspaceFolder&#125;",</span><br><span class="line">            "environment": [],</span><br><span class="line">            "externalConsole": true,</span><br><span class="line">            "MIMode": "lldb"</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>同时，我们也需要考虑对数据结构的使用者施加何种约束：若当前存在线程A通过一个特定函数对数据结构进行访问，那么其他线程能安全使用哪些函数？<br>通常，构造函数和析构函数需要互斥地访问数据结构，但需要用户保证不会在构造函数完成前/析构函数完成后访问数据结构。若该数据结构支持<code>copy assignment</code>，<code>swap</code>或<code>copy ctor</code>，则我们必须决定这些操作与其他操作并发调用时使用安全，或者它们是否必须要求用户保证互斥访问。</p>
+<h2 id="并发访问"><a href="#并发访问" class="headerlink" title="并发访问"></a>并发访问</h2><p>在设计数据结构之前，我们必须扪心自问</p>
+<ul>
+<li>是否可以限制锁的作用范围，以允许操作的某些部分在锁外执行？</li>
+<li>数据结构不同部分能否被不同的互斥锁保护?</li>
+<li>所有的操作需要同一级别的保护吗?</li>
+<li>是否可以在不影响操作语义的前提下修改数据结构，增加其得以被并发访问的可能？</li>
+</ul>
+<p>上述问题的核心是——如何最小化必须的串行操作，使真实的并发最大化?<br>就实际使用场景而言，只读线程并发访问，修改线程互斥访问的案例较为常见（可以通过使用<code>std::shared_thread</code>实现）。后文将提及另一种常见场景:串行执行执行同一操作，并发执行不同操作。</p>
 
       
     </div>
@@ -561,22 +593,26 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/并发编程/" rel="tag"><i class="fa fa-tag"></i> 并发编程</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/post/ebe14806.html" rel="next" title="macOS环境下gtest框架的使用">
-                <i class="fa fa-chevron-left"></i> macOS环境下gtest框架的使用
+              <a href="/post/6a732eae.html" rel="next" title="C++内存模型与原子类型操作——同步操作与强制顺序">
+                <i class="fa fa-chevron-left"></i> C++内存模型与原子类型操作——同步操作与强制顺序
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/post/59a3b0ed.html" rel="prev" title="线程管理——线程管理基础">
-                线程管理——线程管理基础 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -648,7 +684,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -720,7 +756,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#vscode插件"><span class="nav-number">1.</span> <span class="nav-text">vscode插件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#全局设置"><span class="nav-number">2.</span> <span class="nav-text">全局设置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cpp设置"><span class="nav-number">3.</span> <span class="nav-text">cpp设置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#debug设定"><span class="nav-number">4.</span> <span class="nav-text">debug设定</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#何谓并发设计"><span class="nav-number">2.</span> <span class="nav-text">何谓并发设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#并发设计纲要"><span class="nav-number">3.</span> <span class="nav-text">并发设计纲要</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#访问安全"><span class="nav-number">3.1.</span> <span class="nav-text">访问安全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并发访问"><span class="nav-number">3.2.</span> <span class="nav-text">并发访问</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
@@ -760,7 +796,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

@@ -468,138 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/7a0731d7.html" itemprop="url">
-                  执行期语义学——new与delete运算符
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-05-30T07:05:00+08:00" content="2018-05-30">
-              2018-05-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;
-new operator看起来似乎是一个单一运算，例如：1int *pi = new int(5);
-但实际上它由以下两个步骤组成：
-
-通过适当的new运算符函数实体，配置所有所需内存：
-1int *pi = _new(sizeof(int));
-
-给配置得来的对象设立初值：*pi = 5;
-
-
-当然，初始化操作应当在内存配置成功后才执行：123//重写声明int *pi;if(pi = _new(sizeof(int))) *pi=5;
-delete运算符性质类似，只是在使用前会判断一下参数是否为nullptr，并且需要注意的是，在执行完delete后，p并不会被置为nul
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/7a0731d7.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/122673.html" itemprop="url">
                   执行期语义学——对象的构造与析构
                 </a>
@@ -1696,6 +1564,129 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/3142cc0a.html" itemprop="url">
+                  Function语义学——指向Member Function的指针
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-05-16T10:52:00+08:00" content="2018-05-16">
+              2018-05-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;在第三章中我们已经看出，取一个nonstatic data member的地址，得到的结果是该member在class布局中的bytes位置（+1）。我们可以想象它是一个不完整的值，必须依附于某个class object才可以完成存取。
+
+Nostatic Nonvirtual Member Function的指针&nbsp;取一个nonstatic nonvirtual member function的地址，得到的是该函数在内存中真正的地址，但这个值也是不完全的，它也需要被绑定到某个class object的地址上才能调用该函数。所有nonstatic member func
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/3142cc0a.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1740,7 +1731,7 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1841,7 +1832,7 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

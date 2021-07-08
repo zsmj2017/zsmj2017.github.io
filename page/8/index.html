@@ -468,128 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/1bf831ca.html" itemprop="url">
-                  14.若函数不会发生异常，则将其声明为noexcept
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-07-01T16:42:00+08:00" content="2018-07-01">
-              2018-07-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;在C++98中，异常规格是一个很麻烦的事情。你必须时刻关注函数可能抛出的异常，一旦函数的实现发生改变，其异常规格也需要发生变化。轻易更改异常规格可能会破坏客户端代码，因为调用者可能依赖于原始的异常规格。编译器并不能帮助你维持函数实现、异常规格、客户端代码之间的一致性。大多数程序员都认为C++98的异常规格实在是太不友善了。
-在长期的开发过程中人们逐渐产生了一项共识:函数的异常规格只需要告诉人们该函数是否可能会抛出一个异常即可。C++11以这种非黑即白式的异常规格取代了C++98中繁琐且易于出错的规格（不过它们现在仍然有效）。在C++11中，我们使用noexcept表征某个函数不
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/1bf831ca.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/43ba0b0d.html" itemprop="url">
                   13.以const_iterator代替iterator
                 </a>
@@ -1686,6 +1564,133 @@ Braced initialization&nbsp;
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/a418faf4.html" itemprop="url">
+                  4.了解如何查看类型推衍结果
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-06-25T17:10:00+08:00" content="2018-06-25">
+              2018-06-25
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;一般来说有三个阶段可以进行类型推衍结果查看：撰写期、编译期、运行期。
+
+IDE&nbsp;IDE通常可以在完成解析的前提下帮你判断当前类型推衍所得到的结果，但对于较为复杂的类型可能会失效。
+
+编译期诊断&nbsp;最有效的让编译器显示其推衍结果的方法是故意错用这些类型，编译器所给出的错误信息将清楚地告诉你哪里发生了错误。
+问题实例&nbsp;现有需要作类型推衍的变量x、y:123const int theAnswer = 42;auto x = theAnswer;auto y = &amp;theAnswer;
+首先我们需要定义一个类以展示类型：12template&lt;t
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/a418faf4.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1730,7 +1735,7 @@ Braced initialization&nbsp;
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1831,7 +1836,7 @@ Braced initialization&nbsp;
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

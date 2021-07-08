@@ -468,130 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/9e2e41f0.html" itemprop="url">
-                  14.审慎使用异常明细
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-26T10:50:00+08:00" content="2018-04-26">
-              2018-04-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          （本节内容在Effective C++ 30中亦有涉及）
-前言&nbsp;异常明细明确描述了一个函数可能抛出的异常，如果说函数抛出了一个不能存在于异常明细范围里的异常，系统将在运行时检测到该错误，并且自动地调用特殊函数unexpected。unexpected默认机制是调用terminate，而terminate缺省行为是调用abort.也就是说，一旦违反了异常明细，程序将立刻终止，所有资源（甚至包括局部变量）都未得到释放。
-
-问题实例&nbsp;前言中描述的情况其实极易发生，因为编译器仅仅部分地检测异常的使用是否与异常明细保持一致。举例而言，假设函数A有一个明确的异常明细，并且调用了函数B，
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/9e2e41f0.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/8ff59e9c.html" itemprop="url">
                   13.以引用方式捕获异常
                 </a>
@@ -1702,6 +1578,127 @@ operator new 返回值一般而言，operator new返回值很简单，分配成�
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/9af3aba1.html" itemprop="url">
+                  6.自增，自减操作符前置与后置的区别
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-24T13:18:00+08:00" content="2018-04-24">
+              2018-04-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前置与后置操作符&nbsp;重载函数间的区别在于它们参数类型上的差异，但是无论increment还是decrement的前缀与后缀都只有一个参数。为了解决问题，c++规定后缀形式有一个int类型参数，当函数被调用时编译器传递一个0作为int参数的值:1234567891011class UPInt &#123; //unlimited precision intpublic:    UPInt&amp; operator++();    const UPInt operator++(int);    UPInt&amp; operator--();    const UPInt operato
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/9af3aba1.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1746,7 +1743,7 @@ operator new 返回值一般而言，operator new返回值很简单，分配成�
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1847,7 +1844,7 @@ operator new 返回值一般而言，operator new返回值很简单，分配成�
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

@@ -468,134 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/87c0aab6.html" itemprop="url">
-                  18.避免使用vector&lt;bool>
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-11T09:26:00+08:00" content="2018-04-11">
-              2018-04-11
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&lt;/br&gt;vector&lt;bool&gt;只有两个问题：
-
-它不是一个STL容器
-它没有容纳bool
-
-
-vector&lt;bool&gt;的特点STL的一个必要条件STL容器的一个要求是：如果c是stl容器，且支持operator[],则以下代码可编译：1T *p = &amp;c[0]; // 无论operator[]返回什么，都可以用这个地址初始化一个T*
-具体来说就是，如果你可以使用operator[]来得到Container&lt;T&gt;中的一个T对象，那你必然可以通过取它的地址而获得指向那个对象的指针。看起来很正常的要求，但vector&lt;bool&g
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/87c0aab6.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/19c8f39d.html" itemprop="url">
                   17.new与delete成对使用时必须形式相同
                 </a>
@@ -1719,6 +1591,135 @@ resize：强制将元素个数变为n个，调用构
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/54a14355.html" itemprop="url">
+                  13. vector与string相较于动态数组的优越性
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-09T11:48:00+08:00" content="2018-04-09">
+              2018-04-09
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          如果我们决定使用new进行动态分配，那么我们必须肩负以下责任：
+
+有new必然要delete
+new[]必然要对应着delete[]
+避免重复delete
+
+实际上上述操作总是很麻烦，所以我们应该尽可能使用vector或者string来代替动态数组。另外，这两大容器可以配合STL算法，效果绝佳。
+事实上除了在多线程中使用引用计数字符串会导致性能下降外，其他情况下vector与string都具有绝对优势。就算这样，我们也可以试图关闭引用计数，或者使用vector&lt;char&gt;,尽管那失去了一些string的专有成员函数。
+
+          
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/54a14355.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1763,7 +1764,7 @@ resize：强制将元素个数变为n个，调用构
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1864,7 +1865,7 @@ resize：强制将元素个数变为n个，调用构
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

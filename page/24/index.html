@@ -468,135 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/54a14355.html" itemprop="url">
-                  13. vector与string相较于动态数组的优越性
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-09T11:48:00+08:00" content="2018-04-09">
-              2018-04-09
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          如果我们决定使用new进行动态分配，那么我们必须肩负以下责任：
-
-有new必然要delete
-new[]必然要对应着delete[]
-避免重复delete
-
-实际上上述操作总是很麻烦，所以我们应该尽可能使用vector或者string来代替动态数组。另外，这两大容器可以配合STL算法，效果绝佳。
-事实上除了在多线程中使用引用计数字符串会导致性能下降外，其他情况下vector与string都具有绝对优势。就算这样，我们也可以试图关闭引用计数，或者使用vector&lt;char&gt;,尽管那失去了一些string的专有成员函数。
-
-          
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/54a14355.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/e744d59e.html" itemprop="url">
                   12. 在operator=中处理自赋值
                 </a>
@@ -1702,6 +1573,128 @@ listlist也可以用erase_remove，但是最好直接使用remove：1c.remove(19
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/6249bcbe.html" itemprop="url">
+                  8.切勿创建包含auto_ptr的容器对象
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-08T09:00:00+08:00" content="2018-04-08">
+              2018-04-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          Contain of auto_ptr (COAP)被禁止使用，其代码无法编译。原因很简单，COAP无法移植，再究其根本，在于auto_ptr被复制后，它所指向的对象的所有权被移交给lhs，而自身被置为nullptr,其特性可以用代码表述如下：123auto_ptr&lt;Widget&gt; pw1(new Widget); // pw1指向一个Widgetauto_ptr&lt;Widget&gt; pw2(pw1); // pw2指向pw1的Widget,pw1被设为nullptrpw1 = pw2; // pw1现在再次指向Widget，pw2被设为nullptr
+举一个COAP的例子
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/6249bcbe.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1746,7 +1739,7 @@ listlist也可以用erase_remove，但是最好直接使用remove：1c.remove(19
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1847,7 +1840,7 @@ listlist也可以用erase_remove，但是最好直接使用remove：1c.remove(19
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

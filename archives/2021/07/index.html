@@ -89,16 +89,15 @@
 
 
 
-<meta name="description" content="本篇记录了目前笔者的zsh配置文件（将长期保持更新）。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="macOS环境zsh配置">
-<meta property="og:url" content="https://zsmj2017.tech/post/a60a6893.html">
+<meta name="description" content="Stay Hungry,Stay Foolish">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ZSMJ's Blog">
+<meta property="og:url" content="https://zsmj2017.tech/archives/2021/07/index.html">
 <meta property="og:site_name" content="ZSMJ's Blog">
-<meta property="og:description" content="本篇记录了目前笔者的zsh配置文件（将长期保持更新）。">
-<meta property="og:updated_time" content="2021-06-23T07:44:08.073Z">
+<meta property="og:description" content="Stay Hungry,Stay Foolish">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="macOS环境zsh配置">
-<meta name="twitter:description" content="本篇记录了目前笔者的zsh配置文件（将长期保持更新）。">
+<meta name="twitter:title" content="ZSMJ's Blog">
+<meta name="twitter:description" content="Stay Hungry,Stay Foolish">
 
 
 
@@ -119,12 +118,12 @@
 
 
 
-  <link rel="canonical" href="https://zsmj2017.tech/post/a60a6893.html"/>
+  <link rel="canonical" href="https://zsmj2017.tech/archives/2021/07/"/>
 
 
 <!-- 网页加载条 -->
 <script src="/js/src/pace.min.js"></script>
-  <title> macOS环境zsh配置 | ZSMJ's Blog </title>
+  <title> 归档 | ZSMJ's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -145,7 +144,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left page-post-detail ">
+  <div class="container one-collumn sidebar-position-left  page-archive  ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -445,140 +444,65 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
+  <section id="posts" class="posts-collapse">
+    <span class="archive-move-on"></span>
+
+    <span class="archive-page-counter">
+      
+      
+       
+        
+      太棒了! 目前共计 254 篇日志。 继续努力。
+    </span>
+
     
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                macOS环境zsh配置
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2019-07-16T20:28:00+08:00" content="2019-07-16">
-              2019-07-16
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/杂项/" itemprop="url" rel="index">
-                    <span itemprop="name">杂项</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
-      
-        <p>本篇记录了目前笔者的zsh配置文件（将长期保持更新）。</p>
-<a id="more"></a>
-<h1 id="zshrc内容"><a href="#zshrc内容" class="headerlink" title=".zshrc内容"></a>.zshrc内容</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> If you come from bash you might have to change your $PATH.</span><br><span class="line"><span class="meta">#</span> export PATH=$HOME/bin:/usr/local/bin:$PATH</span><br><span class="line"><span class="meta">#</span> Path to your oh-my-zsh installation.</span><br><span class="line">export ZSH="/Users/zsmj/.oh-my-zsh"</span><br><span class="line">export PATH="usr/local/opt/llvm/bin:$PATH"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Set name of the theme to load --- if set to "random", it will</span><br><span class="line"><span class="meta">#</span> load a random theme each time oh-my-zsh is loaded, in which case,</span><br><span class="line"><span class="meta">#</span> to know which specific one was loaded, run: echo $RANDOM_THEME</span><br><span class="line"><span class="meta">#</span> See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes</span><br><span class="line">ZSH_THEME="agnoster"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Set list of themes to pick from when loading at random</span><br><span class="line"><span class="meta">#</span> Setting this variable when ZSH_THEME=random will cause zsh to load</span><br><span class="line"><span class="meta">#</span> a theme from this variable instead of looking in ~/.oh-my-zsh/themes/</span><br><span class="line"><span class="meta">#</span> If set to an empty array, this variable will have no effect.</span><br><span class="line"><span class="meta">#</span> ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to use case-sensitive completion.</span><br><span class="line"><span class="meta">#</span> CASE_SENSITIVE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to use hyphen-insensitive completion.</span><br><span class="line"><span class="meta">#</span> Case-sensitive completion must be off. _ and - will be interchangeable.</span><br><span class="line"><span class="meta">#</span> HYPHEN_INSENSITIVE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to disable bi-weekly auto-update checks.</span><br><span class="line"><span class="meta">#</span> DISABLE_AUTO_UPDATE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to change how often to auto-update (in days).</span><br><span class="line"><span class="meta">#</span> export UPDATE_ZSH_DAYS=13</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to disable colors in ls.</span><br><span class="line"><span class="meta">#</span> DISABLE_LS_COLORS="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to disable auto-setting terminal title.</span><br><span class="line"><span class="meta">#</span> DISABLE_AUTO_TITLE="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to enable command auto-correction.</span><br><span class="line"><span class="meta">#</span> ENABLE_CORRECTION="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line to display red dots whilst waiting for completion.</span><br><span class="line"><span class="meta">#</span> COMPLETION_WAITING_DOTS="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line if you want to disable marking untracked files</span><br><span class="line"><span class="meta">#</span> under VCS as dirty. This makes repository status check for large repositories</span><br><span class="line"><span class="meta">#</span> much, much faster.</span><br><span class="line"><span class="meta">#</span> DISABLE_UNTRACKED_FILES_DIRTY="true"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Uncomment the following line if you want to change the command execution time</span><br><span class="line"><span class="meta">#</span> stamp shown in the history command output.</span><br><span class="line"><span class="meta">#</span> You can set one of the optional three formats:</span><br><span class="line"><span class="meta">#</span> "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"</span><br><span class="line"><span class="meta">#</span> or set a custom format using the strftime function format specifications,</span><br><span class="line"><span class="meta">#</span> see 'man strftime' for details.</span><br><span class="line"><span class="meta">#</span> HIST_STAMPS="mm/dd/yyyy"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Would you like to use another custom folder than $ZSH/custom?</span><br><span class="line"><span class="meta">#</span> ZSH_CUSTOM=/path/to/new-custom-folder</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Which plugins would you like to load?</span><br><span class="line"><span class="meta">#</span> Standard plugins can be found in ~/.oh-my-zsh/plugins/*</span><br><span class="line"><span class="meta">#</span> Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/</span><br><span class="line"><span class="meta">#</span> Example format: plugins=(rails git textmate ruby lighthouse)</span><br><span class="line"><span class="meta">#</span> Add wisely, as too many plugins slow down shell startup.</span><br><span class="line">plugins=(git)</span><br><span class="line"></span><br><span class="line">source $ZSH/oh-my-zsh.sh</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> User configuration</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> export MANPATH="/usr/local/man:$MANPATH"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> You may need to manually set your language environment</span><br><span class="line"><span class="meta">#</span> export LANG=en_US.UTF-8</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Preferred editor for local and remote sessions</span><br><span class="line"><span class="meta">#</span> if [[ -n $SSH_CONNECTION ]]; then</span><br><span class="line"><span class="meta">#</span>   export EDITOR='vim'</span><br><span class="line"><span class="meta">#</span> else</span><br><span class="line"><span class="meta">#</span>   export EDITOR='mvim'</span><br><span class="line"><span class="meta">#</span> fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Compilation flags</span><br><span class="line"><span class="meta">#</span> export ARCHFLAGS="-arch x86_64"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> ssh</span><br><span class="line"><span class="meta">#</span> export SSH_KEY_PATH="~/.ssh/rsa_id"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Set personal aliases, overriding those provided by oh-my-zsh libs,</span><br><span class="line"><span class="meta">#</span> plugins, and themes. Aliases can be placed here, though oh-my-zsh</span><br><span class="line"><span class="meta">#</span> users are encouraged to define aliases within the ZSH_CUSTOM folder.</span><br><span class="line"><span class="meta">#</span> For a full list of active aliases, run `alias`.</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span> Example aliases</span><br><span class="line"><span class="meta">#</span> alias zshconfig="mate ~/.zshrc"</span><br><span class="line"><span class="meta">#</span> alias ohmyzsh="mate ~/.oh-my-zsh"</span><br><span class="line"></span><br><span class="line">source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh</span><br><span class="line"></span><br><span class="line">if brew list | grep coreutils &gt; /dev/null ; then</span><br><span class="line">  PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"</span><br><span class="line">  alias ls='ls -F --show-control-chars --color=auto'</span><br><span class="line">  eval `gdircolors -b $HOME/.dir_colors`</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">export PATH="/usr/local/opt/e2fsprogs/bin:$PATH"</span><br><span class="line">export PATH="/usr/local/opt/e2fsprogs/sbin:$PATH"</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    <div>
       
         
-
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/post/7f000deb.html" rel="next" title="同步并发操作——限制等待时间">
-                <i class="fa fa-chevron-left"></i> 同步并发操作——限制等待时间
-              </a>
-            
-          </div>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/post/9ce449fe.html" rel="prev" title="同步并发操作——使用同步操作简化代码">
-                同步并发操作——使用同步操作简化代码 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
+        <div class="collection-title">
+          <h2 class="archive-year motion-element" id="archive-year-2021">2021</h2>
         </div>
       
+      
 
       
-      
-    </footer>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <h1 class="post-title">
+        
+            <a class="post-title-link" href="/post/a561c589.html" itemprop="url">
+              
+                <span itemprop="name">设计基于锁的并发数据结构——并发设计纲要</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2021-07-08T15:00:00+08:00"
+              content="2021-07-08" >
+          07-08
+        </time>
+      </div>
+
+    </header>
   </article>
 
 
 
-    <div class="post-spread">
-      
-    </div>
-  </div>
+    
+
+  </section>
+
+  
+
 
 
           </div>
@@ -586,15 +510,6 @@
 
 
           
-
-  
-    <div class="comments" id="comments">
-      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
-    </div>
-
-  
-
-
         </div>
         
           
@@ -613,17 +528,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel ">
+      <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/avatar/avatar.png"
@@ -634,7 +540,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -700,17 +606,6 @@
       </section>
 
       
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-            
-              
-            
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#zshrc内容"><span class="nav-number">1.</span> <span class="nav-text">.zshrc内容</span></a></li></ol></div>
-            
-          </div>
-        </section>
-      
     </div>
   </aside>
 
@@ -746,7 +641,7 @@
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>
@@ -816,9 +711,11 @@
 
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
-
+  
+    <script type="text/javascript" id="motion.page.archive">
+      $('.archive-year').velocity('transition.slideLeftIn');
+    </script>
+  
 
 
   
@@ -830,17 +727,6 @@
 
   
 
-  
-    <script type="text/javascript">
-      (function(d, s) {
-        var j, e = d.getElementsByTagName(s)[0];
-        if (typeof LivereTower === 'function') { return; }
-        j = d.createElement(s);
-        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-        j.async = true;
-        e.parentNode.insertBefore(j, e);
-      })(document, 'script');
-    </script>
   
 
 
@@ -983,6 +869,26 @@
 
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src=""></script>
   
 
 

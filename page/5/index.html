@@ -468,129 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/506268e4.html" itemprop="url">
-                  40.对并发应用std::atomic,对special memory使用volatile
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-07-19T09:15:00+08:00" content="2018-07-19">
-              2018-07-19
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;一般而言，volatile与C++并发编程毫无关联。在别的语言中（例如Java或C#），volatile对于并发编程存在较大帮助，不过时至今日，C++的某些编译器也将其与某些语义相结合应用至并发编程，因此在并发编程一章讨论volatile也情有可原。
-
-atomic&nbsp;在C++11中提供了一个std::atomic类模版，可以具体实例化出int、bool等类型实例，这个实例保证了操作的原子性，可以被其他线程查看到操作后的结果。它的行为类似于应用了mutex，但是性能损耗更小，因为其内部使用了一种特殊的机器指令实现，该模版类的使用实例如下所示：12345std::atom
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/506268e4.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/14fcd109.html" itemprop="url">
                   39.对于一次性事件通信考虑采用void future
                 </a>
@@ -1680,6 +1557,129 @@ std::launch::deferred launch policy意味着f只有在std::asy
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/8112f3f9.html" itemprop="url">
+                  31.避免默认捕获模式
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-16T09:41:00+08:00" content="2018-07-16">
+              2018-07-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;C++11中有两种默认捕获模式：by-reference和by-value。默认的引用捕获可能导致空悬引用。默认的按值捕获让你觉得你的闭包是自包含（self-contained)的（它们可能不是）。
+
+by-reference&nbsp;引用捕获会导致闭包包含对局部变量或lambda的作用域中可用参数的引用,如果从该lambda创建的闭包的生命周期超过局部变量或参数的生命周期，则闭包引用空悬。举例而言，假设当前存在一个容器，其元素为过滤函数，每个函数都接受一个int并返回一个bool，指示传入的值是否满足过滤器：12using FilterContainer = std::ve
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/8112f3f9.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1724,7 +1724,7 @@ std::launch::deferred launch policy意味着f只有在std::asy
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1825,7 +1825,7 @@ std::launch::deferred launch policy意味着f只有在std::asy
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>

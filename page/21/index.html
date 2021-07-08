@@ -468,129 +468,6 @@
             
               
                 
-                <a class="post-title-link" href="/post/b829f90a.html" itemprop="url">
-                  27.尽可能延后变量定义式的出现时间
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-14T12:25:00+08:00" content="2018-04-14">
-              2018-04-14
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;只要你定义了一个需要构造和析构的成员变量，那么当程序的控制流转移到该变量定义式时，你就必须承担构造成本。同样地，当控制流离开其作用域时，你必须承担析构成本。即使这个变量从未被使用。
-
-问题实例&nbsp;你或许认为没人会定义一个不使用的变量。请看下述程序：12345678910string encryptPassword(const string&amp; password)&#123;    //加密文本串，如果串过短则抛出异常    using namespace std;    string encrypted;    if(password.length()&lt;Mi
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/b829f90a.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/post/25429929.html" itemprop="url">
                   28.使用base将reverse_iterator转为iterator
                 </a>
@@ -1677,6 +1554,135 @@ map::operator[]与map::in
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/post/398dc813.html" itemprop="url">
+                  23.考虑用有序vector代替关联容器
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-13T10:35:00+08:00" content="2018-04-13">
+              2018-04-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          （我认为本节内容强调的是底层数据结构的选择）
+各容器的查找速度&lt;/br&gt;理论上，散列容器可以提供常数时间的查找。如果你仅仅需要对数时间的查找，和直觉相悖的是，有序vector性能可能会优于关联容器。
+
+有序vector的优越性为何有序vector在性能上优于关联容器关联容器的底层数据结构是平衡搜索二叉树，其设计是综合了插入，删除，查找下的最优，但我们在实际应用中这三种操作并非像在测试条件那样随机执行。一般而言，都是某一段时间都在插入，另一段时间都是在查找等等…在这种情况下，有序vector可能会比关联容器在时间和空间上性能更好。
+具体优越点
+空间问题
+引用局部性问题
+
+问题实例空间
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/398dc813.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1721,7 +1727,7 @@ map::operator[]与map::in
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">255</span>
+              <span class="site-state-item-count">254</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1822,7 +1828,7 @@ map::operator[]与map::in
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 813k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
 </div>
         
       </div>
