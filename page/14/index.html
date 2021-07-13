@@ -468,6 +468,131 @@
             
               
                 
+                <a class="post-title-link" href="/post/8e0de6eb.html" itemprop="url">
+                  24.了解虚函数、多继承、虚基类、RTTI所带来的成本
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-27T14:17:00+08:00" content="2018-04-27">
+              2018-04-27
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;C++编译器必须实现语言的每一个特性，其实现细节由编译器来决定，不同的编译器以不同的方式实现语言特性。在多数情况下，开发者无需理解这些隐藏于代码背后的操作。然而某些特性的实现对对象大小和其成员函数执行速度有很大的影响，所以对于这些特性有一个基本的了解，知道编译器可能执行的操作，就较为重要。 
+
+虚函数&nbsp;当调用虚函数时，所执行的代码必须与调用函数的对象的动态类型一致；指向对象的指针或引用的静态类型并不重要。编译器为了高效地提供这种行为，通常会使用virtual table与virtual table pointers.此二者通常又被称为vtbl与vptr.
+
+vbtl一
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/8e0de6eb.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/cff5d3c4.html" itemprop="url">
                   23.考虑变更程序库
                 </a>
@@ -1563,130 +1688,6 @@ profiler有助于洞察性能，虽然并非每一次都能被你发现，为了
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/9e2e41f0.html" itemprop="url">
-                  14.审慎使用异常明细
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-26T10:50:00+08:00" content="2018-04-26">
-              2018-04-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          （本节内容在Effective C++ 30中亦有涉及）
-前言&nbsp;异常明细明确描述了一个函数可能抛出的异常，如果说函数抛出了一个不能存在于异常明细范围里的异常，系统将在运行时检测到该错误，并且自动地调用特殊函数unexpected。unexpected默认机制是调用terminate，而terminate缺省行为是调用abort.也就是说，一旦违反了异常明细，程序将立刻终止，所有资源（甚至包括局部变量）都未得到释放。
-
-问题实例&nbsp;前言中描述的情况其实极易发生，因为编译器仅仅部分地检测异常的使用是否与异常明细保持一致。举例而言，假设函数A有一个明确的异常明细，并且调用了函数B，
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/9e2e41f0.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1731,7 +1732,7 @@ profiler有助于洞察性能，虽然并非每一次都能被你发现，为了
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">254</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1832,7 +1833,7 @@ profiler有助于洞察性能，虽然并非每一次都能被你发现，为了
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 811k 字</span>
 </div>
         
       </div>

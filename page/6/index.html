@@ -468,6 +468,129 @@
             
               
                 
+                <a class="post-title-link" href="/post/8112f3f9.html" itemprop="url">
+                  31.避免默认捕获模式
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-16T09:41:00+08:00" content="2018-07-16">
+              2018-07-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;C++11中有两种默认捕获模式：by-reference和by-value。默认的引用捕获可能导致空悬引用。默认的按值捕获让你觉得你的闭包是自包含（self-contained)的（它们可能不是）。
+
+by-reference&nbsp;引用捕获会导致闭包包含对局部变量或lambda的作用域中可用参数的引用,如果从该lambda创建的闭包的生命周期超过局部变量或参数的生命周期，则闭包引用空悬。举例而言，假设当前存在一个容器，其元素为过滤函数，每个函数都接受一个int并返回一个bool，指示传入的值是否满足过滤器：12using FilterContainer = std::ve
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/8112f3f9.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/bbcf5ff7.html" itemprop="url">
                   Lambda表达式
                 </a>
@@ -713,6 +836,129 @@
             
               
                 
+                <a class="post-title-link" href="/post/ae03537d.html" itemprop="url">
+                  28.了解引用塌缩
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-15T09:25:00+08:00" content="2018-07-15">
+              2018-07-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;众所周知，当一个左值或右值初始化universal reference时将触发类型推衍，例如：12template&lt;typename T&gt;void func(T&amp;&amp; param);
+T将会根据传递至param的类型完成推衍、编码。
+编码机制十分简单：当传入左值时，T被推导为左值引用。当传入右值时，T被推断为non-reference。因此：1234Widget widgetFactory(); // function returning rvalueWidget w; // a variable (an lvalue)func(w); // call
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/ae03537d.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/db3a64cc.html" itemprop="url">
                   29.不必高估move语义
                 </a>
@@ -788,129 +1034,6 @@
 
           <div class="post-more-link text-center">
             <a class="btn" href="/post/db3a64cc.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/ae03537d.html" itemprop="url">
-                  28.了解引用塌缩
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-07-15T09:25:00+08:00" content="2018-07-15">
-              2018-07-15
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;众所周知，当一个左值或右值初始化universal reference时将触发类型推衍，例如：12template&lt;typename T&gt;void func(T&amp;&amp; param);
-T将会根据传递至param的类型完成推衍、编码。
-编码机制十分简单：当传入左值时，T被推导为左值引用。当传入右值时，T被推断为non-reference。因此：1234Widget widgetFactory(); // function returning rvalueWidget w; // a variable (an lvalue)func(w); // call
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/ae03537d.html" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1555,130 +1678,6 @@ std::move&nbsp;C++11中std::move的大致实现如下所示：123456template&lt;
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/c66efa80.html" itemprop="url">
-                  右值引用、移动语义、完美转发
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-07-11T18:02:00+08:00" content="2018-07-11">
-              2018-07-11
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          移动语义使编译器可以用移动操作来替换花销较大的复制操作。与拷贝构造函数和拷贝赋值运算符类似，开发者可以自由定制移动操作的一切行为。移动语义还允许创建move-only类型，例如std::unique_ptr，std::future和std::thread。
-完美转发使得编写形参为任意参数的函数模板成为可能，并且能够在转发参数时确保接收函数与发送函数保持一致。
-Rvalue引用是将这两个不同的特性联系在一起的粘合,它是使移动语义和完美转发成为可能的底层语言机制。
-对这些功能的体验越多，开发者就越意识到这些功能妙用无穷。移动语义，完美转发和右值引用的世界比它们展示出来的更加微妙。举例而言，std:
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/c66efa80.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1723,7 +1722,7 @@ Rvalue引用是将这两个不同的特性联系在一起的粘合,它是使移�
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">254</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1824,7 +1823,7 @@ Rvalue引用是将这两个不同的特性联系在一起的粘合,它是使移�
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 811k 字</span>
 </div>
         
       </div>

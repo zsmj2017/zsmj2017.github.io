@@ -468,6 +468,133 @@
             
               
                 
+                <a class="post-title-link" href="/post/a418faf4.html" itemprop="url">
+                  4.了解如何查看类型推衍结果
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-06-25T17:10:00+08:00" content="2018-06-25">
+              2018-06-25
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;一般来说有三个阶段可以进行类型推衍结果查看：撰写期、编译期、运行期。
+
+IDE&nbsp;IDE通常可以在完成解析的前提下帮你判断当前类型推衍所得到的结果，但对于较为复杂的类型可能会失效。
+
+编译期诊断&nbsp;最有效的让编译器显示其推衍结果的方法是故意错用这些类型，编译器所给出的错误信息将清楚地告诉你哪里发生了错误。
+问题实例&nbsp;现有需要作类型推衍的变量x、y:123const int theAnswer = 42;auto x = theAnswer;auto y = &amp;theAnswer;
+首先我们需要定义一个类以展示类型：12template&lt;t
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/a418faf4.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/77bd3be8.html" itemprop="url">
                   3.了解decltype技术
                 </a>
@@ -1561,138 +1688,6 @@ template声明可以理解为当你声明一个template class或template class m
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/7a0731d7.html" itemprop="url">
-                  执行期语义学——new与delete运算符
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-05-30T07:05:00+08:00" content="2018-05-30">
-              2018-05-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;
-new operator看起来似乎是一个单一运算，例如：1int *pi = new int(5);
-但实际上它由以下两个步骤组成：
-
-通过适当的new运算符函数实体，配置所有所需内存：
-1int *pi = _new(sizeof(int));
-
-给配置得来的对象设立初值：*pi = 5;
-
-
-当然，初始化操作应当在内存配置成功后才执行：123//重写声明int *pi;if(pi = _new(sizeof(int))) *pi=5;
-delete运算符性质类似，只是在使用前会判断一下参数是否为nullptr，并且需要注意的是，在执行完delete后，p并不会被置为nul
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/7a0731d7.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1737,7 +1732,7 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">254</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1838,7 +1833,7 @@ delete运算符性质类似，只是在使用前会判断一下参数是否为nu
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 811k 字</span>
 </div>
         
       </div>

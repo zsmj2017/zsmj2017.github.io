@@ -468,6 +468,131 @@
             
               
                 
+                <a class="post-title-link" href="/post/8e89566a.html" itemprop="url">
+                  37.禁止重定义继承而来的non-virtual函数
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-18T18:33:00+08:00" content="2018-04-18">
+              2018-04-18
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;假设我们有base class与derived class如下：12345class B｛public：    void mf();&#125;class D:public B &#123;...&#125;
+我们应该确定：123D x;B* pB = &amp;x;pB-&gt;mf();D* pD = &amp;x;pD-&gt;mf();
+两次函数调用的行为应当一致。
+
+问题实例&nbsp;仍以前文为例，如果我们在D中重定义了mf，也就是说造成了遮蔽名称的现象，那会有如下情况发生12345D x;B* pb= &amp;xD * pd = &amp;x；pb-&gt;mf
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/8e89566a.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/e7c4956c.html" itemprop="url">
                   38.仿函数类与值传递
                 </a>
@@ -1578,130 +1703,6 @@ includes
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/1a54233e.html" itemprop="url">
-                  32.降低文件间的编译依存关系
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-16T09:13:00+08:00" content="2018-04-16">
-              2018-04-16
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          前言&nbsp;某一天你对某个class中的部分实现文件做了些许更改，注意，改的不是接口，仅仅是实现，并且是private部分。当你按下build之后你估计大概要等几秒，但实际上。。。。你发现整个世界都被重新编译和连接了。
-
-问题实例&nbsp;上述问题出在C++对“将接口从实现中分离”完成得不好。class的定义式不仅仅描述了接口，还包括了实现细目：12345678class Person&#123;public:    ...private:    //以下均为实现细目    string theName;    Address theAddress;&#125;
-如果编译器没有取得上述程
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/1a54233e.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1746,7 +1747,7 @@ includes
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">254</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1847,7 +1848,7 @@ includes
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 811k 字</span>
 </div>
         
       </div>

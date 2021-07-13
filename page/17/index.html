@@ -468,6 +468,132 @@
             
               
                 
+                <a class="post-title-link" href="/post/e6a80e69.html" itemprop="url">
+                  1.指针与引用的区别
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-04-22T07:29:00+08:00" content="2018-04-22">
+              2018-04-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+<!-- 自定义，用于添加摘要图片，文章中不显示 -->
+        
+<!-- 自定义结束 -->
+        
+          
+          前言&nbsp;指针与引用似乎完全不同，前者是某个对象的地址，后者是某个对象的别名，但是功能却似乎一样，都是间接引用其他对象。那么何时用指针何时用引用呢？
+
+空值&nbsp;不存在指向空值的引用，但是存在指向空值的指针。但可能会有人写出这种程序：1char *pc = nullptr；char &amp; rc = *pc；
+其结果未定义，在C++的世界里我们不讨论这种无聊且低级的错误。引用不存在空值，所以必须要初始化，而指针则不用，虽然这样很危险。引用不存在空值这一特性说明其有效性比指针高，因为我们在指针的使用中总需要判断其非空，但引用则无需如此。
+
+重新赋值&nbsp;指针可以被重新赋值以
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/post/e6a80e69.html" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/post/f7f21336.html" itemprop="url">
                   46.运用member function template接受所有兼容类型
                 </a>
@@ -1562,127 +1688,6 @@ template内refer to的名称&nbs
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/post/971d81b5.html" itemprop="url">
-                  42.了解隐式接口与编译期多态
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-04-20T12:52:00+08:00" content="2018-04-20">
-              2018-04-20
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-<!-- 自定义，用于添加摘要图片，文章中不显示 -->
-        
-<!-- 自定义结束 -->
-        
-          
-          OOP中的接口与多态&nbsp;面向对象编程以显式接口和运行期多态解决问题。举例而言：12345678910111213141516class Widget&#123;public:    Widget();    virtual ~Widget();    virtual size_t size() const;    virtual void normalize();    void swap(WidgeT&amp; other);    ...&#125;;void doSth(Widget&amp; w)&#123;    if(w.size()&gt;10)&#123;       
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/post/971d81b5.html" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1727,7 +1732,7 @@ template内refer to的名称&nbs
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">254</span>
+              <span class="site-state-item-count">255</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1828,7 +1833,7 @@ template内refer to的名称&nbs
 
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count" style="color: #e90f92;">全站共 808k 字</span>
+  <span class="post-count" style="color: #e90f92;">全站共 811k 字</span>
 </div>
         
       </div>

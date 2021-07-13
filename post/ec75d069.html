@@ -61,7 +61,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT, ZSMJ, Blog, C++" />
+  <meta name="keywords" content="C++,并发编程," />
 
 
 
@@ -89,15 +89,16 @@
 
 
 
-<meta name="description" content="Stay Hungry,Stay Foolish">
-<meta property="og:type" content="website">
-<meta property="og:title" content="ZSMJ's Blog">
-<meta property="og:url" content="https://zsmj2017.tech/archives/2018/page/3/index.html">
+<meta name="description" content="前言&amp;nbsp;设计基于锁的数据结构的核心要旨：在持有锁时间最短的前提下，访问数据时锁住正确的互斥锁。若使用不同的互斥锁来保护数据结构中不同的部分，操作不当可能会导致死锁，因此更需小心。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计基于锁的并发数据结构——并发数据结构实例">
+<meta property="og:url" content="https://zsmj2017.tech/post/ec75d069.html">
 <meta property="og:site_name" content="ZSMJ's Blog">
-<meta property="og:description" content="Stay Hungry,Stay Foolish">
+<meta property="og:description" content="前言&amp;nbsp;设计基于锁的数据结构的核心要旨：在持有锁时间最短的前提下，访问数据时锁住正确的互斥锁。若使用不同的互斥锁来保护数据结构中不同的部分，操作不当可能会导致死锁，因此更需小心。">
+<meta property="og:updated_time" content="2021-07-13T07:58:19.121Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ZSMJ's Blog">
-<meta name="twitter:description" content="Stay Hungry,Stay Foolish">
+<meta name="twitter:title" content="设计基于锁的并发数据结构——并发数据结构实例">
+<meta name="twitter:description" content="前言&amp;nbsp;设计基于锁的数据结构的核心要旨：在持有锁时间最短的前提下，访问数据时锁住正确的互斥锁。若使用不同的互斥锁来保护数据结构中不同的部分，操作不当可能会导致死锁，因此更需小心。">
 
 
 
@@ -118,12 +119,12 @@
 
 
 
-  <link rel="canonical" href="https://zsmj2017.tech/archives/2018/page/3/"/>
+  <link rel="canonical" href="https://zsmj2017.tech/post/ec75d069.html"/>
 
 
 <!-- 网页加载条 -->
 <script src="/js/src/pace.min.js"></script>
-  <title> 归档 | ZSMJ's Blog </title>
+  <title> 设计基于锁的并发数据结构——并发数据结构实例 | ZSMJ's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -144,7 +145,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  page-archive  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -444,402 +445,158 @@
           <div id="content" class="content">
             
 
-  <section id="posts" class="posts-collapse">
-    <span class="archive-move-on"></span>
-
-    <span class="archive-page-counter">
-      
-      
-       
-        
-      太棒了! 目前共计 255 篇日志。 继续努力。
-    </span>
-
+  <div id="posts" class="posts-expand">
     
-
-      
-      
-      
-
-      
-        
-        <div class="collection-title">
-          <h2 class="archive-year motion-element" id="archive-year-2018">2018</h2>
-        </div>
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/14fcd109.html" itemprop="url">
-              
-                <span itemprop="name">39.对于一次性事件通信考虑采用void future</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-18T17:08:00+08:00"
-              content="2018-07-18" >
-          07-18
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/9429dd3c.html" itemprop="url">
-              
-                <span itemprop="name">38.对线程句柄析构行为保持关注</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-18T15:35:00+08:00"
-              content="2018-07-18" >
-          07-18
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/122b5540.html" itemprop="url">
-              
-                <span itemprop="name">37.令std::thread在所有路径上unjoinable</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-18T13:05:00+08:00"
-              content="2018-07-18" >
-          07-18
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/61b11a8d.html" itemprop="url">
-              
-                <span itemprop="name">36.必须异步时请使用std::launch::async</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-17T20:51:00+08:00"
-              content="2018-07-17" >
-          07-17
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/9d090b0c.html" itemprop="url">
-              
-                <span itemprop="name">35.优先选择任务式并发编程而非线程式并发编程</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-17T10:51:00+08:00"
-              content="2018-07-17" >
-          07-17
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/e8e79e61.html" itemprop="url">
-              
-                <span itemprop="name">C++并发编程</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-17T10:41:00+08:00"
-              content="2018-07-17" >
-          07-17
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/993e47be.html" itemprop="url">
-              
-                <span itemprop="name">34.尽量以lambda取代std::bind</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-17T08:41:00+08:00"
-              content="2018-07-17" >
-          07-17
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/3411b9fe.html" itemprop="url">
-              
-                <span itemprop="name">33.当需要forward auto&&参数时，记得采用decltype</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-16T19:41:00+08:00"
-              content="2018-07-16" >
-          07-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/531d36bf.html" itemprop="url">
-              
-                <span itemprop="name">32.使用init捕获将对象移动到闭包中</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-16T15:41:00+08:00"
-              content="2018-07-16" >
-          07-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-      
-      
-      
-
-      
-      
-
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/post/8112f3f9.html" itemprop="url">
-              
-                <span itemprop="name">31.避免默认捕获模式</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-07-16T09:41:00+08:00"
-              content="2018-07-16" >
-          07-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-    
-
-  </section>
 
   
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/2018/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/archives/2018/">1</a><a class="page-number" href="/archives/2018/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/archives/2018/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/archives/2018/page/24/">24</a><a class="extend next" rel="next" href="/archives/2018/page/4/"><i class="fa fa-angle-right"></i></a>
-  </nav>
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                设计基于锁的并发数据结构——并发数据结构实例
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2021-07-13T15:00:00+08:00" content="2021-07-13">
+              2021-07-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/C-并发编程实战/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
 
 
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>设计基于锁的数据结构的核心要旨：在持有锁时间最短的前提下，访问数据时锁住<strong>正确的</strong>互斥锁。若使用不同的互斥锁来保护数据结构中不同的部分，操作不当可能会导致死锁，因此更需小心。</p>
+<a id="more"></a>
+<hr>
+<h1 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h1><h2 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;exception&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">empty_stack</span>:</span> <span class="built_in">std</span>::exception &#123;</span><br><span class="line">  <span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">what</span><span class="params">()</span> <span class="keyword">const</span> <span class="title">throw</span><span class="params">()</span></span>; </span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">threadsafe_stack</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">stack</span>&lt;T&gt; data; </span><br><span class="line">  <span class="keyword">mutable</span> <span class="built_in">std</span>::mutex m;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_stack()&#123;&#125;</span><br><span class="line">  threadsafe_stack(<span class="keyword">const</span> threadsafe_stack&amp; other) &#123;</span><br><span class="line">    <span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; lock(other.m); </span><br><span class="line">    data=other.data;</span><br><span class="line">  &#125;</span><br><span class="line">  threadsafe_stack&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> threadsafe_stack&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; lock(m);</span><br><span class="line">    data.push(<span class="built_in">std</span>::move(new_value));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; pop() &#123;</span><br><span class="line">    <span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; lock(m); </span><br><span class="line">    <span class="keyword">if</span>(data.empty()) </span><br><span class="line">      <span class="keyword">throw</span> empty_stack();</span><br><span class="line">    std::shared_ptr&lt;T&gt; const res(std::make_shared&lt;T&gt;(std::move(data.top())));</span><br><span class="line">    data.pop();</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; lock(m); </span><br><span class="line">    <span class="keyword">if</span>(data.empty()) <span class="keyword">throw</span> empty_stack(); </span><br><span class="line">    value=<span class="built_in">std</span>::move(data.top());</span><br><span class="line">    data.pop(); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; lock(m);</span><br><span class="line">    <span class="keyword">return</span> data.empty(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="实例分析"><a href="#实例分析" class="headerlink" title="实例分析"></a>实例分析</h2><ol>
+<li>线程安全<br>通过使用互斥锁保护每个成员函数，确保任一时刻均只有一个线程在访问数据。</li>
+<li><p>条件竞争<br>2.1 在<code>empty</code>和<code>pop</code>成员函数间有潜在的竞争条件(调用<code>empty</code>时是正确的，但其结果并不可靠：其返回后可能其他线程执行了<code>pop</code>操作），但<code>pop</code>在持有锁时将显式地判空，因此条件竞争无影响。<br>2.2 <code>pop</code>函数将直接返回栈顶数据，避免操作分离后<code>top</code>与<code>pop</code>潜在的竞争条件（具体可见<code>线程间共享数据——使用互斥量保护共享数据</code>一章）。</p>
+</li>
+<li><p>异常<br>3.1 对互斥锁上锁可能会抛出异常，但这种情况不仅极其罕见(互斥锁存在问题，或缺乏系统资源)，并且上锁是每个成员函数的第一个操作。由于没有数据被修改，因此异常安全。<br>3.2 解锁互斥锁不会失败，所以总是安全的，并且<code>std::lock_guard&lt;&gt;</code>确保了互斥锁不会一直处于上锁的状态。<br>3.3 在第一个重载的<code>pop</code>中，程序可能抛出一个<code>empty_stack</code>异常，由于没有数据被修改，所以是安全的。创建<code>res</code>可能会抛出一个异常，原因可能为：<code>std::make_shared</code>可能因为无法为新对象以及引用计数需要的数据分配出足够的内存而抛出异常，亦或在拷贝/移动数据到新分配内存时构造函数抛出异常。C++运行库与标准库将保证上述两种情况没有内存泄露，同时正确销毁新创建的对象（如有），由于没有数据被修改，因此异常安全。调用<code>data.pop</code>保证不会抛出异常。综上，该<code>pop</code>函数异常安全。<br>3.4 第二个重载的<code>pop</code>在拷贝赋值或移动赋值时可能抛出异常,但依旧没有数据修改，异常安全。<br>3.5 <code>empty</code>不会修改数据，异常安全。</p>
+</li>
+<li><p>死锁<br>由于持有锁时调用了用户代码——数据的拷贝/移动构造或拷贝/移动赋值运算符，亦或是自定义的new操作运算符，因此可能出现死锁，例如：<br>4.1 这些函数调用了栈上的成员函数(而栈正在插入或移除数据项)<br>4.2 这些函数内部持有一种锁，而在调用栈成员函数时又lock了内部的互斥锁，二者可能存在关联<br>因此必须令用户保证上述情况不会发生。</p>
+</li>
+<li><p>构造与析构<br>构造函数与析构函数没有上锁保护，因此可能存在安全问题。但不管并发与否，调用一个不完全构造的对象或是部分销毁的对象的成员函数永远都不可取。因此，用户必须确保2点：<br>5.1 其他线程直到栈完全构造才能访问它<br>5.2 在栈对象销毁前，所有线程都已经停止访问栈</p>
+</li>
+</ol>
+<h2 id="实例缺陷"><a href="#实例缺陷" class="headerlink" title="实例缺陷"></a>实例缺陷</h2><p>尽管该数据结构安全性很高，但其性能非常差——每次只有一个线程能够操作栈内数据，而其他线程在等待锁时什么也干不了，过度的串行化抑制了性能。<br>同时，栈也未能提供等待添加一个数据项的方法——因此线程必须周期性地调用<code>empty</code>或<code>pop</code>，并捕获<code>empty_stack</code>异常。这逼迫用户要么浪费宝贵的计算资源来检查数据，要么编写等待——通知机制（如条件变量），这使得内部上锁没有必要。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"><i class="fa fa-tag"></i> C++</a>
+          
+            <a href="/tags/并发编程/" rel="tag"><i class="fa fa-tag"></i> 并发编程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post/a561c589.html" rel="next" title="设计基于锁的并发数据结构——并发设计纲要">
+                <i class="fa fa-chevron-left"></i> 设计基于锁的并发数据结构——并发设计纲要
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -847,6 +604,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODQ2Ny8xNDk5NQ=="></div>
+    </div>
+
+  
+
+
         </div>
         
           
@@ -865,8 +631,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/avatar/avatar.png"
@@ -942,6 +717,17 @@
         
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#栈"><span class="nav-number">2.</span> <span class="nav-text">栈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实例"><span class="nav-number">2.1.</span> <span class="nav-text">代码实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例分析"><span class="nav-number">2.2.</span> <span class="nav-text">实例分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例缺陷"><span class="nav-number">2.3.</span> <span class="nav-text">实例缺陷</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
       
     </div>
   </aside>
@@ -1048,11 +834,9 @@
 
 
   
-  
-    <script type="text/javascript" id="motion.page.archive">
-      $('.archive-year').velocity('transition.slideLeftIn');
-    </script>
-  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
 
 
   
@@ -1064,6 +848,17 @@
 
   
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
@@ -1206,26 +1001,6 @@
 
 
   
-  
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-          processEscapes: true,
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-      });
-    </script>
-
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-      });
-    </script>
-    <script type="text/javascript" src=""></script>
   
 
 
