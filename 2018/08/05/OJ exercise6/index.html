@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Data Structures and Algorithms," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="题目名称 Gray Code(Leetcode #89) Gas Station(Leetcode #134） Candy(Leetcode #135) Single Number(Leetcode #136) 二进制中1的个数（剑指offer #15） 数值的整数次方（剑指offer #16） 打印从1到最大的n位数(剑指offer #17) 删除链表的节点（剑指offer #18）">
+<meta name="keywords" content="C++,Data Structures and Algorithms">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OJ每日练习（6）">
+<meta property="og:url" content="https://xander.wiki/2018/08/05/OJ%20exercise6/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="题目名称 Gray Code(Leetcode #89) Gas Station(Leetcode #134） Candy(Leetcode #135) Single Number(Leetcode #136) 二进制中1的个数（剑指offer #15） 数值的整数次方（剑指offer #16） 打印从1到最大的n位数(剑指offer #17) 删除链表的节点（剑指offer #18）">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/08/05/OJ exercise6/"/>
+
+
+
+
+
+  <title>OJ每日练习（6） | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/08/05/OJ%20exercise6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OJ每日练习（6）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-05T13:40:00+08:00">
+                2018-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OJ-Exercises/" itemprop="url" rel="index">
+                    <span itemprop="name">OJ Exercises</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><ol>
+<li>Gray Code(Leetcode #89)</li>
+<li>Gas Station(Leetcode #134）</li>
+<li>Candy(Leetcode #135)</li>
+<li>Single Number(Leetcode #136)</li>
+<li>二进制中1的个数（剑指offer #15）</li>
+<li>数值的整数次方（剑指offer #16）</li>
+<li>打印从1到最大的n位数(剑指offer #17)</li>
+<li>删除链表的节点（剑指offer #18）</li>
+</ol>
+<a id="more"></a>
+<hr>
+<h1 id="Gray-Code-Leetcode-89"><a href="#Gray-Code-Leetcode-89" class="headerlink" title="Gray Code(Leetcode #89)"></a>Gray Code(Leetcode #89)</h1><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>The gray code is a binary numeral system where two successive values differ in only one bit.<br>Given a non-negative integer n representing the total number of bits in the code, print the sequence of gray code. A gray code sequence must begin with 0.<br><strong>Example 1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Input: 2</span><br><span class="line">Output: [0,1,3,2]</span><br><span class="line">Explanation:</span><br><span class="line">00 - 0</span><br><span class="line">01 - 1</span><br><span class="line">11 - 3</span><br><span class="line">10 - 2</span><br></pre></td></tr></table></figure><br>For a given n, a gray code sequence may not be uniquely defined.For example, [0,2,3,1] is also a valid gray code sequence.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">00 - 0</span><br><span class="line">10 - 2</span><br><span class="line">11 - 3</span><br><span class="line">01 - 1</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>解题的核心思想在于，格雷码与自然数的二进制码存在对应关系，其公式为：<code>Nth Gray Code == n^(n&gt;&gt;1)</code>。</p>
+<h2 id="解题方案"><a href="#解题方案" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">grayCode</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n==<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;(<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">res</span><span class="params">(<span class="built_in">pow</span>(<span class="number">2</span>,n),<span class="number">0</span>)</span></span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> index=<span class="number">1</span>;index!=<span class="built_in">pow</span>(<span class="number">2</span>,n);++index)</span><br><span class="line">            res[index]=index^(index&gt;&gt;<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Gas-Station-Leetcode-134）"><a href="#Gas-Station-Leetcode-134）" class="headerlink" title="Gas Station(Leetcode #134）"></a>Gas Station(Leetcode #134）</h1><h2 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h2><p>There are N gas stations along a circular route, where the amount of gas at station i is gas[i].You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.<br>Return the starting gas station’s index if you can travel around the circuit once in the clockwise direction, otherwise return -1.<br><strong>Note:</strong><br>If there exists a solution, it is guaranteed to be unique.Both input arrays are non-empty and have the same length.Each element in the input arrays is a non-negative integer.<br><strong>Example 1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Input: </span><br><span class="line">gas  &#x3D; [1,2,3,4,5]</span><br><span class="line">cost &#x3D; [3,4,5,1,2]</span><br><span class="line">Output: 3</span><br><span class="line">Explanation:</span><br><span class="line">Start at station 3 (index 3) and fill up with 4 unit of gas. Your tank &#x3D; 0 + 4 &#x3D; 4</span><br><span class="line">Travel to station 4. Your tank &#x3D; 4 - 1 + 5 &#x3D; 8</span><br><span class="line">Travel to station 0. Your tank &#x3D; 8 - 2 + 1 &#x3D; 7</span><br><span class="line">Travel to station 1. Your tank &#x3D; 7 - 3 + 2 &#x3D; 6</span><br><span class="line">Travel to station 2. Your tank &#x3D; 6 - 4 + 3 &#x3D; 5</span><br><span class="line">Travel to station 3. The cost is 5. Your gas is just enough to travel back to station 3.Therefore, return 3 as the starting index.</span><br></pre></td></tr></table></figure><br><strong>Example 2:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Input: </span><br><span class="line">gas  &#x3D; [2,3,4]</span><br><span class="line">cost &#x3D; [3,4,3]</span><br><span class="line">Output: -1</span><br><span class="line">Explanation:</span><br><span class="line">You can&#39;t start at station 0 or 1, as there is not enough gas to travel to the next station.</span><br><span class="line">Let&#39;s start at station 2 and fill up with 4 unit of gas. Your tank &#x3D; 0 + 4 &#x3D; 4</span><br><span class="line">Travel to station 0. Your tank &#x3D; 4 - 3 + 2 &#x3D; 3</span><br><span class="line">Travel to station 1. Your tank &#x3D; 3 - 3 + 3 &#x3D; 3</span><br><span class="line">You cannot travel back to station 2, as it requires 4 unit of gas but you only have 3.Therefore, you can&#39;t travel around the circuit once no matter where you start.</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="解题思路-1"><a href="#解题思路-1" class="headerlink" title="解题思路"></a>解题思路</h2><p>第一种解法基于暴力，对每一个节点都判断其能否到达终点。<br>第二种解法基于推论：若从点A无法到达点B，那么A到B之间的任何一个点都不可能到达点B。因此只需要在失败后将目光投向下一个节点即可（本题的思路让我想起了最大子序列和）。</p>
+<hr>
+<h2 id="解题方案-1"><a href="#解题方案-1" class="headerlink" title="解题方案"></a>解题方案</h2><h3 id="暴力"><a href="#暴力" class="headerlink" title="暴力"></a>暴力</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">canCompleteCircuit</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; gas, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; cost)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">size_t</span> index = <span class="number">0</span>; index != gas.<span class="built_in">size</span>(); ++index) &#123;</span><br><span class="line">		    <span class="keyword">int</span> res = canTraverse(index, gas, cost);</span><br><span class="line">		    <span class="keyword">if</span> (res != <span class="number">-1</span>) <span class="keyword">return</span> res;</span><br><span class="line">		    <span class="keyword">else</span> <span class="keyword">continue</span>;</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">canTraverse</span><span class="params">(<span class="keyword">size_t</span> i, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; gas, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp;cost)</span> </span>&#123;</span><br><span class="line">	    <span class="keyword">int</span> n = gas.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">	    <span class="keyword">for</span> (<span class="keyword">size_t</span> loop = <span class="number">0</span>; loop != n; ++loop) &#123;</span><br><span class="line">		    res += (gas[(i + loop) % n] - cost[(i + loop) % n]);</span><br><span class="line">		    <span class="keyword">if</span> (res &lt; <span class="number">0</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="一次遍历"><a href="#一次遍历" class="headerlink" title="一次遍历"></a>一次遍历</h3><p>（tank表征当前存量，total表征需要克服的缺额）<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">canCompleteCircuit</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; gas, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; cost)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> start=<span class="number">0</span>,total=<span class="number">0</span>,tank=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i!=gas.<span class="built_in">size</span>();++i)&#123;</span><br><span class="line">            tank+=gas[i]-cost[i];</span><br><span class="line">            <span class="keyword">if</span>(tank&lt;<span class="number">0</span>)&#123;</span><br><span class="line">                start=i+<span class="number">1</span>;</span><br><span class="line">                total+=tank;</span><br><span class="line">                tank=<span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> total+tank&lt;<span class="number">0</span>?<span class="number">-1</span>:start;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="Candy-Leetcode-135"><a href="#Candy-Leetcode-135" class="headerlink" title="Candy(Leetcode #135)"></a>Candy(Leetcode #135)</h1><h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p>There are N children standing in a line. Each child is assigned a rating value.You are giving candies to these children subjected to the following requirements:Each child must have at least one candy.Children with a higher rating get more candies than their neighbors.What is the minimum candies you must give?<br><strong>Example 1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: [1,0,2]</span><br><span class="line">Output: 5</span><br><span class="line">Explanation: You can allocate to the first, second and third child with 2, 1, 2 candies respectively.</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-2"><a href="#解题思路-2" class="headerlink" title="解题思路"></a>解题思路</h2><p>使用两个数组，一个从前向后遍历，确保从前向后的区间必然保证优先级，一个从后向前，做同样的动作。最终每个孩子分到的糖果是这两个数组中对应位置的最大值。</p>
+<h2 id="解题方案-2"><a href="#解题方案-2" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">candy</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; ratings)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(ratings.<span class="built_in">size</span>()&lt;=<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> ratings.<span class="built_in">size</span>();</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">temp1</span><span class="params">(ratings.<span class="built_in">size</span>(),<span class="number">1</span>)</span></span>;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">temp2</span><span class="params">(temp1)</span></span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">1</span>;i!=ratings.<span class="built_in">size</span>();++i)</span><br><span class="line">            <span class="keyword">if</span>(ratings[i]&gt;ratings[i<span class="number">-1</span>])</span><br><span class="line">                temp1[i]=temp1[i<span class="number">-1</span>]+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=ratings.<span class="built_in">size</span>()<span class="number">-2</span>;i!=<span class="number">-1</span>;--i)</span><br><span class="line">            <span class="keyword">if</span>(ratings[i]&gt;ratings[i+<span class="number">1</span>])</span><br><span class="line">                temp2[i]=temp2[i+<span class="number">1</span>]+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i!=temp1.<span class="built_in">size</span>();++i)</span><br><span class="line">            res+=<span class="built_in">max</span>(temp1[i],temp2[i]);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Single-Number-Leetcode-136"><a href="#Single-Number-Leetcode-136" class="headerlink" title="Single Number(Leetcode #136)"></a>Single Number(Leetcode #136)</h1><h2 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a non-empty array of integers, every element appears twice except for one. Find that single one.<br><strong>Example 1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: [2,2,1]</span><br><span class="line">Output: 1</span><br></pre></td></tr></table></figure><br><strong>Example 2:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: [4,1,2,1,2]</span><br><span class="line">Output: 4</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-3"><a href="#解题思路-3" class="headerlink" title="解题思路"></a>解题思路</h2><p>对于重复元素，需要了解的一个重要性质是：A^A=0；了解这个后这道题自然迎刃而解。</p>
+<h2 id="解题方案-3"><a href="#解题方案-3" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">singleNumber</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> accumulate(nums.cbegin(),nums.cend(),<span class="number">0</span>,bit_xor&lt;<span class="keyword">int</span>&gt;());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><p>倘若当前数组内存在两个只出现了一次的元素，如何找出这两个元素？</p>
+<h3 id="解题思路-4"><a href="#解题思路-4" class="headerlink" title="解题思路"></a>解题思路</h3><p>全部异或后得到这两个数的异或值<code>diff</code>,然后执行<code>diff&amp;=-diff</code>，可以获取这两个数从后向前第一个不相等的位（例如00001,00100）等。对于原有数组中的元素，必然可以被分为两组，一组该位为0，一组该位为1。这两个数就位于这两组之中，再次对两组执行异或运算即可。</p>
+<h3 id="解题方案-4"><a href="#解题方案-4" class="headerlink" title="解题方案"></a>解题方案</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">FindNumsAppearOnce</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; data,<span class="keyword">int</span>* num1,<span class="keyword">int</span> *num2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> diff = accumulate(data.cbegin(),data.cend(),<span class="number">0</span>,bit_xor&lt;<span class="keyword">int</span>&gt;());</span><br><span class="line">        diff&amp;=-diff;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> i:data)</span><br><span class="line">            <span class="keyword">if</span>(i&amp;diff)</span><br><span class="line">                *num1^=i;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                *num2^=i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="更进一步的扩展"><a href="#更进一步的扩展" class="headerlink" title="更进一步的扩展"></a>更进一步的扩展</h2><p>如果当前数组内元素都出现了3次，仅有一个只出现了两次，如何找出这个元素？</p>
+<h3 id="解题思路-5"><a href="#解题思路-5" class="headerlink" title="解题思路"></a>解题思路</h3><p>用二进制模拟三进制，思路如下：因为一个元素最多出现3次，那么采用2个bit即可表征所有状态：00—&gt;01-&gt;10-&gt;00;因此我们设立两个int：ones、twos，用来记录元素出现的次数。因此，建立真值表如下所示：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">twos</th>
+<th style="text-align:center">ones</th>
+<th style="text-align:center">number</th>
+<th style="text-align:center">output twos</th>
+<th style="text-align:center">output ones</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>综上，有运算式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ones = (ones ^ nums[i]) &amp; ~twos;</span><br><span class="line">twos = (twos ^ nums[i]) &amp; ones;</span><br></pre></td></tr></table></figure></p>
+<h3 id="解题方案-5"><a href="#解题方案-5" class="headerlink" title="解题方案"></a>解题方案</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">singleNumber</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ones=<span class="number">0</span>,twos=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> index=<span class="number">0</span>;index!=nums.<span class="built_in">size</span>();++index)&#123;</span><br><span class="line">            ones=ones^nums[index]&amp;~twos;</span><br><span class="line">            twos=twos^nums[index]&amp;ones;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ones;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="二进制中1的个数"><a href="#二进制中1的个数" class="headerlink" title="二进制中1的个数"></a>二进制中1的个数</h1><h2 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h2><p>输入一个整数，输出该数二进制表示中1的个数。其中负数用补码表示。</p>
+<h2 id="解题思路-6"><a href="#解题思路-6" class="headerlink" title="解题思路"></a>解题思路</h2><p>直接位运算，记住<code>x&amp;=(x-1)</code>表示去掉最右边的1.</p>
+<h2 id="解题方案-6"><a href="#解题方案-6" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="keyword">int</span>  <span class="title">NumberOf1</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(n)</span><br><span class="line">             n&amp;=(n<span class="number">-1</span>),++res;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">     &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="数值的整数次方"><a href="#数值的整数次方" class="headerlink" title="数值的整数次方"></a>数值的整数次方</h1><h2 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个double类型的浮点数base和int类型的整数exponent。求base的exponent次方。</p>
+<h2 id="解题思路-7"><a href="#解题思路-7" class="headerlink" title="解题思路"></a>解题思路</h2><p>直接照抄了STL的解法，不过需要注意的是这里可能exponent是负数。</p>
+<h2 id="解题方案-7"><a href="#解题方案-7" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">double</span> <span class="title">Power</span><span class="params">(<span class="keyword">double</span> base, <span class="keyword">int</span> exponent)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(exponent==<span class="number">0</span>)</span><br><span class="line">          <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">if</span>(base==<span class="number">0</span>)</span><br><span class="line">          <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">      <span class="keyword">if</span>(<span class="built_in">abs</span>(base<span class="number">-1</span>)&lt;= <span class="number">1e-10</span>)</span><br><span class="line">          <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">bool</span> flag = exponent&gt;<span class="number">0</span>?<span class="number">0</span>:<span class="number">1</span>;</span><br><span class="line">      exponent = <span class="built_in">abs</span>(exponent);</span><br><span class="line">      <span class="keyword">while</span>(!(exponent&amp;<span class="number">1</span>))</span><br><span class="line">          base*=base,exponent&gt;&gt;=<span class="number">1</span>;</span><br><span class="line">      <span class="keyword">double</span> result = base;</span><br><span class="line">      exponent&gt;&gt;=<span class="number">1</span>;</span><br><span class="line">      <span class="keyword">while</span>(exponent!=<span class="number">0</span>)&#123;</span><br><span class="line">          base*=base;</span><br><span class="line">          <span class="keyword">if</span>(exponent&amp;<span class="number">1</span>)</span><br><span class="line">              result*=base;</span><br><span class="line">          exponent&gt;&gt;=<span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> flag?<span class="number">1</span>/result:result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="打印从1到最大的n位数-剑指offer-17"><a href="#打印从1到最大的n位数-剑指offer-17" class="headerlink" title="打印从1到最大的n位数(剑指offer #17)"></a>打印从1到最大的n位数(剑指offer #17)</h1><h2 id="解题思路-8"><a href="#解题思路-8" class="headerlink" title="解题思路"></a>解题思路</h2><p>本题的关键在于如何高精度表示数字，用数组或字符串存储即可。再配合上一节所说的Plus One即可打印所有数字，过程略去不表。</p>
+<hr>
+<h1 id="删除链表的节点（剑指offer-18）"><a href="#删除链表的节点（剑指offer-18）" class="headerlink" title="删除链表的节点（剑指offer #18）"></a>删除链表的节点（剑指offer #18）</h1><h2 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h2><p>O（1）时间删除单链表的指定节点。</p>
+<h2 id="解题思路-9"><a href="#解题思路-9" class="headerlink" title="解题思路"></a>解题思路</h2><p>该问题可以分为以下几步：</p>
+<ol>
+<li>如果头结点为空或指定节点为空，直接返回。</li>
+<li>单链表中仅有头结点，删除头结点后返回。</li>
+<li>需要删除的点是尾节点，遍历链表，找到尾节点之前的点，令其next指向nullptr。</li>
+<li>被删除的节点只是寻常节点（不需要获取前向节点），此时令其值为其next的值，其next指向next—&gt;next即可。</li>
+</ol>
+<h2 id="解题方案-8"><a href="#解题方案-8" class="headerlink" title="解题方案"></a>解题方案</h2><p>(仅给出最后一种情况的解答）<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">deleteNode</span><span class="params">(ListNode* node)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(node==<span class="literal">nullptr</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        node-&gt;val=node-&gt;next-&gt;val;</span><br><span class="line">        node-&gt;next=node-&gt;next-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Data-Structures-and-Algorithms/" rel="tag"># Data Structures and Algorithms</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/04/OJ%20exercise5/" rel="next" title="OJ每日练习（5）">
+                <i class="fa fa-chevron-left"></i> OJ每日练习（5）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/06/OJ%20exercise7/" rel="prev" title="OJ每日练习（7）">
+                OJ每日练习（7） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#题目名称"><span class="nav-number">1.</span> <span class="nav-text">题目名称</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Gray-Code-Leetcode-89"><span class="nav-number">2.</span> <span class="nav-text">Gray Code(Leetcode #89)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述"><span class="nav-number">2.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路"><span class="nav-number">2.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案"><span class="nav-number">2.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Gas-Station-Leetcode-134）"><span class="nav-number">3.</span> <span class="nav-text">Gas Station(Leetcode #134）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-1"><span class="nav-number">3.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-1"><span class="nav-number">3.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-1"><span class="nav-number">3.3.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#暴力"><span class="nav-number">3.3.1.</span> <span class="nav-text">暴力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一次遍历"><span class="nav-number">3.3.2.</span> <span class="nav-text">一次遍历</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Candy-Leetcode-135"><span class="nav-number">4.</span> <span class="nav-text">Candy(Leetcode #135)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-2"><span class="nav-number">4.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-2"><span class="nav-number">4.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-2"><span class="nav-number">4.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Single-Number-Leetcode-136"><span class="nav-number">5.</span> <span class="nav-text">Single Number(Leetcode #136)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-3"><span class="nav-number">5.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-3"><span class="nav-number">5.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-3"><span class="nav-number">5.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展"><span class="nav-number">5.4.</span> <span class="nav-text">扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-4"><span class="nav-number">5.4.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-4"><span class="nav-number">5.4.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更进一步的扩展"><span class="nav-number">5.5.</span> <span class="nav-text">更进一步的扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-5"><span class="nav-number">5.5.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-5"><span class="nav-number">5.5.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二进制中1的个数"><span class="nav-number">6.</span> <span class="nav-text">二进制中1的个数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-4"><span class="nav-number">6.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-6"><span class="nav-number">6.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-6"><span class="nav-number">6.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数值的整数次方"><span class="nav-number">7.</span> <span class="nav-text">数值的整数次方</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-5"><span class="nav-number">7.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-7"><span class="nav-number">7.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-7"><span class="nav-number">7.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#打印从1到最大的n位数-剑指offer-17"><span class="nav-number">8.</span> <span class="nav-text">打印从1到最大的n位数(剑指offer #17)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-8"><span class="nav-number">8.1.</span> <span class="nav-text">解题思路</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#删除链表的节点（剑指offer-18）"><span class="nav-number">9.</span> <span class="nav-text">删除链表的节点（剑指offer #18）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-6"><span class="nav-number">9.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-9"><span class="nav-number">9.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-8"><span class="nav-number">9.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

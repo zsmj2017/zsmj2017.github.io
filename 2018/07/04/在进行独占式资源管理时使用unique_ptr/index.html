@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;unique_ptr的大小与原始指针相同（在大多数情况），操作起来也类似，这意味着你可以某些内存吃紧与实时性较高的场合(例如嵌入式？）中使用它们。  unique_ptr定义&amp;nbsp;std::unique_ptr代表着独占语义。任何一个非空unique_ptr总是唯一拥有其指向资源。对unique_ptr执行移动操作将导致资源所有权从源指针传递到目标指针（源指针被置为null)">
+<meta name="keywords" content="C++,Modern C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="18.在进行独占式资源管理时使用std::unique_ptr">
+<meta property="og:url" content="https://xander.wiki/2018/07/04/%E5%9C%A8%E8%BF%9B%E8%A1%8C%E7%8B%AC%E5%8D%A0%E5%BC%8F%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%97%B6%E4%BD%BF%E7%94%A8unique_ptr/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;unique_ptr的大小与原始指针相同（在大多数情况），操作起来也类似，这意味着你可以某些内存吃紧与实时性较高的场合(例如嵌入式？）中使用它们。  unique_ptr定义&amp;nbsp;std::unique_ptr代表着独占语义。任何一个非空unique_ptr总是唯一拥有其指向资源。对unique_ptr执行移动操作将导致资源所有权从源指针传递到目标指针（源指针被置为null)">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/jhth2nfbeiqo5j2vqsn0u6pg/image_1chigac1e1b531m0r1cs5o81bmj9.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/jhth2nfbeiqo5j2vqsn0u6pg/image_1chigac1e1b531m0r1cs5o81bmj9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/07/04/在进行独占式资源管理时使用unique_ptr/"/>
+
+
+
+
+
+  <title>18.在进行独占式资源管理时使用std::unique_ptr | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/04/%E5%9C%A8%E8%BF%9B%E8%A1%8C%E7%8B%AC%E5%8D%A0%E5%BC%8F%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%97%B6%E4%BD%BF%E7%94%A8unique_ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">18.在进行独占式资源管理时使用std::unique_ptr</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-04T18:42:00+08:00">
+                2018-07-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>unique_ptr的大小与原始指针相同（在大多数情况），操作起来也类似，这意味着你可以某些内存吃紧与实时性较高的场合(例如嵌入式？）中使用它们。</p>
+<hr>
+<h1 id="unique-ptr定义"><a href="#unique-ptr定义" class="headerlink" title="unique_ptr定义"></a>unique_ptr定义</h1><p>&nbsp;<br>std::unique_ptr代表着独占语义。任何一个非空unique_ptr总是唯一拥有其指向资源。对unique_ptr执行移动操作将导致资源所有权从源指针传递到目标指针（源指针被置为null),unique_ptr不允许copy操作，因为这会导致存在两个指针指向同一份资源，与独占性相违。由此可见，unique_ptr是一种move_only type，在它析构时，默认将对其所拥有的原始指针执行delete操作。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>&nbsp;<br>一般来说，unique_ptr常用于作为工厂函数的返回类型（当然，工厂函数并非std::unique_ptrs的唯一常见用例,它们也经常作为Pimpl手法的实现机制而得到使用，具体可见Item22）。<br>假设当前有一个代表投资的继承体系如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/jhth2nfbeiqo5j2vqsn0u6pg/image_1chigac1e1b531m0r1cs5o81bmj9.png" alt="image_1chigac1e1b531m0r1cs5o81bmj9.png-17.6kB"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Investment</span> &#123;</span> … &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Stock</span>:</span><span class="keyword">public</span> Investment &#123; … &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bond</span>:</span><span class="keyword">public</span> Investment &#123; … &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RealEstate</span>:</span><span class="keyword">public</span> Investment &#123; … &#125;;</span><br></pre></td></tr></table></figure>
+<p>工厂函数将在堆上生成一个对象并返回一个指向它的指针，调用者负责在不再需要时删除该对象。这正是std::unique_ptr的职责所在：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Ts&gt; <span class="comment">// return std::unique_ptr</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Investment&gt; <span class="comment">// to an object created</span></span><br><span class="line">makeInvestment(Ts&amp;&amp;... params); <span class="comment">// from the given args</span></span><br></pre></td></tr></table></figure><br>调用者可在某作用域内使用工厂函数返回值如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    …</span><br><span class="line">    <span class="keyword">auto</span> pInvestment = makeInvestment(arguments); <span class="comment">// std::unique_ptr&lt;Investment&gt;</span></span><br><span class="line">    …</span><br><span class="line">&#125;<span class="comment">// destroy *pInvestment</span></span><br></pre></td></tr></table></figure><br>但也可以在所有权迁移场景中使用unique_ptr,例如将工厂函数的返回值置入容器，而容器元素又在其后成为了某个对象的data member，其后该对象被销毁。当发生这种情况时，对象的std::unique data member也将被销毁，并且其销毁将导致工厂函数所返回的资源被释放。如果在上述过程中出现了异常或逻辑错误（函数过早返回或循环由于break退出），那么管资源的std::unique_ptr最终将调用其析构函数,释放其托管的资源。</p>
+<p>在默认情况下，该资源释放将通过使用delete完成，但在构造过程中，std::unique_ptr对象可以配置自定义删除器：任意函数、函数对象、lambda等等。在unqie_ptr析构之时，这些删除器将负责完成资源的释放操作。举例而言，如果makeInvestment所创建的对象不应该直接删除，而应首先完成日志记录操作，makeInvestment可实现如下:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> delInvmt = [](Investment* pInvestment) &#123;makeLogEntry(pInvestment);<span class="keyword">delete</span> pInvestment;&#125;;<span class="comment">//lambda</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Ts&gt;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Investment, <span class="keyword">decltype</span>(delInvmt)&gt;</span><br><span class="line">makeInvestment(Ts&amp;&amp;... params)&#123;</span><br><span class="line">    std::unique_ptr&lt;Investment, decltype(delInvmt)&gt; pInv(nullptr, delInvmt);</span><br><span class="line">    <span class="keyword">if</span> (<span class="comment">/* a Stock object should be created */</span>)&#123;</span><br><span class="line">        pInv.reset(<span class="keyword">new</span> Stock(<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ( <span class="comment">/* a Bond object should be created */</span> )&#123;</span><br><span class="line">        pInv.reset(<span class="keyword">new</span> Bond(<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ( <span class="comment">/* a RealEstate object should be created */</span> )&#123;</span><br><span class="line">        pInv.reset(<span class="keyword">new</span> RealEstate(<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> pInv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="实现剖析"><a href="#实现剖析" class="headerlink" title="实现剖析"></a>实现剖析</h2><ol>
+<li>delInvmt是工厂函数返回对象的自定义删除器，其接受指向应被销毁的对象的原始指针，然后执行销毁该对象所需的操作。 在本例中，销毁操作时调用makeLogEntry然后应用delete。使用lambda表达式创建delInvmt十分便捷，但实际上它并不止便捷那么简单。</li>
+<li>当需要使用自定义删除器时，必须将其类型指定为std::unique_ptr的第二个模板类型参数。因此在本例中makeInvestment的返回类型是std::unique_ptr&lt;Investment，decltype(delInvmt)&gt;。</li>
+<li>将原始指针（例如从new得到的资源）对std::unique_ptr进行赋值将无法编译，因为这一行为构成了从原始指针到智能指针的隐式转换，C++11禁止这种隐式转换，因此使用reset成员函数。</li>
+<li>每次调用new时，我们都使用std::forward来实现完美转发makeInvestment获得的参数（见Item25）。这一行为使得调用者提供的所有信息都可被正在创建的对象的constructor所采纳。</li>
+<li>为了保证删除器能够正确完成析构操作，基类必须具备virtual析构函数（因为我们是通过一个指向基类的指针来执行delete）：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Investment</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">   … <span class="comment">// essential</span></span><br><span class="line">   <span class="keyword">virtual</span> ~Investment(); <span class="comment">// design</span></span><br><span class="line">   … <span class="comment">// component!</span></span><br><span class="line"> &#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<hr>
+<h1 id="C-14提供的工厂函数实现"><a href="#C-14提供的工厂函数实现" class="headerlink" title="C++14提供的工厂函数实现"></a>C++14提供的工厂函数实现</h1><p>&nbsp;<br>C++14支持返回值类型推衍，因此C++14中工厂函数的实现可如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Ts&gt;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">makeInvestment</span><span class="params">(Ts&amp;&amp;... params)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> delInvmt = [](Investment* pInvestment)&#123;makeLogEntry(pInvestment);<span class="keyword">delete</span> pInvestment;&#125;; </span><br><span class="line">    std::unique_ptr&lt;Investment, decltype(delInvmt)&gt; pInv(nullptr, delInvmt);</span><br><span class="line">    <span class="keyword">if</span> ( … )&#123;</span><br><span class="line">        pInv.reset(<span class="keyword">new</span> Stock(<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ( … )&#123;</span><br><span class="line">        pInv.reset(<span class="keyword">new</span> Bond(<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ( … )&#123;</span><br><span class="line">        pInv.reset(<span class="keyword">new</span> RealEstate(<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> pInv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="自定义删除器对unique-ptr的影响"><a href="#自定义删除器对unique-ptr的影响" class="headerlink" title="自定义删除器对unique_ptr的影响"></a>自定义删除器对unique_ptr的影响</h1><p>&nbsp;<br>前文曾经提及，当使用默认删除器（即delete）时，可以合理地假设std::unique_ptr对象与原始指针的大小相同。但一旦存在自定义删除器，那么该假设一般不再成立。如果删除器是函数指针类型，含有自定义删除器的std::unique_ptr大小往往从1个word增长至2个word。如果删除器是函数对象，那么unique_ptr增长的大小视函数中状态的多少而定。无状态函数对象（例如没有捕获的lambda表达式）不会导致unique_ptr的大小发生变化，这意味着当自定义删除器可实现为函数或无捕获的lambda表达式时，lambda更为可取：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> delInvmt1 = [](Investment* pInvestment)&#123;makeLogEntry(pInvestment);<span class="keyword">delete</span> pInvestment;&#125;; </span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Ts&gt;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Investment, <span class="keyword">decltype</span>(delInvmt1)&gt;</span><br><span class="line">makeInvestment(Ts&amp;&amp;... args);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delInvmt2</span><span class="params">(Investment* pInvestment)</span></span>&#123;<span class="comment">// function object</span></span><br><span class="line">    makeLogEntry(pInvestment);</span><br><span class="line">    <span class="keyword">delete</span> pInvestment;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Ts&gt;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Investment,<span class="keyword">void</span> (*)(Investment*)&gt;</span><br><span class="line">makeInvestment(Ts&amp;&amp;... params);</span><br></pre></td></tr></table></figure>
+<p>具有状态的函数对象删除器可能会生产较大的unique_ptr对象。如果你发现自定义删除器std::unique_ptrs大到了不可接受的程度，则可以考虑更改删除器类型。</p>
+<hr>
+<h1 id="unique-ptr与数组"><a href="#unique-ptr与数组" class="headerlink" title="unique_ptr与数组"></a>unique_ptr与数组</h1><p>&nbsp;<br>std::unique_ptr存在两种形式，一种用于单个对象（std::unique_ptr&lt;T&gt;）,另一种用于数组（std::unique_ptr&lt;T[]&gt;）。因此，对于std::unique_ptr指向的实体类型从不存在任何歧义。std::unique_ptr的API视当前使用情况而定。例如，指向单一对象时unique_ptr没有operator[]，而指向数组时则缺少operator*和operator-&gt;。</p>
+<p>但指向数组的unique_ptr并无必要，因为STL中的容器比数组好用太多，std::unique_ptr&lt;T[]&gt;唯一有存在价值的情况就是当你使用类C的API时，它会返回一个原始指针，指向你独占的堆数组。</p>
+<hr>
+<h1 id="unique-ptr与shared——ptr"><a href="#unique-ptr与shared——ptr" class="headerlink" title="unique_ptr与shared——ptr"></a>unique_ptr与shared——ptr</h1><p>&nbsp;<br>std::unique_ptr最吸引人的特性之一是它可以轻松高效隐式地转换为std::shared_ptr:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Investment&gt; sp = makeInvestment( arguments );</span><br></pre></td></tr></table></figure>
+<p>这即是std::unique_ptr适合作为工厂函数返回类型的关键原因所在。工厂函数无法知道调用者是否希望对返回的对象使用独占语义，或者共享语义。通过返回std::unique_pt，工厂函数得以保证当调用者需要实现共享语义时可以轻松从unique_ptr转换得到shared_ptr。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>std::unique_ptr是一种小型、快速、move-only的智能指针，其在管理资源时具备独占语义。</strong></li>
+<li><strong>在默认情况下，资源释放通过delete完成，但用户亦可自定义删除器。存有状态的删除器和函数指针会增加std::unique_ptr对象的大小。</strong></li>
+<li><strong>将std::unique_ptr转换为std::shared_ptr十分容易。</strong></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"># Modern C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/04/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E6%A6%82%E8%BF%B0/" rel="next" title="智能指针概述">
+                <i class="fa fa-chevron-left"></i> 智能指针概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/05/%E5%9C%A8%E8%BF%9B%E8%A1%8C%E5%85%B1%E4%BA%AB%E5%BC%8F%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%97%B6%E4%BD%BF%E7%94%A8stdshared_ptr/" rel="prev" title="19.在进行共享式资源管理时使用std::shared_ptr">
+                19.在进行共享式资源管理时使用std::shared_ptr <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#unique-ptr定义"><span class="nav-number">2.</span> <span class="nav-text">unique_ptr定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题实例"><span class="nav-number">2.1.</span> <span class="nav-text">问题实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现剖析"><span class="nav-number">2.2.</span> <span class="nav-text">实现剖析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-14提供的工厂函数实现"><span class="nav-number">3.</span> <span class="nav-text">C++14提供的工厂函数实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自定义删除器对unique-ptr的影响"><span class="nav-number">4.</span> <span class="nav-text">自定义删除器对unique_ptr的影响</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#unique-ptr与数组"><span class="nav-number">5.</span> <span class="nav-text">unique_ptr与数组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#unique-ptr与shared——ptr"><span class="nav-number">6.</span> <span class="nav-text">unique_ptr与shared——ptr</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

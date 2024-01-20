@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="（本节标题完美揭示了全部主旨，不宜翻译） 问题实例&amp;nbsp;假定当前存在一个Widget class，其成员函数addName接受一个string并将其添加到内部容器中。一般为了保证效率，我们通常会对左值string执行pass-by-const-reference，对右值执行move：12345678910class Widget &amp;#123;public:    void addName(c">
+<meta name="keywords" content="C++,Modern C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="41.Consider pass by value for copyable parameters that are cheap to move and always copied.">
+<meta property="og:url" content="https://xander.wiki/2018/07/19/Consider%20pass%20by%20value%20for%20copyable%20parameters/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="（本节标题完美揭示了全部主旨，不宜翻译） 问题实例&amp;nbsp;假定当前存在一个Widget class，其成员函数addName接受一个string并将其添加到内部容器中。一般为了保证效率，我们通常会对左值string执行pass-by-const-reference，对右值执行move：12345678910class Widget &amp;#123;public:    void addName(c">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-07-01T07:10:07.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/07/19/Consider pass by value for copyable parameters/"/>
+
+
+
+
+
+  <title>41.Consider pass by value for copyable parameters that are cheap to move and always copied. | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/19/Consider%20pass%20by%20value%20for%20copyable%20parameters/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">41.Consider pass by value for copyable parameters that are cheap to move and always copied.</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-19T12:15:00+08:00">
+                2018-07-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>（本节标题完美揭示了全部主旨，不宜翻译）</p>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假定当前存在一个Widget class，其成员函数addName接受一个string并将其添加到内部容器中。一般为了保证效率，我们通常会对左值string执行pass-by-const-reference，对右值执行move：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; newName)</span> <span class="comment">// take lvalue;</span></span></span><br><span class="line"><span class="function">    </span>&#123; names.push_back(newName); &#125; <span class="comment">// copy it</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span>&amp;&amp; newName)</span> <span class="comment">// take rvalue;</span></span></span><br><span class="line"><span class="function">    </span>&#123; names.push_back(<span class="built_in">std</span>::<span class="built_in">move</span>(newName)); &#125; <span class="comment">// move it;</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; names;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>以上代码运行地非常良好，就是函数可能太多了一点，我们不得不写下两份声明，两份实现，两份文档。。。诸如此类。此外，目标码中将存在两个函数，这无疑会导致程序的占用空间增大。内联会优化这一行为，但你并不能保证内联的必然执行。</p>
+<p>另一种方法是使addName成为一个形参为universal reference的函数模板：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// take lvalues and rvalues;</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(T&amp;&amp; newName)</span> </span>&#123; </span><br><span class="line">        <span class="comment">// copy lvalues,move rvalues;</span></span><br><span class="line">        names.push_back(<span class="built_in">std</span>::forward&lt;T&gt;(newName));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这减少了源码的大小，但可能会造成更加恶劣的情况。作为模板，addName的实现通常必须位于头文件中，因此它可能在目标码中生成相当多的函数，原因在于它不仅对lvalue和rvalue产生不同的实例化，它还对std::string和可转换为std::string的类型产生不同的实例化（见Item25）。此外，有些参数类型无法通过universal reference传递（见Item30），如果客户传递了不正确的参数类型，编译器所提出的错误报告可能会令人头大（见Item27）。</p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&nbsp;<br>有没有一种函数，既能针对不同情况作出不同处理（copy左值，移动右值），又能只在源码和目标码中仅仅出现一次，并且还不需要使用universal reference？事实上真的有。我们唯一要做的就是摒弃入门时的第一条C++准则——禁止对自定义类型采用值传递形式。对于Addname中的newname这种参数，采用值传递确实是一种正当选择。以下是值传递版本的实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> newName)</span> <span class="comment">// take lvalue or rvalue; move it</span></span></span><br><span class="line"><span class="function">    </span>&#123; names.push_back(<span class="built_in">std</span>::<span class="built_in">move</span>(newName)); &#125; </span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>此代码中唯一不太显然之处就是push_back的实参中采用了std::move。通常情况下，move一般与右值一起使用（见Item25），但在本例中我们可以清楚地看出：</p>
+<ol>
+<li><strong>newName是完全独立的对象，更改newName不会影响caller。</strong></li>
+<li><strong>这是newName的最后一次使用，移动它并不影响程序的其他地方。</strong></li>
+</ol>
+<p>因此使用move不会产生任何问题。</p>
+<hr>
+<h1 id="性能剖析"><a href="#性能剖析" class="headerlink" title="性能剖析"></a>性能剖析</h1><p>&nbsp;<br>在C++98中，pass-by-value将导致昂贵的性能损耗， pass-by-value意味着无论caller传入的是什么都必须经由copy constructor构造。但在C++11中，addName将仅为lvalue执行拷贝构造。 对于右值，它将执行移动构造。例如在如下语句中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line">…</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">name</span><span class="params">(<span class="string">"Bart"</span>)</span></span>;</span><br><span class="line">w.addName(name); <span class="comment">// call addName with lvalue</span></span><br><span class="line">…</span><br><span class="line">w.addName(name + <span class="string">"Jenne"</span>); <span class="comment">// call addName with rvalue(see below)</span></span><br></pre></td></tr></table></figure><br>在第一次调用addName时，newName由左值初始化，因此与C++98一样采用拷贝构造。在第二次调用中，newName由一个匿名std::string对象初始化，该对象是一个右值，因此newName由移动构造。一切都如我们所愿。</p>
+<hr>
+<h2 id="方案比较"><a href="#方案比较" class="headerlink" title="方案比较"></a>方案比较</h2><p>&nbsp;<br>前文讨论的三种方案依次如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// Approach 1:overload for lvalues and rvalues</span></span><br><span class="line"><span class="keyword">public</span>: </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; newName)</span></span></span><br><span class="line"><span class="function">    </span>&#123; names.push_back(newName); &#125; </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span>&amp;&amp; newName)</span></span></span><br><span class="line"><span class="function">    </span>&#123; names.push_back(<span class="built_in">std</span>::<span class="built_in">move</span>(newName)); &#125;</span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; names;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// Approach 2:use universal reference</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(T&amp;&amp; newName)</span></span></span><br><span class="line"><span class="function">    </span>&#123; names.push_back(<span class="built_in">std</span>::forward&lt;T&gt;(newName)); &#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// Approach 3:pass by value</span></span><br><span class="line"><span class="keyword">public</span>: </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> newName)</span></span></span><br><span class="line"><span class="function">    </span>&#123; names.push_back(<span class="built_in">std</span>::<span class="built_in">move</span>(newName)); &#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>我们可以将前两种称为“by-reference approaches”，因为它们都通过reference传递参数。现有两种测试场景如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line">…</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">name</span><span class="params">(<span class="string">"Bart"</span>)</span></span>;</span><br><span class="line">w.addName(name); <span class="comment">// pass lvalue</span></span><br><span class="line">…</span><br><span class="line">w.addName(name + <span class="string">"Jenne"</span>); <span class="comment">// pass rvalue</span></span><br></pre></td></tr></table></figure><br>针对上述三种方案，现有分析如下：</p>
+<ol>
+<li><strong>重载</strong><br>无论传入的是左值还是右值，其均被绑定至一个名为newName的引用。将实参绑定至引用没有任何成本。在左值重载函数中，newName被copy至Widget::names中。在右值重载函数中，newName被移动至Widget::names中。总的来说，左值需要一次拷贝，右值需要一次移动。</li>
+<li><strong>universal reference</strong><br>与重载一样，实参被绑定至引用newName，绑定操作没有成本。由于使用了std::forward，lvalue std::string参数将会被copy到Widget::names中，而ravlue std::string将会被移动到该容器内。总的来说成本与重载一致：左值需要一次拷贝，右值需要一次引用。（在本次分析中我们假设传入的总是string，而非别的类型）。</li>
+<li><strong>传值</strong><br>无论传入的是左值还是右值，string对象newName都必须构造，区别在于传入左值则采用拷贝构造，传入右值则采用移动构造。在函数体中，newName将被无条件地移动到Widget::names之中。总的来说，成本总是为一次构造（copy/move)+一次move，这比上两种方案多了一次move。</li>
+</ol>
+<hr>
+<h1 id="以传值代替引用的条件"><a href="#以传值代替引用的条件" class="headerlink" title="以传值代替引用的条件"></a>以传值代替引用的条件</h1><p>&nbsp;<br>现在我们将镜头拉回至标题：<strong>Consider pass by value for copyable parameters that are cheap to move<br>and always copied</strong><br>该标题实则已经表明了作者的一切立场，以下将一一解读：</p>
+<ol>
+<li>你应当<strong>考虑（consider)</strong>使用传值。尽管它只需要撰写一次，并且避免了目标码膨胀，但传值比其替代方案成本更高，并且可能存在其他成本（详见下文）。</li>
+<li>传值仅针对可拷贝的对象，move-only类型无法拷贝，在这种情况下，“重载”解决方案只需要一个重载：采用rvalue引用的重载。<br>举例而言，当前Widget class内含一个unique_ptr&lt;std::string&gt;对象与一个由于unique_ptr是一个move-only类型，因此重载版本完全可以写为：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">   …</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setPtr</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;&amp;&amp; ptr)</span></span></span><br><span class="line"><span class="function">   </span>&#123; p = <span class="built_in">std</span>::<span class="built_in">move</span>(ptr); &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; p;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+其调用形式大致类似于：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line">…</span><br><span class="line">w.setPtr(<span class="built_in">std</span>::make_unique&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;(<span class="string">"Modern C++"</span>));</span><br></pre></td></tr></table></figure>
+其总成本为一次移动操作（移动unique_ptr匿名对象至p）。<br>如果将该类设计为pass-by-value：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">   …</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setPtr</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; ptr)</span></span></span><br><span class="line"><span class="function">   </span>&#123; p = <span class="built_in">std</span>::<span class="built_in">move</span>(ptr); &#125;</span><br><span class="line">   …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+则将首先移动构造ptr，然后再将其移入p中，其成本为右值重载的两本。</li>
+<li>仅在移动操作成本较低时选择pass-by-value，否则多付出的一次move操作将导致得不偿失。</li>
+<li>应当考虑为始终执行copy的参数选择pass-by-value。举例而言，假如在加入容器前需要对字符串长度进行判断，符合条件者方可加入：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">addName</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> newName)</span></span>&#123;</span><br><span class="line">       <span class="keyword">if</span> ((newName.length() &gt;= minLen) &amp;&amp;(newName.length() &lt;= maxLen))&#123;</span><br><span class="line">           names.push_back(<span class="built_in">std</span>::<span class="built_in">move</span>(newName));</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; names;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+这种情况下可能会造成不必要的copy操作，因此在使用pass-by-value之前必须确保该参数定会被copy。</li>
+</ol>
+<hr>
+<h2 id="赋值拷贝"><a href="#赋值拷贝" class="headerlink" title="赋值拷贝"></a>赋值拷贝</h2><p>即使我们真正符合上述条件，pass-by-value也未必是最佳方案。原因在于函数可能会以两种方式拷贝参数：构造（copy构造与move构造）、赋值（copy赋值与move赋值）。<br>addName成员函数使用构造：其参数newName被传递给vector::push_back，在该函数内部，newName被拷贝构造为vector尾端的一个新元素。本节开篇便分析了这种情况，此时无论传递的是左值还是右值都会导致额外的一次move的开销。<br>使用赋值copy参数时，情况会变得较为复杂。假设当前存在一个表示密码的类，因为密码可以更改，我们提供了setter函数changeTo，采用pass-by-value策略，该class实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Password</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Password</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> pwd)</span>: <span class="title">text</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">move</span>(pwd))</span> </span>&#123;&#125; <span class="comment">// construct text</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">changeTo</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> newPwd)</span></span>&#123; <span class="built_in">text</span> = <span class="built_in">std</span>::<span class="built_in">move</span>(newPwd); &#125; <span class="comment">// assign text</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>; <span class="comment">// text of password</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>尽管将密码设为纯文本似乎有些不妥，但请忽略它而将焦点关注于可能发生的问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">initPwd</span><span class="params">(<span class="string">"Supercalifragilisticexpialidocious"</span>)</span></span>;</span><br><span class="line"><span class="function">Password <span class="title">p</span><span class="params">(initPwd)</span></span>;</span><br></pre></td></tr></table></figure><br>上述程序一切正常，相对于重载或universal reference方案，我们只需要多付出一次move成本而已。但用户可能会试图更改密码，例如他们会写下此类程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> newPassword = <span class="string">"Beware the Jabberwock"</span>;</span><br><span class="line">p.changeTo(newPassword);</span><br></pre></td></tr></table></figure><br>传递给changeTo的参数是一个左值（newPassword），因此在构造参数newPwd时将触发string的拷贝构造函数，该构造函数分配内存以保存新密码，然后将newPwd移动到text，这会导致原有text占用的内存被释放。因此，changeTo中有两个动态内存管理操作：一个为新密码分配内存，另一个为旧密码释放内存。</p>
+<p>但事实上，因为旧密码要长于新密码。所以我们本没有必要执行动态内存分配。倘若当前采用的是重载版本，将不会触发任何内存分配行为（因为采取了赋值构造）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Password</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">     <span class="comment">// the overload for lvalues can reuse text's memory if text.capacity() &gt;= newPwd.size()</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">changeTo</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; newPwd)</span></span>&#123;</span><br><span class="line">        <span class="built_in">text</span> = newPwd;</span><br><span class="line">    &#125;</span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>; <span class="comment">// as above</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>执行内存动态分配可能要比move操作多花数个数量级的时间，因此pass-by-value在此场景下并不可取。此外，如果旧text长度小于新text的长度，那么无论采取何种方案，内存动态分配所带来的开销均不可避免。因此，参数复制的成本可能会取决于该参数的值。上述分析只适用于值是保存在堆内存中的，需要动态分配内存的类型，例如std::string与std::vector。</p>
+<p>此外，上述分析只适用于实参是左值的情况，如果传递的是右值，那么开销还是很低的，因为不需要进行拷贝构造，省却了拷贝构造带来的内存分配开销（内存分配一般仅发生于copy操作之中）。</p>
+<p>总而言之，赋值拷贝性能取决于实参类型，左值与右值的比率，是否存在动态内存分配等等。甚至还需要考虑要传入参数的具体实现方案，以std::string举例，如果它使用了SSO优化进行实现，那么赋值操作会将要赋值的内容放到SSO的buffer中，因此情况又将不同。</p>
+<hr>
+<h1 id="最终定论"><a href="#最终定论" class="headerlink" title="最终定论"></a>最终定论</h1><p>&nbsp;<br>通常情况下，最实际的做法是采用”有罪推定”的策略，也就是平时均使用重载或universal reference方案，除非明显pass-by-value的效率更高。</p>
+<p>现如今软件总是越快越好，因此pass-by-value未必是一个良好方案，因为避免一次廉价的move开销也相当重要，我们无法明确一个操作会有多少次这样的move操作。例如Widget::addName通过值传递造成了一次额外的move操作，但是这个函数内部又调用了Widget::validateName，这个函数也是值传递的方式，这就又造成了一次额外的move开销，validateName内部如果再调用其他的函数，并且这个函数同样是值传递的方式呢?，这就造成了累加效应，如果使用引用传递的话就不会有这样的累加效应了。</p>
+<hr>
+<h1 id="pass-by-value与slicing"><a href="#pass-by-value与slicing" class="headerlink" title="pass-by-value与slicing"></a>pass-by-value与slicing</h1><p>&nbsp;<br>如果当前存在一个形参为基类对象或派生类对象的函数，此时应当谨慎使用pass-by-value，因为这会去除派生类的所有特性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> … &#125;; <span class="comment">// base class</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWidget</span>:</span> <span class="keyword">public</span> Widget &#123; … &#125;; <span class="comment">// derived class</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processWidget</span><span class="params">(Widget w)</span></span>; <span class="comment">// func for any kind of Widget,including derived types;</span></span><br><span class="line">…</span><br><span class="line">SpecialWidget sw;</span><br><span class="line">…</span><br><span class="line">processWidget(sw); <span class="comment">// processWidget sees a Widget, not a SpecialWidget!</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"># Modern C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/19/%E5%AF%B9%E5%B9%B6%E5%8F%91%E5%BA%94%E7%94%A8stdatomic,%E5%AF%B9special%20memory%E4%BD%BF%E7%94%A8volatile/" rel="next" title="40.对并发应用std::atomic,对special memory使用volatile">
+                <i class="fa fa-chevron-left"></i> 40.对并发应用std::atomic,对special memory使用volatile
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/19/%E8%80%83%E8%99%91%E4%BB%A5emplacement%E4%BB%A3%E6%9B%BFinsertion/" rel="prev" title="42.考虑以emplacement代替insertion">
+                42.考虑以emplacement代替insertion <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例"><span class="nav-number">1.</span> <span class="nav-text">问题实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#性能剖析"><span class="nav-number">3.</span> <span class="nav-text">性能剖析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方案比较"><span class="nav-number">3.1.</span> <span class="nav-text">方案比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#以传值代替引用的条件"><span class="nav-number">4.</span> <span class="nav-text">以传值代替引用的条件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#赋值拷贝"><span class="nav-number">4.1.</span> <span class="nav-text">赋值拷贝</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最终定论"><span class="nav-number">5.</span> <span class="nav-text">最终定论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pass-by-value与slicing"><span class="nav-number">6.</span> <span class="nav-text">pass-by-value与slicing</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

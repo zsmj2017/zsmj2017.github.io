@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Computer Network," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="本篇为《Computer Network-A Top-Down Approach》第一章读书笔记。">
+<meta name="keywords" content="Computer Network">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络与互联网">
+<meta property="og:url" content="https://xander.wiki/2020/05/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E4%BA%92%E8%81%94%E7%BD%91/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="本篇为《Computer Network-A Top-Down Approach》第一章读书笔记。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/de8blil0iqur1lod8pehp0il/WX20200504-143411@2x.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/ojdknbtilpd7n5c0zhr7aeup/WX20200504-144038@2x.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/7nwbcb17m4o0j3c5ez2pt7q4/WX20200504-184743@2x.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/2a6s7phknrnuq9bdh6hdp4af/WX20200504-192241@2x.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/3wjcflxrm66esvgwvwdors7c/WX20200504-195027@2x.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2019/ludlhii7p63so2srpbkaxw50/WX20200504-200252@2x.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2019/de8blil0iqur1lod8pehp0il/WX20200504-143411@2x.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2020/05/04/计算机网络与互联网/"/>
+
+
+
+
+
+  <title>计算机网络与互联网 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2020/05/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E4%BA%92%E8%81%94%E7%BD%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">计算机网络与互联网</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-05-04T13:29:00+08:00">
+                2020-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Computer-Networking-A-Top-Down-Approach/" itemprop="url" rel="index">
+                    <span itemprop="name">Computer Networking A Top-Down Approach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇为《Computer Network-A Top-Down Approach》第一章读书笔记。</p>
+<a id="more"></a>
+<hr>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><ul>
+<li>连接至计算机网络的计算设备被称为<strong>主机（hosts）</strong>或<strong>终端（end system）</strong>。<ul>
+<li>终端间通过<strong>通信链路（communication link）</strong>与<strong>分组交换机（packet switch）</strong>相连。<ul>
+<li>通信链路由同轴电缆，光纤，双绞线等物理媒介构成，其传输速率被定义为bits/second。</li>
+<li>路由器（router）与链路层交换机（link-layer switch）均属于分组交换机。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>终端通过<strong>ISP（Internet Service Provider）</strong>提供的服务连接至互联网。</li>
+<li>计算机网络中信息的收发均遵从<strong>协议（protocols）</strong>, <strong>TCP（Transmission Control Protocol ）与 Internet Protocol (IP)</strong> 是其中最重要的两个。</li>
+<li>为了保证所有人都遵从协议，IETF（Internet Engineering Task Force）制定了互联网标准（Internet standard）。</li>
+<li>分布式应用程序（distributed application）——包含多个彼此交换数据的终端。</li>
+<li>连接至互联网的终端，通<strong>过套接字接口（Socket Interface）</strong>指定数据如何传递至另一个终端上的特定应用程序。</li>
+<li>协议是实体间为完成通信所必须遵从的规则，它包含了信息格式，信息顺序，以及发送/接受信息所必须执行的操作。</li>
+</ul>
+<hr>
+<h1 id="网络边沿"><a href="#网络边沿" class="headerlink" title="网络边沿"></a>网络边沿</h1><ul>
+<li>接入网络（access network）——将终端系统以物理方式连接到首个路由器的网络。<ul>
+<li>原书对诸如DSL,FTTH及各物理媒介的介绍与对比不再赘述。</li>
+<li>接入网络在网络体系中的位置如图中蓝色高亮所示。<br><img src="http://static.zybuluo.com/zsmj2019/de8blil0iqur1lod8pehp0il/WX20200504-143411@2x.png" alt="WX20200504-143411@2x.png-696.6kB"></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="网络核心"><a href="#网络核心" class="headerlink" title="网络核心"></a>网络核心</h1><p>本节所研究内容如下图蓝色高亮位置所示。<br><img src="http://static.zybuluo.com/zsmj2019/ojdknbtilpd7n5c0zhr7aeup/WX20200504-144038@2x.png" alt="WX20200504-144038@2x.png-712.9kB"></p>
+<ul>
+<li>分组交换（packet switch）：终端间通过<strong>报文（message）</strong>通信，较长的报文将被切割为<strong>分组/包（packet）</strong><ul>
+<li>存储-转发（store-and-forward transmission）机制：交换机仅在接收完<strong>整个</strong>包后才开始向外发送数据，这造成了一定的时延。</li>
+<li>排队时延（Queuing Delay）与丢包（Packet Loss）：每一个交换机均持有一个<strong>输出队列</strong>（output queue），所有待发送包均需在此队列中排队（当前通信链路正忙于发送数据），若<strong>队列已满</strong>时到达了新包，新包将被<strong>丢弃</strong>。</li>
+<li>在因特网中，IP地址的多级结构信息和路由器的<strong>转发表（forwarding table）</strong>，决定了路由器拿到包后送往哪条链路，转发表是由路由选择协议自动设置的。</li>
+</ul>
+</li>
+<li>电路交换（Circuit Switch）：另一种端与端通信手段，特点是源和目标点建立起名副其实的连接，称为电路，这条路上的带宽全部为这个连接空出来，所以电路交换的速度非常可靠（电话就采用了这种通信方式）。<ul>
+<li>频分复用，时分复用等不再赘述。 </li>
+</ul>
+</li>
+<li>分组交换 VS 电路交换：</li>
+</ul>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">电路交换</th>
+<th style="text-align:center">分组交换</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">实现</td>
+<td style="text-align:center">复杂，成本高</td>
+<td style="text-align:center">简单,成本低</td>
+</tr>
+<tr>
+<td style="text-align:center">可靠性</td>
+<td style="text-align:center">可靠</td>
+<td style="text-align:center">延时不可预测</td>
+</tr>
+<tr>
+<td style="text-align:center">利用率</td>
+<td style="text-align:center">低，有空闲浪费</td>
+<td style="text-align:center">高，可共享空闲资源</td>
+</tr>
+<tr>
+<td style="text-align:center">特点</td>
+<td style="text-align:center">专线专用</td>
+<td style="text-align:center">共享路由</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li>ISP架构图：<br>其中IXP （Internet Exchange Point）用以令各ISP相互peer。<br><img src="http://static.zybuluo.com/zsmj2019/7nwbcb17m4o0j3c5ez2pt7q4/WX20200504-184743@2x.png" alt="WX20200504-184743@2x.png-244.8kB"></li>
+</ul>
+<hr>
+<h1 id="时延，丢包与吞吐量"><a href="#时延，丢包与吞吐量" class="headerlink" title="时延，丢包与吞吐量"></a>时延，丢包与吞吐量</h1><ul>
+<li>分组交换中时延的分类<ul>
+<li>处理时延（Processing Delay）：<strong>检查分组首部和决定将该分组导向何处</strong>，是节点处理时延（nodal processing delay）的一部分，其他部分有包括检查比特级差错处理（通常是微秒级以下）等。在这之后，路由器将包引向通往路由器B链路之前的队列。</li>
+<li>排队时延（Queuing Delay）：在队列中，当分组在链路缓存中<strong>等待传输</strong>时，它经受排队时延。 到达组的分组数量是到达该队列的流量强度的函数。实际的排队时延通常在毫秒到微秒级。 </li>
+<li>传输时延（Transmission Delay）：假定包长度为L，从路由器A到路由器B的链路传输速率为R （b/s），则有传输时延L/R。这是<strong>将所有比特推向链路所需要的时间</strong>。实际的传输时延通常在毫秒到微秒级。传输时延与包体长度正相关，与路由间距无关。 </li>
+<li>传播时延（Propagation Delay）：一旦一个比特被A推向链路向路由器B传播，从该链路的<strong>起点到路由器B的传播所需要的时间</strong>为传播时延，其速率范围等于或略小于光速，时延范围在毫秒级。传播时延等于两台路由器之间的距离d除以传播速率s。 </li>
+<li><strong>传输时延与传播时延的区别</strong>：传输时延可以看做是车队（包）过收费站（路由器）的时间（车队头需要等待车队尾通过），而传播时延可看作在高速上花费的时间。</li>
+<li>节点总时延 = 处理时延（可忽略） + 排队时延 + 传输时延 + 传播时延。</li>
+</ul>
+</li>
+<li>排队时延与丢包<ul>
+<li>流量强度（ traffic intensity）：假定包（packet）进入队列的速率为a（packets/sec）,当前所有包总长度为L（bits）,链路传输速度为R，则有流量强度=La/R。<ul>
+<li>如果La/R &gt; 1，则意味着队列进入端速度大于流出端速度，此时排队时延将趋向无穷大。因此，流量工程中设计系统时流量强度不能大于1。在因特网中，接近1时将容易发生丢包。</li>
+<li>若La/R &lt;= 1，此时排序时延取决于流量本身的特点（即突发还是平稳）。</li>
+<li>排序时延与流量强度的关系大致如下图所示：<br><img src="http://static.zybuluo.com/zsmj2019/2a6s7phknrnuq9bdh6hdp4af/WX20200504-192241@2x.png" alt="WX20200504-192241@2x.png-84.8kB"></li>
+</ul>
+</li>
+<li>丢包：在理想状态下丢包不会发生（将队列容量视作无穷大），实际上队列容量有限。若新包到达时队列已满，此时将发生丢包，在后续章节中我们将了解到丢失的包将会被再次传递至目的地，以保证数据的完整性。</li>
+</ul>
+</li>
+<li>端到端时延（End-to-End Delay）<ul>
+<li>假定源主机和目的主机之间有N-1台路由器，并且该网络是无拥塞的（此时可无视排队时延）。那么端到端时延为：<script type="math/tex">d_{end-end} = N (d_{proc} + d_{trans} + d_{prop})</script></li>
+</ul>
+</li>
+<li>吞吐量（Throughput）<ul>
+<li>在如以太网路及封包无线电之类的电信网络之中，吞吐量或网络吞吐量是指于一通讯通道上单位时间能成功传递的平均资料量，资料可以于实体或逻辑链接上传递，或通过某个网络节点。吞吐量的单位通常表示为bit/s或bp。</li>
+<li>在因特网内表现为网速。</li>
+<li>整个通信网络的吞吐量由所有通信链路中的最低吞吐量决定（短板效应）。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="协议栈"><a href="#协议栈" class="headerlink" title="协议栈"></a>协议栈</h1><ul>
+<li><p>五层模型与七层模型：<br><img src="http://static.zybuluo.com/zsmj2019/3wjcflxrm66esvgwvwdors7c/WX20200504-195027@2x.png" alt="WX20200504-195027@2x.png-195kB"></p>
+</li>
+<li><p>五层协议栈</p>
+<ul>
+<li>应用层：应用程序的协议。<ul>
+<li>我们把应用层的信息称为<strong>报文（message）</strong>。</li>
+<li>典型协议如<code>HTTP</code>、<code>FTP</code>、<code>SMTP(电邮)</code>、<code>DNS</code>。</li>
+</ul>
+</li>
+<li>运输层：在应用程序端点之间传输应用层报文的协议。<ul>
+<li>因特网中常用的有两个，即<code>TCP</code>和<code>UDP</code>。</li>
+<li>TCP：面向连接，提供分割长报文，拥塞控制机制。</li>
+<li>UDP：无连接，无特殊功能。</li>
+<li>处于运输层的分组叫做<strong>报文段（segement）</strong></li>
+</ul>
+</li>
+<li>网络层：负责将<strong>数据报(datagram)</strong>从主机移动到另一主机，使两端能够互连且决定最佳路径。<ul>
+<li>从运输层拿到报文段和目标地址。然后进行<code>路由</code>。</li>
+<li>网络层的典型协议是<code>IP</code>协议，用来识别目标地址。</li>
+<li>另一典型协议是<code>网络控制消息协定（ICMP）</code>，它是IP的主要部分，一般不用于在两点间传输数据。它通常不由网络程序直接使用，除了<code>ping</code>和<code>traceroute</code>这两个特例。</li>
+</ul>
+</li>
+<li>链路层：在两个网络实体之间提供数据链路连接的创建、维持和释放管理。<ul>
+<li>传输<strong>数据帧（frame）</strong>，并对帧定界、同步、收发顺序的控制。</li>
+<li>负责传输过程中的流量控制,差错检测和差错控制等方面。</li>
+<li>数据链路层中的数据封装是指：封装的数据信息中，包含了地址段和数据段等。地址段含有点对点发送节点和接收节点的地址（如<code>MAC</code>），控制段用来表示数格连接帧的类型，数据段包含实际要传输的数据。</li>
+<li>网络层将数据报下发给链路层，链路层传输后，上报给目标结点的网络层。</li>
+<li>典型协议：<code>异步传输模式（ATM）</code>、<code>帧中继（frame relay）</code>、<code>高级数据链路控制（HDLC）</code>。</li>
+<li>交换机、桥接器是本层设备。而集线器是物理层设备。</li>
+</ul>
+</li>
+<li>物理层：移动比特。<ul>
+<li>典型协议如：<code>蓝牙协议</code>、<code>数字用户线路（DSL）</code>等等。</li>
+<li>常见物理层设备：网卡、光纤、集线器 。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>封装：<ul>
+<li>因特网协议栈自顶向下传输时，各层会将上层信息包装，上层信息包装为<code>负载字段（payload field）</code>，本层信息包装为<code>首部字段（header field）</code>。</li>
+<li>应用层报文 -&gt; 运输层报文段 -&gt; 网络层数据报 -&gt; 链路层帧</li>
+<li><img src="http://static.zybuluo.com/zsmj2019/ludlhii7p63so2srpbkaxw50/WX20200504-200252@2x.png" alt="WX20200504-200252@2x.png-261.9kB"></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="网络攻击"><a href="#网络攻击" class="headerlink" title="网络攻击"></a>网络攻击</h1><ul>
+<li>因特网攻击举例<ol>
+<li>利用病毒和木马形成僵尸网络（botnet），即肉鸡。</li>
+<li>弱点攻击（攻击bug）、带宽洪泛（较为常见，多采用分布式攻击）、连接洪泛（伪造大量TCP连接）。</li>
+<li>分组嗅探（packet sniffer）：抓包，窃取隐私。</li>
+<li>伪造分组：IP哄骗等。</li>
+</ol>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Computer-Network/" rel="tag"># Computer Network</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/14/C++%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%AD%90%E7%B1%BB%E5%9E%8B%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/" rel="next" title="C++内存模型与原子类型操作——内存模型基础">
+                <i class="fa fa-chevron-left"></i> C++内存模型与原子类型操作——内存模型基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/05/VimTutor/" rel="prev" title="VimTutor小结">
+                VimTutor小结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络边沿"><span class="nav-number">2.</span> <span class="nav-text">网络边沿</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络核心"><span class="nav-number">3.</span> <span class="nav-text">网络核心</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#时延，丢包与吞吐量"><span class="nav-number">4.</span> <span class="nav-text">时延，丢包与吞吐量</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#协议栈"><span class="nav-number">5.</span> <span class="nav-text">协议栈</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络攻击"><span class="nav-number">6.</span> <span class="nav-text">网络攻击</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

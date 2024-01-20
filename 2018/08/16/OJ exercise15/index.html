@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Data Structures and Algorithms," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="题目名称 Regular Expression Matching（Leetcode #10） Longest Common Prefix（Leetcode #14） Valid Number（Leetcode #65） Integer to Roman（Leetcode #12） Anagrams（Leetcode #242） Simplify Path (Leetcode #242) Lengt">
+<meta name="keywords" content="C++,Data Structures and Algorithms">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OJ每日练习（15）">
+<meta property="og:url" content="https://xander.wiki/2018/08/16/OJ%20exercise15/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="题目名称 Regular Expression Matching（Leetcode #10） Longest Common Prefix（Leetcode #14） Valid Number（Leetcode #65） Integer to Roman（Leetcode #12） Anagrams（Leetcode #242） Simplify Path (Leetcode #242) Lengt">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ryjh0nmuux2zdc7b2p6okyrw/image_1cl0sedd71qrq1kauccp19e5r5p19.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:07.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/ryjh0nmuux2zdc7b2p6okyrw/image_1cl0sedd71qrq1kauccp19e5r5p19.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/08/16/OJ exercise15/"/>
+
+
+
+
+
+  <title>OJ每日练习（15） | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/08/16/OJ%20exercise15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OJ每日练习（15）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-16T13:40:00+08:00">
+                2018-08-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OJ-Exercises/" itemprop="url" rel="index">
+                    <span itemprop="name">OJ Exercises</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><ol>
+<li>Regular Expression Matching（Leetcode #10）</li>
+<li>Longest Common Prefix（Leetcode #14）</li>
+<li>Valid Number（Leetcode #65）</li>
+<li>Integer to Roman（Leetcode #12）</li>
+<li>Anagrams（Leetcode #242）</li>
+<li>Simplify Path (Leetcode #242)</li>
+<li>Length of Last Word (Leetcode #58)</li>
+<li>Valid Parentheses (Leetcode #20)</li>
+<li>Largest Rectangle in Histogram（Leetcode #84）</li>
+<li>Evaluate Reverse Polish Notation (Leetcode #150)</li>
+</ol>
+<a id="more"></a>
+<hr>
+<h1 id="Regular-Expression-Matching"><a href="#Regular-Expression-Matching" class="headerlink" title="Regular Expression Matching"></a>Regular Expression Matching</h1><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given an input string (s) and a pattern (p), implement regular expression matching with support for ‘.’ and ‘*‘.<br>‘.’ Matches any single character.<br>‘*‘ Matches zero or more of the preceding element.<br>The matching should cover the entire input string (not partial).<br><strong>Note:</strong><br>s could be empty and contains only lowercase letters a-z.<br>p could be empty and contains only lowercase letters a-z, and characters like . or *.<br><strong>Example 2:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">s &#x3D; &quot;aa&quot;</span><br><span class="line">p &#x3D; &quot;a*&quot;</span><br><span class="line">Output: true</span><br><span class="line">Explanation: &#39;*&#39; means zero or more of the precedeng element, &#39;a&#39;. Therefore, by repeating &#39;a&#39; once, it becomes &quot;aa&quot;.</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>本题采用递归完成。可以分为两个部分：第二个字符是’*‘与不是。若第二个字符不是，则直接比对当前第一个是否相等，若不相等返回false,相等则返回剩余部分是否相等。若第二个字符是’*‘,则问题可以分为两种情况：</p>
+<ol>
+<li>若当前第一个字符不相等，忽略*(对应于匹配p.substr(2))。</li>
+<li>若当前第一个相等，要么忽略*,要么删去当前的相等字符(s.substr(1))。</li>
+</ol>
+<h2 id="解题方案"><a href="#解题方案" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isMatch</span><span class="params">(<span class="built_in">string</span> s, <span class="built_in">string</span> p)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(p.empty())</span><br><span class="line">            <span class="keyword">return</span> s.empty();</span><br><span class="line">        <span class="keyword">if</span>(p[<span class="number">1</span>]!=<span class="string">'*'</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(s[<span class="number">0</span>]==p[<span class="number">0</span>] || p[<span class="number">0</span>]==<span class="string">'.'</span> &amp;&amp; !s.empty())</span><br><span class="line">                <span class="keyword">return</span> isMatch(s.substr(<span class="number">1</span>),p.substr(<span class="number">1</span>));</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(s[<span class="number">0</span>]==p[<span class="number">0</span>] || p[<span class="number">0</span>]==<span class="string">'.'</span> &amp;&amp; !s.empty())&#123;</span><br><span class="line">                <span class="keyword">if</span>(isMatch(s,p.substr(<span class="number">2</span>)))</span><br><span class="line">                   <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">                s=s.substr(<span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> isMatch(s,p.substr(<span class="number">2</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（Wildcard-Matching-Leetcode-44"><a href="#扩展（Wildcard-Matching-Leetcode-44" class="headerlink" title="扩展（Wildcard Matching Leetcode #44)"></a>扩展（Wildcard Matching Leetcode #44)</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for ‘?’ and ‘*‘.<br>‘?’ Matches any single character.<br>‘*‘ Matches any sequence of characters (including the empty sequence).<br>The matching should cover the entire input string (not partial).<br><strong>Note:</strong><br>s could be empty and contains only lowercase letters a-z.<br>p could be empty and contains only lowercase letters a-z, and characters like ? or *.<br><strong>Example 3:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">s &#x3D; &quot;cb&quot;</span><br><span class="line">p &#x3D; &quot;?a&quot;</span><br><span class="line">Output: false</span><br><span class="line">Explanation: &#39;?&#39; matches &#39;c&#39;, but the second letter is &#39;a&#39;, which does not match &#39;b&#39;.</span><br></pre></td></tr></table></figure></p>
+<h3 id="解题思路（递归）"><a href="#解题思路（递归）" class="headerlink" title="解题思路（递归）"></a>解题思路（递归）</h3><p>递归解法的思路与上一题类似，若当前模式串字符为’*‘，则略过所有’*‘，若模式串略过’*‘后已到达尾部，必然匹配，否则递归式匹配s,p,若后者不匹配，++s，观察s是否为空（成功匹配）。<br>若当前模式串或主串为空，返回二者是否均为空。<br>若当前首字符相等，递归式匹配二者的下一个。<br>若当前不相等，不匹配。<br>本递归式解法时间复杂度为O(n!*m!),仅仅为了理解题意。</p>
+<h3 id="解题方案-1"><a href="#解题方案-1" class="headerlink" title="解题方案"></a>解题方案</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isMatch</span><span class="params">(<span class="built_in">string</span> s, <span class="built_in">string</span> p)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(p[<span class="number">0</span>]==<span class="string">'*'</span>)&#123;</span><br><span class="line">            <span class="keyword">while</span>(p[<span class="number">0</span>]==<span class="string">'*'</span>) p=p.substr(<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(p.empty()) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            <span class="keyword">while</span>(!s.empty() &amp;&amp; !isMatch(s,p)) s=s.substr(<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">return</span> !s.empty();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(p.empty()||s.empty())</span><br><span class="line">            <span class="keyword">return</span> s==p;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(s[<span class="number">0</span>]==p[<span class="number">0</span>] || p[<span class="number">0</span>]==<span class="string">'?'</span>) <span class="keyword">return</span> isMatch(s.substr(<span class="number">1</span>),p.substr(<span class="number">1</span>));</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="解题思路（迭代）"><a href="#解题思路（迭代）" class="headerlink" title="解题思路（迭代）"></a>解题思路（迭代）</h3><p>主要是’*‘的匹配，p每遇到一个’*‘，就保留住当前’*‘坐标与s的坐标，然后s，若不成功则重新扫描。</p>
+<h3 id="解题方案（迭代）"><a href="#解题方案（迭代）" class="headerlink" title="解题方案（迭代）"></a>解题方案（迭代）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isMatch</span><span class="params">(<span class="built_in">string</span> s, <span class="built_in">string</span> p)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>  slen = s.<span class="built_in">size</span>(), plen = p.<span class="built_in">size</span>(), i, j, iStar = <span class="number">-1</span>, jStar = <span class="number">-1</span>;</span><br><span class="line">	    <span class="keyword">for</span> (i = <span class="number">0</span>, j = <span class="number">0</span>; i&lt;slen; ++i, ++j) &#123;</span><br><span class="line">		    <span class="keyword">if</span> (p[j] == <span class="string">'*'</span>) &#123; <span class="comment">//meet a new '*', update traceback i/j info</span></span><br><span class="line">			    iStar = i;<span class="comment">//record i</span></span><br><span class="line">			    jStar = j;<span class="comment">//record j</span></span><br><span class="line">			    --i;</span><br><span class="line">		    &#125;</span><br><span class="line">		    <span class="keyword">else</span> &#123;</span><br><span class="line">			    <span class="keyword">if</span> (p[j] != s[i] &amp;&amp; p[j] != <span class="string">'?'</span>) &#123;  <span class="comment">// mismatch happens</span></span><br><span class="line">				    <span class="keyword">if</span> (iStar &gt;= <span class="number">0</span>) &#123; <span class="comment">// met a '*' before, then do traceback</span></span><br><span class="line">					    i = iStar++;</span><br><span class="line">					    j = jStar;</span><br><span class="line">				    &#125;</span><br><span class="line">				    <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// otherwise fail</span></span><br><span class="line">			    &#125;</span><br><span class="line">		    &#125;</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="keyword">while</span> (p[j] == <span class="string">'*'</span>) ++j;</span><br><span class="line">	    <span class="keyword">return</span> j == plen;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Longest-Common-Prefix（Leetcode-14）"><a href="#Longest-Common-Prefix（Leetcode-14）" class="headerlink" title="Longest Common Prefix（Leetcode #14）"></a>Longest Common Prefix（Leetcode #14）</h1><h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p>Write a function to find the longest common prefix string amongst an array of strings.<br>If there is no common prefix, return an empty string “”.<br><strong>Example 1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: [&quot;flower&quot;,&quot;flow&quot;,&quot;flight&quot;]</span><br><span class="line">Output: &quot;fl&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-1"><a href="#解题思路-1" class="headerlink" title="解题思路"></a>解题思路</h2><p>纵向比较，拿每个str与第一行相比配，不匹配当即返回。</p>
+<h2 id="解题方案-2"><a href="#解题方案-2" class="headerlink" title="解题方案"></a>解题方案</h2><p>(由于STL的实现原因，下述代码不会导致数组越界）<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">string</span> <span class="title">longestCommonPrefix</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&amp; strs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(strs.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i!=strs[<span class="number">0</span>].<span class="built_in">size</span>();++i)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">size_t</span> j=<span class="number">1</span>;j!=strs.<span class="built_in">size</span>();++j)</span><br><span class="line">                <span class="keyword">if</span>(strs[j][i]!=strs[<span class="number">0</span>][i]) <span class="keyword">return</span> strs[<span class="number">0</span>].substr(<span class="number">0</span>,i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> strs[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="Valid-Number-Leetcode-65"><a href="#Valid-Number-Leetcode-65" class="headerlink" title="Valid Number (Leetcode #65)"></a>Valid Number (Leetcode #65)</h1><h2 id="解题思路-2"><a href="#解题思路-2" class="headerlink" title="解题思路"></a>解题思路</h2><p>此题与我在解析JSON数字时十分相似，但JSON格式与此不太相同。此外，本题也可以使用有限自动机实现。</p>
+<h2 id="解题方案-3"><a href="#解题方案-3" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isNumeric</span><span class="params">(<span class="keyword">char</span>* s)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(*s==<span class="string">'\0'</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(*s==<span class="string">'+'</span>||*s==<span class="string">'-'</span>)</span><br><span class="line">            ++s;</span><br><span class="line">        <span class="keyword">while</span>(<span class="built_in">isdigit</span>(*s)) ++s;</span><br><span class="line">        <span class="keyword">if</span>(*s==<span class="string">'.'</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(!<span class="built_in">isdigit</span>(*(s+<span class="number">1</span>)))</span><br><span class="line">               <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">else</span> ++s;</span><br><span class="line">            <span class="keyword">while</span>(<span class="built_in">isdigit</span>(*s)) ++s;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">toupper</span>(*s)==<span class="string">'E'</span>)&#123;</span><br><span class="line">            ++s;</span><br><span class="line">            <span class="keyword">if</span>(*(s)==<span class="string">'+'</span>||*(s)==<span class="string">'-'</span>)</span><br><span class="line">                ++s;</span><br><span class="line">            <span class="keyword">if</span>(!<span class="built_in">isdigit</span>(*s))</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">while</span>(<span class="built_in">isdigit</span>(*s)) ++s;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (*s==<span class="string">'\0'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Integer-to-Roman（Leetcode-12）"><a href="#Integer-to-Roman（Leetcode-12）" class="headerlink" title="Integer to Roman（Leetcode #12）"></a>Integer to Roman（Leetcode #12）</h1><h2 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h2><p>Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Symbol       Value</span><br><span class="line">I             1</span><br><span class="line">V             5</span><br><span class="line">X             10</span><br><span class="line">L             50</span><br><span class="line">C             100</span><br><span class="line">D             500</span><br><span class="line">M             1000</span><br></pre></td></tr></table></figure><br>For example, two is written as II in Roman numeral, just two one’s added together. Twelve is written as, XII, which is simply X + II. The number twenty seven is written as XXVII, which is XX + V + II.<br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: 58</span><br><span class="line">Output: &quot;LVIII&quot;</span><br><span class="line">Explanation: C &#x3D; 100, L &#x3D; 50, XXX &#x3D; 30 and III &#x3D; 3.</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-3"><a href="#解题思路-3" class="headerlink" title="解题思路"></a>解题思路</h2><p>本题存在两种解法，一种为O（1），非常奇怪的特解。一种为通用解。通用解的做法就是取出所有的单位（共13个），然后不断在string中加入。</p>
+<h2 id="解题方案-4"><a href="#解题方案-4" class="headerlink" title="解题方案"></a>解题方案</h2><h3 id="特解"><a href="#特解" class="headerlink" title="特解"></a>特解</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">string</span> <span class="title">intToRoman</span><span class="params">(<span class="keyword">int</span> num)</span> </span>&#123;</span><br><span class="line">	    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; M = &#123; <span class="string">""</span>, <span class="string">"M"</span>, <span class="string">"MM"</span>, <span class="string">"MMM"</span> &#125;;</span><br><span class="line">	    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; C = &#123; <span class="string">""</span>, <span class="string">"C"</span>, <span class="string">"CC"</span>, <span class="string">"CCC"</span>, <span class="string">"CD"</span>, <span class="string">"D"</span>, <span class="string">"DC"</span>, <span class="string">"DCC"</span>, <span class="string">"DCCC"</span>, <span class="string">"CM"</span> &#125;;</span><br><span class="line">	    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; X = &#123; <span class="string">""</span>, <span class="string">"X"</span>, <span class="string">"XX"</span>, <span class="string">"XXX"</span>, <span class="string">"XL"</span>, <span class="string">"L"</span>, <span class="string">"LX"</span>, <span class="string">"LXX"</span>, <span class="string">"LXXX"</span>, <span class="string">"XC"</span> &#125;;</span><br><span class="line">	    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; I = &#123; <span class="string">""</span>, <span class="string">"I"</span>, <span class="string">"II"</span>, <span class="string">"III"</span>, <span class="string">"IV"</span>, <span class="string">"V"</span>, <span class="string">"VI"</span>, <span class="string">"VII"</span>, <span class="string">"VIII"</span>, <span class="string">"IX"</span> &#125;;</span><br><span class="line">	    <span class="keyword">return</span> M[num / <span class="number">1000</span>] + C[(num % <span class="number">1000</span>) / <span class="number">100</span>] + X[(num % <span class="number">100</span>) / <span class="number">10</span>] + I[num % <span class="number">10</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="通用解"><a href="#通用解" class="headerlink" title="通用解"></a>通用解</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">string</span> <span class="title">intToRoman</span><span class="params">(<span class="keyword">int</span> num)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; unitS&#123;<span class="string">"M"</span>,<span class="string">"CM"</span>,<span class="string">"D"</span>,<span class="string">"CD"</span>,<span class="string">"C"</span>,<span class="string">"XC"</span>,<span class="string">"L"</span>,<span class="string">"XL"</span>,<span class="string">"X"</span>,<span class="string">"IX"</span>,<span class="string">"V"</span>,<span class="string">"IV"</span>,<span class="string">"I"</span>&#125;;</span><br><span class="line">        <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; unitD&#123;<span class="number">1000</span>,<span class="number">900</span>,<span class="number">500</span>,<span class="number">400</span>,<span class="number">100</span>,<span class="number">90</span>,<span class="number">50</span>,<span class="number">40</span>,<span class="number">10</span>,<span class="number">9</span>,<span class="number">5</span>,<span class="number">4</span>,<span class="number">1</span>&#125;;</span><br><span class="line">        <span class="built_in">string</span> res;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;num;++i)&#123;</span><br><span class="line">            <span class="keyword">size_t</span> count=num/unitD[i];</span><br><span class="line">            num%=unitD[i];</span><br><span class="line">            <span class="keyword">while</span>(count--) res+=unitS[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（Roman-to-Integer-Leetcode-13）"><a href="#扩展（Roman-to-Integer-Leetcode-13）" class="headerlink" title="扩展（Roman to Integer Leetcode#13）"></a>扩展（Roman to Integer Leetcode#13）</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>Example1:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: &quot;IX&quot;</span><br><span class="line">Output: 9</span><br></pre></td></tr></table></figure><br>Example2:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: &quot;LVIII&quot;</span><br><span class="line">Output: 58</span><br><span class="line">Explanation: C &#x3D; 100, L &#x3D; 50, XXX &#x3D; 30 and III &#x3D; 3.</span><br></pre></td></tr></table></figure></p>
+<h3 id="解题思路-4"><a href="#解题思路-4" class="headerlink" title="解题思路"></a>解题思路</h3><p>从后向前扫描，若第i位大于等于第i+1位，则加上第i位，否则减去。</p>
+<h3 id="解题方案-5"><a href="#解题方案-5" class="headerlink" title="解题方案"></a>解题方案</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">romanToInt</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(s.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(s.<span class="built_in">size</span>()==<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> match(s[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">int</span> res=match(s.back());</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=s.<span class="built_in">size</span>()<span class="number">-2</span>;i!=<span class="number">-1</span>;--i)&#123;</span><br><span class="line">            <span class="keyword">int</span> m=match(s[i]);</span><br><span class="line">            <span class="keyword">int</span> n=match(s[i+<span class="number">1</span>]);</span><br><span class="line">            res+=m&gt;=n?m:-m;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">int</span> <span class="title">match</span><span class="params">(<span class="keyword">char</span> c)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">switch</span> (c) &#123;</span><br><span class="line">	<span class="keyword">case</span> <span class="string">'I'</span>:<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="string">'V'</span>:<span class="keyword">return</span> <span class="number">5</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="string">'X'</span>:<span class="keyword">return</span> <span class="number">10</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="string">'L'</span>:<span class="keyword">return</span> <span class="number">50</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="string">'C'</span>:<span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="string">'D'</span>:<span class="keyword">return</span> <span class="number">500</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="string">'M'</span>:<span class="keyword">return</span> <span class="number">1000</span>;</span><br><span class="line">	<span class="keyword">default</span>:<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Anagrams（Leetcode-242）"><a href="#Anagrams（Leetcode-242）" class="headerlink" title="Anagrams（Leetcode #242）"></a>Anagrams（Leetcode #242）</h1><h2 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given two strings s and t , write a function to determine if t is an anagram of s.<br><strong>Example1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: s &#x3D; &quot;anagram&quot;, t &#x3D; &quot;nagaram&quot;</span><br><span class="line">Output: true</span><br></pre></td></tr></table></figure><br><strong>Example2:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: s &#x3D; &quot;rat&quot;, t &#x3D; &quot;car&quot;</span><br><span class="line">Output: false</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-5"><a href="#解题思路-5" class="headerlink" title="解题思路"></a>解题思路</h2><p>相当容易的题目，以空间换时间即可。</p>
+<h2 id="解题方案-6"><a href="#解题方案-6" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isAnagram</span><span class="params">(<span class="built_in">string</span> s, <span class="built_in">string</span> t)</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">hash</span><span class="params">(<span class="number">256</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> c:s)</span><br><span class="line">            ++hash[c];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> c:t)</span><br><span class="line">            --hash[c];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> i:hash)</span><br><span class="line">            <span class="keyword">if</span>(i!=<span class="number">0</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（Group-Anagrams-Leetcode-49"><a href="#扩展（Group-Anagrams-Leetcode-49" class="headerlink" title="扩展（Group Anagrams Leetcode #49)"></a>扩展（Group Anagrams Leetcode #49)</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><p>Given an array of strings, group anagrams together.<br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Input: [&quot;eat&quot;, &quot;tea&quot;, &quot;tan&quot;, &quot;ate&quot;, &quot;nat&quot;, &quot;bat&quot;],</span><br><span class="line">Output:</span><br><span class="line">[</span><br><span class="line">  [&quot;ate&quot;,&quot;eat&quot;,&quot;tea&quot;],</span><br><span class="line">  [&quot;nat&quot;,&quot;tan&quot;],</span><br><span class="line">  [&quot;bat&quot;]</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<h3 id="解题思路-6"><a href="#解题思路-6" class="headerlink" title="解题思路"></a>解题思路</h3><p>从常规的角度来说，每一个放在一起的字符串排序之后必然相同，因此可以用一个<code>hashtable&lt;string,string&gt;</code>来存储结果，前一个string是排序结果，后一个是真实值。结着只要遍历vector即可。</p>
+<p>本题另有一种巧妙解法，是人为地构建hash函数，每一组string对应一个独有的key。用一个map存储每个key对应的res数组的行号，若当前key已存储在map中，直接res[map[key]].push_back，否则在res中插入一个新的vector，并且更新map[key]=res.size()-1;</p>
+<h3 id="解题方案-7"><a href="#解题方案-7" class="headerlink" title="解题方案"></a>解题方案</h3><h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; &gt; <span class="title">groupAnagrams</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&amp; strs)</span> </span>&#123;</span><br><span class="line">	    <span class="built_in">unordered_map</span>&lt;<span class="built_in">string</span>, <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&gt; mp;</span><br><span class="line">	    <span class="keyword">for</span> (<span class="built_in">string</span> s : strs) &#123;</span><br><span class="line">		    <span class="built_in">string</span> t = s;</span><br><span class="line">		    sort(t.<span class="built_in">begin</span>(), t.<span class="built_in">end</span>());</span><br><span class="line">		    mp[t].push_back(s);</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&gt; anagrams;</span><br><span class="line">	    <span class="keyword">for</span> (<span class="keyword">auto</span> m : mp) &#123;</span><br><span class="line">		    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; <span class="title">anagram</span><span class="params">(m.second.<span class="built_in">begin</span>(), m.second.<span class="built_in">end</span>())</span></span>;</span><br><span class="line">		    anagrams.push_back(anagram);</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="keyword">return</span> anagrams;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&gt; <span class="title">groupAnagrams</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&amp; strs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; prime&#123;<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">17</span>, <span class="number">19</span>, <span class="number">23</span>, <span class="number">29</span>, <span class="number">31</span>, <span class="number">41</span>, <span class="number">43</span>, <span class="number">47</span>, <span class="number">53</span>, <span class="number">59</span>, <span class="number">61</span>, <span class="number">67</span>, <span class="number">71</span>, <span class="number">73</span>, <span class="number">79</span>, <span class="number">83</span>, <span class="number">89</span>, <span class="number">97</span>, <span class="number">101</span>, <span class="number">103</span>&#125;;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; &gt; res;</span><br><span class="line">        <span class="built_in">unordered_map</span>&lt;<span class="keyword">int</span>,<span class="keyword">int</span>&gt; <span class="built_in">map</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span>&amp; s:strs)&#123;</span><br><span class="line">            <span class="keyword">int</span> key=<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">char</span> c:s)</span><br><span class="line">                key*=prime[c-<span class="string">'a'</span>];</span><br><span class="line">            <span class="keyword">if</span>(<span class="built_in">map</span>.<span class="built_in">find</span>(key)!=<span class="built_in">map</span>.<span class="built_in">end</span>())</span><br><span class="line">               res[<span class="built_in">map</span>[key]].push_back(s);      </span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                res.push_back(<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&#123;s&#125;);</span><br><span class="line">                <span class="built_in">map</span>[key]=res.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Simplify-Path-Leetcode-242"><a href="#Simplify-Path-Leetcode-242" class="headerlink" title="Simplify Path (Leetcode #242)"></a>Simplify Path (Leetcode #242)</h1><h2 id="题目描述-7"><a href="#题目描述-7" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given an absolute path for a file (Unix-style), simplify it.<br>For example,<br>path = “/home/“, =&gt; “/home”<br>path = “/a/./b/../../c/“, =&gt; “/c”<br><strong>Corner Cases:</strong><br>Did you consider the case where path = “/../“?<br>In this case, you should return “/“.<br>Another corner case is the path might contain multiple slashes ‘/‘ together, such as “/home//foo/“.In this case, you should ignore redundant slashes and return “/home/foo”.</p>
+<h2 id="解题思路-7"><a href="#解题思路-7" class="headerlink" title="解题思路"></a>解题思路</h2><p>C++没有split，因此我们必须借助于getline(ss,temp,’/‘)。本题需要利用一个stack，当temp为””或”.”时直接无视，若temp为”..”且当前栈非空则pop，否则push temp。最后取出栈中元素，依次加上”/“。最后需要注意的是res若为空，返回的是”/“。</p>
+<h2 id="解题方案-8"><a href="#解题方案-8" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">string</span> <span class="title">simplifyPath</span><span class="params">(<span class="built_in">string</span> path)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">string</span> res,temp;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; stk;</span><br><span class="line">        <span class="function"><span class="built_in">stringstream</span> <span class="title">ss</span><span class="params">(path)</span></span>;</span><br><span class="line">        <span class="keyword">while</span>(getline(ss,temp,<span class="string">'/'</span>))&#123;</span><br><span class="line">            <span class="keyword">if</span>(temp==<span class="string">""</span>||temp==<span class="string">"."</span>) <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">if</span>(temp==<span class="string">".."</span>&amp;&amp; !stk.empty()) stk.pop_back();</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(temp!=<span class="string">".."</span>) stk.push_back(temp);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span>&amp; str:stk)</span><br><span class="line">            res+=<span class="string">"/"</span>+str;</span><br><span class="line">        <span class="keyword">return</span> res.empty()?<span class="string">"/"</span>:res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Length-of-Last-Word-Leetcode-58"><a href="#Length-of-Last-Word-Leetcode-58" class="headerlink" title="Length of Last Word (Leetcode #58)"></a>Length of Last Word (Leetcode #58)</h1><h2 id="题目描述-8"><a href="#题目描述-8" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a string s consists of upper/lower-case alphabets and empty space characters ‘ ‘, return the length of last word in the string.If the last word does not exist, return 0.<br>Note: A word is defined as a character sequence consists of non-space characters only.<br>Example:<br>Input: “Hello World”<br>Output: 5</p>
+<h2 id="解题思路-8"><a href="#解题思路-8" class="headerlink" title="解题思路"></a>解题思路</h2><p>非常简单的题目，从后向前遍历，将第一个非” “字符设为起点，再将接下来的第一个” “设为终点即可。</p>
+<h2 id="解题方案-9"><a href="#解题方案-9" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">lengthOfLastWord</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">auto</span> beg = s.rbegin();</span><br><span class="line">        <span class="keyword">while</span>(beg!=s.rend() &amp;&amp; *beg==<span class="string">' '</span>) ++beg;</span><br><span class="line">        <span class="keyword">auto</span> <span class="built_in">end</span> = beg;</span><br><span class="line">        <span class="keyword">while</span>(<span class="built_in">end</span>!=s.rend() &amp;&amp; *<span class="built_in">end</span>!=<span class="string">' '</span>) ++<span class="built_in">end</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">end</span>-beg;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Valid-Parentheses-Leetcode-20"><a href="#Valid-Parentheses-Leetcode-20" class="headerlink" title="Valid Parentheses (Leetcode #20)"></a>Valid Parentheses (Leetcode #20)</h1><h2 id="解题思路-9"><a href="#解题思路-9" class="headerlink" title="解题思路"></a>解题思路</h2><p>栈的标准应用。</p>
+<h2 id="解题方案-10"><a href="#解题方案-10" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isValid</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(s.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(s.<span class="built_in">size</span>()&amp;<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="built_in">stack</span>&lt;<span class="keyword">char</span>&gt; stk;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> c :s)&#123;</span><br><span class="line">            <span class="keyword">switch</span>(c)&#123;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">'('</span>:stk.push(c);<span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">'['</span>:stk.push(c);<span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">'&#123;'</span>:stk.push(c);<span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">')'</span>:&#123;</span><br><span class="line">                    <span class="keyword">if</span>(stk.empty() || stk.top()!=<span class="string">'('</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                    <span class="keyword">else</span> stk.pop();</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">']'</span>:&#123;</span><br><span class="line">                    <span class="keyword">if</span>(stk.empty() || stk.top()!=<span class="string">'['</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                    <span class="keyword">else</span> stk.pop();</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">'&#125;'</span>:&#123;</span><br><span class="line">                    <span class="keyword">if</span>(stk.empty() || stk.top()!=<span class="string">'&#123;'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                    <span class="keyword">else</span> stk.pop();</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stk.empty();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（Longest-Valid-Parentheses-Leetcode-32"><a href="#扩展（Longest-Valid-Parentheses-Leetcode-32" class="headerlink" title="扩展（Longest Valid Parentheses Leetcode #32)"></a>扩展（Longest Valid Parentheses Leetcode #32)</h2><h2 id="题目描述-9"><a href="#题目描述-9" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a string containing just the characters ‘(‘ and ‘)’, find the length of the longest valid (well-formed) parentheses substring.<br>Example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: &quot;)()())&quot;</span><br><span class="line">Output: 4</span><br><span class="line">Explanation: The longest valid parentheses substring is &quot;()()&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-10"><a href="#解题思路-10" class="headerlink" title="解题思路"></a>解题思路</h2><p>用栈存储每一个’(‘的位置，并且设立last表征上一个不匹配点’)’的位置。若当前匹配，根据stk的情况更新maxlen。</p>
+<h2 id="解题方案-11"><a href="#解题方案-11" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">longestValidParentheses</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(s.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="built_in">stack</span>&lt;<span class="keyword">int</span>&gt; stk;</span><br><span class="line">        <span class="keyword">int</span> maxlen=<span class="number">0</span>,last=<span class="number">-1</span>;  </span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i!=s.<span class="built_in">size</span>();++i)&#123;</span><br><span class="line">            <span class="keyword">if</span>(s[i]==<span class="string">'('</span>)</span><br><span class="line">                stk.push(i);</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(stk.empty())</span><br><span class="line">                    last=i;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    stk.pop();</span><br><span class="line">                    <span class="keyword">if</span>(stk.empty())</span><br><span class="line">                        maxlen=<span class="built_in">max</span>(maxlen,i-last);</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                        maxlen=<span class="built_in">max</span>(maxlen,i-stk.top());</span><br><span class="line">                        </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> maxlen;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Largest-Rectangle-in-Histogram（Leetcode-84）"><a href="#Largest-Rectangle-in-Histogram（Leetcode-84）" class="headerlink" title="Largest Rectangle in Histogram（Leetcode #84）"></a>Largest Rectangle in Histogram（Leetcode #84）</h1><h2 id="题目描述-10"><a href="#题目描述-10" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given n non-negative integers representing the histogram’s bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.<br><img src="http://static.zybuluo.com/zsmj2017/ryjh0nmuux2zdc7b2p6okyrw/image_1cl0sedd71qrq1kauccp19e5r5p19.png" alt="image_1cl0sedd71qrq1kauccp19e5r5p19.png-30.8kB"><br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: [2,1,5,6,2,3]</span><br><span class="line">Output: 10</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-11"><a href="#解题思路-11" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题十分类似于水库存水，解决方案是维护一个递增的栈，若当前元素小于栈顶，令其入栈，否则合并现有栈，直到栈顶元素小于当前元素。结尾是入栈元素0，再次完成合并。</p>
+<h2 id="解题方案-12"><a href="#解题方案-12" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">largestRectangleArea</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; heights)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(heights.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(heights.<span class="built_in">size</span>()==<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> heights[<span class="number">0</span>];</span><br><span class="line">        heights.push_back(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">stack</span>&lt;<span class="keyword">int</span>&gt; stk;</span><br><span class="line">        <span class="keyword">int</span> i=<span class="number">0</span>,j=<span class="number">0</span>,h=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(i&lt;heights.<span class="built_in">size</span>())&#123;</span><br><span class="line">            <span class="keyword">if</span>(stk.empty()||heights[i]&gt;heights[stk.top()])</span><br><span class="line">                stk.push(i++);</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="comment">//heights[i]&lt;heights[s.top()]</span></span><br><span class="line">			    <span class="comment">//so we compute the area from [s.top(),i) ,any elements in [s.top(),i) must be &gt;=s[i]</span></span><br><span class="line">                h=heights[stk.top()];</span><br><span class="line">                stk.pop();</span><br><span class="line">                j=stk.empty()?<span class="number">-1</span>:stk.top();</span><br><span class="line">                res=<span class="built_in">max</span>(res,h*(i-j<span class="number">-1</span>));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Evaluate-Reverse-Polish-Notation-Leetcode-150"><a href="#Evaluate-Reverse-Polish-Notation-Leetcode-150" class="headerlink" title="Evaluate Reverse Polish Notation (Leetcode #150)"></a>Evaluate Reverse Polish Notation (Leetcode #150)</h1><h2 id="题目描述-11"><a href="#题目描述-11" class="headerlink" title="题目描述"></a>题目描述</h2><p>Evaluate the value of an arithmetic expression in Reverse Polish Notation.Valid operators are +, -, *, /. Each operand may be an integer or another expression.<br><strong>Note:</strong><br>Division between two integers should truncate toward zero.<br>The given RPN expression is always valid. That means the expression would always evaluate to a result and there won’t be any divide by zero operation.<br>Example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: [&quot;2&quot;, &quot;1&quot;, &quot;+&quot;, &quot;3&quot;, &quot;*&quot;]</span><br><span class="line">Output: 9</span><br><span class="line">Explanation: ((2 + 1) * 3) &#x3D; 9</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-12"><a href="#解题思路-12" class="headerlink" title="解题思路"></a>解题思路</h2><p>逆波兰表达式求值，栈的典型应用，没有难点，带有浮点数的中缀表达式求值才好玩。</p>
+<h2 id="解题方案-13"><a href="#解题方案-13" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">evalRPN</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&amp; tokens)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">unordered_map</span>&lt;<span class="built_in">string</span>, function&lt;<span class="keyword">int</span>(<span class="keyword">int</span>, <span class="keyword">int</span>) &gt; &gt; op = &#123;</span><br><span class="line">		    &#123; <span class="string">"+"</span> , [](<span class="keyword">int</span> a, <span class="keyword">int</span> b) &#123; <span class="keyword">return</span> a + b; &#125; &#125;,</span><br><span class="line">		    &#123; <span class="string">"-"</span> , [](<span class="keyword">int</span> a, <span class="keyword">int</span> b) &#123; <span class="keyword">return</span> a - b; &#125; &#125;,</span><br><span class="line">		    &#123; <span class="string">"*"</span> , [](<span class="keyword">int</span> a, <span class="keyword">int</span> b) &#123; <span class="keyword">return</span> a * b; &#125; &#125;,</span><br><span class="line">		    &#123; <span class="string">"/"</span> , [](<span class="keyword">int</span> a, <span class="keyword">int</span> b) &#123; <span class="keyword">return</span> a / b; &#125; &#125;</span><br><span class="line">	    &#125;;</span><br><span class="line">        <span class="built_in">stack</span>&lt;<span class="keyword">int</span>&gt; stk;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span>&amp; s:tokens)&#123;</span><br><span class="line">            <span class="keyword">if</span>(op.<span class="built_in">find</span>(s)==op.<span class="built_in">end</span>())</span><br><span class="line">                stk.push(stoi(s));</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">int</span> num1=stk.top();stk.pop();</span><br><span class="line">                <span class="keyword">int</span> num2=stk.top();stk.pop();</span><br><span class="line">                stk.push(op[s](num2,num1));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stk.top();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（将中缀表达式变为后缀表达式）"><a href="#扩展（将中缀表达式变为后缀表达式）" class="headerlink" title="扩展（将中缀表达式变为后缀表达式）"></a>扩展（将中缀表达式变为后缀表达式）</h2><h3 id="解题思路-13"><a href="#解题思路-13" class="headerlink" title="解题思路"></a>解题思路</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">map</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt; isp = &#123; &#123; <span class="string">'('</span>,<span class="number">1</span>&#125;,&#123; <span class="string">'^'</span>,<span class="number">6</span>&#125;,&#123; <span class="string">'*'</span>,<span class="number">5</span>&#125;,&#123;<span class="string">'/'</span>,<span class="number">5</span> &#125;,&#123;<span class="string">'+'</span>,<span class="number">3</span>&#125;,&#123;<span class="string">'-'</span>,<span class="number">3</span>&#125;,&#123;<span class="string">')'</span>,<span class="number">7</span>&#125; &#125;;</span><br><span class="line"><span class="built_in">map</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt; icp = &#123; &#123; <span class="string">'('</span>,<span class="number">7</span>&#125;,&#123; <span class="string">'^'</span>,<span class="number">6</span>&#125;,&#123; <span class="string">'*'</span>,<span class="number">4</span>&#125;,&#123;<span class="string">'/'</span>,<span class="number">4</span> &#125;,&#123;<span class="string">'+'</span>,<span class="number">2</span>&#125;,&#123;<span class="string">'-'</span>,<span class="number">2</span>&#125;,&#123;<span class="string">')'</span>,<span class="number">1</span>&#125; &#125;;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>遍历字符串</li>
+<li>遇到数字直接rpn.push_back</li>
+<li>遇到操作符<br>①如果是左括号 直接入栈<br>②如果是右括号，pop出栈内所有元素，直到遇到一个左括号，再pop掉左括号<br>③如果是操作运算符：<br>  &nbsp;&nbsp;Ⅰ如果栈为空或者栈顶是左括号，入栈<br>  &nbsp;&nbsp;Ⅱ如果当前字符的icp高于栈顶字符的isp，入栈<br>  &nbsp;&nbsp;Ⅲ并不高于isp，弹出所有大于等于当前字符icp的操作符并且送入rpn，弹完之后把当前的push进去<br>④遍历结束，弹出栈内操作符，送入rpn</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Data-Structures-and-Algorithms/" rel="tag"># Data Structures and Algorithms</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/15/OJ%20exercise14/" rel="next" title="OJ每日练习（14）">
+                <i class="fa fa-chevron-left"></i> OJ每日练习（14）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/17/OJ%20exercise16/" rel="prev" title="OJ每日练习（16）">
+                OJ每日练习（16） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#题目名称"><span class="nav-number">1.</span> <span class="nav-text">题目名称</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Regular-Expression-Matching"><span class="nav-number">2.</span> <span class="nav-text">Regular Expression Matching</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述"><span class="nav-number">2.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路"><span class="nav-number">2.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案"><span class="nav-number">2.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（Wildcard-Matching-Leetcode-44"><span class="nav-number">2.4.</span> <span class="nav-text">扩展（Wildcard Matching Leetcode #44)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#题目描述-1"><span class="nav-number">2.4.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路（递归）"><span class="nav-number">2.4.2.</span> <span class="nav-text">解题思路（递归）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-1"><span class="nav-number">2.4.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路（迭代）"><span class="nav-number">2.4.4.</span> <span class="nav-text">解题思路（迭代）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案（迭代）"><span class="nav-number">2.4.5.</span> <span class="nav-text">解题方案（迭代）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Longest-Common-Prefix（Leetcode-14）"><span class="nav-number">3.</span> <span class="nav-text">Longest Common Prefix（Leetcode #14）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-2"><span class="nav-number">3.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-1"><span class="nav-number">3.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-2"><span class="nav-number">3.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Valid-Number-Leetcode-65"><span class="nav-number">4.</span> <span class="nav-text">Valid Number (Leetcode #65)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-2"><span class="nav-number">4.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-3"><span class="nav-number">4.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Integer-to-Roman（Leetcode-12）"><span class="nav-number">5.</span> <span class="nav-text">Integer to Roman（Leetcode #12）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-3"><span class="nav-number">5.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-3"><span class="nav-number">5.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-4"><span class="nav-number">5.3.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#特解"><span class="nav-number">5.3.1.</span> <span class="nav-text">特解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通用解"><span class="nav-number">5.3.2.</span> <span class="nav-text">通用解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（Roman-to-Integer-Leetcode-13）"><span class="nav-number">5.4.</span> <span class="nav-text">扩展（Roman to Integer Leetcode#13）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#题目描述-4"><span class="nav-number">5.4.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-4"><span class="nav-number">5.4.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-5"><span class="nav-number">5.4.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Anagrams（Leetcode-242）"><span class="nav-number">6.</span> <span class="nav-text">Anagrams（Leetcode #242）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-5"><span class="nav-number">6.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-5"><span class="nav-number">6.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-6"><span class="nav-number">6.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（Group-Anagrams-Leetcode-49"><span class="nav-number">6.4.</span> <span class="nav-text">扩展（Group Anagrams Leetcode #49)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#题目描述-6"><span class="nav-number">6.4.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-6"><span class="nav-number">6.4.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-7"><span class="nav-number">6.4.3.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#排序"><span class="nav-number">6.4.3.1.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hash"><span class="nav-number">6.4.3.2.</span> <span class="nav-text">hash</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Simplify-Path-Leetcode-242"><span class="nav-number">7.</span> <span class="nav-text">Simplify Path (Leetcode #242)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-7"><span class="nav-number">7.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-7"><span class="nav-number">7.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-8"><span class="nav-number">7.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Length-of-Last-Word-Leetcode-58"><span class="nav-number">8.</span> <span class="nav-text">Length of Last Word (Leetcode #58)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-8"><span class="nav-number">8.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-8"><span class="nav-number">8.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-9"><span class="nav-number">8.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Valid-Parentheses-Leetcode-20"><span class="nav-number">9.</span> <span class="nav-text">Valid Parentheses (Leetcode #20)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-9"><span class="nav-number">9.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-10"><span class="nav-number">9.2.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（Longest-Valid-Parentheses-Leetcode-32"><span class="nav-number">9.3.</span> <span class="nav-text">扩展（Longest Valid Parentheses Leetcode #32)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-9"><span class="nav-number">9.4.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-10"><span class="nav-number">9.5.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-11"><span class="nav-number">9.6.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Largest-Rectangle-in-Histogram（Leetcode-84）"><span class="nav-number">10.</span> <span class="nav-text">Largest Rectangle in Histogram（Leetcode #84）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-10"><span class="nav-number">10.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-11"><span class="nav-number">10.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-12"><span class="nav-number">10.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Evaluate-Reverse-Polish-Notation-Leetcode-150"><span class="nav-number">11.</span> <span class="nav-text">Evaluate Reverse Polish Notation (Leetcode #150)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-11"><span class="nav-number">11.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-12"><span class="nav-number">11.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-13"><span class="nav-number">11.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（将中缀表达式变为后缀表达式）"><span class="nav-number">11.4.</span> <span class="nav-text">扩展（将中缀表达式变为后缀表达式）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-13"><span class="nav-number">11.4.1.</span> <span class="nav-text">解题思路</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

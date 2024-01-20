@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,对象模型," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;在C++继承模型中，derived class object所表现出来的东西，是其自身members与其base classes’s members的总和。它们出现的次序没有强制性约定，一般来说，base class members将先出现，但属于virtual base class的除外（virtual继承总能带来各种各样的意外）。 下面提出一个问题：假设我们单独为Point2d">
+<meta name="keywords" content="C++,对象模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Data语义学——继承与Data Member">
+<meta property="og:url" content="https://xander.wiki/2018/05/13/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E7%BB%A7%E6%89%BF%E4%B8%8EData%20Member/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;在C++继承模型中，derived class object所表现出来的东西，是其自身members与其base classes’s members的总和。它们出现的次序没有强制性约定，一般来说，base class members将先出现，但属于virtual base class的除外（virtual继承总能带来各种各样的意外）。 下面提出一个问题：假设我们单独为Point2d">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/jp5tg6qlunoszrzobspufq5a/image_1cdbs9ibch0pqjd1og0ea7h5e9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/480bzhsehdfb517ptj3v2iru/image_1cdbu8p77snq1si1gvs19qs91sm.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/hbvlhopo6pvzo73ea6baayas/image_1cdbuglib14gi1vio1i3ccmf19gl13.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/b54p6wdi2kc9m6tqalxs62x9/image_1cdc03hof1afb1j9j14on1dil1bb1g.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/8mj8sx1d5fr03mnp37e7c0kh/image_1cdc28lnr174m1jog1ij11uoiiun1t.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/nzscxmojht7lnb6q0j9grxuj/image_1cdcepq3a1kujvm18c68ci1isp9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/st5vbsypleod3p5gjnojmjeo/image_1cdcfmt601mlv19nbvcla301euc13.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/pu00iyx7251hakdp3btf68l8/image_1cdcfslrde8v2vj191013rmn291g.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/zd7pgmuplp23hivdldpv3v94/image_1cdci6k8ch0bm5b1rhh7f0lu81t.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/79qtpiuqhabp3bbzwoinc0gm/image_1cdcliqiiia8k7053914auc012a.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ynf51jtexz0pk33jfkjnvact/image_1cdcn3a2gnqm15dlcje1q3j19tn2n.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/0z7276ju43vcjtwydzzml15g/image_1cdcnn2kagir14on1lkg65rdd9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/uqayb22chpgqgdckcsnqw8cq/image_1cdcp8gvs28o10cvt9v19913f0m.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/uv41z78c5sk81pb30zy84y42/image_1cdcqbki0avl6a816871u33f8g13.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/jp5tg6qlunoszrzobspufq5a/image_1cdbs9ibch0pqjd1og0ea7h5e9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/05/13/Data语义学——继承与Data Member/"/>
+
+
+
+
+
+  <title>Data语义学——继承与Data Member | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/13/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E7%BB%A7%E6%89%BF%E4%B8%8EData%20Member/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Data语义学——继承与Data Member</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-13T12:01:00+08:00">
+                2018-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在C++继承模型中，derived class object所表现出来的东西，是其自身members与其base classes’s members的总和。它们出现的次序没有强制性约定，一般来说，base class members将先出现，但属于virtual base class的除外（virtual继承总能带来各种各样的意外）。</p>
+<p>下面提出一个问题：假设我们单独为Point2d与Point3d建立class，而不是令他们派生自某个固有继承体系（如Inside the C++ object model 关于对象一章）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">float</span> x,y;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>下述的各个小节将依次讨论不同情况下的区别。在没有virtual functions的情况下，我们可以认为上述两种写法的对象布局与C struct一致：<br><img src="http://static.zybuluo.com/zsmj2017/jp5tg6qlunoszrzobspufq5a/image_1cdbs9ibch0pqjd1og0ea7h5e9.png" alt="image_1cdbs9ibch0pqjd1og0ea7h5e9.png-26.9kB"></p>
+<hr>
+<h1 id="Inheritance-without-Polymorphism"><a href="#Inheritance-without-Polymorphism" class="headerlink" title="Inheritance without Polymorphism"></a>Inheritance without Polymorphism</h1><p>&nbsp;<br>一般来说，C++中有将非尾端类设计为抽象类的准则，假设我们暂且忽略这一点，将Point3d derived from Point2d，从而保证共享数据和操作数据的方法。一般来说，具体继承不会增加空间或时间的开销，有继承体系如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point2d(<span class="keyword">float</span> x=<span class="number">0.0</span>,<span class="keyword">float</span> y=<span class="number">0.0</span>):_x(x),_y(y) &#123;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> _x;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> _y;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">x</span><span class="params">(<span class="keyword">float</span> newX)</span> </span>&#123;_x=newX;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">y</span><span class="params">(<span class="keyword">float</span> newY)</span> </span>&#123;_y=newY;&#125;</span><br><span class="line">    <span class="keyword">void</span> <span class="keyword">operator</span>+=(<span class="keyword">const</span> Point2d&amp; rhs)&#123;</span><br><span class="line">        _x+=rhs._x;</span><br><span class="line">        _y+=rhs._y;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> _x,_y;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point3d(<span class="keyword">float</span> x=<span class="number">0.0</span>,<span class="keyword">float</span> y=<span class="number">0.0</span>,<span class="keyword">float</span> z=<span class="number">0.0</span>)</span><br><span class="line">        :Point2d(x,y),_z(z) &#123;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">z</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> _z;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">z</span><span class="params">(<span class="keyword">float</span> newZ)</span> </span>&#123;_z=newZ;&#125;</span><br><span class="line">    <span class="keyword">void</span> <span class="keyword">operator</span>+=(<span class="keyword">const</span> Point3d&amp; rhs)&#123;</span><br><span class="line">        Point2d::<span class="keyword">operator</span>+=(rhs);</span><br><span class="line">        _z+=rhs.z();</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> _z;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>它们的对象模型如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/480bzhsehdfb517ptj3v2iru/image_1cdbu8p77snq1si1gvs19qs91sm.png" alt="image_1cdbu8p77snq1si1gvs19qs91sm.png-75.4kB"></p>
+<h2 id="空间膨胀"><a href="#空间膨胀" class="headerlink" title="空间膨胀"></a>空间膨胀</h2><p>将一个class分为多层，可能会因为“表现class体系的抽象化”而扩张所需空间。C++语言保证，<strong>出现在derived class中的base class subobject具备完整性</strong>，具体如下述实例所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> val;</span><br><span class="line">    <span class="keyword">char</span> c1;</span><br><span class="line">    <span class="keyword">char</span> c2;</span><br><span class="line">    <span class="keyword">char</span> c3;</span><br><span class="line">    <span class="keyword">char</span> c4;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br><img src="http://static.zybuluo.com/zsmj2017/hbvlhopo6pvzo73ea6baayas/image_1cdbuglib14gi1vio1i3ccmf19gl13.png" alt="image_1cdbuglib14gi1vio1i3ccmf19gl13.png-22.9kB"><br>图中左侧的数字表明在32位机器上，这一部分占用了多少bytes（padding表示alignment带来的影响）。<br>现假设出于某些需要，我们将该Concrete分为三层：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete1</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> val;</span><br><span class="line">    <span class="keyword">char</span> bit1;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Concrete2</span>:</span><span class="keyword">public</span> Concrete1&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> bit2;</span><br><span class="line">&#125;</span><br><span class="line">clss Concrete3:<span class="keyword">public</span> Concrete2&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">char</span> bit3;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>可能从设计的角度来说该结构比较合理，但我们会发现现在的Concrete3已经扩充到了16bytes，足足多了一倍，原因便是subobject的原样性必须保持。现在的对象布局如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/b54p6wdi2kc9m6tqalxs62x9/image_1cdc03hof1afb1j9j14on1dil1bb1g.png" alt="image_1cdc03hof1afb1j9j14on1dil1bb1g.png-245kB"></p>
+<h2 id="保证subobject一致性的原因"><a href="#保证subobject一致性的原因" class="headerlink" title="保证subobject一致性的原因"></a>保证subobject一致性的原因</h2><p>看起来很蠢，那么为什么我们非要保证base class subobject的原样性呢？<br>考虑下述指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Concrete2 *pc2;</span><br><span class="line">Concrete1 *pc1_1,*pc1_2;<span class="comment">//可以指向任意的concrete object</span></span><br></pre></td></tr></table></figure><br>当我们通过指针来完成复制操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*pc1_2=*pc1_1;</span><br></pre></td></tr></table></figure><br>会执行默认的memberwise复制，对象是被指的object的Concrete2或Concrete3 object。如果pc1_1实际上指向的是Concrete2或Concrete3 object，则上述操作实际上应该复制pc1_1指向对象的Concrete1 subobject部分。</p>
+<p>如果，C++将derived class members与subobject捆绑（失去一致性），那么会直接导致复制操作出现各种未定义行为：<br><img src="http://static.zybuluo.com/zsmj2017/8mj8sx1d5fr03mnp37e7c0kh/image_1cdc28lnr174m1jog1ij11uoiiun1t.png" alt="image_1cdc28lnr174m1jog1ij11uoiiun1t.png-430.4kB"></p>
+<hr>
+<h1 id="Adding-Polymorphism"><a href="#Adding-Polymorphism" class="headerlink" title="Adding Polymorphism"></a>Adding Polymorphism</h1><p>&nbsp;<br>如果我们在现有的继承体系中加入virtual function接口：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="keyword">operator</span>+=(<span class="keyword">const</span> Point2d&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>显然，virtual function仅仅发生于多态情况下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">(Point2d&amp; p1.Point2d&amp; p2)</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    p1+=p2;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其中p1与p2既可能指向Point2d object也可能指向Point3d object。多态是面向对象程序设计的核心，支持这样的弹性势必需要给class带来空间与存取时间上的负担。</p>
+<h2 id="多态带来的开销"><a href="#多态带来的开销" class="headerlink" title="多态带来的开销"></a>多态带来的开销</h2><ol>
+<li><strong>vtbl</strong><br>vtbl将会被生成，其内部存放着所有virtual function的地址，显然，该table的大小与virtual function的数目正相关。内部可能还会有别的slots，用以支持RTTI;</li>
+<li><strong>vptr</strong><br>每一个class object内部都被置入一个vptr，提供执行期链接，保证每一个object能够找到对应的vtbl。</li>
+<li><strong>加强constructor</strong><br>constructor需要为vptr设定初值，这可能意味着需要在derived class和每一个base class的constructor中重新设定vptr。</li>
+<li><strong>加强destructor</strong><br>destructor需要能够抹除指向vbtl的vptr，需要记住的是，destructor的调用次序是反向的：从derived class到base class。</li>
+</ol>
+<h2 id="vptr的位置"><a href="#vptr的位置" class="headerlink" title="vptr的位置"></a>vptr的位置</h2><p>在设计C++编译器时的一个经典问题是：把vptr置于class object的哪一个位置最佳？</p>
+<h3 id="置于尾部"><a href="#置于尾部" class="headerlink" title="置于尾部"></a>置于尾部</h3><p>假设我们将其置于object的尾部：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">no_virts</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> d1,d2;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">has_virts</span>:</span><span class="keyword">public</span> no_virts&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> d3;</span><br><span class="line">&#125;;</span><br><span class="line">no_virts *p = <span class="keyword">new</span> has_virts;</span><br></pre></td></tr></table></figure><br><img src="http://static.zybuluo.com/zsmj2017/nzscxmojht7lnb6q0j9grxuj/image_1cdcepq3a1kujvm18c68ci1isp9.png" alt="image_1cdcepq3a1kujvm18c68ci1isp9.png-78.1kB"><br>把vptr置于class object的尾端可以保留base class C struct的对象布局，从而确保即使在C程序中也能使用。</p>
+<h3 id="置于头部"><a href="#置于头部" class="headerlink" title="置于头部"></a>置于头部</h3><p>自C++2.0起，虚继承与抽象基类特性被引入，且OO兴起，部分编译器开始把vptr放在object的头部：<img src="http://static.zybuluo.com/zsmj2017/st5vbsypleod3p5gjnojmjeo/image_1cdcfmt601mlv19nbvcla301euc13.png" alt="image_1cdcfmt601mlv19nbvcla301euc13.png-77.9kB"><br>将vptr置于前端，对于“在多重继承下，通过指向class members的指针调用member function”会带来帮助。但代价是丧失了与C struct的语言兼容性</p>
+<p>下图展示了Point2d与Point3d加上了virtual function之后的内存布局（vptr位于尾端）：<br><img src="http://static.zybuluo.com/zsmj2017/pu00iyx7251hakdp3btf68l8/image_1cdcfslrde8v2vj191013rmn291g.png" alt="image_1cdcfslrde8v2vj191013rmn291g.png-82.2kB"></p>
+<hr>
+<h1 id="Multiple-Inheritance"><a href="#Multiple-Inheritance" class="headerlink" title="Multiple Inheritance"></a>Multiple Inheritance</h1><p>&nbsp;<br>在单一继承下，base class与derived class objects均从相同地址开始，只是其大小不同，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point3d p3d;</span><br><span class="line">Point2d* p = &amp;p3d;</span><br></pre></td></tr></table></figure><br>上述操作并不需要编译器去修改地址，且具备最佳执行效率。<br>上文曾叙述某些编译器将vptr置于class object的起始处。如果base class不具备virtual function而derived class具备的话，此时无法再保持对象起始地址的相同，需要编译器的介入以调整地址（因为vptr插入的缘故）。</p>
+<p>多重继承不同于单一继承，也难以塑造模型，其复杂度在于derived class和其上一个base class乃至于上上个base class….之间的“非自然”关系，下文将以实例说明。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...<span class="comment">//具备virtual接口</span></span><br><span class="line"><span class="keyword">protected</span>：</span><br><span class="line">    <span class="keyword">float</span> _x,_y;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> _z;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vertex</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...<span class="comment">//具备virtual接口</span></span><br><span class="line"><span class="keyword">protected</span>：</span><br><span class="line">    Vertex *p;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vertex3d</span>:</span><span class="keyword">public</span> Point3d,<span class="keyword">public</span> Vertex&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> mumble;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><img src="http://static.zybuluo.com/zsmj2017/zd7pgmuplp23hivdldpv3v94/image_1cdci6k8ch0bm5b1rhh7f0lu81t.png" alt="image_1cdci6k8ch0bm5b1rhh7f0lu81t.png-43.6kB"><br>多重继承的主要问题在于derived class objects和其第二或后继的base class objects之间的转换，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> <span class="title">mumble</span><span class="params">(<span class="keyword">const</span> Vertex&amp;)</span></span>;</span><br><span class="line">Vertex3d v;</span><br><span class="line">...</span><br><span class="line">mumuble(v);<span class="comment">//将v转化为Vertex对象</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h2><p>对于一个多重派生对象，将其地址指定给“最左端base class的指针”时，情况与单一继承情况一致。但如果你需要指定后继的base class地址，则需要编译器修改地址：加减介于中间的base class subobjects的大小：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Vertex3d v3d;</span><br><span class="line">Vertex *pv;</span><br><span class="line">Point2d *p2d;</span><br><span class="line">Point3d *p3d;</span><br></pre></td></tr></table></figure><br>对于上述声明，下面的赋值操作将引发内部地址转换如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pv = &amp;v3d;</span><br><span class="line">pv = (Vertex*)(((<span class="keyword">char</span>*)&amp;v3d)+<span class="keyword">sizeof</span>(Point3d));</span><br></pre></td></tr></table></figure><br>而下面的assignment则只需要简单地拷贝地址即可：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p2d = &amp;v3d;</span><br><span class="line">p3d = &amp;v3d;</span><br></pre></td></tr></table></figure><br>如果现有两个指针如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Vertex3d *pv3d;</span><br><span class="line">Vertex *pv;</span><br></pre></td></tr></table></figure><br>那么下面的assignment无法像上面那样简单地移位：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pv = pv3d;</span><br><span class="line">pv = (Vertex*)(((<span class="keyword">char</span>*)&amp;pv3d)+<span class="keyword">sizeof</span>(Point3d));</span><br></pre></td></tr></table></figure><br>原因在于如果pv3d==0，那么pv将获得sizeof(Point3d),这不可取，因此需要修改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pv = pv3d?(Vertex*)(((<span class="keyword">char</span>*)&amp;pv3d)+<span class="keyword">sizeof</span>(Point3d)):<span class="number">0</span>;</span><br></pre></td></tr></table></figure><br>引用在赋值时不需要考虑这么多，因为引用始终具备指向性（More Effective C++ 1）。下图给出了当前继承体系下的内存布局：<br><img src="http://static.zybuluo.com/zsmj2017/79qtpiuqhabp3bbzwoinc0gm/image_1cdcliqiiia8k7053914auc012a.png" alt="image_1cdcliqiiia8k7053914auc012a.png-298.9kB"><br>存取后继base class中的data member无需付出额外的成本，因为members的位置在编译期间便已经固定。</p>
+<hr>
+<h1 id="Virtual-Inheritance"><a href="#Virtual-Inheritance" class="headerlink" title="Virtual Inheritance"></a>Virtual Inheritance</h1><p>&nbsp;<br>多重继承的一大副作用在于，它必须支持某种形式的“shared subobject继承”。其中一个很典型的例子就是iostream library：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ios</span> &#123;</span>..&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">istream</span>:</span><span class="keyword">public</span> ios &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ostream</span>:</span><span class="keyword">public</span> ios &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">iostream</span>:</span><span class="keyword">public</span> istream,<span class="keyword">public</span> ostream &#123;...&#125;;</span><br></pre></td></tr></table></figure><br>显然，无论是istream还是ostream内部都含有一个ios subobject。我们希望避免在iostream中出现两个2个ios subobject，因此可以引入虚继承：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ios</span> &#123;</span>..&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">istream</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> ios &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ostream</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> ios &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">iostream</span>:</span><span class="keyword">public</span> istream,<span class="keyword">public</span> ostream &#123;...&#125;;</span><br></pre></td></tr></table></figure><br><img src="http://static.zybuluo.com/zsmj2017/ynf51jtexz0pk33jfkjnvact/image_1cdcn3a2gnqm15dlcje1q3j19tn2n.png" alt="image_1cdcn3a2gnqm15dlcje1q3j19tn2n.png-227.9kB"></p>
+<h2 id="虚继承实现的难点"><a href="#虚继承实现的难点" class="headerlink" title="虚继承实现的难点"></a>虚继承实现的难点</h2><p>实现虚继承的一大难点在于需要找到一个足够有效的方法。将istream与ostream各自维护的一个ios subobject，折叠成为一个由iostream维护的单一ios subobject，并且保存pointer与reference对应的多态指定操作。</p>
+<h2 id="虚继承的具体实现"><a href="#虚继承的具体实现" class="headerlink" title="虚继承的具体实现"></a>虚继承的具体实现</h2><p>我们将class分为两部分：不变局部、共享局部。</p>
+<ol>
+<li><strong>不变局部</strong><br>不变局部中的数据不管后继如何衍化，总是拥有固定的offset，因此这一部分数据可以被直接存取。</li>
+<li><strong>共享局部</strong><br>所谓的共享局部则是virtual base class subobject这一部分的数据，其位置会由于派生操作而发生改变，所以它们只能被间接存取。</li>
+</ol>
+<p>有三种主流策略来实现虚继承，我们将在实例中一一介绍。</p>
+<hr>
+<h2 id="问题实例-1"><a href="#问题实例-1" class="headerlink" title="问题实例"></a>问题实例</h2><p>现有Vertex3d虚继承体系如下：<br><img src="http://static.zybuluo.com/zsmj2017/0z7276ju43vcjtwydzzml15g/image_1cdcnn2kagir14on1lkg65rdd9.png" alt="image_1cdcnn2kagir14on1lkg65rdd9.png-48.7kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>：</span><br><span class="line">    <span class="keyword">float</span> _x,_y;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> _z;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vertex</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>：</span><br><span class="line">    Vertex *p;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vertex3d</span>:</span><span class="keyword">public</span> Vertex,<span class="keyword">public</span> Point3d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> mumble;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>一般布局策略是先安置好不变局部，再建立其共享局部。关键在于如何去读取class的共享部分？</p>
+<h3 id="实现模型"><a href="#实现模型" class="headerlink" title="实现模型"></a>实现模型</h3><p>部分编译器会在每一个derived class object中安插一些指针，每个指针指向一个virtual base class。存取继承得到的virtual base class members可以通过这些指针来完成，其对象布局大致如下：<img src="http://static.zybuluo.com/zsmj2017/uqayb22chpgqgdckcsnqw8cq/image_1cdcp8gvs28o10cvt9v19913f0m.png" alt="image_1cdcp8gvs28o10cvt9v19913f0m.png-340.9kB"><br>举例而言，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//原有函数</span></span><br><span class="line"><span class="keyword">void</span> Point3d::<span class="keyword">operator</span>+=(<span class="keyword">const</span> Point3d &amp;rhs)&#123;</span><br><span class="line">    _x+=rhs._x;</span><br><span class="line">    _y+=rhs._y;</span><br><span class="line">    _z+=rhs._z;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//真正实现</span></span><br><span class="line">_vbcPoint2d-&gt;_x += rhs._vbcPoint2d-&gt;_x;<span class="comment">//vbc means virtual base class</span></span><br><span class="line">_vbcPoint2d-&gt;_y += rhs._vbcPoint2d-&gt;_y;</span><br><span class="line">_z += rhs._z;</span><br></pre></td></tr></table></figure><br>而一个derived class和一个base class的实例之间的转换如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point2d *p2d = pv3d;</span><br><span class="line">Point2d * p2d = pv3d?pv3d-&gt;__vbcPoint2d:<span class="number">0</span>;</span><br></pre></td></tr></table></figure><br>这种实现模型主要有两个缺点：</p>
+<ol>
+<li>每一个virtual base class都存在一个与之对应的指针，但我们希望空间开销固定，不能因为virtual base class数目的增长而增长。</li>
+<li>继承体系发生纵向增长后，间接存取的层次也将提高，我们希望时间开销固定，不随着继承体系扩张而增长。</li>
+</ol>
+<p>第二个问题的解决方案是：拷贝所有的virtual base指针放在derived class object内部，保证一次间接访问即可获取data member，但这种方法增加了空间支出。</p>
+<p>第一个问题有两种解决策略：</p>
+<ol>
+<li><strong>virtual base class table</strong><br>Microsoft编译器采纳此法，如果一个class object存在一个或多个virtual base class，即会由编译器生成一个指向virtual base class table的指针，该table内部存放着访问各个virtual base class的指针。</li>
+<li><strong>在vbtl中放置virtual base class的offset</strong><br>其实现模型大致如下：<img src="http://static.zybuluo.com/zsmj2017/uv41z78c5sk81pb30zy84y42/image_1cdcqbki0avl6a816871u33f8g13.png" alt="image_1cdcqbki0avl6a816871u33f8g13.png-233.3kB"><br>vbtl由正值或负值来索引，正值则索引到virtual functions，负值则索引至virtual base class offsets。在该模型下，derived class实体与base class实体之间的转换操作如下所示：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Point2d *p2d = pv3d;</span><br><span class="line"><span class="comment">//转换后的程序</span></span><br><span class="line">Point2d *p2d = pv3d? pv3d + pv3d-&gt;_vptr_Point3d[<span class="number">-1</span>]:<span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="最佳运用方式"><a href="#最佳运用方式" class="headerlink" title="最佳运用方式"></a>最佳运用方式</h3><p>一般而言，virtual base class最有效的一种运用方式是：一个抽象的virtual base class，没有任何data members（类似于Java的Interface）。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/" rel="tag"># 对象模型</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E5%AD%98%E5%8F%96/" rel="next" title="Data语义学——Data Member的存取">
+                <i class="fa fa-chevron-left"></i> Data语义学——Data Member的存取
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/14/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%AF%B9%E8%B1%A1%E6%88%90%E5%91%98%E7%9A%84%E6%95%88%E7%8E%87/" rel="prev" title="Data语义学——对象成员的效率">
+                Data语义学——对象成员的效率 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Inheritance-without-Polymorphism"><span class="nav-number">2.</span> <span class="nav-text">Inheritance without Polymorphism</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#空间膨胀"><span class="nav-number">2.1.</span> <span class="nav-text">空间膨胀</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#保证subobject一致性的原因"><span class="nav-number">2.2.</span> <span class="nav-text">保证subobject一致性的原因</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Adding-Polymorphism"><span class="nav-number">3.</span> <span class="nav-text">Adding Polymorphism</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#多态带来的开销"><span class="nav-number">3.1.</span> <span class="nav-text">多态带来的开销</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vptr的位置"><span class="nav-number">3.2.</span> <span class="nav-text">vptr的位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#置于尾部"><span class="nav-number">3.2.1.</span> <span class="nav-text">置于尾部</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#置于头部"><span class="nav-number">3.2.2.</span> <span class="nav-text">置于头部</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Multiple-Inheritance"><span class="nav-number">4.</span> <span class="nav-text">Multiple Inheritance</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题实例"><span class="nav-number">4.1.</span> <span class="nav-text">问题实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题剖析"><span class="nav-number">4.2.</span> <span class="nav-text">问题剖析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Virtual-Inheritance"><span class="nav-number">5.</span> <span class="nav-text">Virtual Inheritance</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚继承实现的难点"><span class="nav-number">5.1.</span> <span class="nav-text">虚继承实现的难点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚继承的具体实现"><span class="nav-number">5.2.</span> <span class="nav-text">虚继承的具体实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题实例-1"><span class="nav-number">5.3.</span> <span class="nav-text">问题实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现模型"><span class="nav-number">5.3.1.</span> <span class="nav-text">实现模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最佳运用方式"><span class="nav-number">5.3.2.</span> <span class="nav-text">最佳运用方式</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

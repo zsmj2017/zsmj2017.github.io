@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;按照官方说法，所谓特殊成员函数就是C++自动生成的函数。在C++98中有4种这样的函数（它们自动生成的条件可见Inside the C++ Object Model）：  default constructor default destructor default copy constructor default copy assignment operator  一般而言，自动生">
+<meta name="keywords" content="C++,Modern C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="17.了解自动生成的特殊成员函数">
+<meta property="og:url" content="https://xander.wiki/2018/07/04/%E4%BA%86%E8%A7%A3%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E7%9A%84%E7%89%B9%E6%AE%8A%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;按照官方说法，所谓特殊成员函数就是C++自动生成的函数。在C++98中有4种这样的函数（它们自动生成的条件可见Inside the C++ Object Model）：  default constructor default destructor default copy constructor default copy assignment operator  一般而言，自动生">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/07/04/了解自动生成的特殊成员函数/"/>
+
+
+
+
+
+  <title>17.了解自动生成的特殊成员函数 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/04/%E4%BA%86%E8%A7%A3%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E7%9A%84%E7%89%B9%E6%AE%8A%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">17.了解自动生成的特殊成员函数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-04T13:42:00+08:00">
+                2018-07-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>按照官方说法，所谓特殊成员函数就是C++自动生成的函数。在C++98中有4种这样的函数（它们自动生成的条件可见Inside the C++ Object Model）：</p>
+<ol>
+<li><strong>default constructor</strong></li>
+<li><strong>default destructor</strong></li>
+<li><strong>default copy constructor</strong></li>
+<li><strong>default copy assignment operator</strong></li>
+</ol>
+<p>一般而言，自动生成的此类特殊函数将隐式地具备public &amp;&amp; inline，并且为non-virtual（析构函数存在一个意外，如果该类继承自一个具备virtual destructor的基类，则自动生成的default destructor具备virtual属性）。</p>
+<p>上述内容你可能已经完全掌握，但在C++11中它们发生了一些变化，了解这些新的规则对C++高效编程至关重要。</p>
+<hr>
+<h1 id="move-constructor-and-move-assignment"><a href="#move-constructor-and-move-assignment" class="headerlink" title="move constructor and move assignment"></a>move constructor and move assignment</h1><p>&nbsp;<br>C++11的特殊成员函数相较于C++98多出了两个新人：move constructor与move assignment，它们的签名如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    Widget(Widget&amp;&amp; rhs); <span class="comment">// move constructor</span></span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(Widget&amp;&amp; rhs); <span class="comment">// move assignment operator</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>生成它们的规则类似于copy，move操作仅在它们需要时才被生成，其行为是对rhs的所有non-static data member执行move操作，此外，它们对rhs中的基类部分同样执行move操作。</p>
+<p>严格意义上来说，move constructor与move assignment更像是一种请求，我们无法保证必然会发生move行为。这种原因很简单，C++98中大量的历史遗留类型并不支持move操作，，因此它们实际上通过copy操作完成了move行为。move行为的核心操作是对所有需要移动的数据执行std::move，并且在函数重载期内根据实际情况判断到底是使用copy还是move（Item23 将会对此进行详尽分析）。我们现在所需要了解的就是对所有能move的执行move，不能move的执行copy。</p>
+<hr>
+<h2 id="move操作的生成"><a href="#move操作的生成" class="headerlink" title="move操作的生成"></a>move操作的生成</h2><p>&nbsp;<br>类似于copy，自动生成move操作仅发生于你并未手动地声明它，但其生成条件和copy相比还是略有不同。</p>
+<p>两个copy操作相互独立，也就是说声明其中的一个对另一个并无任何影响。如果你声明了一个copy constructor但没有声明copy assignment，那么编译器将会在需要的时候自动定义与声明copy assignment，反之亦是如此。</p>
+<p>两个move操作并不独立，其中的任何一个被声明都会阻止编译器生成另外一个。理由很简单，如果你声明了一个移动构造函数，那你至少应当指出如何实现移动构造以及它与编译器默认memberwise move版本的不同之处。如果 memberwise move constructor并不适用于该类，那么几乎必然memberwise move assignment也不适用。同理，声明move assignment也会阻止move constructor的生成。</p>
+<p>此外，move操作不会在任何显式声明了copy操作的类中生成。声明copy操作的原因是因为memberwise copy并不适用于该类，因此编译器会认为既然memberwise copy并不适合，那么memberwise move必然也不适合该类。这引发了另一个话题，如果一个类中声明了move操作，那么编译器将禁止自动生成copy操作，原因在于memberwise move无法适用的类想必也无法使用memberwise copy。这听起来可能会破坏C++98中的旧有程序，因为C++11中自动生成copy操作的条件似乎更加苛刻。但实则并非如此，C++98代码中不会出现move操作，因为C++98根本就不存在“move object”。遗留代码只有在经过符合C++11标准的修改之后才会具备移动语义。</p>
+<hr>
+<h1 id="三-五法则（C-Primer-P477）"><a href="#三-五法则（C-Primer-P477）" class="headerlink" title="三/五法则（C++ Primer P477）"></a>三/五法则（C++ Primer P477）</h1><p>&nbsp;<br>也许你曾经听说过一条被称为“Rule of Three”的指导方针，该指导方针规定，copy constructor，copy assignment opertaor或destructor的声明总应该一起出现，不允许出现任何遗漏。该原则的背景在于，手动声明copy操作几乎必然是因为当前类负责资源管理，而资源管理类又存在如下特征：</p>
+<ol>
+<li><strong>copy操作几乎不可能只使用一个（copy constructor中的行为也需要被应用于copy assignment opertaor之中）。</strong></li>
+<li><strong>析构函数负责资源的释放。</strong></li>
+</ol>
+<p>一般来说需要管理的资源都是指内存，这也就是为何所有负责内存管理的标准库类均声明有这三件套的原因。</p>
+<p>自定义destructor表明单纯的memberwise copy行为可能并不适用于该类，因此一旦存在用户自定义destructor，编译器将不会自发生成任何copy操作。在C++98被创建时这条规则尚未得到清楚认知，因此在C++98中用户自定义destructor并不会对编译器生成copy操作造成任何影响，在C++11中自定义destructor仍然不会限制copy操作的生成，但这次并非认知不明，而是出于担心破坏历史遗留代码的原因。</p>
+<p>但“Rule of Three”规则依然有效，前文中我们已经明确带有自定义copy操作的类不会自动生成move操作，因此我们也可以推断，带有自定义destructor的class使用默认move操作也是不正确的行为（因为自定义destructor的存在表示当前类需要自定义copy操作）。因此，只有当下述三个条件成立时才会生成move操作：</p>
+<ol>
+<li><strong>class中没有任何自定义copy操作。</strong></li>
+<li><strong>class中不存在另一个move操作的声明。</strong></li>
+<li><strong>class中不存在自定义destructor。</strong></li>
+</ol>
+<hr>
+<h1 id="default声明"><a href="#default声明" class="headerlink" title="=default声明"></a>=default声明</h1><p>&nbsp;<br>在某些情况下，类似的规则可能会延伸至copy操作，原因在于C++11很是抵制为含有自定义destructor或copy操作的class生成copy操作。因此如果你曾经依赖于使用编译器自动生成的特殊成员函数，你应当仔细检查并按照“Rule of Three”法则消去其相关性。如果你认为memberwise足以完成工作，那你可以在声明时直接以default注明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    ~Widget(); <span class="comment">// user-declared dtor</span></span><br><span class="line">    …</span><br><span class="line">    Widget(<span class="keyword">const</span> Widget&amp;) = <span class="keyword">default</span>; <span class="comment">// default copy ctor behavior is OK</span></span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp;) = <span class="keyword">default</span>;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br><code>=default</code>在多态基类中使用非常普遍。多态基类通常具有虚析构函数，因为如果它们不存在，则某些操作（例如通过基类指针或引用对派生类对象使用delete或typeid）会产生未定义或误导性的结果。除非一个类已经继承了其基类的虚析构函数，否则你最好显式地声明它。前文已述，自定义destructor会抑制move操作的生成，因此你必须使用<code>=default</code>显式说明自己需要memberwise copy。类似地，声明移动操作会禁用copy操作，因此如果需要复制性的话，则需要手动声明copy操作为<code>=default</code>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Base() = <span class="keyword">default</span>; <span class="comment">// make dtor virtual</span></span><br><span class="line">    Base(Base&amp;&amp;) = <span class="keyword">default</span>; <span class="comment">// support moving</span></span><br><span class="line">    Base&amp; <span class="keyword">operator</span>=(Base&amp;&amp;) = <span class="keyword">default</span>;</span><br><span class="line">    Base(<span class="keyword">const</span> Base&amp;) = <span class="keyword">default</span>; <span class="comment">// support copying</span></span><br><span class="line">    Base&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Base&amp;) = <span class="keyword">default</span>;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>此外，结果编译器愿意生成某些操作，也不妨碍我们在类中以<code>=default</code>显式地声明它们，尽管多打了几个字，但可以使接口更加清晰，同时避免一些微妙的错误。举例而言，当前存在一个表示字符串表的类，即一个允许通过整数ID快速查找字符串值的数据结构：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StringTable</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    StringTable() &#123;&#125;</span><br><span class="line">    … <span class="comment">// functions for insertion, erasure, lookup,</span></span><br><span class="line">    <span class="comment">// etc., but no copy/move/dtor functionality</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">int</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt; values;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>可以看到该类并未声明copy操作、move操作等等，编译器将会在其需要时将其合成。但考虑如果你日后发现需要在构造和析构对象时做一个日志记录，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StringTable</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    StringTable()  &#123; makeLogEntry(<span class="string">"Creating StringTable object"</span>); &#125; <span class="comment">// added</span></span><br><span class="line">    ~StringTable() &#123; makeLogEntry(<span class="string">"Destroying StringTable object"</span>); &#125; <span class="comment">// added</span></span><br><span class="line">    … <span class="comment">// other funcs as before</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">int</span>, <span class="built_in">std</span>::<span class="built_in">string</span>&gt; values; <span class="comment">// as before</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>析构函数的加入看起来没毛病，但实际上它导致了移动操作不再会被生成，但同时复制操作不受影响。因此，在我们启动移动操作时，实际上使用的copy操作，而我们却对此一无所知（赋值map造成了相当严重的性能下降，这一切只是因为引入了一个自定义destructor）。如果我们在之前曾经手动声明过<code>=default</code>，那一切都不会发生问题。</p>
+<hr>
+<h1 id="C-11中特殊函数的规则总结"><a href="#C-11中特殊函数的规则总结" class="headerlink" title="C++11中特殊函数的规则总结"></a>C++11中特殊函数的规则总结</h1><ul>
+<li><strong>Default constructor</strong><br>和C++98一样，仅在不存在自定义constructor时自动生成。</li>
+<li><strong>Destructor</strong><br>类似于C++98，唯一的区别在于编译器自动生成的destructor带有noexcept属性，并且与C++98一致的是，仅有基类destructor为virtual的情况下才会具备virtual属性。</li>
+<li><strong>Copy constructor</strong><br>与C++98行为相同：复制构造所有的non-static data member。仅在class中不存在自定义copy constructor的情况下才会被生成。如果类中声明了移动操作，则不会生成copy constructor。不推荐在任何具备自定义copy操作或自定义destructor的class中依赖此函数。</li>
+<li><strong>Copy assignment operator</strong><br>类似于copy constructor。</li>
+<li><strong>Move constructor and move assignment operator</strong><br>为每一个non-static data member执行move操作。仅在类不包含自定义copy操作，move操作或析构函数时生成。</li>
+</ul>
+<p>规则中并没有任何关于模板成员函数阻止其他特殊成员函数生成的说明，因此，如果有一个Widget class如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line">    …</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line">    Widget(<span class="keyword">const</span> T&amp; rhs); <span class="comment">// construct Widget from anything</span></span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> T&amp; rhs); <span class="comment">// assign Widget from anything</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>编译器仍将为Widget生成copy和move操作（假设其生成条件已经具备），即使存在可以实例化生成copy操作与move操作的成员函数模板（当T为Widget时）。在某些情况下这种行为可能会产生相当严重的后果，我们将Item26中对其进行详细论述。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"># Modern C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/03/%E7%A1%AE%E4%BF%9Dconst%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/" rel="next" title="16.确保const成员函数线程安全">
+                <i class="fa fa-chevron-left"></i> 16.确保const成员函数线程安全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/04/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E6%A6%82%E8%BF%B0/" rel="prev" title="智能指针概述">
+                智能指针概述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#move-constructor-and-move-assignment"><span class="nav-number">2.</span> <span class="nav-text">move constructor and move assignment</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#move操作的生成"><span class="nav-number">2.1.</span> <span class="nav-text">move操作的生成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三-五法则（C-Primer-P477）"><span class="nav-number">3.</span> <span class="nav-text">三/五法则（C++ Primer P477）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#default声明"><span class="nav-number">4.</span> <span class="nav-text">=default声明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-11中特殊函数的规则总结"><span class="nav-number">5.</span> <span class="nav-text">C++11中特殊函数的规则总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

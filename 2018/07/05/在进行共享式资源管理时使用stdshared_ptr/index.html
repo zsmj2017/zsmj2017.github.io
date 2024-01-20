@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;有人认为C++的手动内存回收机制过于原始，这钟说辞相当正确，但是否存在一种方式，可以保证C++既可以自动完成内存回收，又能够明确它们释放的时间？  shared_ptr&amp;nbsp;std::shared_ptrs所指向的对象，其生命周期由这些共享其所有权的指针共同管理，不存在某个特定的std::shared_ptr拥有该对象。同时，所有指向该对象的std:: shared_ptrs">
+<meta name="keywords" content="C++,Modern C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="19.在进行共享式资源管理时使用std::shared_ptr">
+<meta property="og:url" content="https://xander.wiki/2018/07/05/%E5%9C%A8%E8%BF%9B%E8%A1%8C%E5%85%B1%E4%BA%AB%E5%BC%8F%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%97%B6%E4%BD%BF%E7%94%A8stdshared_ptr/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;有人认为C++的手动内存回收机制过于原始，这钟说辞相当正确，但是否存在一种方式，可以保证C++既可以自动完成内存回收，又能够明确它们释放的时间？  shared_ptr&amp;nbsp;std::shared_ptrs所指向的对象，其生命周期由这些共享其所有权的指针共同管理，不存在某个特定的std::shared_ptr拥有该对象。同时，所有指向该对象的std:: shared_ptrs">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ke8earnwfpuaib3hf17ieral/image_1chk5vpusl9c187q1pa7o9p16si1p.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/ke8earnwfpuaib3hf17ieral/image_1chk5vpusl9c187q1pa7o9p16si1p.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/07/05/在进行共享式资源管理时使用stdshared_ptr/"/>
+
+
+
+
+
+  <title>19.在进行共享式资源管理时使用std::shared_ptr | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/05/%E5%9C%A8%E8%BF%9B%E8%A1%8C%E5%85%B1%E4%BA%AB%E5%BC%8F%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%97%B6%E4%BD%BF%E7%94%A8stdshared_ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">19.在进行共享式资源管理时使用std::shared_ptr</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-05T06:42:00+08:00">
+                2018-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>有人认为C++的手动内存回收机制过于原始，这钟说辞相当正确，但是否存在一种方式，可以保证C++既可以自动完成内存回收，又能够明确它们释放的时间？</p>
+<hr>
+<h1 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h1><p>&nbsp;<br>std::shared_ptrs所指向的对象，其生命周期由这些共享其所有权的指针共同管理，不存在某个特定的std::shared_ptr拥有该对象。同时，所有指向该对象的std:: shared_ptrs都将保证在该对象不再需要时对其进行销毁。当指向对象的最后一个std :: shared_ptr停止指向那里时（例如该std::shared_ptr被销毁或被指向另一个对象），此时该std::shared_ptr会析构它指向的对象。类似于内存回收机制，客户端无需关心管理对象的生命周期，但这种行为同时也兼具析构函数的特点，即对象销毁时间是确定的。</p>
+<p>std::shared_ptr通过查询资源的引用计数来判断它是否是指向该资源的最后一个sp指针，当执行构造函数时<strong>通常</strong>会导致引用计数自增，析构时自减，执行copy assignment operator同时执行二者（原有资源引用计数自减，新资源引用计数自增）。当std::shared_ptr在执行递减后发现当前引用计数为0，则表明此时不再有任何std::shared_ptrs指向该资源，那么shared_ptr则会执行析构。</p>
+<hr>
+<h1 id="引用计数对性能的影响"><a href="#引用计数对性能的影响" class="headerlink" title="引用计数对性能的影响"></a>引用计数对性能的影响</h1><p>&nbsp;<br>shared_ptr中的引用计数对性能存在如下影响：</p>
+<ol>
+<li><strong>shared_ptr大小是原始指针的两倍</strong><br>原因在于shared_ptr持有两个指针，一个指针指向资源，另一个指向引用计数。</li>
+<li><strong>必须动态分配引用计数的内存</strong><br>理论上引用计数与资源相关联，但资源自身对此却一无所知，因此，资源不会存储引用计数（这也意味着任何对象，甚至是内置类型的对象也可由shared_ptr管理）。无论哪种方式，引用计数都存储为动态分配的数据。动态分配需要成本，Item21阐明当使用std::make_shared创建std::shared_ptr时可以避免该开销，但并非任何情况都可以使用make_shared。总之，无论采取何种方式，引用计数都必须存储于动态分配的内存中。</li>
+<li><strong>引用计数的自增与自减行为必须是atomic</strong><br>不同的线程之中可能同时存在着reader与writer。举例而言，线程A中，指向某资源的std::shared_ptr正在执行析构函数（引用计数自减），而在线程B中，存在一个shared_ptr被复制（引用计数自增）。atomic操作通常慢于non-atomic操作，因此即使引用计数大小通常只是一个word，我们也应当认为其读取和写入操作成本较高。</li>
+</ol>
+<hr>
+<h1 id="shared-ptr的创建"><a href="#shared-ptr的创建" class="headerlink" title="shared_ptr的创建"></a>shared_ptr的创建</h1><p>&nbsp;<br>在前文中我们提到，shared_ptr在创建时<strong>通常</strong>会自增引用引用，那为什么不是<strong>总是</strong>自增引用计数呢？原因在于move constructor。在执行移动构造时，源shared_ptr会被置为null，而引用计数不需要发生任何改变。因此，移动std::shared_ptrs比复制它们要快：move construct优于copy construct，move assignment优于copy assignment。</p>
+<hr>
+<h1 id="shared-ptr的删除器"><a href="#shared-ptr的删除器" class="headerlink" title="shared_ptr的删除器"></a>shared_ptr的删除器</h1><p>&nbsp;<br>类似于unique_ptr，shared_ptr也使用delete作为默认删除器，并且支持自定义删除器行为，不过对于这一特性，shared_ptr的设计与unique_ptr的设计颇有不同。对于unique_ptr而言，删除器是智能指针的一部分，但对于shared_ptr而言并非如此：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> loggingDel = [](Widget *pw)&#123;makeLogEntry(pw);<span class="keyword">delete</span> pw;&#125;;</span><br><span class="line">std::unique_ptr&lt;Widget, decltype(loggingDel)&gt; upw(new Widget, loggingDel);</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw</span><span class="params">(<span class="keyword">new</span> Widget, loggingDel)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>std::shared_ptr设计具备更高的灵活性。 考虑当前存在两个std::shared_ptr&lt;lWidget&gt;，每个都有一个不同类型的自定义删除器（其原因可能是自定义删除器是一个lambda）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> customDeleter1 = [](Widget *pw) &#123; … &#125;; <span class="comment">// custom deleters,</span></span><br><span class="line"><span class="keyword">auto</span> customDeleter2 = [](Widget *pw) &#123; … &#125;; <span class="comment">// each with a different type</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">pw1</span><span class="params">(<span class="keyword">new</span> Widget, customDeleter1)</span></span>;</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">pw2</span><span class="params">(<span class="keyword">new</span> Widget, customDeleter2)</span></span>;</span><br></pre></td></tr></table></figure><br>因为pw1和pw2具备相同的类型，因此它们可以放在同一个容器之中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt;&gt; vpw&#123; pw1, pw2 &#125;;</span><br></pre></td></tr></table></figure><br>pw1与pw2也可以相互赋值，并且可以都能够作为实参传递给一个形参类型为 std::shared_ptr&lt;Widget&gt;的函数。对于自定义删除器类型不同的std::unique_ptrs，上述操作均无法实现，因为自定义删除器的类型会影响std::unique_ptr的类型。此外，自定义删除器不会更改std::shared_ptr对象的大小。无论采用何种删除器，std::shared_ptr对象的大小始终为两个指针大小。但std::shared_ptr如何在不使用任何额外内存的情况下引用任意大小的删除器？</p>
+<hr>
+<h1 id="control-block"><a href="#control-block" class="headerlink" title="control block"></a>control block</h1><p>&nbsp;<br>事实上shared_ptr仍然需要额外的内存以放置与使用删除器，只是这块内存并非std::shared_ptr对象的一部分。它位于堆上，或者是allocator分配的内存所在的位置（如果shared_ptr使用了自定义allocator）。前文曾经提到，std::shared_ptr对象包含一个指向引用计数的指针，但实际上该指针其实指向的是一个更大的数据结构control block，引用计数是它的一部分。std::shared_ptrs所管理的每个对象都具备一个control block。除引用计数之外，control block还包含自定义删除程序的副本（如果拟制定了自定义删除器的话）。如果你在定义shared_ptr时指定了自定义分配器，则control block也包含该副本。control block还可以包含附加数据(见Item21），但这一节我们先不做理会。我们可以设想与std::shared_ptr &lt;T&gt;对象相关联的内存看起来如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/ke8earnwfpuaib3hf17ieral/image_1chk5vpusl9c187q1pa7o9p16si1p.png" alt="image_1chk5vpusl9c187q1pa7o9p16si1p.png-48kB"></p>
+<hr>
+<h2 id="control-block创建规则"><a href="#control-block创建规则" class="headerlink" title="control block创建规则"></a>control block创建规则</h2><p>&nbsp;<br>理论上而言，对象的controol block应当由第一个指向该对象的std::shared_ptr设置，但在实际情况中，构建std::shared_ptr的函数不可能明确是否已经存在其他std::shared_ptr已指向该对象，因此control block有如下创建规则：</p>
+<ol>
+<li><strong>std::make_shared（见Item21）总是创建一个control block</strong><br>它生成一个需要被指向的新对象，因此在调用std::make_shared时肯定没有该对象的控制块。</li>
+<li><strong>当std::shared_ptr的构造源是唯一所有权指针（即std::unique_ptr或std::auto_ptr）时，创建一个control block</strong><br>唯一所有权指针并不需要control block，因此需要创建，此外，当shread_ptr被构建完毕后，唯一所有权指针将会被置为null。</li>
+<li><strong>当以原始指针作为实参调用std::shared_ptr构造函数时，创建一个control block</strong><br>如果你想通过一个已有control block的对象创建一个std::shared_ptr，你可能会将std::shared_ptr或std ::weak_ptr（见Item20）作为实参传递给shared_ptr的构造函数，而不是使用原始指针。事实上，当它们作为实参构造shared_ptr时不会构造control block。</li>
+</ol>
+<p>这些规则可能会触发一些不良后果，假设你以一个原始指针创建了多个shared_ptr，那么将会产生多个control block，从而触发多次析构：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> pw = <span class="keyword">new</span> Widget; <span class="comment">// pw is raw ptr</span></span><br><span class="line">…</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw1</span><span class="params">(pw, loggingDel)</span></span>; <span class="comment">// create control block for *pw</span></span><br><span class="line">…</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw2</span><span class="params">(pw, loggingDel)</span></span>; <span class="comment">// create 2nd control block for *pw!</span></span><br></pre></td></tr></table></figure><br>为动态创建的对象分配一个原始指针是一种不良行为，这完全违背了本章的主旨：以智能指针取代原始指针。但这充其量只是一种不正确的编程风格，因为它至少没有主动引起未定义行为。在刚才的代码示例中，一个对象有两个相关联的control block，这必然会导致该对象会被析构两次，在第二次析构时将会导致未定义行为。</p>
+<p>刚代码示例至少蕴含两个启示：</p>
+<ol>
+<li><strong>应当尽量避免使用原始指针创建shared_ptr</strong><br>上述程序之所以不使用make_shared，是因为我们使用了自定义删除器的原因。</li>
+<li><strong>如果一定要以原始指针初始化shared_ptr，则直接以new表达式初始化之</strong><br>如果示例中的代码被重写为：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw1</span><span class="params">(<span class="keyword">new</span> Widget,loggingDel)</span></span>;</span><br></pre></td></tr></table></figure>
+当我们需要创建第二个shared_ptr时，则通常会选择使用copy construct：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw2</span><span class="params">(spw1)</span></span>; <span class="comment">// spw2 uses same control block as spw1</span></span><br></pre></td></tr></table></figure>
+如此则不会产生任何问题。</li>
+</ol>
+<hr>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>&nbsp;<br>假设我们的程序使用std::shared_ptrs来管理Widget对象，并且我们有一个数据结构来跟踪被处理的Widgets：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; &gt; processedWidgets;</span><br></pre></td></tr></table></figure><br>进一步地假设Widget具备一个负责处理的成员函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">()</span></span>;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>process一种可能的实现方式如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Widget::process</span><span class="params">()</span></span>&#123;</span><br><span class="line">    … <span class="comment">// process the Widget</span></span><br><span class="line">    processedWidgets.emplace_back(<span class="keyword">this</span>); <span class="comment">// add it to list of processed Widgets</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>关于emplace_back可见Item42.此实现的最大错误在于将this,也就是原始指针作为参数传入容器，从而直接导致关于某Wideget可能存在多个control block。</p>
+<hr>
+<h2 id="解决方案-std-enable-shared-from-this"><a href="#解决方案-std-enable-shared-from-this" class="headerlink" title="解决方案(std::enable_shared_from_this)"></a>解决方案(std::enable_shared_from_this)</h2><p>&nbsp;<br>std::shared_ptr早已考虑到这种情况，并为之提供了API，只是名字有点奇怪：std::enable_shared_from_this。如果你希望std::shared_ptrs管理的类能够通过this指针安全地创建std::shared_ptr，那么你必须令你的class继承此基类模板，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>:</span> <span class="keyword">public</span> <span class="built_in">std</span>::enable_shared_from_this&lt;Widget&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">()</span></span>;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>std::enable_shared_from_this是一个基类模板,它的类型参数始终是派生类的名称,基类决定于派生类这一行为十分奇怪，但这段代码完全合法，甚至存在一个与之相关的设计模式Curiously Recurring Template Pattern (CRTP)。（实际上在Effective C++ Item49中已有涉及）</p>
+<p>std::enable_shared_from_this定义了一个成员函数，它可为当前对象创建一个std::shared_ptr，但该函数不会造成重复的control block。该成员函数名为shared_from_this，其隐含实参为*this，返回由*this初始化的shared_ptr,其使用示例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Widget::process</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">// as before, process the Widget</span></span><br><span class="line">    …</span><br><span class="line">    <span class="comment">// add std::shared_ptr to current object to processedWidgets</span></span><br><span class="line">    processedWidgets.emplace_back(shared_from_this());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="shared-from-this实现"><a href="#shared-from-this实现" class="headerlink" title="shared_from_this实现"></a>shared_from_this实现</h2><p>&nbsp;<br>shared_from_this会查找当前对象的control block，并创建一个引用该control block的新std::shared_ptr。显而易见，该函数要求当前必须已经存在一个shared_ptr指向该对象，如果不存在（即当前对象并无相关control block），则其行为未定义（事实上会抛出一个异常）。</p>
+<p>为了防止客户在尚未存在std::shared_ptr指向*this之前调用shared_from_this，继承自std::enable_shared_from_this的类通常将其构造函数声明为private，并让客户通过调用返回std::shared_ptrs的工厂函数来创建对象，举例而言，Widget的实现可能如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>:</span> <span class="keyword">public</span> <span class="built_in">std</span>::enable_shared_from_this&lt;Widget&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Ts&gt;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">create</span><span class="params">(Ts&amp;&amp;... params)</span></span>;</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">()</span></span>; <span class="comment">// as before</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    … <span class="comment">// ctors</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="shared-ptr使用成本"><a href="#shared-ptr使用成本" class="headerlink" title="shared_ptr使用成本"></a>shared_ptr使用成本</h1><p>&nbsp;<br>control block的大小通常只有几个word，不过自定义删除器和分配器可能会令它较大一些。一般而言，control block的实现比人们想象地更加复杂，它可能会用到继承甚至虚函数的概念（确保对象可被正确析构），这意味着使用std::shared_ptrs也需要付出虚函数所带来的那些成本（详见More Effective C++ Item24）。</p>
+<p>在介绍了如此之多的细节后，你可能会对shared_ptr所产生的control block如此复杂难用而感到不满，但实际上针对它们所完成的那些功能，使用shared_ptr绝对物超所值。此外，当你处于典型应用环境（无自定义删除器及allocator）时，control block的大小约为3个word，并且它通常会被合并到对象所占用的内存空间之中（详见Item21）。</p>
+<p>解引用std::shared_ptr并不比解引用原始指针所消耗的成本更高。执行需要引用计数的操作（例如copy construct,copy assignment operator，destructor）需要一到两个atomic 操作，但这些操作仅仅相对于non-atomic而言开销较多。conrtrol block中虽然蕴含虚函数，但虚函数的使用频率并不高（实际上仅在析构时才会被使用）。在付出了上述代价后，你收获了内存回收机制，甚至比它还要更加出色一点，我认为这是相当值得的。</p>
+<hr>
+<h1 id="shared-ptr与unique-ptr"><a href="#shared-ptr与unique-ptr" class="headerlink" title="shared_ptr与unique_ptr"></a>shared_ptr与unique_ptr</h1><p>&nbsp;<br>如果你发现当前资源是独占式的，std::unique_ptr相对于shared_ptr无疑是更好的选择，它的性能与原始指针相差无几，并且从std::unique_ptr到std::shared_ptr的转变十分方便。但这种情况反之却并不成立，一旦你将资源的生命周期管理转换为std::shared_ptr，就再也无法收回成命。也就是说，unique_ptr到shared_ptr总是允许的，但发生转变之后就再也不能后悔了（即使当前对象的引用计数为1你也不能将其转交给unique_ptr)。</p>
+<p>shared_ptr与unique_ptr的另一点不同是它无法指向数组，也就是说没有std::shared_ptr&lt;T[]&gt;。有人会想到使用自定义删除器来执行数组删除（即delete []），这种程序可以编译，但毫无价值。首先，std::shared_ptr不提供operator[]，因此索引到数组需要基于指针算术。另一方面，std::shared_ptr支持单一对象的派生类指针到基类指针之间的转换，但其无法应用于数组之中。STL存在如此之多的容器，使用数组无疑是一种较为不智的设计。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>std::shared_ptr为C++开发者提供了接近内存回收机制般的便利。</strong></li>
+<li><strong>相较于unique_ptr，shared_ptr对象通常较大，并且引入了control block与atomic操作（并且导致了性能下降）。</strong></li>
+<li><strong>自定义删除器对shared_ptr的类型并无任何影响。</strong></li>
+<li><strong>应当尽量避免以原始指针初始化shared_ptr</strong>。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"># Modern C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/04/%E5%9C%A8%E8%BF%9B%E8%A1%8C%E7%8B%AC%E5%8D%A0%E5%BC%8F%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%97%B6%E4%BD%BF%E7%94%A8unique_ptr/" rel="next" title="18.在进行独占式资源管理时使用std::unique_ptr">
+                <i class="fa fa-chevron-left"></i> 18.在进行独占式资源管理时使用std::unique_ptr
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/05/%E7%B1%BBshared_ptr%E4%BD%86%E5%8F%AF%E7%A9%BA%E6%82%AC%E7%9A%84%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88weak_ptr/" rel="prev" title="20.类shared_ptr但可空悬的智能指针——std::weak_ptr">
+                20.类shared_ptr但可空悬的智能指针——std::weak_ptr <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shared-ptr"><span class="nav-number">2.</span> <span class="nav-text">shared_ptr</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引用计数对性能的影响"><span class="nav-number">3.</span> <span class="nav-text">引用计数对性能的影响</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shared-ptr的创建"><span class="nav-number">4.</span> <span class="nav-text">shared_ptr的创建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shared-ptr的删除器"><span class="nav-number">5.</span> <span class="nav-text">shared_ptr的删除器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#control-block"><span class="nav-number">6.</span> <span class="nav-text">control block</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#control-block创建规则"><span class="nav-number">6.1.</span> <span class="nav-text">control block创建规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题实例"><span class="nav-number">6.2.</span> <span class="nav-text">问题实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案-std-enable-shared-from-this"><span class="nav-number">6.3.</span> <span class="nav-text">解决方案(std::enable_shared_from_this)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shared-from-this实现"><span class="nav-number">6.4.</span> <span class="nav-text">shared_from_this实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shared-ptr使用成本"><span class="nav-number">7.</span> <span class="nav-text">shared_ptr使用成本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shared-ptr与unique-ptr"><span class="nav-number">8.</span> <span class="nav-text">shared_ptr与unique_ptr</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,对象模型," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="（由于学校琐事不断，本月更新过少，下个月需要参加电赛，可能会再次影响更新） 问题实例&amp;nbsp;考虑下述程序：12345678910Point global;Point foobar()&amp;#123;    Point local;    Point *heap &#x3D; new Point;    *heap &#x3D; local;    ...&#x2F;&#x2F;do sth    delete heap;    retu">
+<meta name="keywords" content="C++,对象模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构造、析构、拷贝语义学——&quot;无继承“情况下的对象构造">
+<meta property="og:url" content="https://xander.wiki/2018/05/28/%E6%9E%84%E9%80%A0%E3%80%81%E6%9E%90%E6%9E%84%E3%80%81%E6%8B%B7%E8%B4%9D%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E6%97%A0%E7%BB%A7%E6%89%BF%E6%83%85%E5%86%B5%E4%B8%8B%E7%9A%84%E5%AF%B9%E8%B1%A1%E6%9E%84%E9%80%A0/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="（由于学校琐事不断，本月更新过少，下个月需要参加电赛，可能会再次影响更新） 问题实例&amp;nbsp;考虑下述程序：12345678910Point global;Point foobar()&amp;#123;    Point local;    Point *heap &#x3D; new Point;    *heap &#x3D; local;    ...&#x2F;&#x2F;do sth    delete heap;    retu">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/05/28/构造、析构、拷贝语义学——无继承情况下的对象构造/"/>
+
+
+
+
+
+  <title>构造、析构、拷贝语义学——"无继承“情况下的对象构造 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/28/%E6%9E%84%E9%80%A0%E3%80%81%E6%9E%90%E6%9E%84%E3%80%81%E6%8B%B7%E8%B4%9D%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E6%97%A0%E7%BB%A7%E6%89%BF%E6%83%85%E5%86%B5%E4%B8%8B%E7%9A%84%E5%AF%B9%E8%B1%A1%E6%9E%84%E9%80%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">构造、析构、拷贝语义学——"无继承“情况下的对象构造</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-28T08:17:00+08:00">
+                2018-05-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>（由于学校琐事不断，本月更新过少，下个月需要参加电赛，可能会再次影响更新）</p>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>考虑下述程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Point global;</span><br><span class="line"></span><br><span class="line"><span class="function">Point <span class="title">foobar</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Point local;</span><br><span class="line">    Point *heap = <span class="keyword">new</span> Point;</span><br><span class="line">    *heap = local;</span><br><span class="line">    ...<span class="comment">//do sth</span></span><br><span class="line">    <span class="keyword">delete</span> heap;</span><br><span class="line">    <span class="keyword">return</span> local;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其中第一行、第五行、第六行体现出了完全不同的对象产生方式：global内存配置、local内存配置和heap内存配置。第七行将一个class object赋值给另一个，第九行，明确地delete heap object，第十行则设定返回值（此处再次发生了构造）。</p>
+<p>一个object的生命是该object的一个执行期属性，local object的生命从第五行定义开始直至第十行为止。global object的生命与整个程序的生命相同，heap object的生命从它被new出来开始，直至被delete。</p>
+<hr>
+<h1 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h1><p>&nbsp;<br>我们假定Point有声明如下，C++ standrad称这种声明为所谓的Plain OI’s Data形式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line">&#125; Point;</span><br></pre></td></tr></table></figure><br>如果以C++来编译这段代码，那么编译器理论上会为Point 声明一个trivial default constructor、一个trival destructor、一个trival copy constructor、以及一个trival copy assignment operator。但是实际上，编译器会分析该声明，并为其贴上Plain OI’s Data卷标。</p>
+<p>当编译器遇到定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Point global;</span><br></pre></td></tr></table></figure><br>观念上Point的trival constructor与destructor都会被产生与调用，constructor在程序起始处被调用而destructor在程序的exit()处被调用(exit()由编译器产生，置于main()函数结束之前)。然而，那些constructor与destructor要么是没定义，要么是没调用，程序的行为一如在C中的表现一样。</p>
+<p>除了一处例外：在C中，global被视为一个“临时性定义”，因为它没有一个明确的初始化操作。一个临时性定义会在程序中发生多次，它们的实例会被链接器折叠，只留下一个单独的实体，被放在程序data segment中一个“特别保留给未初始化之global objects使用”的空间。</p>
+<p>C++并不支持临时性的定义，这是因为class构造函数的隐含应用之故。虽然大家公认C++能够判定出目前对象是一个class object或是一个Plain OI’s Data,但似乎我们没有必要去分辨它们。因此，global在C++中被视为完全定义（阻止其他的定义）。C与C++的一大差异在于，BSS data segment在C++中不甚重要，C++中所有的全局对象都被当做初始化过的数据来对待。</p>
+<p>foobar()中的第五行，有一个Point object local,同样既没有被构造也没有被析构，如果其在未经初始化的情况下就试图去使用，那么会引发bug。至于heap object在第六行中的初始化操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Point* heap = <span class="keyword">new</span> Point;</span><br></pre></td></tr></table></figure><br>会被转换为对new操作符的调用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Point *heap = _new(<span class="keyword">sizeof</span>(Point));</span><br></pre></td></tr></table></figure><br>需要注意的是，并没有任何default constructor施行于new运算符所传回的Point object身上，第七行对此object有一个赋值操作，我们可能会认为object是一个Plain OI’s Data,所以赋值操作将只是简单地纯粹位搬移操作，第九行执行的delete将被转换为对delete运算符的调用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_delete(heap);</span><br></pre></td></tr></table></figure><br>而非触发Point的trivial destructor。最后，函数以pass by value的方式将local当做返回值使用，这在观念上会触发trivial copy constructor，但实际上return操作只是执行了一个简单的位拷贝操作，因为对象是一个Plain OI’s Data。</p>
+<hr>
+<h1 id="抽象数据类型"><a href="#抽象数据类型" class="headerlink" title="抽象数据类型"></a>抽象数据类型</h1><p>&nbsp;<br>现在我们考虑Point加入了private数据之后的情况：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point(<span class="keyword">float</span> x = <span class="number">0.0</span>,<span class="keyword">float</span> y = <span class="number">0.0</span>,<span class="keyword">float</span> z = <span class="number">0.0</span>):</span><br><span class="line">        _x(x),_y(y),_z(z) &#123;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">float</span> _x,_y,_z;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>众所周知，封装并未给其带来空间上的额外开销，另外，我们并没有声明copy constructor或copy assignment operator，因为default bitwise已经足够，出于类似的原因，我们也不需要为其声明destructor。</p>
+<p>对于一个global实体，现有default constructor作用于其上：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Point global;<span class="comment">//执行Point::Point(0.0,0.0,0.0);</span></span><br></pre></td></tr></table></figure><br>由于global被定义在全局范畴，因此其初始化操作将会延迟到程序startup时才开始。</p>
+<h2 id="explicit-initialization-list"><a href="#explicit-initialization-list" class="headerlink" title="explicit initialization list"></a>explicit initialization list</h2><p>如果需要对class中的所有成员均设定常量初值，那么给予一个explicit initialization list会比较高效。有实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">mumble</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Point local1 = &#123;<span class="number">1.0</span>,<span class="number">1.0</span>,<span class="number">1.0</span>&#125;;</span><br><span class="line">    Point local2;</span><br><span class="line">    local2._x=<span class="number">1.0</span>;</span><br><span class="line">    local2._y=<span class="number">1.0</span>;</span><br><span class="line">    local2._z=<span class="number">1.0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>local1的初始化操作比local2的更加高效，因为当函数的activation record被放进程序堆栈时，上述initialization list中的常量就可以被放入local1内存中。</p>
+<p>Explicit initialization list存在3项缺陷：</p>
+<ol>
+<li>仅能作用于class member均为public的情况</li>
+<li>只能指定常量，因为仅有常量能在编译时期就可以被evaluate</li>
+<li>由于不存在自动施行，因此初始化行为的失败可能性会比较高</li>
+</ol>
+<p>一般来说，explicit initialization list带来的优势不足以弥补其弊端，但对于全局对象而言，explicit initialization list的效率要高于inline constructor。</p>
+<p>在编译器层面，会有一个特殊的机制来识别inline constructor，然后将其转变为explicit initialization list那种格式（如果可以转变的话），如果不能转变，那么将提供member-by-member的常量指定操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    Point local;</span><br><span class="line">    <span class="comment">//inline expansion</span></span><br><span class="line">    local._x=<span class="number">0.0</span>;local._y=<span class="number">0.0</span>;local._z=<span class="number">0.0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="为继承做准备"><a href="#为继承做准备" class="headerlink" title="为继承做准备"></a>为继承做准备</h1><p>&nbsp;<br>我们的第三个Point声明，将为“继承性质”以及某些操作的dynamic resolution做准备：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point(<span class="keyword">float</span> x=<span class="number">0.0</span>,y=<span class="number">0.0</span>):_x(x),_y(y) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> _x,_y;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>virtual function的引入使得每一个Point object拥有一个vptr，这可能会引起空间性能的降低。另外，virtual function的引入也将引发编译器对Point class产生膨胀作用：</p>
+<ul>
+<li>我们所定义的constructor被附加了一些代码，以便将vptr初始化。这些代码必须附加于任何base class constructors的调用之后，但必须在任何由开发者撰写的代码之前。<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Point* Point(Point *this,float x,float y):_x(x),_y(y)&#123;</span><br><span class="line">    <span class="comment">//以下为附加部分</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;_vptr_Point = _vtbl_Point;</span><br><span class="line">    <span class="keyword">this</span>-&gt;_x = x;</span><br><span class="line">    <span class="keyword">this</span>-&gt;-y = y;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>合成一个constructor与一个copy assignment operator，而且其操作不再为trivial（但implicit destructor依然是trivial）。bitwise操作可能会导致vptr非法：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">inline</span> Point*</span><br><span class="line"> Point::Point(Point *<span class="keyword">this</span>,<span class="keyword">const</span> Point &amp;rhs)&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;_vptr_Point = _vtbl_Point;</span><br><span class="line">    <span class="comment">//执行原计划的复制操作</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>编译器在优化状态下可能会把object的连续内容拷贝到另一个object上，而不是考虑memberwise的赋值操作。C++ standard要求编译器尽量延迟nontrivial members的实际合成操作，直到其真正使用。</p>
+<p>我们再一次分析如下程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Point global;</span><br><span class="line"></span><br><span class="line"><span class="function">Point <span class="title">foobar</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Point local;</span><br><span class="line">    Point *heap = <span class="keyword">new</span> Point;</span><br><span class="line">    *heap = local;</span><br><span class="line">    ...<span class="comment">//do sth</span></span><br><span class="line">    <span class="keyword">delete</span> heap;</span><br><span class="line">    <span class="keyword">return</span> local;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br><code>*heap=local</code>memberwise赋值操作，可能会触发copy assignment operator的合成，及其调用操作的一个inline expansion：以this代替heao而以rhs代替local。</p>
+<p>传值返回的那一行出现了更大的冲击，由于copy constructor的出现，foobar很有可能被转化成了下面的形式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point <span class="title">foobar</span><span class="params">(Point &amp;_result)</span></span>&#123;</span><br><span class="line">    Point local;</span><br><span class="line">    local.Point::Point(<span class="number">0.0</span>,<span class="number">0.0</span>);</span><br><span class="line">    <span class="comment">//heap与之前相同</span></span><br><span class="line">    _result.Point::Point(local);<span class="comment">//应用copy constructor</span></span><br><span class="line">    local.Point::~Point();<span class="comment">//destroy local</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果支持NRV优化，那么这个函数将会进一步被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Point <span class="title">foobar</span><span class="params">(Point &amp;_result)</span></span>&#123;</span><br><span class="line">    _result.Point::Point(<span class="number">0.0</span>,<span class="number">0.0</span>);</span><br><span class="line">    <span class="comment">//heap部分相同</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>一般而言，如果你的程序中充斥着大量需要return value的函数（例如数值计算函数），那么提供一个copy constructor比较合理，因为这会触发NRV优化。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/" rel="tag"># 对象模型</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/17/%E6%9E%84%E9%80%A0%E3%80%81%E6%9E%90%E6%9E%84%E3%80%81%E6%8B%B7%E8%B4%9D%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%AF%BC%E8%AF%BB/" rel="next" title="构造、析构、拷贝语义学——导读">
+                <i class="fa fa-chevron-left"></i> 构造、析构、拷贝语义学——导读
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/29/%E6%9E%84%E9%80%A0%E3%80%81%E6%9E%90%E6%9E%84%E3%80%81%E6%8B%B7%E8%B4%9D%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E7%BB%A7%E6%89%BF%E4%BD%93%E7%B3%BB%E4%B8%8B%E7%9A%84%E5%AF%B9%E8%B1%A1%E6%9E%84%E9%80%A0/" rel="prev" title="构造、析构、拷贝语义学——继承体系下的对象构造">
+                构造、析构、拷贝语义学——继承体系下的对象构造 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例"><span class="nav-number">1.</span> <span class="nav-text">问题实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题剖析"><span class="nav-number">2.</span> <span class="nav-text">问题剖析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#抽象数据类型"><span class="nav-number">3.</span> <span class="nav-text">抽象数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#explicit-initialization-list"><span class="nav-number">3.1.</span> <span class="nav-text">explicit initialization list</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为继承做准备"><span class="nav-number">4.</span> <span class="nav-text">为继承做准备</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

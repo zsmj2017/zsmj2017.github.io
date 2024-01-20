@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,类型推衍," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;如果开发者在不了解某系统运行机制的前提下仍能高效地使用它，他们往往会给予该系统极高的赞美。由此说来，C++中的模板类型推衍无疑是一项巨大的成功，数以万计的开发者轻松获取了满意的结果，尽管他们不得不为了描述这些经由推衍得到的类型而做出相当大的努力。 如果你就是上述开发者中的一员，迎接你的是一个好消息与一个坏消息。好消息是模板类型推衍技术是auto技术的基础，如果你对于模板类型推衍感到">
+<meta name="keywords" content="C++,类型推衍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1.了解模板类型推衍">
+<meta property="og:url" content="https://xander.wiki/2018/06/20/%E6%A8%A1%E6%9D%BF%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;如果开发者在不了解某系统运行机制的前提下仍能高效地使用它，他们往往会给予该系统极高的赞美。由此说来，C++中的模板类型推衍无疑是一项巨大的成功，数以万计的开发者轻松获取了满意的结果，尽管他们不得不为了描述这些经由推衍得到的类型而做出相当大的努力。 如果你就是上述开发者中的一员，迎接你的是一个好消息与一个坏消息。好消息是模板类型推衍技术是auto技术的基础，如果你对于模板类型推衍感到">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/06/20/模板类型推衍/"/>
+
+
+
+
+
+  <title>1.了解模板类型推衍 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/20/%E6%A8%A1%E6%9D%BF%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">1.了解模板类型推衍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-20T17:10:00+08:00">
+                2018-06-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>如果开发者在不了解某系统运行机制的前提下仍能高效地使用它，他们往往会给予该系统极高的赞美。由此说来，C++中的模板类型推衍无疑是一项巨大的成功，数以万计的开发者轻松获取了满意的结果，尽管他们不得不为了描述这些经由推衍得到的类型而做出相当大的努力。</p>
+<p>如果你就是上述开发者中的一员，迎接你的是一个好消息与一个坏消息。好消息是模板类型推衍技术是<code>auto</code>技术的基础，如果你对于模板类型推衍感到满意，那么想必你也会认为<code>auto</code>老少咸宜。坏消息是<code>auto</code>技术中所使用的类型推衍技术相较于template可能不够直观。为了清楚地了解<code>auto</code>，我们首先最好认知一下模板类型推衍。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>考虑以下函数模板及其调用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(ParamType param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(expr);</span><br></pre></td></tr></table></figure><br>在编译期间，编译器会使用expr去推衍T、ParamType。这两者往往存在一定的差异，原因在于ParamType可能会带有一定的修饰，例如const或者reference之类。举例而言，如果该函数模板被声明和使用如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x=<span class="number">0</span>;</span><br><span class="line">f(x);</span><br></pre></td></tr></table></figure><br>那么T将被推衍为int类型，而ParamType将被推衍为const int&amp;。</p>
+<p>认为实参类型类型等价于T的类型是一种十分自然的想法，就像刚才的T为int一样，但很多时候情况并不是这样，事实上，T的类型并不完全取决于expr的类型，也与ParamType的形式有关。以下将给出三组案例：</p>
+<ol>
+<li><strong>ParamType是一个pointer或reference，但其非universal reference。</strong>（universal reference将在Item24中给出解释，这里只需要明确其并非左值引用或右值引用）</li>
+<li><strong>ParamTyp是一个universal reference。</strong></li>
+<li><strong>ParamType既不是pointer也不是reference。</strong></li>
+</ol>
+<hr>
+<h2 id="Refernece-or-Pointer，and-not-a-universal-reference"><a href="#Refernece-or-Pointer，and-not-a-universal-reference" class="headerlink" title="Refernece or Pointer，and not a universal reference"></a>Refernece or Pointer，and not a universal reference</h2><p>&nbsp;<br>这种情况是最简单的情况，在此情况下，类型推衍遵循以下原则：</p>
+<p> <strong>1. 如果expr的类型是一个refernce，则忽略refernece部分。</strong><br> <strong>2. 根据expr与ParamType的类型完成T类型推衍</strong></p>
+<p>举例而言，现有声明与应用如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// function template declartion</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T&amp; param)</span></span>;</span><br><span class="line"><span class="comment">//variable declaration</span></span><br><span class="line"><span class="keyword">int</span> x =<span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> cx = x;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span>&amp; rx =x;</span><br><span class="line"></span><br><span class="line">f(x);<span class="comment">//T is int，param's type is int&amp;</span></span><br><span class="line">f(cx);<span class="comment">//T is const int,param's type is const int&amp;</span></span><br><span class="line">f(rx);<span class="comment">//T is const int,param's type is const int&amp;</span></span><br></pre></td></tr></table></figure><br>需要注意的是第二和第三个函数调用，由于cx与rx代表常量，因此T是一个const int，param的类型是const int&amp;。当你试图传递一个常量给引用参数时，编译器会认为对象仍然需要保持不可变性，因此param会成为一个reference-to-const。我们可以认为，const对象传递给引用类型的形参是安全的，编译器会推衍出T带有const属性。</p>
+<p>在第三个函数调用中，rx本身是一个reference，而T被推衍为non-refernce，这是由于rx的reference属性在类型推衍中被忽略所致。</p>
+<p>上述的三个实例都是左值引用，但实际上右值引用的类型推衍并没有什么不同，非要说的话就是只有右值实参才能被赋予右值形参。</p>
+<p>如果我们将template function的形参由T&amp;改为const T&amp;，事情会发生一点点小小的变化。cx与rx的const属性仍然得到了关注，但由于我们已经认定param是一个reference-to-const，因此T将被推衍为int类型，即：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x = <span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> cx = x;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span>&amp; rx =x;</span><br><span class="line"></span><br><span class="line">f(x);<span class="comment">//T is int，param's type is const int&amp;</span></span><br><span class="line">f(cx);<span class="comment">//T is int,param's type is const int&amp;</span></span><br><span class="line">f(rx);<span class="comment">//T is int,param's type is const int&amp;</span></span><br></pre></td></tr></table></figure><br>当然，这里rx的reference属性也被忽略了。</p>
+<p>如果param是一个pointer或pointer-to-const，那么类型推衍结果几乎没什么变化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T* param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x = <span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> *px = &amp;x;</span><br><span class="line"></span><br><span class="line">f(&amp;x);<span class="comment">//T is int,param 's type is int*</span></span><br><span class="line">f(px);<span class="comment">//T is const int,param's type is const int *</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="ParamType-is-a-Universal-Reference"><a href="#ParamType-is-a-Universal-Reference" class="headerlink" title="ParamType is a Universal Reference"></a>ParamType is a Universal Reference</h2><p>&nbsp;<br>在上一案例中，一切推衍都十分自然。但当template以universal reference作为参数时，推衍法则将变得不再显然。某些parameters被声明为右值引用，但当左值传入时，其表现的结果将不再类似于右值引用。关于universal reference的详细介绍将在Item24展开,接下来将给出本案例的推衍法则：</p>
+<ol>
+<li><strong>如果expr是一个左值，那么T与ParamType都将被推衍为左值引用。</strong>这里存在两点不同寻常之处，首先，只有在此种情况下template才会将T推衍为引用类型；其次，尽管ParamType被声明为右值引用，但最终其推衍类型是一个左值引用。</li>
+<li><strong>如果expr是一个右值，则遵照案例1中的法则执行</strong>。</li>
+</ol>
+<p>有问题实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T&amp;&amp; param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x= <span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> cx = x;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span>&amp; rx =x;</span><br><span class="line"></span><br><span class="line">f(x);<span class="comment">//x is lvalue,T is int&amp;,param's type is int&amp;</span></span><br><span class="line">f(cx);<span class="comment">//cx is lvalue,T is const int&amp;,param's type is const int&amp;</span></span><br><span class="line">f(rx);<span class="comment">//rx is lvalue,T is const int&amp;,param's type is const int&amp;</span></span><br><span class="line">f(<span class="number">27</span>);<span class="comment">//27 is rvalue,T is int,param's type is int&amp;&amp;</span></span><br></pre></td></tr></table></figure></p>
+<p>在Item24中将会详细解释此处的类型推衍法则原理。在Universal reference案例中，关键点在于实参是左值还是右值会导致不同的推衍原则被执行，这在non-universal reference中不会出现。</p>
+<hr>
+<h2 id="ParamType-is-Neither-a-Pointer-nor-a-Reference"><a href="#ParamType-is-Neither-a-Pointer-nor-a-Reference" class="headerlink" title="ParamType is Neither a Pointer nor a Reference"></a>ParamType is Neither a Pointer nor a Reference</h2><p>&nbsp;<br>这种情况意味着执行值传递——产生了一个对象的copy，这一现象产生了本案例下的类型推衍法则：</p>
+<ol>
+<li><strong>如果expr为reference，则忽略其reference属性。</strong></li>
+<li><strong>如果在忽略reference属性后，expr还留有const或volatile属性，则一并忽略。</strong></li>
+</ol>
+<p>有实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x = <span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> cx = x;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span>&amp; rx = x;</span><br><span class="line"></span><br><span class="line">f(x);<span class="comment">//T is int,param's type is int</span></span><br><span class="line">f(cx);<span class="comment">//T is int,param's type is int</span></span><br><span class="line">f(rx);<span class="comment">//T is int,param's type is int</span></span><br></pre></td></tr></table></figure></p>
+<p>这里需要注意的是，即使cx与rx代表常量，param也并非const。我们应当明确，param是一个与cx或rx无关的对象，它由copy得到，这很好地解释了为什么param不会具备expr所带有的constness与volatileness。不过需要说明的是，constness或volatilness只在pass-by-value中会被忽视，pass-by-pointer或pass-by-reference则会保留其特性。最后，让我们看看以下这种情况：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ptr = <span class="string">"Hello,world!"</span>;</span><br><span class="line">f(ptr);<span class="comment">//T is const char*, param's is const char*</span></span><br></pre></td></tr></table></figure><br>在本实例中，我们需要明确的是param是一个ptr的拷贝，因此底层const属性被丢失（bitwise copy），而顶层const则得到了保留。</p>
+<hr>
+<h2 id="Array-Arguments"><a href="#Array-Arguments" class="headerlink" title="Array Arguments"></a>Array Arguments</h2><p>&nbsp;<br>尽管我们经常在实际使用中将数组类型与指针混为一谈，但在类型推衍中它们存在一定的区别。我们首先复习一下数组名与指针的关系：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> name[] = <span class="string">"J.P.Briggs"</span>;<span class="comment">//name's type is const char[13]</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* ptrname = name;<span class="comment">//array decays to pointer</span></span><br></pre></td></tr></table></figure><br>显然，ptrname经由name得到了初始化，尽管它们的类型并不相同，但由于退化原则（array-to-pointer)，上述代码得以被编译。不妨试想，如果一个数组以pass-by-value方式传递给template，将会如何？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(name);</span><br></pre></td></tr></table></figure></p>
+<p>为了解决这个问题，我们先从一个更加基础的问题开始回答：当数组作为一个函数的参数时会发生什么？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">myFunc</span><span class="params">(<span class="keyword">int</span> param[])</span></span>;</span><br></pre></td></tr></table></figure><br>此处的形参尽管被声明为数组，实际上编译器会将其视为一个指针，因此，myFunc声明式等价于<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">myFunc</span><span class="params">(<span class="keyword">int</span>* param)</span></span>;</span><br></pre></td></tr></table></figure><br>数组名与指针等价的规则起始于C语言，这一设定也被C++继承，这直接导致了开发者产生了数组等价于指针的错误观念。基于这一规则，我们在类型推衍中有设定如下：<strong>当一个数组以pass-by-value的形式被传递给template function时，其类型总是被推衍为指针</strong>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f(name);<span class="comment">//name is array，T deduced as const char*</span></span><br></pre></td></tr></table></figure><br>但是我们需要明确，尽管函数的形参不能够真正地声明为数组类型，但其可以声明为数组的引用，因此假若我们有template function声明如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T&amp; param)</span></span>;</span><br></pre></td></tr></table></figure><br>我们再次传入数组,<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f(name);</span><br></pre></td></tr></table></figure><br>此时T的类型将是一个真正的数组。数组类型包含了数组的长度，因此在本例中，T将会被推衍为const char[13],ParamType的类型为const char（&amp;)[13]。这一特性也保证了模板可以推衍出数组包含元素的个数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//return size of an array as complie-time constant</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T,<span class="built_in">std</span>::<span class="keyword">size_t</span> N&gt;</span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="built_in">std</span>::<span class="keyword">size_t</span> <span class="title">arraySize</span><span class="params">(T (&amp;)[N])</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> N;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>constexpr意味着编译期间即可得到变量值，因此constexpr修饰的int形变量可以作为数组长度参数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> keyVals[] = &#123;<span class="number">1</span>,<span class="number">3</span>,<span class="number">7</span>,<span class="number">9</span>,<span class="number">11</span>,<span class="number">22</span>,<span class="number">35</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> mappedVals[arraySize(keyVals)];<span class="comment">//此处使用std::array更佳</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="Function-Arguments"><a href="#Function-Arguments" class="headerlink" title="Function Arguments"></a>Function Arguments</h2><p>&nbsp;<br>数组名并非是C++中唯一会退化成指针的东西，函数名亦然，因此我们针对数组的所有讨论都可以应用于函数，举例而言：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">someFunc</span><span class="params">(<span class="keyword">int</span>,<span class="keyword">double</span>)</span></span>;<span class="comment">//type is void(int,double)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f1</span><span class="params">(T param)</span></span>;/pass-by-value</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f2</span><span class="params">(T&amp; param)</span></span>;<span class="comment">//pass-by-reference</span></span><br><span class="line"></span><br><span class="line">f1(someFunc);<span class="comment">//ParamType's type is void(*)(int,double)</span></span><br><span class="line">f2(someFunc);<span class="comment">//ParamType's type is void(&amp;)(int,double)</span></span><br></pre></td></tr></table></figure>
+<p>好像在实际应用中没有什么差别，但知道总比不知道要好。 </p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>在普通模板参数推衍过程中，reference-ness会被忽略。</strong></li>
+<li><strong>对于universal reference，lvalue作为实参传入时会保留reference-ness。</strong></li>
+<li><strong>当以pass-by-value形式类型推衍时，const-ness与volatile-ness会被忽略。</strong></li>
+<li><strong>在模板类型推衍过程中，数组名与函数名会退化为指针，除非形参以引用形式得到了初始化。</strong></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D/" rel="tag"># 类型推衍</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/19/%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D%E7%AB%A0%E8%8A%82%E5%89%8D%E8%A8%80/" rel="next" title="类型推衍">
+                <i class="fa fa-chevron-left"></i> 类型推衍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/23/%E4%BA%86%E8%A7%A3auto%E6%8A%80%E6%9C%AF/" rel="prev" title="2.了解auto技术">
+                2.了解auto技术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例"><span class="nav-number">2.</span> <span class="nav-text">问题实例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Refernece-or-Pointer，and-not-a-universal-reference"><span class="nav-number">2.1.</span> <span class="nav-text">Refernece or Pointer，and not a universal reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ParamType-is-a-Universal-Reference"><span class="nav-number">2.2.</span> <span class="nav-text">ParamType is a Universal Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ParamType-is-Neither-a-Pointer-nor-a-Reference"><span class="nav-number">2.3.</span> <span class="nav-text">ParamType is Neither a Pointer nor a Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Array-Arguments"><span class="nav-number">2.4.</span> <span class="nav-text">Array Arguments</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Function-Arguments"><span class="nav-number">2.5.</span> <span class="nav-text">Function Arguments</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

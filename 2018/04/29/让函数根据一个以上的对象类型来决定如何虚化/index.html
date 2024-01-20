@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,设计模式," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="问题实例&amp;nbsp;假设我们在设计一个游戏，游戏的背景发生在太空，有宇宙飞船、太空站和小行星等对象。这些对象可能会发生碰撞，有规则如下：  如果飞船和空间站以低速接触，飞船将泊入空间站。否则，它们将有正比于相对速度的损坏。 如果飞船与飞船，或空间站与空间站相互碰撞，参与者均有正比于相对速度的损坏。 如果小行星与飞船或空间站碰撞，小行星毁灭。如果是小行星体积较大，飞船或空间站也毁坏。 如果两个小行星">
+<meta name="keywords" content="C++,设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="31.让函数根据一个以上的对象类型来决定如何虚化">
+<meta property="og:url" content="https://xander.wiki/2018/04/29/%E8%AE%A9%E5%87%BD%E6%95%B0%E6%A0%B9%E6%8D%AE%E4%B8%80%E4%B8%AA%E4%BB%A5%E4%B8%8A%E7%9A%84%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B%E6%9D%A5%E5%86%B3%E5%AE%9A%E5%A6%82%E4%BD%95%E8%99%9A%E5%8C%96/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="问题实例&amp;nbsp;假设我们在设计一个游戏，游戏的背景发生在太空，有宇宙飞船、太空站和小行星等对象。这些对象可能会发生碰撞，有规则如下：  如果飞船和空间站以低速接触，飞船将泊入空间站。否则，它们将有正比于相对速度的损坏。 如果飞船与飞船，或空间站与空间站相互碰撞，参与者均有正比于相对速度的损坏。 如果小行星与飞船或空间站碰撞，小行星毁灭。如果是小行星体积较大，飞船或空间站也毁坏。 如果两个小行星">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/gd97vru83myvlbpioi22nfph/image_1cc8b0o0hd4smo21uu2166j18fc9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/oyk370ogwudt9e1nin8tyzcu/image_1cc8g09pf18qt12ag5u1hmh1r0am.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/gd97vru83myvlbpioi22nfph/image_1cc8b0o0hd4smo21uu2166j18fc9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/04/29/让函数根据一个以上的对象类型来决定如何虚化/"/>
+
+
+
+
+
+  <title>31.让函数根据一个以上的对象类型来决定如何虚化 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/29/%E8%AE%A9%E5%87%BD%E6%95%B0%E6%A0%B9%E6%8D%AE%E4%B8%80%E4%B8%AA%E4%BB%A5%E4%B8%8A%E7%9A%84%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B%E6%9D%A5%E5%86%B3%E5%AE%9A%E5%A6%82%E4%BD%95%E8%99%9A%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">31.让函数根据一个以上的对象类型来决定如何虚化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-29T17:12:00+08:00">
+                2018-04-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设我们在设计一个游戏，游戏的背景发生在太空，有宇宙飞船、太空站和小行星等对象。这些对象可能会发生碰撞，有规则如下：</p>
+<ul>
+<li>如果飞船和空间站以低速接触，飞船将泊入空间站。否则，它们将有正比于相对速度的损坏。</li>
+<li>如果飞船与飞船，或空间站与空间站相互碰撞，参与者均有正比于相对速度的损坏。</li>
+<li>如果小行星与飞船或空间站碰撞，小行星毁灭。如果是小行星体积较大，飞船或空间站也毁坏。</li>
+<li>如果两个小行星碰撞，将碎裂为更小的小行星，并向各个方向溅射。</li>
+</ul>
+<hr>
+<h1 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h1><p>&nbsp;<br>首先开始分析对象共性。显然，它们都在运动，都有一个速度描述运动，因此应该存在一个抽象基类，让各对象从抽象基类中派生出来。继承体系如下：<img src="http://static.zybuluo.com/zsmj2017/gd97vru83myvlbpioi22nfph/image_1cc8b0o0hd4smo21uu2166j18fc9.png" alt="image_1cc8b0o0hd4smo21uu2166j18fc9.png-53.9kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameObject</span> &#123;</span> ... &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123; ... &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceStation</span>:</span> <span class="keyword">public</span> GameObject &#123; ... &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Asteroid</span>:</span> <span class="keyword">public</span> GameObject &#123; ... &#125;;</span><br></pre></td></tr></table></figure><br>接着我们准备撰写最关键的碰撞函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">checkForCollision</span><span class="params">(GameObject&amp; object1,GameObject&amp; object2)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (theyJustCollided(object1, object2)) &#123;</span><br><span class="line">        processCollision(object1, object2);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>processCollision函数必然是一个虚函数，但关键问题在于，该函数的虚化并非由一个对象类型决定，而是由两个对象类型共同决定。<br>这种二重调度问题被称为double dispatch，相应地当然也有multiple dispatch。C++并没有提供相应的功能，因此我们必须手动模拟编译器来进行实现。</p>
+<hr>
+<h1 id="虚函数-RTTI"><a href="#虚函数-RTTI" class="headerlink" title="虚函数+RTTI"></a>虚函数+RTTI</h1><p>&nbsp;<br>我们在GameObject中申明一个虚函数collide。这个函数被派生类以通常的形式重载：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameObject</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>为了节约篇幅，下文只针对派生类SpaceShip做出详细描述，其他派生类的情况类似于SpaceShip。<br>实现double-dispatch最常见的写法就是if-else逻辑链。在这种方法中，我们首先判断rhs的真实类型，然后测试所有可能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CollisionWithUnknownObject</span> &#123;</span><span class="comment">//异常类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    CollisionWithUnknownObject(GameObject&amp; whatWeHit);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::collide</span><span class="params">(GameObject&amp; otherObject)</span></span>&#123;</span><br><span class="line">    <span class="keyword">const</span> type_info&amp; objectType = <span class="keyword">typeid</span>(otherObject);</span><br><span class="line">    <span class="keyword">if</span> (objectType == <span class="keyword">typeid</span>(SpaceShip)) &#123;</span><br><span class="line">        SpaceShip&amp; ss = <span class="keyword">static_cast</span>&lt;SpaceShip&amp;&gt;(otherObject);</span><br><span class="line">        ...<span class="comment">//process a SpaceShip-SpaceShip collision;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (objectType == <span class="keyword">typeid</span>(SpaceStation)) &#123;</span><br><span class="line">        SpaceStation&amp; ss = <span class="keyword">static_cast</span>&lt;SpaceStation&amp;&gt;(otherObject);</span><br><span class="line">        ...<span class="comment">//process a SpaceShip-SpaceStation collision;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (objectType == <span class="keyword">typeid</span>(Asteroid)) &#123;</span><br><span class="line">        Asteroid&amp; a = <span class="keyword">static_cast</span>&lt;Asteroid&amp;&gt;(otherObject);</span><br><span class="line">        <span class="built_in">process</span> a SpaceShip-Asteroid collision;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> CollisionWithUnknownObject(otherObject);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>我们完全放弃了封装:每一个object都必须了解其同胞类的版本，一旦增了新类，我们必须更新每一个RTTI体系。<br>在没有虚函数的概念时，这种写法就是虚函数的粗陋实现，显然这种程序毫无维护性。</p>
+<hr>
+<h1 id="只使用虚函数"><a href="#只使用虚函数" class="headerlink" title="只使用虚函数"></a>只使用虚函数</h1><p>&nbsp;<br>这个方法架构与RTTI版本其实无二，只不过其collide函数增加了各种重载版本，每一个重载处理一个类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceStation</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Asteroid</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameObject</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(SpaceShip&amp; otherObject)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(SpaceStation&amp; otherObject)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(Asteroid&amp; otherobject)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(SpaceShip&amp; otherObject)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(SpaceStation&amp; otherObject)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(Asteroid&amp; otherobject)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>其基本原理就是用两个单一调度实现二重调度，也就是说有两个单独的虚函数调用：以rhs作为函数调用的对象再次调用虚函数，*this的静态类型已知，可以直接匹配。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::collide</span><span class="params">(GameObject&amp; otherObject)</span></span>&#123;</span><br><span class="line">    otherObject.collide(*<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>该方法的缺陷和RTTI一样：每一个类都必须知道其同胞类，当增加新类时，所有代码必须更新，而且必须为每一个新类增加一个新的虚函数。如果当前依赖于某个运行库，这样的改动会导致整个运行库都必须重新编译。</p>
+<hr>
+<h1 id="模拟虚函数表"><a href="#模拟虚函数表" class="headerlink" title="模拟虚函数表"></a>模拟虚函数表</h1><p>&nbsp;<br>在More Effective C++ 24中我们提及了vtbl，虚函数实现的基础。使用vtbl，编译器避免了使用if…then…else链，并能在所有调用虚函数的地方生成同样的代码。我们没有理由无法在之前的RTTI体系中模拟vtbl。<br>首先，我们对GameObjcet继承体系中的函数作一些修改,为每个子类添加对应的碰撞函数:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameObject</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">hitSpaceShip</span><span class="params">(SpaceShip&amp; otherObject)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">hitSpaceStation</span><span class="params">(SpaceStation&amp; otherObject)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">hitAsteroid</span><span class="params">(Asteroid&amp; otherobject)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::hitSpaceShip</span><span class="params">(SpaceShip&amp; otherObject)</span></span>&#123;</span><br><span class="line">    <span class="built_in">process</span> a SpaceShip-SpaceShip collision;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::hitSpaceStation</span><span class="params">(SpaceStation&amp; otherObject)</span></span>&#123;</span><br><span class="line">    <span class="built_in">process</span> a SpaceShip-SpaceStation collision;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::hitAsteroid</span><span class="params">(Asteroid&amp; otherObject)</span></span>&#123;</span><br><span class="line">    <span class="built_in">process</span> a SpaceShip-Asteroid collision;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在Spaceship::collide中，我们需要一个方法来映射参数otherObject的动态类型到一个成员函数指针，我们使用一个中间函数lookup来完成此工作:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(SpaceShip::*HitFunctionPtr)</span><span class="params">(GameObject&amp;)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> HitFunctionPtr <span class="title">lookup</span><span class="params">(<span class="keyword">const</span> GameObject&amp; whatWeHit)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>既然有了lookup，那么collide的实现就很简单了：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::collide</span><span class="params">(GameObject&amp; otherObject)</span></span>&#123;</span><br><span class="line">    HitFunctionPtr hfp = lookup(otherObject);</span><br><span class="line">    <span class="keyword">if</span>(hfp) &#123;</span><br><span class="line">        (<span class="keyword">this</span>-&gt;*hfp)(otherObject);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> CollisionWithUnknownObject(otherObject);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>接下来要做的就是保证动态类型与成员函数之间的映射了。</p>
+<hr>
+<h2 id="映射表"><a href="#映射表" class="headerlink" title="映射表"></a>映射表</h2><p>首先要做的是一个映射表。该映射表应该在它被使用前构造与初始化，并在不被需要时析构。以上操作应该由编译器自动完成，所以我们将映射表设为lookup函数中的static对象，在第一次调用lookup时构造，在main退出后自行析构：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(SpaceShip::*HitFunctionPtr)</span><span class="params">(GameObject&amp;)</span></span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="built_in">map</span>&lt;<span class="built_in">string</span>, HitFunctionPtr&gt; HitMap;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">SpaceShip::HitFunctionPtr</span><br><span class="line">SpaceShip::lookup(<span class="keyword">const</span> GameObject&amp; whatWeHit)&#123;</span><br><span class="line">    <span class="keyword">static</span> HitMap collisionMap;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>通过使用map的find函数，lookup实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SpaceShip::HitFunctionPtr</span><br><span class="line">SpaceShip::lookup(<span class="keyword">const</span> GameObject&amp; whatWeHit)&#123;</span><br><span class="line">    <span class="keyword">static</span> HitMap collisionMap;</span><br><span class="line">    <span class="keyword">auto</span> mapEntry = collisionMap.<span class="built_in">find</span>(<span class="keyword">typeid</span>(whatWeHit).name());</span><br><span class="line">    <span class="keyword">if</span> (mapEntry == collisionMap.<span class="built_in">end</span>()) <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="keyword">return</span> mapEntry-&gt;second;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="初始化映射表"><a href="#初始化映射表" class="headerlink" title="初始化映射表"></a>初始化映射表</h3><p>我们需要写一个私有的静态成员函数initializeCollisionMap来构造和初始化映射表，然后用其返回值来初始化collisionMap：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> HitMap <span class="title">initializeCollisionMap</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">SpaceShip::HitFunctionPtr</span><br><span class="line">SpaceShip::lookup(<span class="keyword">const</span> GameObject&amp; whatWeHit)&#123;</span><br><span class="line">    <span class="keyword">static</span> HitMap collisionMap = initializeCollisionMap();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种写法意味着我们需要拷贝赋值，如果初始化函数返回指针则可以避免该问题，但堆中对象又可能会发生资源泄露。考虑到RAII，我们可以将 collisionMap改为一个智能指针，它将在自己被析构时delete 所指向的对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123;</span><br><span class="line">    <span class="keyword">private</span>:<span class="function"><span class="keyword">static</span> HitMap* <span class="title">initializeCollisionMap</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">SpaceShip::HitFunctionPtr</span><br><span class="line">SpaceShip::lookup(<span class="keyword">const</span> GameObject&amp; whatWeHit)&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="built_in">auto_ptr</span>&lt;HitMap&gt; <span class="title">collisionMap</span><span class="params">(initializeCollisionMap())</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">SpaceShip::HitMap * <span class="title">SpaceShip::initializeCollisionMap</span><span class="params">()</span></span>&#123;</span><br><span class="line">    HitMap *phm = <span class="keyword">new</span> HitMap;</span><br><span class="line">    (*phm)[<span class="string">"SpaceShip"</span>] = &amp;hitSpaceShip;</span><br><span class="line">    (*phm)[<span class="string">"SpaceStation"</span>] = &amp;hitSpaceStation;</span><br><span class="line">    (*phm)[<span class="string">"Asteroid"</span>] = &amp;hitAsteroid;</span><br><span class="line">    <span class="keyword">return</span> phm;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>但这无法通过编译，因为HitMap内包容的是一堆指向成员函数的指针，他们的参数类型都是GameObject，而hitSpaceShip等函数带的不一样。虽然对象类型可以隐式转换，但函数指针并没有这种转换关系。<br>使用reinterpret_cast并不是好主意，而且存在极大风险，当spaceship位于多继承体系下时，编译器可能会传输错误的地址。为了不采取类型转换，我们不得不把hit函数的形参改为统一的gameobject，然后在每一个函数中使用dynamic_cast：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameObject</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpaceShip</span>:</span> <span class="keyword">public</span> GameObject &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">collide</span><span class="params">(GameObject&amp; otherObject)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">hitSpaceShip</span><span class="params">(GameObject&amp; spaceShip)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">hitSpaceStation</span><span class="params">(GameObject&amp; spaceStation)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">hitAsteroid</span><span class="params">(GameObject&amp; asteroid)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::hitSpaceShip</span><span class="params">(GameObject&amp; spaceShip)</span></span>&#123;</span><br><span class="line">    SpaceShip&amp; otherShip = <span class="keyword">dynamic_cast</span>&lt;SpaceShip&amp;&gt;(spaceShip);</span><br><span class="line">    <span class="built_in">process</span> a SpaceShip-SpaceShip collision;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::hitSpaceStation</span><span class="params">(GameObject&amp; spaceStation)</span></span>&#123;</span><br><span class="line">    SpaceStation&amp; station = <span class="keyword">dynamic_cast</span>&lt;SpaceStation&amp;&gt;(spaceStation);</span><br><span class="line">    <span class="built_in">process</span> a SpaceShip-SpaceStation collision;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SpaceShip::hitAsteroid</span><span class="params">(GameObject&amp; asteroid)</span></span>&#123;</span><br><span class="line">    Asteroid&amp; theAsteroid = <span class="keyword">dynamic_cast</span>&lt;Asteroid&amp;&gt;(asteroid);</span><br><span class="line">    <span class="built_in">process</span> a SpaceShip-Asteroid collision;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="使用非成员碰撞函数"><a href="#使用非成员碰撞函数" class="headerlink" title="使用非成员碰撞函数"></a>使用非成员碰撞函数</h1><p>&nbsp;<br>之前我们一直以成员函数指针存放于map中，这直接导致如果添加新类的话，依然存在更新成员函数的问题，这也导致了重新编译。<br>另外，当发生A撞B时，应该调用谁的成员函数呢?我们总以左侧参数决定调用对象，实际上我们应该认定，A与B的碰撞应该既不在A中处理也不在B中处理。<br>当我们把碰撞函数从类中移除，其文件组织形式大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"SpaceShip.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"SpaceStation.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"Asteroid.h"</span></span></span><br><span class="line"><span class="keyword">namespace</span> &#123; <span class="comment">//无名命名空间</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">shipAsteroid</span><span class="params">(GameObject&amp; spaceShip,GameObject&amp; asteroid)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">shipStation</span><span class="params">(GameObject&amp; spaceShip,GameObject&amp; spaceStation)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">asteroidStation</span><span class="params">(GameObject&amp; asteroid,GameObject&amp; spaceStation)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">asteroidShip</span><span class="params">(GameObject&amp; asteroid,GameObject&amp; spaceShip)</span></span>&#123; </span><br><span class="line">        shipAsteroid(spaceShip, asteroid); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">stationShip</span><span class="params">(GameObject&amp; spaceStation,GameObject&amp; spaceShip)</span></span>&#123; </span><br><span class="line">        shipStation(spaceShip, spaceStation); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">stationAsteroid</span><span class="params">(GameObject&amp; spaceStation,GameObject&amp; asteroid)</span></span>&#123;                            asteroidStation(asteroid, spaceStation); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*HitFunctionPtr)</span><span class="params">(GameObject&amp;, GameObject&amp;)</span></span>;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="built_in">map</span>&lt;pair&lt;<span class="built_in">string</span>,<span class="built_in">string</span>&gt;, HitFunctionPtr &gt; HitMap;</span><br><span class="line">    pair&lt;string,string&gt; makeStringPair(const char *s1,const char *s2);</span><br><span class="line">    <span class="function">HitMap* <span class="title">initializeCollisionMap</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">HitFunctionPtr <span class="title">lookup</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; class1,<span class="keyword">const</span> <span class="built_in">string</span>&amp; class2)</span></span>;</span><br><span class="line">&#125;<span class="comment">//end namespace</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processCollision</span><span class="params">(GameObject&amp; object1,GameObject&amp; object2)</span></span>&#123;</span><br><span class="line">    HitFunctionPtr phf = lookup(<span class="keyword">typeid</span>(object1).name(),<span class="keyword">typeid</span>(object2).name());</span><br><span class="line">    <span class="keyword">if</span>(phf) </span><br><span class="line">        phf(object1, object2);</span><br><span class="line">    <span class="keyword">else</span> </span><br><span class="line">        <span class="keyword">throw</span> UnknownCollision(object1, object2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>注意这里使用了无名命名空间，其特点在于命名空间内所有东西均被本文件所私有（类似于声明在文件范围内的static函数)<br>非成员映射需要两个类型名与一个HitFunctionPtr，但只要用pair把那两个string绑一起就好了。于是映射表初始化函数实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> &#123;</span><br><span class="line">    pair&lt;string,string&gt; makeStringPair(const char *s1,const char *s2)&#123; </span><br><span class="line">        <span class="keyword">return</span> pair&lt;<span class="built_in">string</span>,<span class="built_in">string</span>&gt;(s1, s2); </span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="comment">// end namespace</span></span><br><span class="line"><span class="keyword">namespace</span> &#123;</span><br><span class="line">    <span class="function">HitMap * <span class="title">initializeCollisionMap</span><span class="params">()</span></span>&#123;</span><br><span class="line">        HitMap *phm = <span class="keyword">new</span> HitMap;</span><br><span class="line">        (*phm)[makeStringPair(<span class="string">"SpaceShip"</span>,<span class="string">"Asteroid"</span>)] =&amp;shipAsteroid;</span><br><span class="line">        (*phm)[makeStringPair(<span class="string">"SpaceShip"</span>, <span class="string">"SpaceStation"</span>)] =&amp;shipStation;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> phm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="comment">// end namespace</span></span><br></pre></td></tr></table></figure><br>lookup 函数也必须被修改以处理pair&lt;string,string&gt;对象，并将它作为映射表的第一部分:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> &#123;</span><br><span class="line">    <span class="function">HitFunctionPtr <span class="title">lookup</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; class1,<span class="keyword">const</span> <span class="built_in">string</span>&amp; class2)</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="built_in">auto_ptr</span>&lt;HitMap&gt; <span class="title">collisionMap</span><span class="params">(initializeCollisionMap())</span></span>;</span><br><span class="line">        <span class="keyword">auto</span> mapEntry = collisionMap-&gt;<span class="built_in">find</span>(make_pair(class1, class2));</span><br><span class="line">        <span class="keyword">if</span> (mapEntry == collisionMap-&gt;<span class="built_in">end</span>()) <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">return</span> (*mapEntry).second;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="comment">// end namespace</span></span><br></pre></td></tr></table></figure><br>因为上述函数的声明都在无名命名空间中，因此实现也必须在无名命名空间中。</p>
+<hr>
+<h1 id="继承与模拟虚函数表"><a href="#继承与模拟虚函数表" class="headerlink" title="继承与模拟虚函数表"></a>继承与模拟虚函数表</h1><p>&nbsp;<br>假设我们当前需要区分贸易飞船与军事飞船的区别，无疑，继承体系需要更改：<br><img src="http://static.zybuluo.com/zsmj2017/oyk370ogwudt9e1nin8tyzcu/image_1cc8g09pf18qt12ag5u1hmh1r0am.png" alt="image_1cc8g09pf18qt12ag5u1hmh1r0am.png-76.5kB"><br>我们会发现lookup根本找不到这两个子类，除非我们再次更新表，这样再次造成了重编译。</p>
+<hr>
+<h1 id="再次讨论初始化vtbl"><a href="#再次讨论初始化vtbl" class="headerlink" title="再次讨论初始化vtbl"></a>再次讨论初始化vtbl</h1><p>&nbsp;<br>之所以会出现上一个问题完全是由于我们的map是完全静态的，每当我们注册一个碰撞函数，其行为便被完全固定。从面向对象的角度而言，我们应该建立一个class存放映射表，并且为它提供动态修改映射关系的成员函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CollisionMap</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*HitFunctionPtr)</span><span class="params">(GameObject&amp;, GameObject&amp;)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addEntry</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; type1,<span class="keyword">const</span> <span class="built_in">string</span>&amp; type2,</span></span></span><br><span class="line"><span class="function"><span class="params">                  HitFunctionPtr collisionFunction,<span class="keyword">bool</span> symmetric = <span class="literal">true</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">removeEntry</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; type1,<span class="keyword">const</span> <span class="built_in">string</span>&amp; type2)</span></span>;</span><br><span class="line">    <span class="function">HitFunctionPtr <span class="title">lookup</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; type1,<span class="keyword">const</span> <span class="built_in">string</span>&amp; type2)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> CollisionMap&amp; <span class="title">theCollisionMap</span><span class="params">()</span></span>;<span class="comment">//单例模式</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CollisionMap();</span><br><span class="line">    CollisionMap(<span class="keyword">const</span> CollisionMap&amp;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>该类使用了单例模式，保证只存在一张表。同时允许增加对称性碰撞，自动添加对称关系。<br>为了确保发生碰撞前映射关系已存在，我们可以创建一个register类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RegisterCollisionFunction</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    RegisterCollisionFunction(<span class="keyword">const</span> <span class="built_in">string</span>&amp; type1,<span class="keyword">const</span> <span class="built_in">string</span>&amp; type2,</span><br><span class="line">                              CollisionMap::HitFunctionPtr collisionFunction,</span><br><span class="line">                              <span class="keyword">bool</span> symmetric = <span class="literal">true</span>)&#123;</span><br><span class="line">        CollisionMap::theCollisionMap().addEntry(type1, type2,collisionFunction,symmetric);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>用户于是可以使用此类型的一个全局对象来自动地注册他们所需要的函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">RegisterCollisionFunction <span class="title">cf1</span><span class="params">(<span class="string">"SpaceShip"</span>, <span class="string">"Asteroid"</span>,&amp;shipAsteroid)</span></span>;</span><br><span class="line"><span class="function">RegisterCollisionFunction <span class="title">cf2</span><span class="params">(<span class="string">"SpaceShip"</span>, <span class="string">"SpaceStation"</span>,&amp;shipStation)</span></span>;</span><br><span class="line"><span class="function">RegisterCollisionFunction <span class="title">cf3</span><span class="params">(<span class="string">"Asteroid"</span>, <span class="string">"SpaceStation"</span>,&amp;asteroidStation)</span></span>;</span><br><span class="line">...</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> * argv[])</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>因为这些全局对象在main被调用前就构造了，它们在构造函数中注册的函数也在main被调用前就加入了映射表。如果以后增加了一个派生类或新的碰撞对象，也只需要在主函数执行前加入即可，不需要修改库文件。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/29/Proxy%20Class/" rel="next" title="30.Proxy Class">
+                <i class="fa fa-chevron-left"></i> 30.Proxy Class
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/29/%E9%9D%A2%E5%90%91%E6%9C%AA%E6%9D%A5%E7%BC%96%E7%A8%8B/" rel="prev" title="32.面向未来编程">
+                32.面向未来编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例"><span class="nav-number">1.</span> <span class="nav-text">问题实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题分析"><span class="nav-number">2.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#虚函数-RTTI"><span class="nav-number">3.</span> <span class="nav-text">虚函数+RTTI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#只使用虚函数"><span class="nav-number">4.</span> <span class="nav-text">只使用虚函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模拟虚函数表"><span class="nav-number">5.</span> <span class="nav-text">模拟虚函数表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#映射表"><span class="nav-number">5.1.</span> <span class="nav-text">映射表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化映射表"><span class="nav-number">5.1.1.</span> <span class="nav-text">初始化映射表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用非成员碰撞函数"><span class="nav-number">6.</span> <span class="nav-text">使用非成员碰撞函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#继承与模拟虚函数表"><span class="nav-number">7.</span> <span class="nav-text">继承与模拟虚函数表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#再次讨论初始化vtbl"><span class="nav-number">8.</span> <span class="nav-text">再次讨论初始化vtbl</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Data Structures and Algorithms," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="（周末两天均在完善Json解析器与生成器，现如今可以腾出手来刷题） 题目名称 数字序列中某一位的数（剑指offer #44） 把数组排成最小的数（剑指offer #45） 把数字翻译成字符串（剑指offer #46) 礼物的最大价值（剑指offer #47) 最长不含重复字符的子字符串（剑指offer #48) 丑数（剑指offer #49） 第一个只出现一次的字符（剑指offer #50） 数组">
+<meta name="keywords" content="C++,Data Structures and Algorithms">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OJ每日练习（12）">
+<meta property="og:url" content="https://xander.wiki/2018/08/13/OJ%20exercise12/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="（周末两天均在完善Json解析器与生成器，现如今可以腾出手来刷题） 题目名称 数字序列中某一位的数（剑指offer #44） 把数组排成最小的数（剑指offer #45） 把数字翻译成字符串（剑指offer #46) 礼物的最大价值（剑指offer #47) 最长不含重复字符的子字符串（剑指offer #48) 丑数（剑指offer #49） 第一个只出现一次的字符（剑指offer #50） 数组">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/08/13/OJ exercise12/"/>
+
+
+
+
+
+  <title>OJ每日练习（12） | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/08/13/OJ%20exercise12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OJ每日练习（12）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-13T13:40:00+08:00">
+                2018-08-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OJ-Exercises/" itemprop="url" rel="index">
+                    <span itemprop="name">OJ Exercises</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>（周末两天均在完善Json解析器与生成器，现如今可以腾出手来刷题）</p>
+<h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><ol>
+<li>数字序列中某一位的数（剑指offer #44）</li>
+<li>把数组排成最小的数（剑指offer #45）</li>
+<li>把数字翻译成字符串（剑指offer #46)</li>
+<li>礼物的最大价值（剑指offer #47)</li>
+<li>最长不含重复字符的子字符串（剑指offer #48)</li>
+<li>丑数（剑指offer #49）</li>
+<li>第一个只出现一次的字符（剑指offer #50）</li>
+<li>数组中的逆序对（剑指offer #51）</li>
+<li>两个链表的第一个公共节点（剑指offer #52）</li>
+<li>在排序数组中查找数字（剑指offer #53）</li>
+</ol>
+<a id="more"></a>
+<hr>
+<h1 id="数字序列中某一位的数（剑指offer-44）"><a href="#数字序列中某一位的数（剑指offer-44）" class="headerlink" title="数字序列中某一位的数（剑指offer #44）"></a>数字序列中某一位的数（剑指offer #44）</h1><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>寻找规律，首先明确当前输入在哪一个区段，然后根据偏移量完成求解。这道题毫无难点，就是写起来很不舒服。</p>
+<h2 id="解题方案"><a href="#解题方案" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">findNthDigit</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n&lt;=<span class="number">9</span>)</span><br><span class="line">            <span class="keyword">return</span> n;</span><br><span class="line">	    <span class="keyword">int</span> digitNum = <span class="number">1</span>, numberNum = <span class="number">9</span>, start = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(numberNum &lt; n/digitNum)&#123;</span><br><span class="line">            n -= digitNum * numberNum;</span><br><span class="line">            start *= <span class="number">10</span>;</span><br><span class="line">            digitNum += <span class="number">1</span>;</span><br><span class="line">            numberNum *= <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> nthDigit  = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(n%digitNum == <span class="number">0</span>)&#123;</span><br><span class="line">            nthDigit = (start + n/digitNum<span class="number">-1</span>) % <span class="number">10</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">int</span> nthNumber = (start + n/digitNum);</span><br><span class="line">            nthDigit = to_string(nthNumber)[n%digitNum<span class="number">-1</span>] - <span class="string">'0'</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> nthDigit;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="把数组排成最小的数（剑指offer-45）"><a href="#把数组排成最小的数（剑指offer-45）" class="headerlink" title="把数组排成最小的数（剑指offer #45）"></a>把数组排成最小的数（剑指offer #45）</h1><h2 id="解题思路-1"><a href="#解题思路-1" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题的难点在于排序规律，而非组合。我们完全可以将所有数字变为字符串存入vector中，然后利用C++ STL 接收谓词作为排序规则的特性对该vector排序（排序规则为<code>s1+s2&lt;s2+s1</code>），最终将vector转为string即可。</p>
+<h2 id="解题方案-1"><a href="#解题方案-1" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">string</span> <span class="title">PrintMinNumber</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; numbers)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(numbers.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">string</span>();</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; ns;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> i:numbers)</span><br><span class="line">            ns.push_back(to_string(i));</span><br><span class="line">        sort(ns.<span class="built_in">begin</span>(),ns.<span class="built_in">end</span>(),[](<span class="keyword">const</span> <span class="built_in">string</span>&amp;s1,<span class="keyword">const</span> <span class="built_in">string</span>&amp; s2)&#123;<span class="keyword">return</span> s1+s2&lt;s2+s1;&#125;);</span><br><span class="line">        <span class="built_in">string</span> res;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span>&amp; s:ns)</span><br><span class="line">            res+=s;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="把数字翻译成字符串（剑指offer-46"><a href="#把数字翻译成字符串（剑指offer-46" class="headerlink" title="把数字翻译成字符串（剑指offer #46)"></a>把数字翻译成字符串（剑指offer #46)</h1><h2 id="解题思路-2"><a href="#解题思路-2" class="headerlink" title="解题思路"></a>解题思路</h2><p>动态规划问题，dp[i]=f[i]*dp[i-1]+g[i]*dp[i-2]。其中dp[i]为前i个字符所能构成的组合数。f[i]表征s[i-1]为数字且不为0，g[i]表征s[i-1]是否能与前一个字符构成组合。需要注意的是‘0‘略微繁琐，这是一道细节题。</p>
+<h2 id="解题方案-2"><a href="#解题方案-2" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">numDecodings</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">         <span class="keyword">if</span>(s.length()==<span class="number">0</span> || s[<span class="number">0</span>] == <span class="string">'0'</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">dp</span><span class="params">(s.<span class="built_in">size</span>()+<span class="number">1</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">        dp[<span class="number">0</span>]= <span class="number">1</span>,dp[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">2</span>;i&lt;=s.<span class="built_in">size</span>();i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(s[i<span class="number">-1</span>]&gt;=<span class="string">'1'</span> &amp;&amp; s[i<span class="number">-1</span>]&lt;=<span class="string">'9'</span>)</span><br><span class="line">                dp[i] += dp[i<span class="number">-1</span>];</span><br><span class="line">            <span class="keyword">if</span>(s[i<span class="number">-2</span>]==<span class="string">'1'</span> || (s[i<span class="number">-2</span>]==<span class="string">'2'</span> &amp;&amp; s[i<span class="number">-1</span>]&gt;=<span class="string">'0'</span> &amp;&amp; s[i<span class="number">-1</span>]&lt;=<span class="string">'6'</span>))</span><br><span class="line">                dp[i] += dp[i<span class="number">-2</span>];           </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[s.<span class="built_in">size</span>()];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="礼物的最大价值"><a href="#礼物的最大价值" class="headerlink" title="礼物的最大价值"></a>礼物的最大价值</h1><h2 id="解题思路-3"><a href="#解题思路-3" class="headerlink" title="解题思路"></a>解题思路</h2><p>这又是一道典型的动态规划。但有所区别的是，这道题没必要设立m*n的矩阵来保存临时值。由于到达坐标(i,j)的格子时能够拿到的礼物的最大价值只依赖坐标为(i-1,j)与(i,j-1）的格子，因此只需要使用一个长度为n的一维数组即可，数组中前j个数字为f(i,0)直到f(i,j)，后面的则为f(i-1,j)直到f(i-1,n-1)。</p>
+<h2 id="解题方案-3"><a href="#解题方案-3" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getMax</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; v)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(v.empty()||v[<span class="number">0</span>].empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">dp</span><span class="params">(v[<span class="number">0</span>].<span class="built_in">size</span>())</span></span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i!=v.<span class="built_in">size</span>();++i)</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">size_t</span> j=<span class="number">0</span>;j!=v[<span class="number">0</span>].<span class="built_in">size</span>();++j)&#123;</span><br><span class="line">                <span class="keyword">int</span> up = i==<span class="number">0</span>?<span class="number">0</span>:dp[j];</span><br><span class="line">                <span class="keyword">int</span> left = j==<span class="number">0</span>?<span class="number">0</span>:dp[j<span class="number">-1</span>];</span><br><span class="line">                dp[j]=<span class="built_in">max</span>(up,left)+v[i][j];</span><br><span class="line">            &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[v[<span class="number">0</span>].<span class="built_in">size</span>()<span class="number">-1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="最长不含重复字符的子字符串（剑指offer-48"><a href="#最长不含重复字符的子字符串（剑指offer-48" class="headerlink" title="最长不含重复字符的子字符串（剑指offer #48)"></a>最长不含重复字符的子字符串（剑指offer #48)</h1><h2 id="解题思路-4"><a href="#解题思路-4" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题没必要使用动规。假设子串里含有重复字符，则父串必含有重复字符，单个子问题足以决定父问题，因此可以使用贪心。在动规中，单个子问题影响父问题，并不足以决定父问题。</p>
+<p>从左向右扫描，当遇到重复字母时，以上一个重复字母的index+1作为搜索起始位置，复杂度为O（n）。</p>
+<h2 id="解题方案-4"><a href="#解题方案-4" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">map</span><span class="params">(<span class="number">256</span>,<span class="number">-1</span>)</span></span>;</span><br><span class="line">        <span class="keyword">int</span> slow=<span class="number">0</span>,fast=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> maxlen=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(fast=<span class="number">0</span>;fast&lt;s.<span class="built_in">size</span>();++fast)&#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="built_in">map</span>[s[fast]]&gt;<span class="number">-1</span>)&#123;</span><br><span class="line">                maxlen=<span class="built_in">max</span>(maxlen,fast-slow);</span><br><span class="line">                slow=<span class="built_in">max</span>(<span class="built_in">map</span>[s[fast]]+<span class="number">1</span>,slow);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">map</span>[s[fast]]=fast;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(maxlen,fast-slow);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="丑数（剑指offer-49）"><a href="#丑数（剑指offer-49）" class="headerlink" title="丑数（剑指offer #49）"></a>丑数（剑指offer #49）</h1><h2 id="解题思路-5"><a href="#解题思路-5" class="headerlink" title="解题思路"></a>解题思路</h2><p>将之前所有的丑数全部存储起来，并且额外保存factor2、3、5作为当前的丑数因子。若当前factorn为最小，则更新其为n*ugly[++indexn];</p>
+<h2 id="解题方案-5"><a href="#解题方案-5" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">nthUglyNumber</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">ugly</span><span class="params">(n)</span></span>;</span><br><span class="line">        ugly[<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> index2=<span class="number">0</span>,index3=<span class="number">0</span>,index5=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> factor2=<span class="number">2</span>,factor3=<span class="number">3</span>,factor5=<span class="number">5</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;++i)&#123;</span><br><span class="line">            <span class="keyword">int</span> minf =<span class="built_in">min</span>(<span class="built_in">min</span>(factor2,factor3),factor5);</span><br><span class="line">            ugly[i]=minf;</span><br><span class="line">            <span class="keyword">if</span>(factor2==minf)</span><br><span class="line">                factor2=<span class="number">2</span>*ugly[++index2];</span><br><span class="line">            <span class="keyword">if</span>(factor3==minf)</span><br><span class="line">                factor3=<span class="number">3</span>*ugly[++index3];</span><br><span class="line">            <span class="keyword">if</span>(factor5==minf)</span><br><span class="line">                factor5=<span class="number">5</span>*ugly[++index5];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ugly[n<span class="number">-1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="第一个只出现一次的字符（剑指offer-50）"><a href="#第一个只出现一次的字符（剑指offer-50）" class="headerlink" title="第一个只出现一次的字符（剑指offer #50）"></a>第一个只出现一次的字符（剑指offer #50）</h1><h2 id="解题思路-6"><a href="#解题思路-6" class="headerlink" title="解题思路"></a>解题思路</h2><p>用一个hashtable保存字符出现的次数，然后遍历字符串找到这个字符即可。</p>
+<h2 id="解题方案-6"><a href="#解题方案-6" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">FirstNotRepeatingChar</span><span class="params">(<span class="built_in">string</span> str)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(str.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="built_in">unordered_map</span>&lt;<span class="keyword">char</span>,<span class="keyword">int</span>&gt; res;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> c:str)</span><br><span class="line">            res[c]++;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i!=str.<span class="built_in">size</span>();++i)</span><br><span class="line">            <span class="keyword">if</span>(res[str[i]]==<span class="number">1</span>)</span><br><span class="line">                <span class="keyword">return</span> i;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="数组中的逆序对"><a href="#数组中的逆序对" class="headerlink" title="数组中的逆序对"></a>数组中的逆序对</h1><h2 id="解题思路-7"><a href="#解题思路-7" class="headerlink" title="解题思路"></a>解题思路</h2><p>采用归并排序的策略，其中递归基是beg==end。需要注意的地方在于，若前一半的元素i大于后一半的元素j，则此时存在逆序对的个数为后一般数组剩余元素数，此外，每一次计算后都需要对原有数组完成排序。</p>
+<h2 id="解题方案-7"><a href="#解题方案-7" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">InversePairs</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(data.<span class="built_in">size</span>()&lt;=<span class="number">1</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">copy</span><span class="params">(data.<span class="built_in">size</span>())</span></span>;</span><br><span class="line">        <span class="keyword">int</span> count = aux(data,copy,<span class="number">0</span>,data.<span class="built_in">size</span>()<span class="number">-1</span>);</span><br><span class="line">        <span class="keyword">return</span> count;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">aux</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp;data,<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; copy,<span class="keyword">int</span> beg,<span class="keyword">int</span> <span class="built_in">end</span>)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(beg==<span class="built_in">end</span>)&#123;</span><br><span class="line">            copy[beg]=data[beg];</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> mid = beg+(<span class="built_in">end</span>-beg)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> left = aux(data,copy,beg,mid)%<span class="number">1000000007</span>;</span><br><span class="line">        <span class="keyword">int</span> right = aux(data,copy,mid+<span class="number">1</span>,<span class="built_in">end</span>)%<span class="number">1000000007</span>;</span><br><span class="line">        <span class="keyword">int</span> i=mid;</span><br><span class="line">        <span class="keyword">int</span> j=<span class="built_in">end</span>;</span><br><span class="line">        <span class="keyword">int</span> index=<span class="built_in">end</span>;</span><br><span class="line">        <span class="keyword">int</span> count=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(i&gt;=beg &amp;&amp; j&gt;=mid+<span class="number">1</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(data[i]&gt;data[j])&#123;</span><br><span class="line">                copy[index--]=data[i--];</span><br><span class="line">                count+=j-mid;</span><br><span class="line">                count%=<span class="number">1000000007</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                copy[index--]=data[j--];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(i&gt;=beg) copy[index--]=data[i--];</span><br><span class="line">        <span class="keyword">while</span>(j&gt;=mid+<span class="number">1</span>) copy[index--]=data[j--];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=beg; i&lt;=<span class="built_in">end</span>; i++) data[i] = copy[i];</span><br><span class="line">        <span class="keyword">return</span> (count+left+right)%<span class="number">1000000007</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="两个链表的第一个公共节点（剑指offer-52）"><a href="#两个链表的第一个公共节点（剑指offer-52）" class="headerlink" title="两个链表的第一个公共节点（剑指offer #52）"></a>两个链表的第一个公共节点（剑指offer #52）</h1><h2 id="解题思路-8"><a href="#解题思路-8" class="headerlink" title="解题思路"></a>解题思路</h2><p>假定两个链表长度为a+n与b+n，n为共有部分，那么两个链表一起走a+b+n步后必然相遇，相遇点为第一个共同点或nullptr（n==0）。具体实现就是一旦走到绝地就转向别人的头部。</p>
+<h2 id="解题方案-8"><a href="#解题方案-8" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">ListNode* <span class="title">FindFirstCommonNode</span><span class="params">( ListNode* head1, ListNode* head2)</span> </span>&#123;</span><br><span class="line">        ListNode* p = head1, *q = head2;</span><br><span class="line">        <span class="keyword">while</span>(p!=q)&#123;</span><br><span class="line">            p=p?p-&gt;next:head2;</span><br><span class="line">            q=q?q-&gt;next:head1;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="在排序数组中查找数字（剑指offer-53）"><a href="#在排序数组中查找数字（剑指offer-53）" class="headerlink" title="在排序数组中查找数字（剑指offer #53）"></a>在排序数组中查找数字（剑指offer #53）</h1><h2 id="解题思路-9"><a href="#解题思路-9" class="headerlink" title="解题思路"></a>解题思路</h2><p>本质上就是实现STL算法：equal_range;</p>
+<h2 id="解题方案-9"><a href="#解题方案-9" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">GetNumberOfK</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; data ,<span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(data.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(data.<span class="built_in">size</span>()==<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> data[<span class="number">0</span>]==k?<span class="number">1</span>:<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> lo=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> hi=data.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">while</span>(lo&lt;hi)&#123;</span><br><span class="line">            <span class="keyword">int</span> mid = lo+(hi-lo)/<span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span>(data[mid]&lt;k)</span><br><span class="line">                lo=mid+<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                hi=mid;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> start = lo;</span><br><span class="line">        hi=data.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">while</span>(lo&lt;hi)&#123;</span><br><span class="line">            <span class="keyword">int</span> mid = lo+(hi-lo)/<span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span>(k&lt;data[mid])</span><br><span class="line">                hi=mid;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                lo=mid+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> <span class="built_in">end</span> = lo;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">end</span>-start;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Data-Structures-and-Algorithms/" rel="tag"># Data Structures and Algorithms</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/10/OJ%20exercise11/" rel="next" title="OJ每日练习（11）">
+                <i class="fa fa-chevron-left"></i> OJ每日练习（11）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/14/OJ%20exercise13/" rel="prev" title="OJ每日练习（13）">
+                OJ每日练习（13） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#题目名称"><span class="nav-number">1.</span> <span class="nav-text">题目名称</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数字序列中某一位的数（剑指offer-44）"><span class="nav-number">2.</span> <span class="nav-text">数字序列中某一位的数（剑指offer #44）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路"><span class="nav-number">2.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案"><span class="nav-number">2.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#把数组排成最小的数（剑指offer-45）"><span class="nav-number">3.</span> <span class="nav-text">把数组排成最小的数（剑指offer #45）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-1"><span class="nav-number">3.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-1"><span class="nav-number">3.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#把数字翻译成字符串（剑指offer-46"><span class="nav-number">4.</span> <span class="nav-text">把数字翻译成字符串（剑指offer #46)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-2"><span class="nav-number">4.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-2"><span class="nav-number">4.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#礼物的最大价值"><span class="nav-number">5.</span> <span class="nav-text">礼物的最大价值</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-3"><span class="nav-number">5.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-3"><span class="nav-number">5.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最长不含重复字符的子字符串（剑指offer-48"><span class="nav-number">6.</span> <span class="nav-text">最长不含重复字符的子字符串（剑指offer #48)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-4"><span class="nav-number">6.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-4"><span class="nav-number">6.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#丑数（剑指offer-49）"><span class="nav-number">7.</span> <span class="nav-text">丑数（剑指offer #49）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-5"><span class="nav-number">7.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-5"><span class="nav-number">7.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第一个只出现一次的字符（剑指offer-50）"><span class="nav-number">8.</span> <span class="nav-text">第一个只出现一次的字符（剑指offer #50）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-6"><span class="nav-number">8.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-6"><span class="nav-number">8.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数组中的逆序对"><span class="nav-number">9.</span> <span class="nav-text">数组中的逆序对</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-7"><span class="nav-number">9.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-7"><span class="nav-number">9.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#两个链表的第一个公共节点（剑指offer-52）"><span class="nav-number">10.</span> <span class="nav-text">两个链表的第一个公共节点（剑指offer #52）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-8"><span class="nav-number">10.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-8"><span class="nav-number">10.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在排序数组中查找数字（剑指offer-53）"><span class="nav-number">11.</span> <span class="nav-text">在排序数组中查找数字（剑指offer #53）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-9"><span class="nav-number">11.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-9"><span class="nav-number">11.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

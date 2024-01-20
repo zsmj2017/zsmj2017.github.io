@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,并发编程," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;设计基于锁的数据结构的核心要旨：在持有锁时间最短的前提下，访问数据时锁住正确的互斥锁。若使用不同的互斥锁来保护数据结构中不同的部分，操作不当可能会导致死锁，因此更需小心。">
+<meta name="keywords" content="C++,并发编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计基于锁的并发数据结构——并发数据结构实例">
+<meta property="og:url" content="https://xander.wiki/2021/07/13/%E8%AE%BE%E8%AE%A1%E5%9F%BA%E4%BA%8E%E9%94%81%E7%9A%84%E5%B9%B6%E5%8F%91%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9E%E4%BE%8B/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;设计基于锁的数据结构的核心要旨：在持有锁时间最短的前提下，访问数据时锁住正确的互斥锁。若使用不同的互斥锁来保护数据结构中不同的部分，操作不当可能会导致死锁，因此更需小心。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/p0pm8bxn760i6if798hii7mj/image.png">
+<meta property="og:updated_time" content="2021-07-22T06:14:31.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/p0pm8bxn760i6if798hii7mj/image.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2021/07/13/设计基于锁的并发数据结构——并发数据结构实例/"/>
+
+
+
+
+
+  <title>设计基于锁的并发数据结构——并发数据结构实例 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2021/07/13/%E8%AE%BE%E8%AE%A1%E5%9F%BA%E4%BA%8E%E9%94%81%E7%9A%84%E5%B9%B6%E5%8F%91%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9E%E4%BE%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">设计基于锁的并发数据结构——并发数据结构实例</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-07-13T15:00:00+08:00">
+                2021-07-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>设计基于锁的数据结构的核心要旨：在持有锁时间最短的前提下，访问数据时锁住<strong>正确的</strong>互斥锁。若使用不同的互斥锁来保护数据结构中不同的部分，操作不当可能会导致死锁，因此更需小心。</p>
+<a id="more"></a>
+<hr>
+<h1 id="使用锁的线程安全栈"><a href="#使用锁的线程安全栈" class="headerlink" title="使用锁的线程安全栈"></a>使用锁的线程安全栈</h1><h2 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;exception&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">empty_stack</span>:</span> <span class="built_in">std</span>::exception &#123;</span><br><span class="line">  <span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">what</span><span class="params">()</span> <span class="keyword">const</span> <span class="title">throw</span><span class="params">()</span></span>; </span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">threadsafe_stack</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">stack</span>&lt;T&gt; data; </span><br><span class="line">  <span class="keyword">mutable</span> <span class="built_in">std</span>::mutex m;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_stack()&#123;&#125;</span><br><span class="line">  threadsafe_stack(<span class="keyword">const</span> threadsafe_stack&amp; other) &#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lock</span><span class="params">(other.m)</span></span>; </span><br><span class="line">    data=other.data;</span><br><span class="line">  &#125;</span><br><span class="line">  threadsafe_stack&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> threadsafe_stack&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lock</span><span class="params">(m)</span></span>;</span><br><span class="line">    data.push(<span class="built_in">std</span>::<span class="built_in">move</span>(new_value));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lock</span><span class="params">(m)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(data.empty()) </span><br><span class="line">      <span class="keyword">throw</span> empty_stack();</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="keyword">const</span> <span class="title">res</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(data.top())))</span></span>;</span><br><span class="line">    data.pop();</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lock</span><span class="params">(m)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(data.empty()) <span class="keyword">throw</span> empty_stack(); </span><br><span class="line">    value=<span class="built_in">std</span>::<span class="built_in">move</span>(data.top());</span><br><span class="line">    data.pop(); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lock</span><span class="params">(m)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> data.empty(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="实例分析"><a href="#实例分析" class="headerlink" title="实例分析"></a>实例分析</h2><ol>
+<li>线程安全<br>通过使用互斥锁保护每个成员函数，确保任一时刻均只有一个线程在访问数据。</li>
+<li><p>条件竞争<br>2.1 在<code>empty</code>和<code>pop</code>成员函数间有潜在的竞争条件(调用<code>empty</code>时是正确的，但其结果并不可靠：其返回后可能其他线程执行了<code>pop</code>操作），但<code>pop</code>在持有锁时将显式地判空，因此条件竞争无影响。<br>2.2 <code>pop</code>函数将直接返回栈顶数据，避免操作分离后<code>top</code>与<code>pop</code>潜在的竞争条件（具体可见<code>线程间共享数据——使用互斥量保护共享数据</code>一章）。</p>
+</li>
+<li><p>异常<br>3.1 对互斥锁上锁可能会抛出异常，但这种情况不仅极其罕见(互斥锁存在问题，或缺乏系统资源)，并且上锁是每个成员函数的第一个操作。由于没有数据被修改，因此异常安全。<br>3.2 解锁互斥锁不会失败，所以总是安全的，并且<code>std::lock_guard&lt;&gt;</code>确保了互斥锁不会一直处于上锁的状态。<br>3.3 在第一个重载的<code>pop</code>中，程序可能抛出一个<code>empty_stack</code>异常，由于没有数据被修改，所以是安全的。创建<code>res</code>可能会抛出一个异常，原因可能为：<code>std::make_shared</code>可能因为无法为新对象以及引用计数需要的数据分配出足够的内存而抛出异常，亦或在拷贝/移动数据到新分配内存时构造函数抛出异常。C++运行库与标准库将保证上述两种情况没有内存泄露，同时正确销毁新创建的对象（如有），由于没有数据被修改，因此异常安全。调用<code>data.pop</code>保证不会抛出异常。综上，该<code>pop</code>函数异常安全。<br>3.4 第二个重载的<code>pop</code>在拷贝赋值或移动赋值时可能抛出异常,但依旧没有数据修改，异常安全。<br>3.5 <code>empty</code>不会修改数据，异常安全。</p>
+</li>
+<li><p>死锁<br>由于持有锁时调用了用户代码——数据的拷贝/移动构造或拷贝/移动赋值运算符，亦或是自定义的new操作运算符，因此可能出现死锁，例如：<br>4.1 这些函数调用了栈上的成员函数(而栈正在插入或移除数据项)<br>4.2 这些函数内部持有一种锁，而在调用栈成员函数时又lock了内部的互斥锁，二者可能存在关联<br>因此必须令用户保证上述情况不会发生。</p>
+</li>
+<li><p>构造与析构<br>构造函数与析构函数没有上锁保护，因此可能存在安全问题。但不管并发与否，调用一个不完全构造的对象或是部分销毁的对象的成员函数永远都不可取。因此，用户必须确保2点：<br>5.1 其他线程直到栈完全构造才能访问它<br>5.2 在栈对象销毁前，所有线程都已经停止访问栈</p>
+</li>
+</ol>
+<h2 id="实例缺陷"><a href="#实例缺陷" class="headerlink" title="实例缺陷"></a>实例缺陷</h2><p>尽管该数据结构安全性很高，但其性能非常差——每次只有一个线程能够操作栈内数据，而其他线程在等待锁时什么也干不了，过度的串行化抑制了性能。<br>同时，栈也未能提供等待添加一个数据项的方法——因此线程必须周期性地调用<code>empty</code>或<code>pop</code>，并捕获<code>empty_stack</code>异常。这逼迫用户要么浪费宝贵的计算资源来检查数据，要么编写等待——通知机制（如条件变量），这使得内部上锁没有必要。</p>
+<hr>
+<h1 id="使用锁的线程安全队列"><a href="#使用锁的线程安全队列" class="headerlink" title="使用锁的线程安全队列"></a>使用锁的线程安全队列</h1><h2 id="代码实例1"><a href="#代码实例1" class="headerlink" title="代码实例1"></a>代码实例1</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">threadsafe_queue</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">mutable</span> <span class="built_in">std</span>::mutex mut; </span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">queue</span>&lt;T&gt; data_queue; </span><br><span class="line">  <span class="built_in">std</span>::condition_variable data_cond;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_queue() &#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T data)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_queue.push(<span class="built_in">std</span>::<span class="built_in">move</span>(data)); </span><br><span class="line">    data_cond.notify_one();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">wait_and_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_cond.wait(lk,[<span class="keyword">this</span>]&#123;<span class="keyword">return</span> !data_queue.empty();&#125;); </span><br><span class="line">    value=<span class="built_in">std</span>::<span class="built_in">move</span>(data_queue.front());</span><br><span class="line">    data_queue.pop();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">wait_and_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_cond.wait(lk,[<span class="keyword">this</span>]&#123;<span class="keyword">return</span> !data_queue.empty();&#125;); </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">res</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(data_queue.front())))</span></span>;</span><br><span class="line">    data_queue.pop();</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">try_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(data_queue.empty())</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>; </span><br><span class="line">    value=<span class="built_in">std</span>::<span class="built_in">move</span>(data_queue.front()); </span><br><span class="line">    data_queue.pop();</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(data_queue.empty())</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt;();</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">res</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(data_queue.front())))</span></span>; </span><br><span class="line">    data_queue.pop();</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> data_queue.empty(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="实例1分析"><a href="#实例1分析" class="headerlink" title="实例1分析"></a>实例1分析</h2><p>相对栈的实现，主要差别有2点：</p>
+<ol>
+<li>新增了条件变量，不再需要线程持续调用<code>empty</code></li>
+<li><code>try_pop</code>不再抛出异常，转为返回bool量</li>
+</ol>
+<p>在异常安全性方面存在一个细微变化：由于使用的是<code>notify_one</code>，因此在多线程等待时，只会有一个线程被唤醒。但如果该线程在<code>wait_and_pop</code>中抛出一个异常(如构造<code>std::shared_ptr&lt;&gt;</code>对象时），此时队列不为空，但不会有其他线程被唤醒。若当前使用环境无法接受这种情况，存在三种修改方案：</p>
+<ol>
+<li>将<code>notify_one</code>调用可以替换成<code>notify_all</code>，它将唤醒所有的工作线程，代价是大多数线程发现队列依旧是空时将重新进入休眠状态。</li>
+<li>有异常抛出时令<code>wait_and_pop</code>调用<code>notify_one</code>，从而让另一个线程尝试检索队列内数据。</li>
+<li>将<code>std::shared_ptr&lt;&gt;</code>的初始化过程移到<code>push</code>中，队列由存储数据实例转为存储<code>std::shared_ptr&lt;&gt;</code>实例，由于<code>std::shared_ptr&lt;&gt;</code>拷贝不会抛出异常，由此即可保证异常安全性。</li>
+</ol>
+<h2 id="代码实例2"><a href="#代码实例2" class="headerlink" title="代码实例2"></a>代码实例2</h2><p>根据方案3，有代码实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">threadsafe_queue</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">mutable</span> <span class="built_in">std</span>::mutex mut; </span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">queue</span>&lt;<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; &gt; data_queue; </span><br><span class="line">  <span class="built_in">std</span>::condition_variable data_cond;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_queue() &#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">wait_and_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_cond.wait(lk,[<span class="keyword">this</span>]&#123;<span class="keyword">return</span> !data_queue.empty();&#125;); </span><br><span class="line">    value=<span class="built_in">std</span>::<span class="built_in">move</span>(*data_queue.front());</span><br><span class="line">    data_queue.pop();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">try_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(data_queue.empty())</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>; </span><br><span class="line">    value=<span class="built_in">std</span>::<span class="built_in">move</span>(*data_queue.front());</span><br><span class="line">    data_queue.pop();</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">wait_and_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_cond.wait(lk,[<span class="keyword">this</span>]&#123;<span class="keyword">return</span> !data_queue.empty();&#125;); </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; res=data_queue.front();</span><br><span class="line">    data_queue.pop();</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(data_queue.empty())</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt;();</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; res=data_queue.front();</span><br><span class="line">    data_queue.pop();</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">data</span><span class="params">( <span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(new_value)))</span></span>;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_queue.push(data);</span><br><span class="line">    data_cond.notify_one();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> data_queue.empty(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="实例2分析"><a href="#实例2分析" class="headerlink" title="实例2分析"></a>实例2分析</h2><p>除去解决前文所述的问题外，使用<code>std::shared_ptr&lt;&gt;</code>还有一大优点：<code>push</code>内数据实例的构造可以在锁外完成。一般来说，内存分配的性能开销较大，若将其置于锁内将增加持有锁的时间，不利于数据结构的性能。</p>
+<hr>
+<h1 id="使用细粒度锁和条件变量的线程安全队列"><a href="#使用细粒度锁和条件变量的线程安全队列" class="headerlink" title="使用细粒度锁和条件变量的线程安全队列"></a>使用细粒度锁和条件变量的线程安全队列</h1><p>&nbsp;<br>上文所提及的两种线程安全数据结构，本质上均为使用互斥锁保护<code>STL</code>容器，尽管易于实现，但其并发程度较低。通过精心设计底层数据结构，开发者可以提供更细粒度的锁定，从而进一步提高并发程度。</p>
+<h2 id="基于单链表实现的队列"><a href="#基于单链表实现的队列" class="headerlink" title="基于单链表实现的队列"></a>基于单链表实现的队列</h2><p>最简单的队列是单链表，如下图所示。<br><img src="http://static.zybuluo.com/zsmj2017/p0pm8bxn760i6if798hii7mj/image.png" alt="image.png-84.7kB"><br>队列维护着一个头指针和一个尾指针，分别指向链表的首项数据与末项数据。<code>push</code>操作为添加新数据为tail的next，并更新tail，<code>pop</code>操作即为更新head为其next，此后切断联系。<br>当<code>head==tail==nullptr</code>时，链表为空。具体实例如下。</p>
+<h3 id="代码实例（单线程版）"><a href="#代码实例（单线程版）" class="headerlink" title="代码实例（单线程版）"></a>代码实例（单线程版）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">queue</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    T data; </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; next;</span><br><span class="line">    node(T data_): data(<span class="built_in">std</span>::<span class="built_in">move</span>(data_)) &#123;&#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; head;</span><br><span class="line">  node* tail; </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">queue</span>() &#123;&#125;</span><br><span class="line">  <span class="built_in">queue</span>(<span class="keyword">const</span> <span class="built_in">queue</span>&amp; other)=<span class="keyword">delete</span>;</span><br><span class="line">  <span class="built_in">queue</span>&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="built_in">queue</span>&amp; other)=<span class="keyword">delete</span>;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!head) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt;(); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="keyword">const</span> <span class="title">res</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(head-&gt;data)))</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="keyword">const</span> old_head=<span class="built_in">std</span>::<span class="built_in">move</span>(head); </span><br><span class="line">    head=<span class="built_in">std</span>::<span class="built_in">move</span>(old_head-&gt;next);</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">p</span><span class="params">(<span class="keyword">new</span> node(<span class="built_in">std</span>::<span class="built_in">move</span>(new_value)))</span></span>; </span><br><span class="line">    node* <span class="keyword">const</span> new_tail=p.<span class="built_in">get</span>();</span><br><span class="line">    <span class="keyword">if</span>(tail) &#123;</span><br><span class="line">      tail-&gt;next=<span class="built_in">std</span>::<span class="built_in">move</span>(p); <span class="comment">// 1</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      head=<span class="built_in">std</span>::<span class="built_in">move</span>(p);</span><br><span class="line">    &#125;</span><br><span class="line">    tail=new_tail;<span class="comment">// 2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="实例分析-1"><a href="#实例分析-1" class="headerlink" title="实例分析"></a>实例分析</h3><p>该队列使用了<code>std::unique_ptr&lt;node&gt;</code>来管理节点，从而保证了节点和其引用数据将在不需要时自动删除，tail是指向最后一个节点的裸指针，因为它需要引用<code>std::unique_ptr&lt;node&gt;</code>已经拥有的节点(代码1处p已经被move)。</p>
+<p>在多线程下使用细粒度锁时，开发者可能会倾向于使用2个互斥锁分别保护两个数据项<code>head</code>与<code>tail</code>，但存在以下问题：</p>
+<ol>
+<li><code>push</code>可能同时修改head与tail，因此它必须锁住两个互斥锁——虽然很少见，但同时锁住两个互斥锁还不算太诡异。</li>
+<li><code>push</code>和<code>try_pop</code>都能访问next指针指向的节点:<code>push</code>更新tail-&gt;next，然后<code>try_pop</code>读取head-&gt;next。若队列中只有一个元素（head==tail），此时head-&gt;next和tail-&gt;next是同一个需要保护的对象。若不同时读取head和tail，开发者无法区分它们是否是同一个对象，因此必须在<code>push</code>与<code>try_pop</code>内锁住同一个锁（用来保护next数据）。</li>
+</ol>
+<hr>
+<h3 id="实例改进（增加尾部哨兵）"><a href="#实例改进（增加尾部哨兵）" class="headerlink" title="实例改进（增加尾部哨兵）"></a>实例改进（增加尾部哨兵）</h3><p>开发者可以通过分配尾哨兵来解决问题，此时tail将不再指向具体数据，而是承担哨兵角色。为了允许哨兵的存在（没有数据），需要增加额外的一层间接性——通过指针来存储数据，具体代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">queue</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; data; <span class="comment">// 1</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; next; </span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; head;</span><br><span class="line">  node* tail;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">queue</span>():head(<span class="keyword">new</span> node),tail(head.<span class="built_in">get</span>()) &#123;&#125;</span><br><span class="line">  <span class="built_in">queue</span>(<span class="keyword">const</span> <span class="built_in">queue</span>&amp; other)=<span class="keyword">delete</span>;</span><br><span class="line">  <span class="built_in">queue</span>&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="built_in">queue</span>&amp; other)=<span class="keyword">delete</span>;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(head.<span class="built_in">get</span>()==tail) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt;(); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="keyword">const</span> <span class="title">res</span><span class="params">(head-&gt;data)</span></span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; old_head=<span class="built_in">std</span>::<span class="built_in">move</span>(head); </span><br><span class="line">    head=<span class="built_in">std</span>::<span class="built_in">move</span>(old_head-&gt;next);</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">new_data</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(new_value)))</span></span>;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">p</span><span class="params">(<span class="keyword">new</span> node)</span></span>;</span><br><span class="line">    tail-&gt;data=new_data; <span class="comment">// 若tail==head,此时head亦被赋值</span></span><br><span class="line">    node* <span class="keyword">const</span> new_tail=p.<span class="built_in">get</span>(); </span><br><span class="line">    tail-&gt;next=<span class="built_in">std</span>::<span class="built_in">move</span>(p);</span><br><span class="line">    tail=new_tail; </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h3 id="实例分析-2"><a href="#实例分析-2" class="headerlink" title="实例分析"></a>实例分析</h3><h4 id="实例比较"><a href="#实例比较" class="headerlink" title="实例比较"></a>实例比较</h4><ol>
+<li><p>构造函数中新增了对虚拟节点的创建</p>
+</li>
+<li><p><code>try_pop</code>的改动为：<br>2.1 将检查head是否为nullptr替换为比较head与tail，因为引入虚拟节点后head将不可能为nullptr。<br>2.2 直接返回指针，不再需要创建新一个新实例。</p>
+</li>
+<li><p><code>push</code>的改动为:<br>3.1 必须先在堆上创建一个T类型的实例，并让一个<code>std::shared_ptr&lt;&gt;</code>拥有该实例。<br>3.2 将原有哨兵节点数据替换为新实例，连接至新哨兵，并更新哨兵节点。</p>
+</li>
+</ol>
+<h4 id="改进收益"><a href="#改进收益" class="headerlink" title="改进收益"></a>改进收益</h4><ol>
+<li><code>push</code>只需访问tail，不再访问head，这意味着不需要持有2个互斥锁。</li>
+<li><code>try_pop</code>与<code>push</code>将永远不可能对同一节点做操作（head-&gt;next与tail-&gt;next一致时，队列为空，此时直接返回），因此不再需要一个总的互斥锁。</li>
+</ol>
+<hr>
+<h3 id="代码实例（加锁）"><a href="#代码实例（加锁）" class="headerlink" title="代码实例（加锁）"></a>代码实例（加锁）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">threadsafe_queue</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; data;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; next; </span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="built_in">std</span>::mutex head_mutex; </span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; head; </span><br><span class="line">  <span class="built_in">std</span>::mutex tail_mutex; </span><br><span class="line">  node* tail;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="function">node* <span class="title">get_tail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">tail_lock</span><span class="params">(tail_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> tail;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">pop_head</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(head_mutex)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(head.<span class="built_in">get</span>() == get_tail()) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; old_head=<span class="built_in">std</span>::<span class="built_in">move</span>(head); </span><br><span class="line">    head = <span class="built_in">std</span>::<span class="built_in">move</span>(old_head-&gt;next);</span><br><span class="line">    <span class="keyword">return</span> old_head;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_queue(): head(<span class="keyword">new</span> node),tail(head.<span class="built_in">get</span>()) &#123;&#125;</span><br><span class="line">  threadsafe_queue(<span class="keyword">const</span> threadsafe_queue&amp; other)=<span class="keyword">delete</span>; </span><br><span class="line">  threadsafe_queue&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> threadsafe_queue&amp; other)=<span class="keyword">delete</span>;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; old_head = pop_head();</span><br><span class="line">    <span class="keyword">return</span> old_head ? old_head-&gt;data : <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt;(); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">new_data</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(new_value)))</span></span>;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">p</span><span class="params">(<span class="keyword">new</span> node)</span></span>;</span><br><span class="line">    node* <span class="keyword">const</span> new_tail = p.<span class="built_in">get</span>(); </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">tail_lock</span><span class="params">(tail_mutex)</span></span>; </span><br><span class="line">    tail-&gt;data = new_data;</span><br><span class="line">    tail-&gt;next = <span class="built_in">std</span>::<span class="built_in">move</span>(p);</span><br><span class="line">    tail=new_tail;</span><br><span class="line">  &#125; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="实例分析-3"><a href="#实例分析-3" class="headerlink" title="实例分析"></a>实例分析</h3><h4 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h4><p>为了实现最大程度的并发，上锁的时间越少越好。因此<code>push</code>与<code>try_pop</code>有设计思路如下：</p>
+<ol>
+<li>push<br>访问tail期间均必须完成上锁，因此分配完成性哨兵节点后上锁开始，直至函数完成。</li>
+<li>try_pop<br>首先必须锁住head，直至head完成改变（该操作决定了哪一个线程执行pop操作）。其次，由于判空需要获取tail，因此在此期间必须完成对tail的锁定。<br>将<code>pop_head</code>与<code>get_tail</code>封装为函数不仅提高了代码可读性，同时也使得互斥区更加明确。</li>
+</ol>
+<h4 id="安全性分析"><a href="#安全性分析" class="headerlink" title="安全性分析"></a>安全性分析</h4><h5 id="不变量"><a href="#不变量" class="headerlink" title="不变量"></a>不变量</h5><p>针对该基于单链表实现的队列，有不变量如下:</p>
+<ul>
+<li>tail-&gt;next==nullptr</li>
+<li>tail-&gt;data==nullptr</li>
+<li>head==tail意味着空链表</li>
+<li>单元素链表有head-&gt;next==tail</li>
+<li>x-&gt;next==tail意味着x是链表中最后一个节点</li>
+<li>以head为起点迭代，必将访问至tail</li>
+</ul>
+<h5 id="线程安全分析"><a href="#线程安全分析" class="headerlink" title="线程安全分析"></a>线程安全分析</h5><ol>
+<li>push<br>如前文所述，数据被正确保护，不变量未遭到破坏。</li>
+<li>try_pop<br>2.1 该函数需要在读取head，tail时加锁以避免数据竞争。如果tail不加锁，则可能出现数据竞争或UB：一个线程调用try_pop的同时，另一个线程调用push，此时可能两个线程在访问同一个tail对象（尽管每个成员函数都加锁了，但<code>pop</code>与<code>try_pop</code>持有的是不同的锁）。加锁后<code>get_tail</code>将会锁住和<code>push</code>相同的锁，因此调用将存在明确顺序：要么<code>get_tail</code>将在<code>push</code>前被调用，线程看到的是tail旧值；要么在<code>push</code>后被调用，线程将观察到tail新值。<br>2.2 <code>get_tail</code>的调用必须发生于<code>head_mutex</code>互斥区内<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// error version</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">pop_head</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  node* <span class="keyword">const</span> old_tail = get_tail();</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(head_mutex)</span></span>;</span><br><span class="line">  <span class="keyword">if</span>(head.<span class="built_in">get</span>() == old_tail) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; old_head = <span class="built_in">std</span>::<span class="built_in">move</span>(head); </span><br><span class="line">  head=<span class="built_in">std</span>::<span class="built_in">move</span>(old_head-&gt;next);</span><br><span class="line">  <span class="keyword">return</span> old_head;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+当进入<code>head_mutex</code>的互斥区后，很有可能tail与head的值已经发生了改变（另一个线程完成了push或者正在调用pop_head修改head），此后的判空无意义。若<code>get_tail</code>在<code>head_mutex</code>保护范围内，即可保证没有其他线程对head进行修改，判空符合预期。</li>
+</ol>
+<h5 id="异常安全分析"><a href="#异常安全分析" class="headerlink" title="异常安全分析"></a>异常安全分析</h5><ol>
+<li><code>try_pop</code>锁住互斥锁时可能产生异常，但由于在获得锁前数据不会被修改，因此<code>try_pop</code>异常安全。</li>
+<li><code>push</code>在堆上分配数据实例和node实例时（new语句）可能会产生异常，但智能指针保证了异常安全性。获得锁后，<code>push</code>内操作不会产生异常，因此<code>push</code>异常安全。</li>
+</ol>
+<h5 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h5><p><code>pop_head</code>获取锁的顺序永远是先head_mutex再tail_mutex，因此永远不会死锁。</p>
+<h4 id="并发性分析"><a href="#并发性分析" class="headerlink" title="并发性分析"></a>并发性分析</h4><p>细粒度锁的引入带来了更高的并发性，并且本实例已尽可能将操作置于锁外。举例而言，<code>push</code>中新节点和新数据项的分配都未曾持有锁，这保证了多个线程可以并发地分配新节点新数据项。在<code>try_pop</code>中较为耗时的<code>delete</code>同样置于锁外，这增加了并发调用<code>try_pop</code>的次数。</p>
+<hr>
+<h3 id="实例完善（增加wait-and-pop）"><a href="#实例完善（增加wait-and-pop）" class="headerlink" title="实例完善（增加wait_and_pop）"></a>实例完善（增加wait_and_pop）</h3><p>本节将针对上述实例做进一步完善，新增<code>wait_and_pop</code>接口，并补充<code>pop</code>接口重载版本。</p>
+<h4 id="设计思路-1"><a href="#设计思路-1" class="headerlink" title="设计思路"></a>设计思路</h4><ol>
+<li>push<br>简单来看，只需要在函数末尾添加<code>data_cond.notify_one()</code>调用即可，但此时处于tail_mutex被锁住的状态，若被通知的线程在tail_mutex解锁前醒来，则需要等待该互斥锁解锁，因此可以考虑在调用<code>notify_one</code>前解锁互斥锁以获得最大并发性。</li>
+<li>wait_and_pop<br>首先，仅有在队列非空时（head != tail）需要等待，因此似乎需要同时锁住两个互斥锁，但正如前文所述（只有在读取时需要持有互斥锁），因此谓词可设定为<code>head!=get_tail()</code>即可，然后使用head_mutex对data_cond.wait()调用进行保护。</li>
+<li>重载pop<br>若将从old_head检索得到的数据项拷贝赋值至value，若拷贝赋值操作抛出异常，则数据量将彻底丢失（队列中已不存在数据）。因此必须新增一个重载的<code>pop_head</code>函数，在改动链表前检索数据。</li>
+</ol>
+<h4 id="代码实例-1"><a href="#代码实例-1" class="headerlink" title="代码实例"></a>代码实例</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">threadsafe_queue</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; data;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; next; </span><br><span class="line">  &#125;;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="built_in">std</span>::mutex head_mutex; </span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; head; </span><br><span class="line">  <span class="built_in">std</span>::mutex tail_mutex;</span><br><span class="line">  node* tail; </span><br><span class="line">  <span class="built_in">std</span>::condition_variable data_cond;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_queue(): head(<span class="keyword">new</span> node),tail(head.<span class="built_in">get</span>()) &#123;&#125;</span><br><span class="line">  threadsafe_queue(<span class="keyword">const</span> threadsafe_queue&amp; other)=<span class="keyword">delete</span>; </span><br><span class="line">  threadsafe_queue&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> threadsafe_queue&amp; other)=<span class="keyword">delete</span>;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; old_head = try_pop_head();</span><br><span class="line">    <span class="keyword">return</span> old_head?old_head-&gt;data:<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt;();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">try_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="keyword">const</span> old_head = try_pop_head(value);</span><br><span class="line">    <span class="keyword">return</span> old_head;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">wait_and_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="keyword">const</span> old_head = wait_pop_head();</span><br><span class="line">    <span class="keyword">return</span> old_head-&gt;data;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">wait_and_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="keyword">const</span> old_head = wait_pop_head(value);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">new_data</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt;(<span class="built_in">std</span>::<span class="built_in">move</span>(new_value)))</span></span>; </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">p</span><span class="params">(<span class="keyword">new</span> node)</span></span>;</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">tail_lock</span><span class="params">(tail_mutex)</span></span>; </span><br><span class="line">      tail-&gt;data=new_data;</span><br><span class="line">      node* <span class="keyword">const</span> new_tail=p.<span class="built_in">get</span>(); </span><br><span class="line">      tail-&gt;next=<span class="built_in">std</span>::<span class="built_in">move</span>(p);</span><br><span class="line">      tail=new_tail; </span><br><span class="line">    &#125;</span><br><span class="line">    data_cond.notify_one(); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(head_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> (head.<span class="built_in">get</span>()==get_tail());</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="function">node* <span class="title">get_tail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">tail_lock</span><span class="params">(tail_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> tail;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">pop_head</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; old_head=<span class="built_in">std</span>::<span class="built_in">move</span>(head);</span><br><span class="line">    head=<span class="built_in">std</span>::<span class="built_in">move</span>(old_head-&gt;next);</span><br><span class="line">    <span class="keyword">return</span> old_head; </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">wait_for_data</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(head_mutex)</span></span>;</span><br><span class="line">    data_cond.wait(head_lock,[&amp;]&#123;<span class="keyword">return</span> head.<span class="built_in">get</span>()!=get_tail();&#125;); </span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">move</span>(head_lock);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">wait_pop_head</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 确保数据被修改时持有同一把锁</span></span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(wait_for_data())</span></span>;</span><br><span class="line">    <span class="keyword">return</span> pop_head(); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">wait_pop_head</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(wait_for_data())</span></span>;</span><br><span class="line">    value=<span class="built_in">std</span>::<span class="built_in">move</span>(*head-&gt;data);</span><br><span class="line">    <span class="keyword">return</span> pop_head();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">try_pop_head</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(head_mutex)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(head.<span class="built_in">get</span>()==get_tail()) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt;(); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> pop_head(); </span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt; <span class="title">try_pop_head</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">head_lock</span><span class="params">(head_mutex)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(head.<span class="built_in">get</span>()==get_tail()) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;node&gt;(); </span><br><span class="line">    &#125;</span><br><span class="line">    value=<span class="built_in">std</span>::<span class="built_in">move</span>(*head-&gt;data);</span><br><span class="line">    <span class="keyword">return</span> pop_head(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag"># 并发编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/07/08/%E8%AE%BE%E8%AE%A1%E5%9F%BA%E4%BA%8E%E9%94%81%E7%9A%84%E5%B9%B6%E5%8F%91%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91%E8%AE%BE%E8%AE%A1%E7%BA%B2%E8%A6%81/" rel="next" title="设计基于锁的并发数据结构——并发设计纲要">
+                <i class="fa fa-chevron-left"></i> 设计基于锁的并发数据结构——并发设计纲要
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/07/22/%E8%AE%BE%E8%AE%A1%E5%9F%BA%E4%BA%8E%E9%94%81%E7%9A%84%E5%B9%B6%E5%8F%91%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="prev" title="设计基于锁的并发数据结构——更复杂的数据结构">
+                设计基于锁的并发数据结构——更复杂的数据结构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用锁的线程安全栈"><span class="nav-number">2.</span> <span class="nav-text">使用锁的线程安全栈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实例"><span class="nav-number">2.1.</span> <span class="nav-text">代码实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例分析"><span class="nav-number">2.2.</span> <span class="nav-text">实例分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例缺陷"><span class="nav-number">2.3.</span> <span class="nav-text">实例缺陷</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用锁的线程安全队列"><span class="nav-number">3.</span> <span class="nav-text">使用锁的线程安全队列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实例1"><span class="nav-number">3.1.</span> <span class="nav-text">代码实例1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例1分析"><span class="nav-number">3.2.</span> <span class="nav-text">实例1分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实例2"><span class="nav-number">3.3.</span> <span class="nav-text">代码实例2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例2分析"><span class="nav-number">3.4.</span> <span class="nav-text">实例2分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用细粒度锁和条件变量的线程安全队列"><span class="nav-number">4.</span> <span class="nav-text">使用细粒度锁和条件变量的线程安全队列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于单链表实现的队列"><span class="nav-number">4.1.</span> <span class="nav-text">基于单链表实现的队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实例（单线程版）"><span class="nav-number">4.1.1.</span> <span class="nav-text">代码实例（单线程版）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例分析-1"><span class="nav-number">4.1.2.</span> <span class="nav-text">实例分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例改进（增加尾部哨兵）"><span class="nav-number">4.1.3.</span> <span class="nav-text">实例改进（增加尾部哨兵）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例分析-2"><span class="nav-number">4.1.4.</span> <span class="nav-text">实例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#实例比较"><span class="nav-number">4.1.4.1.</span> <span class="nav-text">实例比较</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#改进收益"><span class="nav-number">4.1.4.2.</span> <span class="nav-text">改进收益</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实例（加锁）"><span class="nav-number">4.1.5.</span> <span class="nav-text">代码实例（加锁）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例分析-3"><span class="nav-number">4.1.6.</span> <span class="nav-text">实例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#设计思路"><span class="nav-number">4.1.6.1.</span> <span class="nav-text">设计思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安全性分析"><span class="nav-number">4.1.6.2.</span> <span class="nav-text">安全性分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#不变量"><span class="nav-number">4.1.6.2.1.</span> <span class="nav-text">不变量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#线程安全分析"><span class="nav-number">4.1.6.2.2.</span> <span class="nav-text">线程安全分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#异常安全分析"><span class="nav-number">4.1.6.2.3.</span> <span class="nav-text">异常安全分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#死锁"><span class="nav-number">4.1.6.2.4.</span> <span class="nav-text">死锁</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#并发性分析"><span class="nav-number">4.1.6.3.</span> <span class="nav-text">并发性分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例完善（增加wait-and-pop）"><span class="nav-number">4.1.7.</span> <span class="nav-text">实例完善（增加wait_and_pop）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#设计思路-1"><span class="nav-number">4.1.7.1.</span> <span class="nav-text">设计思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实例-1"><span class="nav-number">4.1.7.2.</span> <span class="nav-text">代码实例</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

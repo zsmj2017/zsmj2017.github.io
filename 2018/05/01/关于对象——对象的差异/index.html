@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,对象模型," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="C++设计范式&amp;nbsp;C++程序设计模型支持三种programming paradigms：  procedursal model过程式编程模型，想必各位已经很熟悉了。 abstract data type model该模型所谓的“抽象”是和一组表达式（public接口）一起提供，而其运算定义符隐而未明：1234String girl &#x3D; &quot;Anna&quot;;String daughter;&#x2F;&#x2F;St">
+<meta name="keywords" content="C++,对象模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于对象——对象的差异">
+<meta property="og:url" content="https://xander.wiki/2018/05/01/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%B7%AE%E5%BC%82/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="C++设计范式&amp;nbsp;C++程序设计模型支持三种programming paradigms：  procedursal model过程式编程模型，想必各位已经很熟悉了。 abstract data type model该模型所谓的“抽象”是和一组表达式（public接口）一起提供，而其运算定义符隐而未明：1234String girl &#x3D; &quot;Anna&quot;;String daughter;&#x2F;&#x2F;St">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/kpwejudzjo3c65urfy0o2dfc/image_1cccoqo1e1le9ners7a1o6bvln9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/hxvwhnvv26o14j3v9ypya7x2/image_1cccrhqma1r9fh2q10iq1tv76ccm.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/py02unmde374jpfcshw5rtag/image_1cccs68dq1ipbudv235mn51blk13.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/rgs4zkg04ebquw17yptke0wy/image_1cccspl1t15h52ss1jintkinfe1g.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/2pbbm8vb7rco2v5txrp29912/image_1cccuduvklms16ro1dbk88bpl51t.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/wn90fd46c6v7t8jn695sul8v/image_1cccukhnsius1so1q1e18281jmf2a.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:07.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/kpwejudzjo3c65urfy0o2dfc/image_1cccoqo1e1le9ners7a1o6bvln9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/05/01/关于对象——对象的差异/"/>
+
+
+
+
+
+  <title>关于对象——对象的差异 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/01/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%B7%AE%E5%BC%82/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于对象——对象的差异</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-01T10:20:00+08:00">
+                2018-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="C-设计范式"><a href="#C-设计范式" class="headerlink" title="C++设计范式"></a>C++设计范式</h1><p>&nbsp;<br>C++程序设计模型支持三种programming paradigms：</p>
+<ol>
+<li><strong>procedursal model</strong><br>过程式编程模型，想必各位已经很熟悉了。</li>
+<li><strong>abstract data type model</strong><br>该模型所谓的“抽象”是和一组表达式（public接口）一起提供，而其运算定义符隐而未明：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">String</span> girl = <span class="string">"Anna"</span>;</span><br><span class="line"><span class="keyword">String</span> daughter;</span><br><span class="line"><span class="comment">//String::operator=();</span></span><br><span class="line">daughter = girl;</span><br></pre></td></tr></table></figure></li>
+<li><strong>object-oriented model</strong><br>在此模型中有一些彼此相关的类型，通过一个abstract base class（提供通用接口）被封装起来。</li>
+</ol>
+<hr>
+<h2 id="多范式混用带来的危害"><a href="#多范式混用带来的危害" class="headerlink" title="多范式混用带来的危害"></a>多范式混用带来的危害</h2><p>纯粹以某一种paradigm编程有助于保证整体行为的稳定性与正确性，如果混合使用了多种paradigm，可能会造成意料之外的后果。</p>
+<h3 id="sliced"><a href="#sliced" class="headerlink" title="sliced"></a>sliced</h3><p>假设当前有Library_material与其派生类book，继承体系如下：<img src="http://static.zybuluo.com/zsmj2017/kpwejudzjo3c65urfy0o2dfc/image_1cccoqo1e1le9ners7a1o6bvln9.png" alt="image_1cccoqo1e1le9ners7a1o6bvln9.png-8.4kB"><br>考虑如下代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ADT paradigm</span></span><br><span class="line">Library_material thing1;</span><br><span class="line">Book book;</span><br><span class="line">thing1 = book;<span class="comment">//本意是重绑定</span></span><br><span class="line">thing1.checkin();<span class="comment">//本意是调用虚函数</span></span><br><span class="line"><span class="comment">//OO paradigm</span></span><br><span class="line">Library_material thing2 = &amp;book;</span><br><span class="line">thing2.checkin();<span class="comment">//book::checkin();</span></span><br></pre></td></tr></table></figure><br>多态性是OO paradigm的重要特性，ADT paradigm不具备此特性，如果在使用时混用二者，极易造成sliced并且产生意外后果。</p>
+<hr>
+<h2 id="OO-paradigm-与-ADT-paradigm"><a href="#OO-paradigm-与-ADT-paradigm" class="headerlink" title="OO paradigm 与 ADT paradigm"></a>OO paradigm 与 ADT paradigm</h2><p>在OO中，程序员需要处理一个个未知实体，它的类型虽然有所界定，却具备无穷可能。实体的类型受限于继承体系，但继承体系的深度与广度没有限制。原则上，被指定的Object的真实类型在每一个特定动作执行前无法确认，只有通过pointer或reference才能够完成这一系列操作。但在ADT中，程序员处理的是一个拥有固定且单一形态的实体，其所有特性在编译时期就已被完全定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//无法确定px rx的动态类型</span></span><br><span class="line">Library_material *px = sth;</span><br><span class="line">Libraay_material &amp;rx = *px;</span><br><span class="line"><span class="comment">//静态类型已知</span></span><br><span class="line">Library_material dx = *px;</span><br></pre></td></tr></table></figure></p>
+<p>多态的实现要求此object必须经由pointer或reference存取，但pointer与reference的操作并不总是构成多态（例如其指向对象不在继承体系中）。</p>
+<h3 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h3><p>C++以下列方法支持多态：</p>
+<ol>
+<li><strong>一组隐式转换操作</strong>，例如把一个derived class指针转为指向base class的指针。</li>
+<li><strong>virtual function机制</strong></li>
+<li><strong>经由dynamic_cast与typeid运算符</strong></li>
+</ol>
+<p>多态的主要用途是经由一个共同的接口来影响类型的封装，该接口通常被定义在一个abstract base class中，通过多态性，我们得以保证当类型发生修改时，程序代码无需改变。</p>
+<hr>
+<h1 id="object的大小"><a href="#object的大小" class="headerlink" title="object的大小"></a>object的大小</h1><p>&nbsp;<br>究竟一个object需要占用多少内存？一般而言，object的内存占用由三部分组成：</p>
+<ol>
+<li><strong>所有non-static data member所占大小</strong></li>
+<li><strong>为了支持virtual而产生的额外开销（vptr)</strong></li>
+<li><strong>齐位所带来的额外占用</strong></li>
+</ol>
+<hr>
+<h1 id="指针类型差异"><a href="#指针类型差异" class="headerlink" title="指针类型差异"></a>指针类型差异</h1><p>&nbsp;<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ZooAnimal *px;</span><br><span class="line"><span class="keyword">int</span> *pi;</span><br><span class="line">Array&lt;<span class="keyword">String</span>&gt; *pta;</span><br></pre></td></tr></table></figure><br>这三种指针有什么不同吗？<br>以内存需求的角度而言，这三种指针并无不同，都需要足够的内存来放置一个机器地址。“指向不同类型的指针的差异”（ZooAnimal*、int*等等），既不在于指针表示法，也不在于内容（地址）不同，而在于其寻址得到的object类型不同。<strong>“指针类型”的主要功能是：教导编译器如何解释某个特定地址中的内存内容及其大小：</strong></p>
+<ol>
+<li>一个指向地址1000的int*，在地址空间上将涵盖1000~1003（32位及其上整数是4-bytes）</li>
+<li>如果String基于传统实现，那么地址空间上将涵盖1000~1015（4+8+4）<br><img src="http://static.zybuluo.com/zsmj2017/hxvwhnvv26o14j3v9ypya7x2/image_1cccrhqma1r9fh2q10iq1tv76ccm.png" alt="image_1cccrhqma1r9fh2q10iq1tv76ccm.png-38.9kB"></li>
+</ol>
+<p>那如果现存在一个地址为1000但类型为void*的指针呢？我们无法了解其指向的具体对象，也无法判断它具体如何覆盖地址空间。</p>
+<p>所以说，cast只是一种编译器指令，它并不改变真正的地址，只是影响编译器如何去解读地址。</p>
+<hr>
+<h1 id="引入多态之后的指针"><a href="#引入多态之后的指针" class="headerlink" title="引入多态之后的指针"></a>引入多态之后的指针</h1><p>&nbsp;<br>现有继承体系如下：<br><img src="http://static.zybuluo.com/zsmj2017/py02unmde374jpfcshw5rtag/image_1cccs68dq1ipbudv235mn51blk13.png" alt="image_1cccs68dq1ipbudv235mn51blk13.png-7.3kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bear</span>:</span>:<span class="keyword">public</span> ZooAnimal&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Bear();</span><br><span class="line">    ~Bear();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">rotate</span><span class="params">()</span></span>;<span class="comment">//继承得到的virtual</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">dance</span><span class="params">()</span></span>;<span class="comment">//特有</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">enum</span> Dances &#123;...&#125;;</span><br><span class="line">    Dances dances_known;</span><br><span class="line">    <span class="keyword">int</span> cell_block;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Bear <span class="title">b</span><span class="params">(<span class="string">"Yogi"</span>)</span></span>;</span><br><span class="line">Bear *pb = &amp;b;</span><br><span class="line">Bear &amp;rb = *pb;</span><br></pre></td></tr></table></figure><br>b、pb、rb的内存需求何如？<br>pointer与refernce只需要一个字长的大小，Bear object 需要24 bytes（ZooAnimal的16 bytes + Bear自有的8 Bytes）：<img src="http://static.zybuluo.com/zsmj2017/rgs4zkg04ebquw17yptke0wy/image_1cccspl1t15h52ss1jintkinfe1g.png" alt="image_1cccspl1t15h52ss1jintkinfe1g.png-118.1kB"></p>
+<hr>
+<h2 id="pointer-to-base-与-pointer-to-derived"><a href="#pointer-to-base-与-pointer-to-derived" class="headerlink" title="pointer to base 与 pointer to derived"></a>pointer to base 与 pointer to derived</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Bear b;</span><br><span class="line">ZooAnimal *pz = &amp;b;</span><br><span class="line">Bear *pb =&amp;b;</span><br></pre></td></tr></table></figure>
+<p>一个Bear*与一个ZooAnimal*有何区别？<br>它们都指向了b的第一个byte，其差别在于pz只涵盖了b中的ZooAnimal subobject部分，pb则是涵盖了整个Bear object。除了Base部分之外，你无法调用任何Bear的专属member，唯一例外是virtual机制。当我们写下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pz-&gt;rotate();</span><br></pre></td></tr></table></figure><br>pz的类型将在编译期检查以下两点：（显式接口）</p>
+<ol>
+<li>该接口是否存在于base内</li>
+<li>该接口的access level是否为public</li>
+</ol>
+<p>在运行期，pz所指向的object决定了rotate的调用实体。类型信息的封装并不存在于pz中，而是存在于vbtl的首元素。</p>
+<p>考虑如下情况：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Bear b;</span><br><span class="line">ZooAnimal za =b;<span class="comment">//sliced</span></span><br><span class="line">za.rotate();<span class="comment">//ZooAnimal::rotate()</span></span><br></pre></td></tr></table></figure><br>为什么调用的并不是Bear的函数实体？此外，如果初始化函数复制了object，为什么vptr没有发生变化指向新的vbtl？<br>关于第二个问题，编译器给出的答案是：如果某个object含有一个或以上一个以上的vptrs，这些vptrs的内容不会在初始化或赋值时发生改变。<br>对于第一个问题，答案是：za并不也不可能是一个Bear，它只能是一个ZooAnimal。有这么一种似是而非的观念：OO程序设计并不支持对object的直接处理。例如在如下继承体系中：<br><img src="http://static.zybuluo.com/zsmj2017/2pbbm8vb7rco2v5txrp29912/image_1cccuduvklms16ro1dbk88bpl51t.png" alt="image_1cccuduvklms16ro1dbk88bpl51t.png-10.7kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ZooAnimal za;</span><br><span class="line">ZooAnimal *pza;</span><br><span class="line">Bear b;</span><br><span class="line">Panda *pp = <span class="keyword">new</span> Panda;</span><br><span class="line">pza =&amp;b;</span><br></pre></td></tr></table></figure><br>其内存布局可能如下：<br><img src="http://static.zybuluo.com/zsmj2017/wn90fd46c6v7t8jn695sul8v/image_1cccukhnsius1so1q1e18281jmf2a.png" alt="image_1cccukhnsius1so1q1e18281jmf2a.png-216.3kB"><br>我们只需要认定，pointer与reference的类型决定了该段内存被如何解析。但如果你试图改变object za的大小，比如将整个Bear Object赋给它，那就直接引发了sliced，于是多态便不再呈现。</p>
+<hr>
+<h1 id="OO与OB"><a href="#OO与OB" class="headerlink" title="OO与OB"></a>OO与OB</h1><p>&nbsp;<br>C++通过pointer与reference来实现多态，这种程序设计风格被称为面向对象。<br>C++也支持ADT程序风格，现如今它们被称为OB（object-based）。OB提供封装的非多态形式，也不支持类型扩充，其典型实例就是STL中的各类容器。OB比OO更具备空间紧凑性，且提供更快的速度，但其缺点在于缺乏设计弹性。<br>在OO与OB之间存在着取舍，在我们使用之前必须分析当前应用领域的实际需求。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/" rel="tag"># 对象模型</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/01/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%85%B3%E9%94%AE%E8%AF%8D%E6%89%80%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%B7%AE%E5%BC%82/" rel="next" title="关于对象——关键词所带来的差异">
+                <i class="fa fa-chevron-left"></i> 关于对象——关键词所带来的差异
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/02/%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Default%20Constructor%E7%9A%84%E6%9E%84%E9%80%A0%E6%93%8D%E4%BD%9C/" rel="prev" title="构造函数语义学——Default Constructor的构造操作">
+                构造函数语义学——Default Constructor的构造操作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-设计范式"><span class="nav-number">1.</span> <span class="nav-text">C++设计范式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#多范式混用带来的危害"><span class="nav-number">1.1.</span> <span class="nav-text">多范式混用带来的危害</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sliced"><span class="nav-number">1.1.1.</span> <span class="nav-text">sliced</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OO-paradigm-与-ADT-paradigm"><span class="nav-number">1.2.</span> <span class="nav-text">OO paradigm 与 ADT paradigm</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多态"><span class="nav-number">1.2.1.</span> <span class="nav-text">多态</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#object的大小"><span class="nav-number">2.</span> <span class="nav-text">object的大小</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#指针类型差异"><span class="nav-number">3.</span> <span class="nav-text">指针类型差异</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引入多态之后的指针"><span class="nav-number">4.</span> <span class="nav-text">引入多态之后的指针</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pointer-to-base-与-pointer-to-derived"><span class="nav-number">4.1.</span> <span class="nav-text">pointer to base 与 pointer to derived</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OO与OB"><span class="nav-number">5.</span> <span class="nav-text">OO与OB</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

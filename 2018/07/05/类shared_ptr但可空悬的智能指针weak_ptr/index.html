@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;有时我们会想，如果有一种行为类似于shared_ptr，但不会参与资源共享权的智能指针该有多好。换而言之，我们需要一种不改变引用计数的shared_ptr。这种智能指针主要负责解决一样问题：指出shared_ptr指向的资源是否已遭到破坏。一个真正智能的指针可以通过跟踪它何时空悬来处理这个问题，这正是weak_ptr的精义所在。你可能想知道std::weak_ptr究竟有何用途，但">
+<meta name="keywords" content="C++,Modern C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="20.类shared_ptr但可空悬的智能指针——std::weak_ptr">
+<meta property="og:url" content="https://xander.wiki/2018/07/05/%E7%B1%BBshared_ptr%E4%BD%86%E5%8F%AF%E7%A9%BA%E6%82%AC%E7%9A%84%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88weak_ptr/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;有时我们会想，如果有一种行为类似于shared_ptr，但不会参与资源共享权的智能指针该有多好。换而言之，我们需要一种不改变引用计数的shared_ptr。这种智能指针主要负责解决一样问题：指出shared_ptr指向的资源是否已遭到破坏。一个真正智能的指针可以通过跟踪它何时空悬来处理这个问题，这正是weak_ptr的精义所在。你可能想知道std::weak_ptr究竟有何用途，但">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/d4qdwqr4k57unpm1x38raaey/image_1chkntif01p2nnas112q152r1hc229.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/z2es54h9day63m3uw80r2okv/image_1chkohht0hdb1p4d71e1rl41c562m.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/d4qdwqr4k57unpm1x38raaey/image_1chkntif01p2nnas112q152r1hc229.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/07/05/类shared_ptr但可空悬的智能指针weak_ptr/"/>
+
+
+
+
+
+  <title>20.类shared_ptr但可空悬的智能指针——std::weak_ptr | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/05/%E7%B1%BBshared_ptr%E4%BD%86%E5%8F%AF%E7%A9%BA%E6%82%AC%E7%9A%84%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88weak_ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">20.类shared_ptr但可空悬的智能指针——std::weak_ptr</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-05T14:42:00+08:00">
+                2018-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>有时我们会想，如果有一种行为类似于shared_ptr，但不会参与资源共享权的智能指针该有多好。换而言之，我们需要一种不改变引用计数的shared_ptr。这种智能指针主要负责解决一样问题：指出shared_ptr指向的资源是否已遭到破坏。一个真正智能的指针可以通过跟踪它何时空悬来处理这个问题，这正是weak_ptr的精义所在。你可能想知道std::weak_ptr究竟有何用途，但你在查看其API时会发现它既不能解引用也不能检测资源是否为NULL，因为weak_ptr并非是一个独立的智能指针，它是shared_ptr的扩充形式。</p>
+<hr>
+<h1 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h1><p>&nbsp;<br>weak_ptr通常由shared_ptr创建，它们指向同样的资源，其区别在于weak_ptr不会改变该资源的引用计数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> spw = <span class="built_in">std</span>::make_shared&lt;Widget&gt;();<span class="comment">// RC is 1</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::weak_ptr&lt;Widget&gt; <span class="title">wpw</span><span class="params">(spw)</span></span>;<span class="comment">// RC remains 1</span></span><br><span class="line">spw = <span class="literal">nullptr</span>;<span class="comment">// RC goes to 0, and the Widget is destroyed.wpw now dangles</span></span><br></pre></td></tr></table></figure><br>你可以通过weak_ptr的成员函数来查看其是否空悬：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (wpw.expired()) … <span class="comment">// if wpw doesn't point to an object…</span></span><br></pre></td></tr></table></figure><br>但通常我们不仅仅想要查看其是否处于空悬状态，而是需要如果其不处于空悬状态，则直接使用它所指向的资源。但说起来容易做起来难，原因在于weak_ptr不存在解引用操作，就算它有解引用操作，如上文一般将空悬检查和解引用相分离也可能会导致问题产生：例如当前存在另一个线程对指向资源的最后一个std::shared_ptr进行了赋值或析构操作，从而导致资源释放。在此环境下，解引用操作将导致未定义行为。</p>
+<p>为了确保线程安全，我们真正需要完成的是一个原子操作，它检查std::weak_ptr是否空悬，如果没有，则访问它指向的对象。 访问对象这一行为可以通过从std::weak_ptr创建std::shared_ptr来完成。该操作有两种形式，具体采用哪一种形式取决于你在明确指针空悬后会采取何种措施。<br>一种形式是std::weak_ptr::lock，它返回一个std::shared_ptr。如果std::weak_ptr已经空悬，则std::shared_ptr为null：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; spw1 = wpw.lock(); <span class="comment">// if wpw's expired,spw1 is null</span></span><br><span class="line"><span class="keyword">auto</span> spw2 = wpw.lock(); <span class="comment">// same as above,but uses auto</span></span><br></pre></td></tr></table></figure>
+<p>另一种形式是以weak_ptr为实参构造shared_ptr,如果weak_ptr已然空悬，则抛出异常：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw3</span><span class="params">(wpw)</span></span>; <span class="comment">// if wpw's expired,throw std::bad_weak_ptr</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="问题实例一（工厂模式）"><a href="#问题实例一（工厂模式）" class="headerlink" title="问题实例一（工厂模式）"></a>问题实例一（工厂模式）</h1><p>&nbsp;<br>我们将以实例分析和探讨weak_ptr的真正使用场景，假设当前一个工厂函数，它根据唯一ID生成只读对象的智能指针。根据Item 18关于工厂函数返回类型的建议，它返回一个std::unique_ptr:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;<span class="keyword">const</span> Widget&gt; <span class="title">loadWidget</span><span class="params">(WidgetID id)</span></span>;</span><br></pre></td></tr></table></figure><br>如果loadWidget调用成本较为昂贵（例如执行文件或数据库I/O），并且重复使用ID这一行为较为常见（即经常需要获取指定ID的对象），那么我们可以采用一种合理的优化方式：cache。将所有Widget都置入缓存也可能会导致性能问题，因此我们也应当保证在适当时段删除缓存。<br>对于缓存式工厂函数，其返回值仍采用unique_ptr已然不再合适，调用者当然需要指向资源的智能指针，但调用者也需要了解资源是否已经遭到释放，cache里存放的智能指针应当具备检测空悬的能力（以便及时地清空缓存），因此缓存中存储的智能指针应当为weak_ptr类型，而工厂函数返回值应当为shared_ptr类型，因为weak_ptr只能检测shared_ptr所管理资源的空悬性，这是loadWidget的缓存版本的快速实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;<span class="keyword">const</span> Widget&gt; <span class="title">fastLoadWidget</span><span class="params">(WidgetID id)</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;WidgetID,<span class="built_in">std</span>::weak_ptr&lt;<span class="keyword">const</span> Widget&gt;&gt; cache;</span><br><span class="line">    <span class="keyword">auto</span> objPtr = cache[id].lock();</span><br><span class="line">    <span class="keyword">if</span> (!objPtr) &#123;<span class="comment">// not in cache</span></span><br><span class="line">        objPtr = loadWidget(id);<span class="comment">//load it</span></span><br><span class="line">        cache[id] = objPtr;<span class="comment">//cache it</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> objPtr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这个实现显然可以进一步改进，因为我们的cache目前只做到了增加元素，实际上还可以在检测到资源破坏后从cache中删除指定元素，但这个实现与本节主题无关，因此有兴趣者可自行尝试。</p>
+<hr>
+<h1 id="问题实例二（观察者模式）"><a href="#问题实例二（观察者模式）" class="headerlink" title="问题实例二（观察者模式）"></a>问题实例二（观察者模式）</h1><p>&nbsp;<br>让我们现在将目光转向第二个实例：Observer设计模式。该模式的主要组成部分是主体（状态可能发生变化的对象）和观察者（发生状态变化时要通知的对象）。在该模式的大多数实现中，每个主体包含一个数据成员，该成员持有指向其观察者的指针，这使得主体可以轻松发出当前状态已更改的通知。主体对观察者的生命周期毫无兴趣（即主体并不需要了解当前观察者的状态），但我们至少需要撰写某种操作保证当某观察者已被破坏时，主体从观察者列表中将其删除。一个合理的设计是每个主体均持有一个容器，其容器内部元素为指向观察者的std::weak_ptrs，从而使得主体可以判断观察者是否已经失效。</p>
+<hr>
+<h1 id="问题实例三"><a href="#问题实例三" class="headerlink" title="问题实例三"></a>问题实例三</h1><p>&nbsp;<br>考虑一个包含对象A，B，C的数据结构，其中A和C共享B的所有权，因此我们使用shared_ptr：<br><img src="http://static.zybuluo.com/zsmj2017/d4qdwqr4k57unpm1x38raaey/image_1chkntif01p2nnas112q152r1hc229.png" alt="image_1chkntif01p2nnas112q152r1hc229.png-14.3kB"><br>假设我们又发现B中也需要存在一个指向A的指针，那它应当是何种类型？<br><img src="http://static.zybuluo.com/zsmj2017/z2es54h9day63m3uw80r2okv/image_1chkohht0hdb1p4d71e1rl41c562m.png" alt="image_1chkohht0hdb1p4d71e1rl41c562m.png-20kB"><br>主要有三种选择：</p>
+<ol>
+<li><strong>原始指针</strong><br>如果使用原始指针，如果A已被销毁，但仍存在C继续指向B，而B中又包含指向A的指针。B无法确定A是否已经析构，因此可能会触发解引用空悬指针的行为，这将导致未定义后果。</li>
+<li><strong>std::shared_ptr</strong><br>在此设计中，A和B中包含指向彼此的std::shared_ptrs。这种彼此指向的行为将阻止A和B被析构。即使A和B无法被其他数据结构访问(例如C不再指向B),A与B仍然具备引用计数为1。这种情况也是一种内存泄漏，因为A与B永远无法被访问，但分配给它们的资源将永远无法回收。</li>
+<li><strong>std::weak_ptr</strong><br>使用weak_ptr完美避免了上述两个问题。如果A已被析构，B指向它的指针将保持空悬状态，并且B能够检测空悬。此外，虽然A和B指向彼此，但B并不对A存有任何引用计数，因此仍然可以析构自如。</li>
+</ol>
+<p>值得注意的是，需要使用std::weak_ptr取代std::shared_ptr的常见并不多见。在严格的分层数据结构（例如树）中，子节点通常仅由其父节点拥有。当父节点被销毁时，其子节点也应该被销毁。因此，父母与孩子之间的链接通常最好由std::unique_ptrs表示。此外，从子节点到父节点的反向链接可以安全地使用原始指针表示，因为子节点的生命周期永远不会超过其父节点。 因此，没有子节点解引用空悬父指针的风险。</p>
+<hr>
+<h1 id="weak-ptr的效率"><a href="#weak-ptr的效率" class="headerlink" title="weak_ptr的效率"></a>weak_ptr的效率</h1><p>&nbsp;<br>从效率的角度而言，std::weak_ptr与std::shared_ptr基本保持一致。std::weak_ptr对象与std::shared_ptr对象大小相同，并且它们也涉及control block，构造，析构和赋值等操作也需要atomic引用计数操作。在本节开头我们曾说weak_ptr不使用引用计数，这说明的是weak_ptr不涉及shared_ptr的引用计数，实际上control block中有专门关于weak_ptr的引用计数（详见Item21）。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>你可以将weak_ptr视为可空悬的shared_ptr。</strong></li>
+<li><strong>weak_ptrs的使用场合包括cache、观察者模式、以及打破shared_ptr循环。</strong></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"># Modern C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/05/%E5%9C%A8%E8%BF%9B%E8%A1%8C%E5%85%B1%E4%BA%AB%E5%BC%8F%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%97%B6%E4%BD%BF%E7%94%A8stdshared_ptr/" rel="next" title="19.在进行共享式资源管理时使用std::shared_ptr">
+                <i class="fa fa-chevron-left"></i> 19.在进行共享式资源管理时使用std::shared_ptr
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/06/%E4%BB%A5make_unique%E6%88%96make_shared%E5%8F%96%E4%BB%A3%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8new/" rel="prev" title="21.以make_unique或make_shared取代直接使用new">
+                21.以make_unique或make_shared取代直接使用new <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#weak-ptr"><span class="nav-number">2.</span> <span class="nav-text">weak_ptr</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例一（工厂模式）"><span class="nav-number">3.</span> <span class="nav-text">问题实例一（工厂模式）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例二（观察者模式）"><span class="nav-number">4.</span> <span class="nav-text">问题实例二（观察者模式）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例三"><span class="nav-number">5.</span> <span class="nav-text">问题实例三</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#weak-ptr的效率"><span class="nav-number">6.</span> <span class="nav-text">weak_ptr的效率</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,设计模式," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;本节内容的极端情况即为禁止建立对象与单例模式。  禁止对象实例化&amp;nbsp;如果我们需要阻止建立某个类的对象，应该把它的构造函数设为private:123456class CantBeInstantiated &amp;#123;private:    CantBeInstantiated();    CantBeInstantiated(const CantBeInstantiated&amp;">
+<meta name="keywords" content="C++,设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="26.限制某个类所能产生的对象数量">
+<meta property="og:url" content="https://xander.wiki/2018/04/28/%E9%99%90%E5%88%B6%E6%9F%90%E4%B8%AA%E7%B1%BB%E6%89%80%E8%83%BD%E4%BA%A7%E7%94%9F%E7%9A%84%E5%AF%B9%E8%B1%A1%E6%95%B0%E9%87%8F/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;本节内容的极端情况即为禁止建立对象与单例模式。  禁止对象实例化&amp;nbsp;如果我们需要阻止建立某个类的对象，应该把它的构造函数设为private:123456class CantBeInstantiated &amp;#123;private:    CantBeInstantiated();    CantBeInstantiated(const CantBeInstantiated&amp;">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/04/28/限制某个类所能产生的对象数量/"/>
+
+
+
+
+
+  <title>26.限制某个类所能产生的对象数量 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/28/%E9%99%90%E5%88%B6%E6%9F%90%E4%B8%AA%E7%B1%BB%E6%89%80%E8%83%BD%E4%BA%A7%E7%94%9F%E7%9A%84%E5%AF%B9%E8%B1%A1%E6%95%B0%E9%87%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">26.限制某个类所能产生的对象数量</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-28T10:03:00+08:00">
+                2018-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>本节内容的极端情况即为禁止建立对象与单例模式。</p>
+<hr>
+<h1 id="禁止对象实例化"><a href="#禁止对象实例化" class="headerlink" title="禁止对象实例化"></a>禁止对象实例化</h1><p>&nbsp;<br>如果我们需要阻止建立某个类的对象，应该把它的构造函数设为private:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CantBeInstantiated</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CantBeInstantiated();</span><br><span class="line">    CantBeInstantiated(<span class="keyword">const</span> CantBeInstantiated&amp;);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><p>&nbsp;<br>假设我们现在只允许生成一个打印机对象，我们应当把这个对象封装置入某个函数，允许所有人访问，但只有一个对象存在：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PrintJob</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">friend</span> Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Printer p; <span class="comment">// 单个打印机对象</span></span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这个设计有三部分：</p>
+<ol>
+<li>printer无法构造</li>
+<li>全局函数thePrinter被设为friend，因此可以调用private构造函数。</li>
+<li>thePrinter包含一个静态Printer对象，这意味着只有一个对象被建立。我们只能通过thePrinter函数来使用这个对象。</li>
+</ol>
+<hr>
+<h2 id="静态函数"><a href="#静态函数" class="headerlink" title="静态函数"></a>静态函数</h2><p>有人会认为thePrinter没必要污染全局命名空间，为此解决方法是把thePrinter声明为printer内部的静态函数，那顺便去除了friend属性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Printer&amp; <span class="title">Printer::thePrinter</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Printer p;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>就是调用函数的时候麻烦了一些：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Printer::thePrinter().reset();</span><br><span class="line">Printer::thePrinter().submitJob(<span class="built_in">buffer</span>);</span><br></pre></td></tr></table></figure></p>
+<h2 id="新建命名空间"><a href="#新建命名空间" class="headerlink" title="新建命名空间"></a>新建命名空间</h2><p>另一种做法是将class与thePrinter移出全局域，放入专属namespace，防止命名冲突：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> PrintingStuff&#123;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;<span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">friend</span> Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Printer p;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>只不过这样一来调用每一次调用都必须提及命名空间：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PrintingStuff::thePrinter().reset();</span><br><span class="line">PrintingStuff::thePrinter().submitJob(<span class="built_in">buffer</span>);</span><br></pre></td></tr></table></figure><br>又或者使用using：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> PrintingStuff::thePrinter; </span><br><span class="line">thePrinter().reset();</span><br><span class="line">thePrinter().submitJob(<span class="built_in">buffer</span>);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="单例模式实现细节"><a href="#单例模式实现细节" class="headerlink" title="单例模式实现细节"></a>单例模式实现细节</h2><p>thePrinter的实现有两个微妙之处：</p>
+<ol>
+<li>p是函数中的静态对象而非类中的静态对象<br>如果是类中的静态对象，则该对象总是会被构造和析构。（即使你根本没有试图去使用）函数中的则不同，只有第一次调用函数时才会被构造。当然，我们也为此付出了代价：每一次都必须检查是否需要建立对象。<br>如果对象是类中的静态成员，它的初始化时间难以确定，我们清楚的了解函数的静态对象初始化于函数的第一次调用，而类则说不准。</li>
+<li>关注内联与函数内静态对象的关系<br>我们看得出thePrinter的函数体非常简短，很适合内联，但我们不能内联它。因为对于非成员函数，内联会导致复制obj中的代码，简单来说，就连静态对象也被复制了。所以不要<strong>内联包含局部静态数据的非成员对象。</strong></li>
+</ol>
+<hr>
+<h1 id="多例模式-限制数目）"><a href="#多例模式-限制数目）" class="headerlink" title="多例模式(限制数目）"></a>多例模式(限制数目）</h1><p>&nbsp;<br>一般来说，限制对象数目的核心思想在于：实时跟踪当前已生成的对象数目，如果超出则抛出异常：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;<span class="comment">//异常类</span></span><br><span class="line">    Printer();</span><br><span class="line">    ~Printer();</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">size_t</span> numObjects;</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);<span class="comment">//禁止拷贝</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">size_t</span> Printer::numObjects = <span class="number">0</span>;</span><br><span class="line">Printer::Printer()&#123;</span><br><span class="line">    <span class="keyword">if</span> (numObjects &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> TooManyObjects();</span><br><span class="line">    &#125;</span><br><span class="line">    ...<span class="comment">//执行构造</span></span><br><span class="line">    ++numObjects;</span><br><span class="line">&#125;</span><br><span class="line">Printer::~Printer()&#123;</span><br><span class="line">    ...<span class="comment">//执行析构;</span></span><br><span class="line">    --numObjects;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种方法相当直观，就是设计起来存在些许小小的问题。</p>
+<hr>
+<h2 id="建立对象的环境"><a href="#建立对象的环境" class="headerlink" title="建立对象的环境"></a>建立对象的环境</h2><p>假设我们有一个彩色打印机，继承自printer：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ColorPrinter</span>:</span> <span class="keyword">public</span> Printer &#123;...&#125;;</span><br><span class="line">Printer p;</span><br><span class="line">ColorPrinter cp;</span><br></pre></td></tr></table></figure><br>上述定义产生了两个Printer对象,于是，在构造cp的基类部分时抛出了异常（More Effective C++ 33提出设计时避免非尾端类为具象类）。<br>如果有其他对象包含Printer对象，也会有同样的问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CPFMachine</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer p;<span class="comment">//有打印能力</span></span><br><span class="line">    FaxMachine f;<span class="comment">//有传真能力</span></span><br><span class="line">    CopyMachine c;<span class="comment">//有复印能力</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">CPFMachine m1;<span class="comment">//运行正常</span></span><br><span class="line">CPFMachine m2;<span class="comment">//抛出异常</span></span><br></pre></td></tr></table></figure><br>这些问题的根源在于Pointer对象可以在3种不同状态下生存：</p>
+<ol>
+<li>仅有自身</li>
+<li>作为派生对象的base成分</li>
+<li>内嵌于较大对象</li>
+</ol>
+<p>这直接导致了我们心目中的“目标个数”与编译器看到的目标个数不一致。</p>
+<h3 id="private构造函数"><a href="#private构造函数" class="headerlink" title="private构造函数"></a>private构造函数</h3><p>通常情况下我们只对状态1感兴趣，那把构造函数设为private可以很有效地满足我们。<strong>带有private构造函数的类无法作为基类，也无法内嵌到其他对象中。</strong><br>private构造函数是一种阻止产生派生类的好手段，具体来说，假如你有一个类FSA（finite state automata），我们允许它产生多个对象，但禁止从它派生出新类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FSA</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> FSA * <span class="title">makeFSA</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> FSA * <span class="title">makeFSA</span><span class="params">(<span class="keyword">const</span> FSA&amp; rhs)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    FSA();</span><br><span class="line">    FSA(<span class="keyword">const</span> FSA&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">FSA* <span class="title">FSA::makeFSA</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FSA(); </span><br><span class="line">&#125;</span><br><span class="line"><span class="function">FSA* <span class="title">FSA::makeFSA</span><span class="params">(<span class="keyword">const</span> FSA&amp; rhs)</span></span>&#123; </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FSA(rhs); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>不同于thePrinter函数总是返回一个对象的引用（引用的对象是固定的），每个 makeFSA的伪构造函数则是返回一个指向对象的指针，也就是说允许建立的 FSA 对象数量没有限制。<br>为了防止资源泄漏，最佳方案自然是RAII：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">auto_ptr</span>&lt;FSA&gt; <span class="title">pfsa1</span><span class="params">(FSA::makeFSA())</span></span>;</span><br><span class="line"><span class="function"><span class="built_in">auto_ptr</span>&lt;FSA&gt; <span class="title">pfsa2</span><span class="params">(FSA::makeFSA(*pfsa1))</span></span>;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="允许对象自由生灭"><a href="#允许对象自由生灭" class="headerlink" title="允许对象自由生灭"></a>允许对象自由生灭</h2><p>在之前的设计手法中，首次我们调用thePrinter时，对象被构造，但我们无法控制对象的销毁，也就是说无法达成这样的功能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">建立Printer对象 p1;</span><br><span class="line">使用p1;</span><br><span class="line">释放p1;</span><br><span class="line">建立Printer对象 p2;</span><br><span class="line">使用p2;</span><br><span class="line">释放p2;</span><br></pre></td></tr></table></figure></p>
+<p>解决方法就是把对象计数和伪构造函数合并：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    ~Printer();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">size_t</span> numObjects;</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">size_t</span> Printer::numObjects = <span class="number">0</span>;</span><br><span class="line">Printer::Printer()&#123;</span><br><span class="line">    <span class="keyword">if</span> (numObjects &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> TooManyObjects();</span><br><span class="line">    &#125;</span><br><span class="line">    ...<span class="comment">//执行构造</span></span><br><span class="line">    ++numObjects;</span><br><span class="line">&#125;</span><br><span class="line">Printer::~Printer()&#123;</span><br><span class="line">    ...<span class="comment">//执行析构;</span></span><br><span class="line">    --numObjects;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>除了用户必须调用伪构造函数之外，这一切使用起来就如同其他类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Printer p1;<span class="comment">//error 构造函数为private</span></span><br><span class="line">Printer *p2 =Printer::makePrinter();</span><br><span class="line">Printer p3 = *p2; <span class="comment">//error 禁止拷贝</span></span><br><span class="line">p2-&gt;performSelfTest();</span><br><span class="line">p2-&gt;reset();</span><br><span class="line">...</span><br><span class="line"><span class="keyword">delete</span> p2;<span class="comment">//避免资源泄漏</span></span><br></pre></td></tr></table></figure><br>如果我们需要制定最多生成N个，那只要在class中定义一个static const maxsize=N就ok：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">(<span class="keyword">const</span> Printer&amp; rhs)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">size_t</span> numObjects;<span class="comment">//声明</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">size_t</span> maxObjects = <span class="number">10</span>;<span class="comment">//内置static类型可以直接在class中声明时定义</span></span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">size_t</span> Printer::numObjects = <span class="number">0</span>;<span class="comment">//在类外定义</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">size_t</span> Printer::maxObjects;<span class="comment">//定义</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="建立具有计数功能的基类"><a href="#建立具有计数功能的基类" class="headerlink" title="建立具有计数功能的基类"></a>建立具有计数功能的基类</h2><p>如果我们需要大量这种限制产出对象数量的class，难道我们要一遍一遍地重复编写？当然不是。<br>理想做法是编写一个具有实例计数功能的基类，然后让产出受限的类继承该类。我们使用一种方法封装计数功能，这种做法不但封装维护实例计数器的函数，也封装实例计数器本身。<br>下面给出该类的具体实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Counted</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;<span class="comment">//异常类</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">objectCount</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> numObjects;&#125;</span><br><span class="line"><span class="keyword">protected</span>:<span class="comment">//仅作为基类使用</span></span><br><span class="line">    Counted();</span><br><span class="line">    Counted(<span class="keyword">const</span> Counted&amp; rhs);</span><br><span class="line">    ~Counted() &#123;--numObjects;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> numObjects;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">size_t</span> maxObjects;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span>;<span class="comment">//避免代码重复</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:Counted()&#123;</span><br><span class="line">    init(); </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:Counted(<span class="keyword">const</span> Counted&lt;BeingCounted&gt;&amp;)&#123;</span><br><span class="line">    init();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:init()&#123;</span><br><span class="line">    <span class="keyword">if</span> (numObjects &gt;= maxObjects) <span class="keyword">throw</span> TooManyObjects();</span><br><span class="line">    ++numObjects;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>于是最终的Printer类如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>:</span><span class="keyword">private</span> Counted&lt;Printer&gt;&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">(<span class="keyword">const</span> Printer&amp; rhs)</span></span>;</span><br><span class="line">    ~Printer();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">using</span> Counted&lt;Printer&gt;::objectCount;</span><br><span class="line">    <span class="keyword">using</span> Counted&lt;Printer&gt;::TooManyObjects;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>用户有权得知当前的对象数目以及最大数目，private继承使得它们被隐藏，因此需要在public中使用using来获取他们。<br>最后需要注意的就是定义counted内部的静态成员，对于numobject，我们只需要在counted的实现中定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">int</span> <span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:numObjects;<span class="comment">//自动初始化为0</span></span><br></pre></td></tr></table></figure><br>max的定义则略微麻烦，我们不初始化它，而是留待客户进行初始化。以Printer举例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">size_t</span> Counted&lt;Printer&gt;::maxObjects = <span class="number">10</span>;</span><br></pre></td></tr></table></figure><br>如果客户没写，那么在连接时会报错。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/28/%E8%99%9A%E6%8B%9F%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" rel="next" title="25.虚拟工厂模式">
+                <i class="fa fa-chevron-left"></i> 25.虚拟工厂模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/28/%E8%A6%81%E6%B1%82%E6%88%96%E7%A6%81%E6%AD%A2%E5%9C%A8%E5%A0%86%E4%B8%AD%E4%BA%A7%E7%94%9F%E5%AF%B9%E8%B1%A1/" rel="prev" title="27.要求或禁止在堆中产生对象">
+                27.要求或禁止在堆中产生对象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#禁止对象实例化"><span class="nav-number">2.</span> <span class="nav-text">禁止对象实例化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单例模式"><span class="nav-number">3.</span> <span class="nav-text">单例模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#静态函数"><span class="nav-number">3.1.</span> <span class="nav-text">静态函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新建命名空间"><span class="nav-number">3.2.</span> <span class="nav-text">新建命名空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式实现细节"><span class="nav-number">3.3.</span> <span class="nav-text">单例模式实现细节</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多例模式-限制数目）"><span class="nav-number">4.</span> <span class="nav-text">多例模式(限制数目）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建立对象的环境"><span class="nav-number">4.1.</span> <span class="nav-text">建立对象的环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#private构造函数"><span class="nav-number">4.1.1.</span> <span class="nav-text">private构造函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#允许对象自由生灭"><span class="nav-number">4.2.</span> <span class="nav-text">允许对象自由生灭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立具有计数功能的基类"><span class="nav-number">4.3.</span> <span class="nav-text">建立具有计数功能的基类</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,资源管理," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="问题实例&amp;nbsp;假设我们正在开发一个多媒体电话簿，它不仅可以存储姓名地址号码外，还能存储照片和声音。该类具体形式如下：12345678910111213141516171819202122232425class Image &amp;#123;public:    Image(const string&amp;amp; imageDataFileName);    ...&amp;#125;;class AudioC">
+<meta name="keywords" content="C++,资源管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="10.在构造函数中防止资源泄漏">
+<meta property="og:url" content="https://xander.wiki/2018/04/25/%E5%9C%A8%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E4%B8%AD%E9%98%B2%E6%AD%A2%E8%B5%84%E6%BA%90%E6%B3%84%E6%BC%8F/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="问题实例&amp;nbsp;假设我们正在开发一个多媒体电话簿，它不仅可以存储姓名地址号码外，还能存储照片和声音。该类具体形式如下：12345678910111213141516171819202122232425class Image &amp;#123;public:    Image(const string&amp;amp; imageDataFileName);    ...&amp;#125;;class AudioC">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/04/25/在构造函数中防止资源泄漏/"/>
+
+
+
+
+
+  <title>10.在构造函数中防止资源泄漏 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/25/%E5%9C%A8%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E4%B8%AD%E9%98%B2%E6%AD%A2%E8%B5%84%E6%BA%90%E6%B3%84%E6%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">10.在构造函数中防止资源泄漏</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-25T11:04:00+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设我们正在开发一个多媒体电话簿，它不仅可以存储姓名地址号码外，还能存储照片和声音。该类具体形式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Image</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Image(<span class="keyword">const</span> <span class="built_in">string</span>&amp; imageDataFileName);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AudioClip</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    AudioClip(<span class="keyword">const</span> <span class="built_in">string</span>&amp; audioDataFileName);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PhoneNumber</span> &#123;</span> ... &#125;; <span class="comment">//存储号码</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookEntry</span> &#123;</span> <span class="comment">//条目</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    BookEntry(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> <span class="built_in">string</span>&amp; address = <span class="string">""</span>,</span><br><span class="line">              <span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName = <span class="string">""</span>,<span class="keyword">const</span> <span class="built_in">string</span>&amp; audioClipFileName = <span class="string">""</span>);</span><br><span class="line">    ~BookEntry();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addPhoneNumber</span><span class="params">(<span class="keyword">const</span> PhoneNumber&amp; number)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> theName;</span><br><span class="line">    <span class="built_in">string</span> theAddress;</span><br><span class="line">    <span class="built_in">list</span>&lt;PhoneNumber&gt; thePhones;</span><br><span class="line">    Image *theImage;</span><br><span class="line">    AudioClip *theAudioClip;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>因为条目必须存在姓名，所以不存在默认构造函数(More Effective C++ 3）。<br>对于条目的构造和析构函数，有具体实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">BookEntry::BookEntry(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> <span class="built_in">string</span>&amp; address,</span><br><span class="line">                     <span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName,Const <span class="built_in">string</span>&amp; audioClipFileName)</span><br><span class="line">            :theName(name), theAddress(address),theImage(<span class="literal">nullptr</span>), theAudioClip(<span class="literal">nullptr</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> (imageFileName != <span class="string">""</span>) &#123;</span><br><span class="line">        theImage = <span class="keyword">new</span> Image(imageFileName);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (audioClipFileName != <span class="string">""</span>) &#123;</span><br><span class="line">        theAudioClip = <span class="keyword">new</span> AudioClip(audioClipFileName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BookEntry::~BookEntry()&#123;</span><br><span class="line">    <span class="keyword">delete</span> theImage;</span><br><span class="line">    <span class="keyword">delete</span> theAudioClip;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这一切看起来运作良好，但如果函数中出现了异常…</p>
+<hr>
+<h2 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h2><p>&nbsp;<br>如果BookEntry的构造函数正在执行中，突然发生异常：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (audioClipFileName != <span class="string">""</span>) &#123;</span><br><span class="line">    theAudioClip = <span class="keyword">new</span> AudioClip(audioClipFileName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>异常的抛出原因，可能是operator new不能够分配足够内存，也可能是audio的构造函数自己抛出了异常。不管如何，这个异常将传递到建立BookEntry对象的地方。<br>假设建立audio时抛出了异常（且控制权此时在Entry构造函数外），那么已经构建好的image对象该由谁来删除呢？无疑该资源应该由Entry的析构函数释放，但在实际情况中，Entry析构函数并未被调用，原因很简单：C++只能对完全构造的对象进行析构，只有一个对象的构造函数完全运行完毕，这个对象才被定义为完全构造。<br>也许有人会想到使用try—catch主动处理异常：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">testBookEntryClass</span><span class="params">()</span></span>&#123;</span><br><span class="line">    BookEntry *pb = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        pb = <span class="keyword">new</span> BookEntry(<span class="string">"Addison-Wesley Publishing Company"</span>,</span><br><span class="line">                           <span class="string">"One Jacob Way, Reading, MA 01867"</span>);</span><br><span class="line">         ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (...) &#123;</span><br><span class="line">        <span class="keyword">delete</span> pb;</span><br><span class="line">        <span class="keyword">throw</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">delete</span> pb;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这并没有什么用，因为new操作并没有完成，pb依旧是一个nullptr，delete只不过删了一个空指针而已。</p>
+<p>c++禁止为尚未完成构造的对象进行析构，因为允许该操作需要记录构造函数执行了多少步，这会造成额外的开销。</p>
+<hr>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>&nbsp;<br>为了解决资源泄漏这一问题，处理方法是在构造函数中捕获所有异常，捕获后执行清除操作，最后再重新抛出异常让它继续传递：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">BookEntry::BookEntry(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> <span class="built_in">string</span>&amp; address,</span><br><span class="line">                     <span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName,Const <span class="built_in">string</span>&amp; audioClipFileName)</span><br><span class="line">            :theName(name), theAddress(address),theImage(<span class="literal">nullptr</span>), theAudioClip(<span class="literal">nullptr</span>)&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (imageFileName != <span class="string">""</span>) &#123;</span><br><span class="line">            theImage = <span class="keyword">new</span> Image(imageFileName);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (audioClipFileName != <span class="string">""</span>) &#123;</span><br><span class="line">            theAudioClip = <span class="keyword">new</span> AudioClip(audioClipFileName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (...) &#123;</span><br><span class="line">        <span class="keyword">delete</span> theImage; </span><br><span class="line">        <span class="keyword">delete</span> theAudioClip;</span><br><span class="line">        <span class="keyword">throw</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>非指针成员在构造函数被调用之前就完成了初始化，属于完全构造，因此会被自动释放。<br>显然，catch语句块中的清除操作几乎与析构函数一摸一样，为了避免代码重复，我们定义一个私有的helper function，让构造函数与析构函数都调用它，如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookEntry</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ... <span class="comment">// 同上</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">cleanup</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BookEntry::cleanup</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">delete</span> theImage;</span><br><span class="line">    <span class="keyword">delete</span> theAudioClip;</span><br><span class="line">&#125;</span><br><span class="line">BookEntry::BookEntry(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> <span class="built_in">string</span>&amp; address,</span><br><span class="line">                     <span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName,Const <span class="built_in">string</span>&amp; audioClipFileName)</span><br><span class="line">            :theName(name), theAddress(address),theImage(<span class="literal">nullptr</span>), theAudioClip(<span class="literal">nullptr</span>)&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (...) &#123;</span><br><span class="line">        cleanup();</span><br><span class="line">        <span class="keyword">throw</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BookEntry::~BookEntry()&#123;</span><br><span class="line">    cleanup();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="异常产生于构造函数调用之前"><a href="#异常产生于构造函数调用之前" class="headerlink" title="异常产生于构造函数调用之前"></a>异常产生于构造函数调用之前</h1><p>&nbsp;<br>假设image与audio是一个const指针，因此它们必须通过初始化列表来完成初始化(不允许赋值）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">BookEntry::BookEntry(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> <span class="built_in">string</span>&amp; address,</span><br><span class="line">                     <span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName,Const <span class="built_in">string</span>&amp; audioClipFileName)</span><br><span class="line">            :theName(name), theAddress(address),</span><br><span class="line">            theImage(imageFileName != <span class="string">""</span>? <span class="keyword">new</span> Image(imageFileName): <span class="literal">nullptr</span>),</span><br><span class="line">            theAudioClip(audioClipFileName != <span class="string">""</span>? <span class="keyword">new</span> AudioClip(audioClipFileName): <span class="literal">nullptr</span>)</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure><br>倘若常量指针初始化时抛出了异常….这一次情况发生在构造函数被调用之前，所以无法在构造函数中使用try catch语句。</p>
+<hr>
+<h2 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="新建初始化函数"><a href="#新建初始化函数" class="headerlink" title="新建初始化函数"></a>新建初始化函数</h3><p>我们可以在私有成员函数中，用一些函数返回指针指向初始化过的image与audio：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookEntry</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function">Image * <span class="title">initImage</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName)</span></span>;</span><br><span class="line">    <span class="function">AudioClip * <span class="title">initAudioClip</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; audioClipFileName)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line">BookEntry::BookEntry(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> <span class="built_in">string</span>&amp; address,</span><br><span class="line">                     <span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName,Const <span class="built_in">string</span>&amp; audioClipFileName)</span><br><span class="line">            :theName(name), theAddress(address),</span><br><span class="line">            theImage(initImage(imageFileName),theAudioClip(initAudioClip(audioClipFileName))</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="comment">// theImage首先初始化，初始化失败也不会有内存泄漏，无需考虑异常</span></span><br><span class="line">Image * BookEntry::initImage(<span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName)&#123;</span><br><span class="line">    <span class="keyword">if</span> (imageFileName != <span class="string">""</span>) <span class="keyword">return</span> <span class="keyword">new</span> Image(imageFileName);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//初始化失败必须要保证Image资源被释放</span></span><br><span class="line">AudioClip * BookEntry::initAudioClip(<span class="keyword">const</span> <span class="built_in">string</span>&amp;audioClipFileName)&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (audioClipFileName != <span class="string">""</span>) </span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> AudioClip(audioClipFileName);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (...) &#123;</span><br><span class="line">        <span class="keyword">delete</span> theImage;</span><br><span class="line">        <span class="keyword">throw</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>该方法的缺点在于原本属于构造函数的代码却分散在各个函数中，维护极为不易，并且对象增加了新成员后代码也需要重新编写。</p>
+<h3 id="RAII"><a href="#RAII" class="headerlink" title="RAII"></a>RAII</h3><p>我们可以运用RAII思想，把audio与image指向的对象作为资源托管给smart-ptr：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BookEntry</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">auto_ptr</span>&lt;Image&gt; theImage;</span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">auto_ptr</span>&lt;AudioClip&gt; theAudioClip;</span><br><span class="line">&#125;;</span><br><span class="line">BookEntry::BookEntry(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> <span class="built_in">string</span>&amp; address,</span><br><span class="line">                     <span class="keyword">const</span> <span class="built_in">string</span>&amp; imageFileName,<span class="keyword">const</span> <span class="built_in">string</span>&amp; audioClipFileName)</span><br><span class="line">            :theName(name), theAddress(address),</span><br><span class="line">            theImage(imageFileName != <span class="string">""</span>? <span class="keyword">new</span> Image(imageFileName): <span class="literal">nullptr</span>),</span><br><span class="line">            theAudioClip(audioClipFileName != <span class="string">""</span>? <span class="keyword">new</span> AudioClip(audioClipFileName): <span class="literal">nullptr</span>)</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure><br>如此一来，audio构造出现异常时，image已经是一个完成构造的完全体，可以被直接清除，同时所有资源均由对象托管，析构函数无需执行任何工作。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86/" rel="tag"># 资源管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/25/%E4%BD%BF%E7%94%A8%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E9%98%B2%E6%AD%A2%E8%B5%84%E6%BA%90%E6%B3%84%E6%BC%8F/" rel="next" title="9.使用析构函数防止资源泄漏">
+                <i class="fa fa-chevron-left"></i> 9.使用析构函数防止资源泄漏
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/25/%E7%A6%81%E6%AD%A2%E5%BC%82%E5%B8%B8%E4%BF%A1%E6%81%AF%E4%BC%A0%E9%80%92%E5%88%B0%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B9%8B%E5%A4%96/" rel="prev" title="11.禁止异常信息传递到析构函数之外">
+                11.禁止异常信息传递到析构函数之外 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题实例"><span class="nav-number">1.</span> <span class="nav-text">问题实例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题剖析"><span class="nav-number">1.1.</span> <span class="nav-text">问题剖析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">1.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异常产生于构造函数调用之前"><span class="nav-number">2.</span> <span class="nav-text">异常产生于构造函数调用之前</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案-1"><span class="nav-number">2.1.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新建初始化函数"><span class="nav-number">2.1.1.</span> <span class="nav-text">新建初始化函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RAII"><span class="nav-number">2.1.2.</span> <span class="nav-text">RAII</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

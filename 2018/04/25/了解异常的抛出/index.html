@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,异常," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="异常的抛出与函数传递参数&amp;nbsp;从语法角度看，传递参数和捕获异常其简直一摸一样：12345678910111213class Widget &amp;#123; ... &amp;#125;; &#x2F;&#x2F;函数调用void f1(Widget w);void f2(Widget&amp;amp; w); void f3(const Widget&amp;amp; w);void f4(Widget *pw);void f5(cons">
+<meta name="keywords" content="C++,异常">
+<meta property="og:type" content="article">
+<meta property="og:title" content="12.了解异常的抛出">
+<meta property="og:url" content="https://xander.wiki/2018/04/25/%E4%BA%86%E8%A7%A3%E5%BC%82%E5%B8%B8%E7%9A%84%E6%8A%9B%E5%87%BA/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="异常的抛出与函数传递参数&amp;nbsp;从语法角度看，传递参数和捕获异常其简直一摸一样：12345678910111213class Widget &amp;#123; ... &amp;#125;; &#x2F;&#x2F;函数调用void f1(Widget w);void f2(Widget&amp;amp; w); void f3(const Widget&amp;amp; w);void f4(Widget *pw);void f5(cons">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/04/25/了解异常的抛出/"/>
+
+
+
+
+
+  <title>12.了解异常的抛出 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/25/%E4%BA%86%E8%A7%A3%E5%BC%82%E5%B8%B8%E7%9A%84%E6%8A%9B%E5%87%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">12.了解异常的抛出</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-25T19:20:00+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="异常的抛出与函数传递参数"><a href="#异常的抛出与函数传递参数" class="headerlink" title="异常的抛出与函数传递参数"></a>异常的抛出与函数传递参数</h1><p>&nbsp;<br>从语法角度看，传递参数和捕获异常其简直一摸一样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> ... &#125;; </span><br><span class="line"><span class="comment">//函数调用</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f1</span><span class="params">(Widget w)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f2</span><span class="params">(Widget&amp; w)</span></span>; </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f3</span><span class="params">(<span class="keyword">const</span> Widget&amp; w)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f4</span><span class="params">(Widget *pw)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f5</span><span class="params">(<span class="keyword">const</span> Widget *pw)</span></span>;</span><br><span class="line"><span class="comment">//异常捕获</span></span><br><span class="line"><span class="keyword">catch</span> (Widget w) ... </span><br><span class="line"><span class="keyword">catch</span> (Widget&amp; w) ... </span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget&amp; w) ... </span><br><span class="line"><span class="keyword">catch</span> (Widget *pw) ... </span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget *pw) ...</span><br></pre></td></tr></table></figure><br>它们确实有相同点，但是也存在巨大差异。</p>
+<ul>
+<li>相同点在于：传递过程都是可以传值、传递引用、传递指针。</li>
+<li>不同点在于：调用函数时，程序控制权终将返回调用处，但当你抛出异常时，控制权将永远回不到抛出异常的地方。</li>
+</ul>
+<hr>
+<h1 id="异常与拷贝"><a href="#异常与拷贝" class="headerlink" title="异常与拷贝"></a>异常与拷贝</h1><p>&nbsp;<br>以如下函数举例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">istream <span class="keyword">operator</span>&gt;&gt;(istream&amp; s, Widget&amp; w);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">passAndThrowWidget</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Widget localWidget;</span><br><span class="line">    <span class="built_in">cin</span> &gt;&gt; localWidget;<span class="comment">//传递参数</span></span><br><span class="line">    <span class="keyword">throw</span> localWidget;<span class="comment">//抛出异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当我们传递参数时，其实是把w绑定到localwidget，任何施加于w的操作都施加于它。但throw则不同<strong>，无论通过传值还是引用，异常都会被拷贝</strong>，原因很简单，localwidget一旦离开了生存空间后析构函数就会被调用。如果我们把localwidget本身传递出去，catch只能接受到一个析构了的widget，因此异常抛出的对象必须被复制。</p>
+<h2 id="static异常"><a href="#static异常" class="headerlink" title="static异常"></a>static异常</h2><p>即使对象是static，不会被析构，抛出异常的时候也会进行复制：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">passAndThrowWidget</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Widget localWidget;</span><br><span class="line">    <span class="built_in">cin</span> &gt;&gt; localWidget;</span><br><span class="line">    <span class="keyword">throw</span> localWidget; <span class="comment">// 拷贝操作</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这表明哪怕是使用引用捕获异常，我们永远也无法通过catch来修改localwidget本身，仅仅只能修改对象的拷贝。这也证明了抛出异常与参数传递的第二个差异：抛出异常速度比参数传递要慢。</p>
+<h2 id="静态类型"><a href="#静态类型" class="headerlink" title="静态类型"></a>静态类型</h2><p>当异常对象被拷贝时，拷贝操作是由对象的拷贝构造函数完成的。该拷贝构造函数是对象的静态类型所对应类的拷贝构造函数，而不是对象的动态类型对应类的拷贝构造函数。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> ... &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWidget</span>:</span> <span class="keyword">public</span> Widget &#123; ... &#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">passAndThrowWidget</span><span class="params">()</span></span>&#123;</span><br><span class="line">    SpecialWidget localSpecialWidget;</span><br><span class="line">    ...</span><br><span class="line">    Widget&amp; rw = localSpecialWidget;</span><br><span class="line">    <span class="keyword">throw</span> rw;<span class="comment">//抛出一个类型为Widget的异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="catch中的异常"><a href="#catch中的异常" class="headerlink" title="catch中的异常"></a>catch中的异常</h1><p>&nbsp;<br>异常是其它对象的拷贝，这个事实影响到你如何在catch块中再抛出一个异常。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget&amp; w)&#123;<span class="comment">// 捕获 Widget 异常</span></span><br><span class="line">    ... <span class="comment">// 处理异常</span></span><br><span class="line">    <span class="keyword">throw</span>; <span class="comment">// 重新抛出异常，让它继续传递</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (Widget&amp; w)&#123;<span class="comment">// 捕获 Widget 异常</span></span><br><span class="line">    ... <span class="comment">// 处理异常</span></span><br><span class="line">    <span class="keyword">throw</span> w; <span class="comment">// 传递被捕获异常的拷贝</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这两个catch块中，第一个catch块重新抛出的是当前捕获的异常，第二个抛出的是当前捕获的异常的一个拷贝。<br>第一个块中抛出的类型不需要静态动态类型，因为它没有进行拷贝操作。<br>第二个块中重新抛出的是新异常，其类型必然是widget.<br>一般来说，推荐使用throw，这样不会改变异常的类型，也不用生成额外的异常临时变量了。（临时变量详见More Effective C++ 19）</p>
+<hr>
+<h1 id="异常的捕获方式"><a href="#异常的捕获方式" class="headerlink" title="异常的捕获方式"></a>异常的捕获方式</h1><p>&nbsp;<br>异常一般有传值、传引用、传指向const的引用三种：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget w) ... <span class="comment">// 通过传值捕获异常</span></span><br><span class="line"><span class="keyword">catch</span> (Widget&amp; w) ... <span class="comment">// 通过传递引用捕获异常</span></span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget&amp; w) ... <span class="comment">//通过传递指向const的引用捕获异常</span></span><br></pre></td></tr></table></figure><br>通过比对我们又发现了一大差异，我们已经知道抛出的拷贝其实是一个临时变量，而在传递参数时临时变量无法被普通引用绑定，只能通过const reference。</p>
+<h2 id="不同捕获方式之间的差异"><a href="#不同捕获方式之间的差异" class="headerlink" title="不同捕获方式之间的差异"></a>不同捕获方式之间的差异</h2><h3 id="传值"><a href="#传值" class="headerlink" title="传值"></a>传值</h3><p>当我们声明这样的一个catch子句时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget w) ...<span class="comment">//传值捕获</span></span><br></pre></td></tr></table></figure><br>该表达式会建立<strong>两个</strong>被抛出对象的拷贝，一个是所有异常都必须建立的临时对象，另一个是把临时对象拷贝进w中。</p>
+<h3 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h3><p>当我们声明使用引用捕获时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget&amp; w) ... <span class="comment">// 通过引用捕获</span></span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget&amp; w) ... <span class="comment">//也通过引用捕获</span></span><br></pre></td></tr></table></figure><br>只会建立一个拷贝，该拷贝是一个临时对象，并且被引用绑定，但我们使用引用传递参数时则不会发生拷贝。</p>
+<h3 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h3><p>对于指针而言，传递参数与传递异常差不多，都是一个指针的拷贝被传递，只不过要记得用指针传递异常时异常必须是全局的或者在堆中，否则catch子句只能通过指针去往一个已经被析构的地方。</p>
+<hr>
+<h1 id="异常与类型转换"><a href="#异常与类型转换" class="headerlink" title="异常与类型转换"></a>异常与类型转换</h1><h2 id="隐式转换"><a href="#隐式转换" class="headerlink" title="隐式转换"></a>隐式转换</h2><p>异常传递中不允许出现隐式转换，但传递参数时可以。</p>
+<h2 id="异常传递中允许发生的转换"><a href="#异常传递中允许发生的转换" class="headerlink" title="异常传递中允许发生的转换"></a>异常传递中允许发生的转换</h2><p>第一种是派生类与基类间的转换。（is-a)<br>另一种就是允许从一个类型化指针转变为无类型指针，所以参数为const void*的catch语句能捕获任何类型的指针类型异常。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span>(<span class="keyword">const</span> <span class="keyword">void</span>*) ...</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="catch语句匹配"><a href="#catch语句匹配" class="headerlink" title="catch语句匹配"></a>catch语句匹配</h1><p>&nbsp;<br>传递函数与传递异常的差别还在于catch语句匹配不按最合适的，而是总是按照先后顺序，因此可能会发生派生类异常永远总是处理不到的情形：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (logic_error&amp; ex) &#123;<span class="comment">//base</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (invalid_argument&amp; ex) &#123;<span class="comment">//derived</span></span><br><span class="line">    ...<span class="comment">//永远不会被执行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>虚函数采用的是最优匹配法，而异常处理采用的是最先适合法。但如果一个派生类的catch在一个基类的catch后面，通常编译器会发出警告。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>一个对象传递给函数,一个对象调用虚函,把一个对象做为异常抛出，它们之间有三个主要区别：</p>
+<ul>
+<li>异常在传递时总被拷贝，传值时被拷贝了两次</li>
+<li>异常的类型转换很少（2种）</li>
+<li>异常采用最先匹配法</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%BC%82%E5%B8%B8/" rel="tag"># 异常</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/25/%E7%A6%81%E6%AD%A2%E5%BC%82%E5%B8%B8%E4%BF%A1%E6%81%AF%E4%BC%A0%E9%80%92%E5%88%B0%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B9%8B%E5%A4%96/" rel="next" title="11.禁止异常信息传递到析构函数之外">
+                <i class="fa fa-chevron-left"></i> 11.禁止异常信息传递到析构函数之外
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/26/%E4%BB%A5%E5%BC%95%E7%94%A8%E6%96%B9%E5%BC%8F%E6%8D%95%E8%8E%B7%E5%BC%82%E5%B8%B8/" rel="prev" title="13.以引用方式捕获异常">
+                13.以引用方式捕获异常 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#异常的抛出与函数传递参数"><span class="nav-number">1.</span> <span class="nav-text">异常的抛出与函数传递参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异常与拷贝"><span class="nav-number">2.</span> <span class="nav-text">异常与拷贝</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#static异常"><span class="nav-number">2.1.</span> <span class="nav-text">static异常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态类型"><span class="nav-number">2.2.</span> <span class="nav-text">静态类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#catch中的异常"><span class="nav-number">3.</span> <span class="nav-text">catch中的异常</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异常的捕获方式"><span class="nav-number">4.</span> <span class="nav-text">异常的捕获方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#不同捕获方式之间的差异"><span class="nav-number">4.1.</span> <span class="nav-text">不同捕获方式之间的差异</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#传值"><span class="nav-number">4.1.1.</span> <span class="nav-text">传值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引用"><span class="nav-number">4.1.2.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指针"><span class="nav-number">4.1.3.</span> <span class="nav-text">指针</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异常与类型转换"><span class="nav-number">5.</span> <span class="nav-text">异常与类型转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#隐式转换"><span class="nav-number">5.1.</span> <span class="nav-text">隐式转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常传递中允许发生的转换"><span class="nav-number">5.2.</span> <span class="nav-text">异常传递中允许发生的转换</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#catch语句匹配"><span class="nav-number">6.</span> <span class="nav-text">catch语句匹配</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Data Structures and Algorithms," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="题目名称 Construct Binary Tree Unique Binary Search Trees（Leetcode #96） Validate Binary Search Tree（Leetcode #98） Convert Sorted Array to Binary Search Tree（Leetcode #108） Convert Sorted List to Binary Se">
+<meta name="keywords" content="C++,Data Structures and Algorithms">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OJ每日练习（17）">
+<meta property="og:url" content="https://xander.wiki/2018/08/18/OJ%20exercise17/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="题目名称 Construct Binary Tree Unique Binary Search Trees（Leetcode #96） Validate Binary Search Tree（Leetcode #98） Convert Sorted Array to Binary Search Tree（Leetcode #108） Convert Sorted List to Binary Se">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/08/18/OJ exercise17/"/>
+
+
+
+
+
+  <title>OJ每日练习（17） | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/08/18/OJ%20exercise17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OJ每日练习（17）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-18T13:40:00+08:00">
+                2018-08-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OJ-Exercises/" itemprop="url" rel="index">
+                    <span itemprop="name">OJ Exercises</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><ol>
+<li>Construct Binary Tree</li>
+<li>Unique Binary Search Trees（Leetcode #96）</li>
+<li>Validate Binary Search Tree（Leetcode #98）</li>
+<li>Convert Sorted Array to Binary Search Tree（Leetcode #108）</li>
+<li>Convert Sorted List to Binary Search Tree（Leetcode #109）</li>
+<li>Minimum Depth of Binary Tree (Leetcode #111)</li>
+<li>Path Sum (Leetcode #112)</li>
+<li>Binary Tree Maximum Path Sum (Leetcode #124)</li>
+<li>Populating Next Right Pointers in Each Node（Leetcode #116）</li>
+<li>Sum Root to Leaf Numbers(Leetcode #129）</li>
+</ol>
+<a id="more"></a>
+<hr>
+<h1 id="Construct-Binary-Tree"><a href="#Construct-Binary-Tree" class="headerlink" title="Construct Binary Tree"></a>Construct Binary Tree</h1><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>从中序+前序，以及中序+后序可以重建完全二叉树，其具体思想就是普通的递归（递归基是起点大于终点），现给出二者的实现方案。</p>
+<h2 id="解题方案"><a href="#解题方案" class="headerlink" title="解题方案"></a>解题方案</h2><p><strong>Pre+In:</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">buildTree</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; pre, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; in)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(pre.empty())</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">if</span>(pre.<span class="built_in">size</span>()==<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> TreeNode(pre[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">return</span> aux(pre,<span class="number">0</span>,pre.<span class="built_in">size</span>()<span class="number">-1</span>,in,<span class="number">0</span>,in.<span class="built_in">size</span>()<span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">aux</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; pre,<span class="keyword">int</span> pb,<span class="keyword">int</span> pe,<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; in,<span class="keyword">int</span> ib,<span class="keyword">int</span> ie)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(pb&gt;pe || ib&gt;ie) <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">int</span> rootVal = pre[pb];</span><br><span class="line">        TreeNode* root = <span class="keyword">new</span> TreeNode(rootVal);</span><br><span class="line">        <span class="keyword">int</span> pos=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(in[pos]!=rootVal) ++pos;</span><br><span class="line">        root-&gt;left = aux(pre,pb+<span class="number">1</span>,pb+pos-ib,in,ib,pos<span class="number">-1</span>);</span><br><span class="line">        root-&gt;right = aux(pre,pb+<span class="number">1</span>+pos-ib,pe,in,pos+<span class="number">1</span>,ie);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong>In+Post:</strong><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">buildTree</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; in, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; post)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (in.empty())</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">		<span class="keyword">if</span> (in.<span class="built_in">size</span>() == <span class="number">1</span>)</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> TreeNode(in[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">return</span> aux(in,<span class="number">0</span>,in.<span class="built_in">size</span>()<span class="number">-1</span>,post,<span class="number">0</span>,post.<span class="built_in">size</span>()<span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">aux</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; in,<span class="keyword">int</span> ib,<span class="keyword">int</span> ie,<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; post,<span class="keyword">int</span> pb,<span class="keyword">int</span> pe)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(ib&gt;ie || pb&gt;pe)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">int</span> rootVal = post[pe];</span><br><span class="line">        TreeNode* root = <span class="keyword">new</span> TreeNode(rootVal);</span><br><span class="line">        <span class="keyword">int</span> pos =<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(in[pos]!=rootVal) ++pos;</span><br><span class="line">        root-&gt;left = aux(in,ib,pos<span class="number">-1</span>,post,pb,pb+pos<span class="number">-1</span>-ib);</span><br><span class="line">        root-&gt;right = aux(in,pos+<span class="number">1</span>,ie,post,pb+pos-ib,pe<span class="number">-1</span>);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="Unique-Binary-Search-Trees（Leetcode-96）"><a href="#Unique-Binary-Search-Trees（Leetcode-96）" class="headerlink" title="Unique Binary Search Trees（Leetcode #96）"></a>Unique Binary Search Trees（Leetcode #96）</h1><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given n, how many structurally unique BST’s (binary search trees) that store values 1 … n?</p>
+<p><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Input: 3</span><br><span class="line">Output: 5</span><br><span class="line">Explanation:</span><br><span class="line">Given n &#x3D; 3, there are a total of 5 unique BST&#39;s:</span><br><span class="line"></span><br><span class="line">   1         3     3      2      1</span><br><span class="line">    \       &#x2F;     &#x2F;      &#x2F; \      \</span><br><span class="line">     3     2     1      1   3      2</span><br><span class="line">    &#x2F;     &#x2F;       \                 \</span><br><span class="line">   2     1         2                 3</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-1"><a href="#解题思路-1" class="headerlink" title="解题思路"></a>解题思路</h2><p>这是卡特兰数的典型实例。举例而言，当构成元素为1~n时，以i为根节点的树，其左子树由[1,i-1]构成，右子树由[i+1,n]构成。定义f(i)为以[1,i]构成的BST的个数，显然，<br><code>f(0)=0,f(1)=1,f(2)=f(0)*f(1)+f(1)*f(0),f(3)=f(0)*f(2)+f(1)*f(1)+f(2)*f(0)</code>(一个乘式对应着一个root），因此不难得出结论：</p>
+<script type="math/tex; mode=display">f(i)=\sum_{k=1}^if(k-1)*f(i-k)</script><p>最终将问题转为一维动态规划求解。</p>
+<h2 id="解题方案-1"><a href="#解题方案-1" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">numTrees</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">dp</span><span class="params">(n+<span class="number">1</span>)</span></span>;</span><br><span class="line">        dp[<span class="number">0</span>]=<span class="number">1</span>,dp[<span class="number">1</span>]=<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">2</span>;i&lt;=n;++i)</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> k=<span class="number">1</span>;k&lt;=i;++k)</span><br><span class="line">                dp[i]+=dp[k<span class="number">-1</span>]*dp[i-k];</span><br><span class="line">        <span class="keyword">return</span> dp[n];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（Unique-Binary-Search-TreesⅡ-Leetcode-95"><a href="#扩展（Unique-Binary-Search-TreesⅡ-Leetcode-95" class="headerlink" title="扩展（Unique Binary Search TreesⅡ  Leetcode#95)"></a>扩展（Unique Binary Search TreesⅡ  Leetcode#95)</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>Given an integer n, generate all structurally unique BST’s (binary search trees) that store values 1 … n.<br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Input: 3</span><br><span class="line">Output:</span><br><span class="line">[</span><br><span class="line">  [1,null,3,2],</span><br><span class="line">  [3,2,null,1],</span><br><span class="line">  [3,1,null,null,2],</span><br><span class="line">  [2,1,3],</span><br><span class="line">  [1,null,2,null,3]</span><br><span class="line">]</span><br><span class="line">Explanation:</span><br><span class="line">The above output corresponds to the 5 unique BST&#39;s shown below:</span><br><span class="line"></span><br><span class="line">   1         3     3      2      1</span><br><span class="line">    \       &#x2F;     &#x2F;      &#x2F; \      \</span><br><span class="line">     3     2     1      1   3      2</span><br><span class="line">    &#x2F;     &#x2F;       \                 \</span><br><span class="line">   2     1         2                 3</span><br></pre></td></tr></table></figure></p>
+<h3 id="解题思路-2"><a href="#解题思路-2" class="headerlink" title="解题思路"></a>解题思路</h3><p>针对每一个根递归求解。具体来说，当beg&gt;end时，插入nullptr并return。（递归基）否则构建左右子树的vector，并遍历其元素以作为左右子树。</p>
+<h3 id="解题方案-2"><a href="#解题方案-2" class="headerlink" title="解题方案"></a>解题方案</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;TreeNode*&gt; <span class="title">generateTrees</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n==<span class="number">0</span>) <span class="keyword">return</span> <span class="built_in">vector</span>&lt;TreeNode*&gt;();</span><br><span class="line">        <span class="keyword">return</span> aux(<span class="number">1</span>,n);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;TreeNode*&gt; <span class="title">aux</span><span class="params">(<span class="keyword">int</span> beg,<span class="keyword">int</span> <span class="built_in">end</span>)</span></span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;TreeNode*&gt; res;</span><br><span class="line">        <span class="keyword">if</span>(beg&gt;<span class="built_in">end</span>)&#123;</span><br><span class="line">            res.push_back(<span class="literal">nullptr</span>);</span><br><span class="line">            <span class="keyword">return</span> res;</span><br><span class="line">        &#125;    </span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=beg;i&lt;=<span class="built_in">end</span>;++i)&#123;</span><br><span class="line">            <span class="built_in">vector</span>&lt;TreeNode*&gt; leftsubs = aux(beg,i<span class="number">-1</span>);</span><br><span class="line">            <span class="built_in">vector</span>&lt;TreeNode*&gt; rightsubs = aux(i+<span class="number">1</span>,<span class="built_in">end</span>);</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">auto</span> nl:leftsubs)</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">auto</span> nr:rightsubs)&#123;</span><br><span class="line">                    TreeNode* root = <span class="keyword">new</span> TreeNode(i);</span><br><span class="line">                    root-&gt;left=nl;</span><br><span class="line">                    root-&gt;right=nr;</span><br><span class="line">                    res.push_back(root);</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Validate-Binary-Search-Tree（Leetcode-98）"><a href="#Validate-Binary-Search-Tree（Leetcode-98）" class="headerlink" title="Validate Binary Search Tree（Leetcode #98）"></a>Validate Binary Search Tree（Leetcode #98）</h1><h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a binary tree, determine if it is a valid binary search tree (BST).</p>
+<h2 id="解题思路-3"><a href="#解题思路-3" class="headerlink" title="解题思路"></a>解题思路</h2><p>第一反应是中序遍历二叉树，观察其中是否存在逆序对，这是一个可行的解，此外也可以使用递归实现（设定max与min，观察每一个节点是否超出，每下一层都更新min与max）</p>
+<h2 id="解题方案-3"><a href="#解题方案-3" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isValidBST</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> aux(root,LONG_MIN,LONG_MAX);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">aux</span><span class="params">(TreeNode* root,<span class="keyword">long</span> <span class="built_in">min</span>,<span class="keyword">long</span> <span class="built_in">max</span>)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(root-&gt;val &lt;= <span class="built_in">min</span> || root-&gt;val &gt;= <span class="built_in">max</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> aux(root-&gt;left,<span class="built_in">min</span>,root-&gt;val) &amp;&amp; aux(root-&gt;right,root-&gt;val,<span class="built_in">max</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Convert-Sorted-Array-to-Binary-Search-Tree（Leetcode-108）"><a href="#Convert-Sorted-Array-to-Binary-Search-Tree（Leetcode-108）" class="headerlink" title="Convert Sorted Array to Binary Search Tree（Leetcode #108）"></a>Convert Sorted Array to Binary Search Tree（Leetcode #108）</h1><h2 id="解题思路-4"><a href="#解题思路-4" class="headerlink" title="解题思路"></a>解题思路</h2><p>非常简单的题目。</p>
+<h2 id="解题方案-4"><a href="#解题方案-4" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">sortedArrayToBST</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> aux(nums,<span class="number">0</span>,nums.<span class="built_in">size</span>()<span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">aux</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums,<span class="keyword">int</span> beg,<span class="keyword">int</span> <span class="built_in">end</span>)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(beg&gt;<span class="built_in">end</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">int</span> middle = beg+(<span class="built_in">end</span>-beg)/<span class="number">2</span>;</span><br><span class="line">        TreeNode* root = <span class="keyword">new</span> TreeNode(nums[middle]);</span><br><span class="line">        root-&gt;left = aux(nums,beg,middle<span class="number">-1</span>);</span><br><span class="line">        root-&gt;right = aux(nums,middle+<span class="number">1</span>,<span class="built_in">end</span>);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Convert-Sorted-List-to-Binary-Search-Tree（Leetcode-109）"><a href="#Convert-Sorted-List-to-Binary-Search-Tree（Leetcode-109）" class="headerlink" title="Convert Sorted List to Binary Search Tree（Leetcode #109）"></a>Convert Sorted List to Binary Search Tree（Leetcode #109）</h1><h2 id="解题思路-5"><a href="#解题思路-5" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题的难度相较于上一道大了不少，主要原因在于单链表不支持随机访问。但原理总是类似的，我们可以采用快慢指针的方式，首先找到中点，然后完成求解。值得注意的是，在寻找中点时需要记录中点的前一个节点，以便于完成单链表的切断。</p>
+<h2 id="解题方案-5"><a href="#解题方案-5" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">sortedListToBST</span><span class="params">(ListNode* head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!head) </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">if</span>(!head-&gt;next) </span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> TreeNode(head-&gt;val);</span><br><span class="line">        ListNode *p = head, *q = head, *pre=<span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">while</span> (q &amp;&amp; q-&gt;next) &#123;</span><br><span class="line">            pre = p;</span><br><span class="line">            p = p-&gt;next;</span><br><span class="line">            q = q-&gt;next-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        pre-&gt;next = <span class="literal">nullptr</span>;</span><br><span class="line">        TreeNode *root = <span class="keyword">new</span> TreeNode(p-&gt;val);</span><br><span class="line">        root-&gt;left = sortedListToBST(head);</span><br><span class="line">        root-&gt;right = sortedListToBST(p-&gt;next);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Minimum-Depth-of-Binary-Tree-Leetcode-111"><a href="#Minimum-Depth-of-Binary-Tree-Leetcode-111" class="headerlink" title="Minimum Depth of Binary Tree (Leetcode #111)"></a>Minimum Depth of Binary Tree (Leetcode #111)</h1><h2 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a binary tree, find its minimum depth.<br>The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.<br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Given binary tree [3,9,20,null,null,15,7],</span><br><span class="line"></span><br><span class="line">    3</span><br><span class="line">   &#x2F; \</span><br><span class="line">  9  20</span><br><span class="line">    &#x2F;  \</span><br><span class="line">   15   7</span><br><span class="line">return its minimum depth &#x3D; 2.</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-6"><a href="#解题思路-6" class="headerlink" title="解题思路"></a>解题思路</h2><p>非常简单的题目，遍历两个子树的min深度即可。值得注意的是若某个子树高度为0，最低高度是另一个子树的高度+根节点。</p>
+<h2 id="解题方案-6"><a href="#解题方案-6" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">minDepth</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (!root) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	    <span class="keyword">int</span> left = minDepth(root-&gt;left);</span><br><span class="line">	    <span class="keyword">int</span> right = minDepth(root-&gt;right);</span><br><span class="line">	    <span class="keyword">return</span> (left == <span class="number">0</span> || right == <span class="number">0</span>) ? left + right + <span class="number">1</span> : <span class="built_in">min</span>(left, right) + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><p>若是求解max，难度更低：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">maxDepth</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(maxDepth(root-&gt;left),maxDepth(root-&gt;right))+<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="扩展-1"><a href="#扩展-1" class="headerlink" title="扩展"></a>扩展</h2><p>若是求解n叉树的maxDep，步骤几乎一样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">maxDepth</span><span class="params">(Node* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">auto</span> n:root-&gt;children)</span><br><span class="line">            res=<span class="built_in">max</span>(maxDepth(n),res);</span><br><span class="line">        <span class="keyword">return</span> res+<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="Path-Sum-Leetcode-112"><a href="#Path-Sum-Leetcode-112" class="headerlink" title="Path Sum (Leetcode #112)"></a>Path Sum (Leetcode #112)</h1><h2 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.<br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Given the below binary tree and sum &#x3D; 22,</span><br><span class="line">      5</span><br><span class="line">     &#x2F; \</span><br><span class="line">    4   8</span><br><span class="line">   &#x2F;   &#x2F; \</span><br><span class="line">  11  13  4</span><br><span class="line"> &#x2F;  \      \</span><br><span class="line">7    2      1</span><br><span class="line">return true, as there exist a root-to-leaf path 5-&gt;4-&gt;11-&gt;2 which sum is 22.</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-7"><a href="#解题思路-7" class="headerlink" title="解题思路"></a>解题思路</h2><p>朴素深搜，找到了直接return。</p>
+<h2 id="解题方案-7"><a href="#解题方案-7" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">hasPathSum</span><span class="params">(TreeNode* root, <span class="keyword">int</span> sum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(!root-&gt;left &amp;&amp; !root-&gt;right &amp;&amp; root-&gt;val==sum)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">return</span> hasPathSum(root-&gt;left,sum-root-&gt;val) || hasPathSum(root-&gt;right,sum-root-&gt;val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（"><a href="#扩展（" class="headerlink" title="扩展（"></a>扩展（</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><p>Given a binary tree and a sum, find all root-to-leaf paths where each path’s sum equals the given sum.<br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Given the below binary tree and sum &#x3D; 22,</span><br><span class="line">      5</span><br><span class="line">     &#x2F; \</span><br><span class="line">    4   8</span><br><span class="line">   &#x2F;   &#x2F; \</span><br><span class="line">  11  13  4</span><br><span class="line"> &#x2F;  \    &#x2F; \</span><br><span class="line">7    2  5   1</span><br><span class="line">Return:</span><br><span class="line">[</span><br><span class="line">   [5,4,11,2],</span><br><span class="line">   [5,8,4,5]</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<h3 id="解题思路-8"><a href="#解题思路-8" class="headerlink" title="解题思路"></a>解题思路</h3><p>这道题的思路与上一题类似，但区别在于找到了不能直接return，需要接着往下探索，当某个节点探索完毕后需要对cur执行pop_back;</p>
+<h3 id="解题方案-8"><a href="#解题方案-8" class="headerlink" title="解题方案"></a>解题方案</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; <span class="title">pathSum</span><span class="params">(TreeNode* root, <span class="keyword">int</span> sum)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; res;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; cur;</span><br><span class="line">        aux(root,sum,res,cur);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">aux</span><span class="params">(TreeNode* root, <span class="keyword">int</span> sum,<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt;&amp;res, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp;cur)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        cur.push_back(root-&gt;val);</span><br><span class="line">        <span class="keyword">if</span>(!root-&gt;left &amp;&amp; !root-&gt;right &amp;&amp; root-&gt;val==sum)</span><br><span class="line">            res.push_back(cur);</span><br><span class="line">        aux(root-&gt;left,sum-root-&gt;val,res,cur);</span><br><span class="line">        aux(root-&gt;right,sum-root-&gt;val,res,cur);</span><br><span class="line">        cur.pop_back();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Binary-Tree-Maximum-Path-Sum-Leetcode-124"><a href="#Binary-Tree-Maximum-Path-Sum-Leetcode-124" class="headerlink" title="Binary Tree Maximum Path Sum (Leetcode #124)"></a>Binary Tree Maximum Path Sum (Leetcode #124)</h1><h2 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a non-empty binary tree, find the maximum path sum.<br>For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The path must contain at least one node and does not need to go through the root.<br><strong>Example1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input: [1,2,3]</span><br><span class="line">       1</span><br><span class="line">      &#x2F; \</span><br><span class="line">     2   3</span><br><span class="line">Output: 6</span><br></pre></td></tr></table></figure><br><strong>Example2:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Input: [-10,9,20,null,null,15,7]</span><br><span class="line">   -10</span><br><span class="line">   &#x2F; \</span><br><span class="line">  9  20</span><br><span class="line">    &#x2F;  \</span><br><span class="line">   15   7</span><br><span class="line">Output: 42</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-9"><a href="#解题思路-9" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题十分类似于最长子序列和，但二叉树并不像array那样可以线性遍历，因此可以采取这样的策略：求解左子树，若其值为正，那么对结果有利，可以加上，接着求解右子树，若其对结果有利，也加上。需要注意的是，最后返回只返回了一个方向，这是因为递归需要返回root，不可能出现left-&gt;root-&gt;right的情况。</p>
+<h2 id="解题方案-9"><a href="#解题方案-9" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">maxPathSum</span><span class="params">(TreeNode *root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res=INT_MIN;</span><br><span class="line">        aux(root,res);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">aux</span><span class="params">(TreeNode* root,<span class="keyword">int</span>&amp; res)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> left=<span class="built_in">max</span>(<span class="number">0</span>,aux(root-&gt;left,res));</span><br><span class="line">        <span class="keyword">int</span> right=<span class="built_in">max</span>(<span class="number">0</span>,aux(root-&gt;right,res));</span><br><span class="line">        res=<span class="built_in">max</span>(res,left+right+root-&gt;val);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(left,right)+root-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Populating-Next-Right-Pointers-in-Each-Node（Leetcode-116）"><a href="#Populating-Next-Right-Pointers-in-Each-Node（Leetcode-116）" class="headerlink" title="Populating Next Right Pointers in Each Node（Leetcode #116）"></a>Populating Next Right Pointers in Each Node（Leetcode #116）</h1><h2 id="解题思路-10"><a href="#解题思路-10" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题比昨天的要简单一些，因为这是一颗满二叉树。因此可以采用递归解决。具体来说就是始终连接左-右，右-兄弟之左或右-nullptr。</p>
+<h2 id="解题方案-10"><a href="#解题方案-10" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">connect</span><span class="params">(TreeLinkNode *root)</span> </span>&#123;</span><br><span class="line">        aux(root,<span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">aux</span><span class="params">(TreeLinkNode *root,TreeLinkNode *next)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root) <span class="keyword">return</span>;</span><br><span class="line">        root-&gt;next=next;</span><br><span class="line">        aux(root-&gt;left,root-&gt;right);</span><br><span class="line">        aux(root-&gt;right,next?next-&gt;left:<span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Sum-Root-to-Leaf-Numbers-Leetcode-129）"><a href="#Sum-Root-to-Leaf-Numbers-Leetcode-129）" class="headerlink" title="Sum Root to Leaf Numbers(Leetcode #129）"></a>Sum Root to Leaf Numbers(Leetcode #129）</h1><h2 id="题目描述-7"><a href="#题目描述-7" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a binary tree containing digits from 0-9 only, each root-to-leaf path could represent a number.An example is the root-to-leaf path 1-&gt;2-&gt;3 which represents the number 123.<br>Find the total sum of all root-to-leaf numbers.<br><strong>Example 1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Input: [1,2,3]</span><br><span class="line">    1</span><br><span class="line">   &#x2F; \</span><br><span class="line">  2   3</span><br><span class="line">Output: 25</span><br><span class="line">Explanation:</span><br><span class="line">The root-to-leaf path 1-&gt;2 represents the number 12.</span><br><span class="line">The root-to-leaf path 1-&gt;3 represents the number 13.</span><br><span class="line">Therefore, sum &#x3D; 12 + 13 &#x3D; 25.</span><br></pre></td></tr></table></figure><br><strong>Example 2:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Input: [4,9,0,5,1]</span><br><span class="line">    4</span><br><span class="line">   &#x2F; \</span><br><span class="line">  9   0</span><br><span class="line"> &#x2F; \</span><br><span class="line">5   1</span><br><span class="line">Output: 1026</span><br><span class="line">Explanation:</span><br><span class="line">The root-to-leaf path 4-&gt;9-&gt;5 represents the number 495.</span><br><span class="line">The root-to-leaf path 4-&gt;9-&gt;1 represents the number 491.</span><br><span class="line">The root-to-leaf path 4-&gt;0 represents the number 40.</span><br><span class="line">Therefore, sum &#x3D; 495 + 491 + 40 &#x3D; 1026.</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-11"><a href="#解题思路-11" class="headerlink" title="解题思路"></a>解题思路</h2><p>朴素深搜即可。</p>
+<h2 id="解题方案-11"><a href="#解题方案-11" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">sumNumbers</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> aux(root,<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">aux</span><span class="params">(TreeNode* root,<span class="keyword">int</span> sum)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(!root-&gt;left &amp;&amp; !root-&gt;right)</span><br><span class="line">            <span class="keyword">return</span> sum*<span class="number">10</span>+root-&gt;val;</span><br><span class="line">        <span class="keyword">return</span> aux(root-&gt;left,sum*<span class="number">10</span>+root-&gt;val)+aux(root-&gt;right,sum*<span class="number">10</span>+root-&gt;val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Data-Structures-and-Algorithms/" rel="tag"># Data Structures and Algorithms</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/17/OJ%20exercise16/" rel="next" title="OJ每日练习（16）">
+                <i class="fa fa-chevron-left"></i> OJ每日练习（16）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/21/vultr%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E8%84%9A%E6%9C%AC%E5%A4%87%E4%BB%BD/" rel="prev" title="vultr科学上网脚本备份">
+                vultr科学上网脚本备份 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#题目名称"><span class="nav-number">1.</span> <span class="nav-text">题目名称</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Construct-Binary-Tree"><span class="nav-number">2.</span> <span class="nav-text">Construct Binary Tree</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路"><span class="nav-number">2.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案"><span class="nav-number">2.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unique-Binary-Search-Trees（Leetcode-96）"><span class="nav-number">3.</span> <span class="nav-text">Unique Binary Search Trees（Leetcode #96）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述"><span class="nav-number">3.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-1"><span class="nav-number">3.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-1"><span class="nav-number">3.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（Unique-Binary-Search-TreesⅡ-Leetcode-95"><span class="nav-number">3.4.</span> <span class="nav-text">扩展（Unique Binary Search TreesⅡ  Leetcode#95)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#题目描述-1"><span class="nav-number">3.4.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-2"><span class="nav-number">3.4.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-2"><span class="nav-number">3.4.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Validate-Binary-Search-Tree（Leetcode-98）"><span class="nav-number">4.</span> <span class="nav-text">Validate Binary Search Tree（Leetcode #98）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-2"><span class="nav-number">4.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-3"><span class="nav-number">4.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-3"><span class="nav-number">4.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Convert-Sorted-Array-to-Binary-Search-Tree（Leetcode-108）"><span class="nav-number">5.</span> <span class="nav-text">Convert Sorted Array to Binary Search Tree（Leetcode #108）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-4"><span class="nav-number">5.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-4"><span class="nav-number">5.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Convert-Sorted-List-to-Binary-Search-Tree（Leetcode-109）"><span class="nav-number">6.</span> <span class="nav-text">Convert Sorted List to Binary Search Tree（Leetcode #109）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-5"><span class="nav-number">6.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-5"><span class="nav-number">6.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Minimum-Depth-of-Binary-Tree-Leetcode-111"><span class="nav-number">7.</span> <span class="nav-text">Minimum Depth of Binary Tree (Leetcode #111)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-3"><span class="nav-number">7.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-6"><span class="nav-number">7.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-6"><span class="nav-number">7.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展"><span class="nav-number">7.4.</span> <span class="nav-text">扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展-1"><span class="nav-number">7.5.</span> <span class="nav-text">扩展</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Path-Sum-Leetcode-112"><span class="nav-number">8.</span> <span class="nav-text">Path Sum (Leetcode #112)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-4"><span class="nav-number">8.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-7"><span class="nav-number">8.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-7"><span class="nav-number">8.3.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（"><span class="nav-number">8.4.</span> <span class="nav-text">扩展（</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#题目描述-5"><span class="nav-number">8.4.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-8"><span class="nav-number">8.4.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-8"><span class="nav-number">8.4.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Binary-Tree-Maximum-Path-Sum-Leetcode-124"><span class="nav-number">9.</span> <span class="nav-text">Binary Tree Maximum Path Sum (Leetcode #124)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-6"><span class="nav-number">9.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-9"><span class="nav-number">9.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-9"><span class="nav-number">9.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Populating-Next-Right-Pointers-in-Each-Node（Leetcode-116）"><span class="nav-number">10.</span> <span class="nav-text">Populating Next Right Pointers in Each Node（Leetcode #116）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-10"><span class="nav-number">10.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-10"><span class="nav-number">10.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Sum-Root-to-Leaf-Numbers-Leetcode-129）"><span class="nav-number">11.</span> <span class="nav-text">Sum Root to Leaf Numbers(Leetcode #129）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-7"><span class="nav-number">11.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-11"><span class="nav-number">11.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-11"><span class="nav-number">11.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

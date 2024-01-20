@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,并发编程," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;在线程运行过程中经常发生如下场景：线程A需要等待线程B完成某操作。有三种方案可以解决这一需求：  反复检查共享标志位(例如mutex)，直到某线程完成操作后将其置位。这将造成两点浪费：首先，线程不得不耗费宝贵的运行时间循环检查数据；其次，如果mutex被线程A上锁（它需要锁住互斥量以查看被其保护的标志位），那么其他线程将无法获得该锁，甚至连已完成任务的线程B也无法锁住互斥量以重置该">
+<meta name="keywords" content="C++,并发编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="同步并发操作——等待事件或条件">
+<meta property="og:url" content="https://xander.wiki/2019/04/20/%E5%90%8C%E6%AD%A5%E5%B9%B6%E5%8F%91%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E7%AD%89%E5%BE%85%E4%BA%8B%E4%BB%B6%E6%88%96%E6%9D%A1%E4%BB%B6/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;在线程运行过程中经常发生如下场景：线程A需要等待线程B完成某操作。有三种方案可以解决这一需求：  反复检查共享标志位(例如mutex)，直到某线程完成操作后将其置位。这将造成两点浪费：首先，线程不得不耗费宝贵的运行时间循环检查数据；其次，如果mutex被线程A上锁（它需要锁住互斥量以查看被其保护的标志位），那么其他线程将无法获得该锁，甚至连已完成任务的线程B也无法锁住互斥量以重置该">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:07.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2019/04/20/同步并发操作——等待事件或条件/"/>
+
+
+
+
+
+  <title>同步并发操作——等待事件或条件 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2019/04/20/%E5%90%8C%E6%AD%A5%E5%B9%B6%E5%8F%91%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E7%AD%89%E5%BE%85%E4%BA%8B%E4%BB%B6%E6%88%96%E6%9D%A1%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">同步并发操作——等待事件或条件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-20T12:27:00+08:00">
+                2019-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在线程运行过程中经常发生如下场景：线程A需要等待线程B完成某操作。有三种方案可以解决这一需求：</p>
+<ol>
+<li><p>反复检查共享标志位(例如mutex)，直到某线程完成操作后将其置位。<br>这将造成两点浪费：首先，线程不得不耗费宝贵的运行时间循环检查数据；其次，如果mutex被线程A上锁（它需要锁住互斥量以查看被其保护的标志位），那么其他线程将无法获得该锁，甚至连已完成任务的线程B也无法锁住互斥量以重置该标志位。</p>
+</li>
+<li><p>使用<code>std::this_thread::sleep_for()</code>令线程在等待间隙短暂休眠</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> flag; </span><br><span class="line"><span class="built_in">std</span>::mutex m;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">wait_for_flag</span><span class="params">()</span> </span>&#123; </span><br><span class="line">  <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(m)</span></span>; </span><br><span class="line">  <span class="keyword">while</span>(!flag) &#123; </span><br><span class="line">    lk.unlock();</span><br><span class="line">    <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::milliseconds(<span class="number">100</span>)); <span class="comment">// 休眠100ms </span></span><br><span class="line">    <span class="comment">//....此时可以保证其他线程获取该锁，重置flag</span></span><br><span class="line">    lk.lock();</span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>方案2优于方案1，但缺憾在于开发者无法确定休眠时间取多少合适。过少的休眠时间等于没有，过多的休眠时间又会造成任务必须等待线程苏醒。尽管休眠时间过长很少会对程序运行产生直接影响，但在对实时性较高的场景中（例如游戏画面绘制），这意味着一场灾难。</p>
+</li>
+<li><p>使用C++标准库提供的工具<br>最基本的处理等待事件机制为条件变量(condition variable)。从本质而言，条件变量的存在与事件或条件相关联，并且必须存在一些等待该变量被满足的线程。若当前执行线程确定条件已被满足，那么它将通知一个或多个等待该条件变量被满足的线程，以便唤醒它们接着执行任务。</p>
+</li>
+</ol>
+<a id="more"></a>
+<h1 id="等待条件达成"><a href="#等待条件达成" class="headerlink" title="等待条件达成"></a>等待条件达成</h1><p>&nbsp;<br>C++标准库提供了了两种条件变量的实现：<code>std::condition_variable</code>与<code>std::condition_variable_any</code>,它们都位于头文件<code>&lt;condition_variable&gt;</code>内。</p>
+<p>二者均需要与互斥量配合，不同之处在于<code>std::condition_variable</code>仅限于与<code>std::mutex</code>搭配使用，而<code>std::condition_variable_any</code>则可以与任何满足最低标准的互斥量一起工作，这也是<code>_any</code>后缀的由来。当然，灵活性会带来性能上的损耗，因此除非必要，我们应当尽可能使用<code>std::condition_variable</code>。以下将展示如何使用<code>std::condition_variable</code>实现条件唤醒：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::mutex mut;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">queue</span>&lt;data_chunk&gt; data_queue; </span><br><span class="line"><span class="built_in">std</span>::condition_variable data_cond;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">data_preparation_thread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(more_data_to_prepare()) &#123; </span><br><span class="line">    data_chunk <span class="keyword">const</span> data = prepare_data(); </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_queue.push(data);</span><br><span class="line">    data_cond.notify_one();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">data_processing_thread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(<span class="literal">true</span>) &#123; </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_cond.wait(lk,[]&#123;<span class="keyword">return</span> !data_queue.empty();&#125;); </span><br><span class="line">    data_chunk data=data_queue.front(); </span><br><span class="line">    data_queue.pop(); </span><br><span class="line">    lk.unlock();<span class="comment">// 时间点1</span></span><br><span class="line">    <span class="built_in">process</span>(data); </span><br><span class="line">    <span class="keyword">if</span>(is_last_chunk(data)) <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先存在一个用于在两个线程间传递数据的队列。当数据准备就绪时，准备数据的线程调用<code>std ::lock_guard</code>锁定保护队列的互斥锁，并将数据推送到队列中。接着该线程调用<code>std:: condition_variable</code>的成员函数<code>notify_one()</code>来通知可能存在的等待线程。</p>
+<p>接下来我们将目光移至<code>data_processing_thread</code>。该线程首先执行对互斥量的锁定(使用的是unique_lock而非lock_gurad,具体原因将在下文提及)。接着线程调用<code>condition_variable</code>的成员函数<code>wait</code>。该函数接收一个lock对象与一个lambda表达式，当lambda表达式返回false时，<code>wait</code>将解锁互斥量，并将当前线程置于阻塞或等待状态。当其他线程调用<code>notify_one()</code>通知条件变量时，执行线程从睡眠中苏醒，重新获取互斥锁并检查执行条件(lambda表达式)。若当前条件满足，从<code>wait()</code>返回（互斥量保持锁定）。若不满足，则线程将解锁互斥量并继续等待。这也就是我们使用<code>unique_lock</code>的原因——我们需要随时加锁解锁的灵活性。如果线程处于休眠状态时互斥锁保持锁定，则数据准备线程将无法锁定互斥锁并把数据添加到队列中，此时等待线程的条件也将永远不会被满足。</p>
+<p><code>unique_lock</code>的存在不仅为了满足<code>wait</code>内频繁加锁与解锁的需要，若当前存在待处理数据，但此时处理操作尚未开始(如代码中时间点1)，开发者同样需要调用<code>unlock</code>，原因在于处理数据可能非常耗时。在前文中我们曾经提及，持有锁的时间过长将造成种种负面影响。</p>
+<hr>
+<h1 id="使用条件变量构建线程安全队列"><a href="#使用条件变量构建线程安全队列" class="headerlink" title="使用条件变量构建线程安全队列"></a>使用条件变量构建线程安全队列</h1><p>&nbsp;<br>使用队列在线程之间传输数据是一种常见行为，既然如此，我们完全可以在队列内部实现同步，从而降低触发条件竞争的可能性。因此，本节将致力于使用条件变量构建通用型线程安全队列。</p>
+<p>首先观察一下C++标准库中<code>queue</code>的对外接口：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>, <span class="title">class</span> <span class="title">Container</span> = <span class="title">std</span>:</span>:<span class="built_in">deque</span>&lt;T&gt; &gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">queue</span> &#123;</span> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">explicit</span> <span class="title">queue</span><span class="params">(<span class="keyword">const</span> Container&amp;)</span></span>; </span><br><span class="line">  <span class="function"><span class="keyword">explicit</span> <span class="title">queue</span><span class="params">(Container&amp;&amp; = Container())</span></span>; </span><br><span class="line">  <span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Alloc</span>&gt; </span></span><br><span class="line"><span class="class">  <span class="title">explicit</span> <span class="title">queue</span>(<span class="title">const</span> <span class="title">Alloc</span>&amp;);</span> </span><br><span class="line">  <span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Alloc</span>&gt; </span></span><br><span class="line"><span class="class">  <span class="title">queue</span>(<span class="title">const</span> <span class="title">Container</span>&amp;, <span class="title">const</span> <span class="title">Alloc</span>&amp;);</span> </span><br><span class="line">  <span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Alloc</span>&gt; </span></span><br><span class="line"><span class="class">  <span class="title">queue</span>(<span class="title">Container</span>&amp;&amp;, <span class="title">const</span> <span class="title">Alloc</span>&amp;);</span> </span><br><span class="line">  <span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Alloc</span>&gt; <span class="title">queue</span>(<span class="title">queue</span>&amp;&amp;, <span class="title">const</span> <span class="title">Alloc</span>&amp;);</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="built_in">queue</span>&amp; q)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span></span>; </span><br><span class="line">  <span class="function">size_type <span class="title">size</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">  <span class="function">T&amp; <span class="title">front</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">const</span> T&amp; <span class="title">front</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">  <span class="function">T&amp; <span class="title">back</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">const</span> T&amp; <span class="title">back</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(<span class="keyword">const</span> T&amp; x)</span></span>; </span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T&amp;&amp; x)</span></span>; </span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">pop</span><span class="params">()</span></span>; </span><br><span class="line">  <span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span>... <span class="title">Args</span>&gt; </span></span><br><span class="line"><span class="class">  <span class="title">void</span> <span class="title">emplace</span>(<span class="title">Args</span>&amp;&amp;... <span class="title">args</span>);</span> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>忽略构造、赋值、交换后，值得注意的接口有以下三种：</p>
+<ol>
+<li>查询接口(<code>empty()</code>，<code>size()</code>)</li>
+<li>数据接口(<code>front()</code>，<code>back()</code>)</li>
+<li>修改接口(<code>push()</code>，<code>pop()</code>，<code>emplace()</code>)</li>
+</ol>
+<p>类似于stack，queue的接口同样存在固有条件竞争，因此需要将<code>front()</code>与<code>pop()</code>合并至一个接口内。在前文queue的使用场景中，我们注意到接收线程常常需要等待数据，因此我们将<code>pop()</code>接口改为两种不同的操作方式：<code>try_pop()</code>与<code>wait_and_pop()</code>。前者尝试从队列中弹出值，并总是立即返回(带有<code>isSuccess</code>标志)；后者则持续等待至目标弹出。综上，<code>threadsafe_queue</code>接口如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt; // for std::shared_ptr</span></span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">threadsafe_queue</span> &#123;</span> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_queue(); </span><br><span class="line">  threadsafe_queue(<span class="keyword">const</span> threadsafe_queue&amp;); </span><br><span class="line">  threadsafe_queue&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> threadsafe_queue&amp;) = <span class="keyword">delete</span>; <span class="comment">// delete assign</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">try_pop</span><span class="params">(T&amp; value)</span></span>; <span class="comment">// 传入引用作为输出</span></span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span></span>; <span class="comment">// 若失败则返回nullptr</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">wait_and_pop</span><span class="params">(T&amp; value)</span></span>; </span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">wait_and_pop</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span></span>; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;queue&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mutex&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;condition_variable&gt;</span></span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">threadsafe_queue</span> &#123;</span> </span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">mutable</span> <span class="built_in">std</span>::mutex mut;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">queue</span>&lt;T&gt; data_queue; </span><br><span class="line">  <span class="built_in">std</span>::condition_variable data_cond; </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  threadsafe_queue() &#123;&#125; </span><br><span class="line">  threadsafe_queue(threadsafe_queue <span class="keyword">const</span>&amp; other) &#123; </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(other.mut)</span></span>; </span><br><span class="line">    data_queue=other.data_queue; </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(T new_value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>;</span><br><span class="line">    data_queue.push(new_value);</span><br><span class="line">    data_cond.notify_one(); </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">wait_and_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_cond.wait(lk,[<span class="keyword">this</span>]&#123;<span class="keyword">return</span> !data_queue.empty();&#125;); </span><br><span class="line">    value=data_queue.front(); </span><br><span class="line">    data_queue.pop();</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">wait_and_pop</span><span class="params">()</span> </span>&#123; </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::unique_lock&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    data_cond.wait(lk,[<span class="keyword">this</span>]&#123;<span class="keyword">return</span> !data_queue.empty();&#125;); </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">res</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt; (data_queue.front()))</span></span>; </span><br><span class="line">    data_queue.pop(); </span><br><span class="line">    <span class="keyword">return</span> res; </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">try_pop</span><span class="params">(T&amp; value)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>; </span><br><span class="line">    <span class="keyword">if</span>(data_queue.empty()) </span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    value=data_queue.front();</span><br><span class="line">    data_queue.pop(); </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">try_pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>;</span><br><span class="line">    <span class="keyword">if</span>(data_queue.empty()) </span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt;(); </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;T&gt; <span class="title">res</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;T&gt; (data_queue.front()))</span></span>; </span><br><span class="line">    data_queue.pop(); <span class="keyword">return</span> res; </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; </span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">lk</span><span class="params">(mut)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> data_queue.empty();</span><br><span class="line">  &#125; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中，<code>wait_and_pop</code>的使用方法如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">threadsafe_queue&lt;data_chunk&gt; data_queue;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">data_preparation_thread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(more_data_to_prepare()) &#123;</span><br><span class="line">    data_chunk <span class="keyword">const</span> data=prepare_data();</span><br><span class="line">    data_queue.push(data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">data_processing_thread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(<span class="literal">true</span>) &#123; </span><br><span class="line">    data_chunk data; </span><br><span class="line">    data_queue.wait_and_pop(data); </span><br><span class="line">    <span class="built_in">process</span>(data); </span><br><span class="line">    <span class="keyword">if</span>(is_last_chunk(data)) <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="notify-one的不足与notify-any"><a href="#notify-one的不足与notify-any" class="headerlink" title="notify_one的不足与notify_any"></a>notify_one的不足与notify_any</h1><p>&nbsp;<br><code>notify_one()</code>的不足在于，它将触发当前正在执行<code>wait()</code>的<strong>一个</strong>线程检查其状态并从<code>wait()</code>返回，但开发者无法精准地通知到某个<strong>指定</strong>进程，即使该进程正处于等待状态。</p>
+<p>若存在几个线程正在等待同一事件，并且它们都需要对该事件作出响应（应用场景如共享数据初始化或多个线程等待共享数据更新）。此时我们可以调用<code>notify_all()</code>这一成员函数，顾名思义，这将导致当前所有正在执行<code>wait()</code>的线程检查它们正在等待的条件。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag"># 并发编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/17/%E7%BA%BF%E7%A8%8B%E9%97%B4%E5%85%B1%E4%BA%AB%E6%95%B0%E6%8D%AE%E2%80%94%E2%80%94%E4%BF%9D%E6%8A%A4%E5%85%B1%E4%BA%AB%E6%95%B0%E6%8D%AE%E7%9A%84%E6%9B%BF%E4%BB%A3%E8%AE%BE%E6%96%BD/" rel="next" title="线程间共享数据——保护共享数据的替代设施">
+                <i class="fa fa-chevron-left"></i> 线程间共享数据——保护共享数据的替代设施
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/%E5%90%8C%E6%AD%A5%E5%B9%B6%E5%8F%91%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8%E6%9C%9F%E6%9C%9B%E7%AD%89%E5%BE%85%E4%B8%80%E6%AC%A1%E6%80%A7%E4%BA%8B%E4%BB%B6/" rel="prev" title="同步并发操作——使用future等待一次性事件">
+                同步并发操作——使用future等待一次性事件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#等待条件达成"><span class="nav-number">2.</span> <span class="nav-text">等待条件达成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用条件变量构建线程安全队列"><span class="nav-number">3.</span> <span class="nav-text">使用条件变量构建线程安全队列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#具体实现"><span class="nav-number">3.1.</span> <span class="nav-text">具体实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#notify-one的不足与notify-any"><span class="nav-number">4.</span> <span class="nav-text">notify_one的不足与notify_any</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

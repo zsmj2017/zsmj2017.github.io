@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Data Structures and Algorithms," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="题目名称 Binary Tree Preorder Traversal（Leetcode #144） Binary Tree Inorder Traversal（Leetcode #94） Binary Tree Postorder Traversal（Leetcode #145） Binary Tree Level Order Traversal（Leetcode #102） Binary Tr">
+<meta name="keywords" content="C++,Data Structures and Algorithms">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OJ每日练习（16）">
+<meta property="og:url" content="https://xander.wiki/2018/08/17/OJ%20exercise16/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="题目名称 Binary Tree Preorder Traversal（Leetcode #144） Binary Tree Inorder Traversal（Leetcode #94） Binary Tree Postorder Traversal（Leetcode #145） Binary Tree Level Order Traversal（Leetcode #102） Binary Tr">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/3w3kbr1r9zalausmrkeeg8cj/image_1cl377p8j1ubf2ecgi8bd21uen19.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/3w3kbr1r9zalausmrkeeg8cj/image_1cl377p8j1ubf2ecgi8bd21uen19.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/08/17/OJ exercise16/"/>
+
+
+
+
+
+  <title>OJ每日练习（16） | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/08/17/OJ%20exercise16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OJ每日练习（16）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-17T13:40:00+08:00">
+                2018-08-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OJ-Exercises/" itemprop="url" rel="index">
+                    <span itemprop="name">OJ Exercises</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><ol>
+<li>Binary Tree Preorder Traversal（Leetcode #144）</li>
+<li>Binary Tree Inorder Traversal（Leetcode #94）</li>
+<li>Binary Tree Postorder Traversal（Leetcode #145）</li>
+<li>Binary Tree Level Order Traversal（Leetcode #102）</li>
+<li>Binary Tree Zigzag Order Traversal（Leetcode #103）</li>
+<li>Recover Binary Search Tree (Leetcode #99)</li>
+<li>Same Tree (Leetcode #100)</li>
+<li>Balanced Binary Tree (Leetcode #110)</li>
+<li>Flatten Binary Tree to Linked List（Leetcode #114）</li>
+<li>Populating Next Right Pointers in Each NodeⅡ (Leetcode #117）</li>
+</ol>
+<a id="more"></a>
+<hr>
+<h1 id="Binary-Tree-Preorder-Traversal（Leetcode-144）"><a href="#Binary-Tree-Preorder-Traversal（Leetcode-144）" class="headerlink" title="Binary Tree Preorder Traversal（Leetcode #144）"></a>Binary Tree Preorder Traversal（Leetcode #144）</h1><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>二叉树的几种遍历中，以后序最繁琐，前序中序都可以借助栈实现，但这里我将介绍Morris遍历，针对三种遍历次序，无需使用额外空间。（这里就不讨论递归了）<br>Morris遍历的前序和中序都较为简单，仅有后序较为繁琐。前序和中序的区别不大，因此将在中序遍历中统一说明。这里需要说明的是，前序和中序的区别是：</p>
+<ul>
+<li><strong>前序</strong><br>若pre-&gt;right尚未线索化，输出当前序列，更新cur与pre。</li>
+<li><strong>中序</strong><br>若pre-&gt;right已线索化，输出当前序列，更新cur与pre。</li>
+</ul>
+<h2 id="解题方案"><a href="#解题方案" class="headerlink" title="解题方案"></a>解题方案</h2><h3 id="栈（先进后出，所以先放右子）"><a href="#栈（先进后出，所以先放右子）" class="headerlink" title="栈（先进后出，所以先放右子）"></a>栈（先进后出，所以先放右子）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for a binary tree node.</span></span><br><span class="line"><span class="comment"> * struct TreeNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     TreeNode *left;</span></span><br><span class="line"><span class="comment"> *     TreeNode *right;</span></span><br><span class="line"><span class="comment"> *     TreeNode(int x) : val(x), left(NULL), right(NULL) &#123;&#125;</span></span><br><span class="line"><span class="comment"> * &#125;;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">preorderTraversal</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">        <span class="built_in">stack</span>&lt;TreeNode*&gt; stk;</span><br><span class="line">        stk.push(root);</span><br><span class="line">        <span class="keyword">while</span>(!stk.empty())&#123;</span><br><span class="line">            TreeNode* temp = stk.top();</span><br><span class="line">            stk.pop();</span><br><span class="line">            res.push_back(temp-&gt;val);</span><br><span class="line">            <span class="keyword">if</span>(temp-&gt;right) stk.push(temp-&gt;right);</span><br><span class="line">            <span class="keyword">if</span>(temp-&gt;left) stk.push(temp-&gt;left);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="Morris"><a href="#Morris" class="headerlink" title="Morris"></a>Morris</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">preorderTraversal</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">        TreeNode* cur=root,*pre=<span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">while</span>(cur)&#123;</span><br><span class="line">            <span class="keyword">if</span>(!cur-&gt;left)&#123;</span><br><span class="line">                res.push_back(cur-&gt;val);</span><br><span class="line">                cur=cur-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                pre=cur-&gt;left;</span><br><span class="line">                <span class="keyword">while</span>(pre-&gt;right &amp;&amp; pre-&gt;right!=cur)</span><br><span class="line">                    pre=pre-&gt;right;</span><br><span class="line">                <span class="keyword">if</span>(!pre-&gt;right)&#123;</span><br><span class="line">                    res.push_back(cur-&gt;val);</span><br><span class="line">                    pre-&gt;right=cur;</span><br><span class="line">                    pre=cur;</span><br><span class="line">                    cur=cur-&gt;left;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    pre-&gt;right=<span class="literal">nullptr</span>;</span><br><span class="line">                    cur=cur-&gt;right;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Binary-Tree-Inorder-Traversal（Leetcode-94）"><a href="#Binary-Tree-Inorder-Traversal（Leetcode-94）" class="headerlink" title="Binary Tree Inorder Traversal（Leetcode #94）"></a>Binary Tree Inorder Traversal（Leetcode #94）</h1><h2 id="解题思路-1"><a href="#解题思路-1" class="headerlink" title="解题思路"></a>解题思路</h2><p>Morris其算法核心思想在于线索华二叉树，具体步骤为：</p>
+<ol>
+<li>如果当前节点的左孩子为空，则输出当前节点并将其右孩子作为当前节点。</li>
+<li>如果当前节点的左孩子不为空，在当前节点的左子树中找到当前节点在中序遍历下的前驱节点。<br>&nbsp;&nbsp;a) 如果前驱节点的右孩子为空，将它的右孩子设置为当前节点。当前节点(Cur)更新为当前节点的左孩子。<br>&nbsp;&nbsp;b) 如果前驱节点的右孩子为当前节点（已经访问过），将它的右孩子重新设为空（恢复树的形状）。输出当前节点。当前节点更新为当前节点的右孩子。</li>
+<li>重复以上1、2直到当前节点（Cur）为空。</li>
+</ol>
+<p>以下为Morris中序遍历图：<br><img src="http://static.zybuluo.com/zsmj2017/3w3kbr1r9zalausmrkeeg8cj/image_1cl377p8j1ubf2ecgi8bd21uen19.png" alt="image_1cl377p8j1ubf2ecgi8bd21uen19.png-136.1kB"></p>
+<h2 id="解题方案-1"><a href="#解题方案-1" class="headerlink" title="解题方案"></a>解题方案</h2><h3 id="栈-一直向左，直至五路可走转向右）"><a href="#栈-一直向左，直至五路可走转向右）" class="headerlink" title="栈(一直向左，直至五路可走转向右）"></a>栈(一直向左，直至五路可走转向右）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">inorderTraversal</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">        <span class="built_in">stack</span>&lt;TreeNode*&gt; stk;</span><br><span class="line">        <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(root)&#123;</span><br><span class="line">                stk.push(root);</span><br><span class="line">                root=root-&gt;left;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(stk.empty()) <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                root =stk.top();</span><br><span class="line">                stk.pop();</span><br><span class="line">                res.push_back(root-&gt;val);</span><br><span class="line">                root=root-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="Morris-1"><a href="#Morris-1" class="headerlink" title="Morris"></a>Morris</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">inorderTraversal</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">        TreeNode* cur=root,*pre=<span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">while</span>(cur)&#123;</span><br><span class="line">            <span class="keyword">if</span>(!cur-&gt;left)&#123;</span><br><span class="line">                res.push_back(cur-&gt;val);</span><br><span class="line">                cur=cur-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                pre=cur-&gt;left;</span><br><span class="line">                <span class="keyword">while</span>(pre-&gt;right &amp;&amp; pre-&gt;right!=cur)</span><br><span class="line">                    pre=pre-&gt;right;</span><br><span class="line">                <span class="keyword">if</span>(pre-&gt;right==cur)&#123;</span><br><span class="line">                    res.push_back(cur-&gt;val);</span><br><span class="line">                    pre-&gt;right=<span class="literal">nullptr</span>;</span><br><span class="line">                    pre=cur;</span><br><span class="line">                    cur=cur-&gt;right;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    pre-&gt;right=cur;</span><br><span class="line">                    cur=cur-&gt;left;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Binary-Tree-Postorder-Traversal（Leetcode-145）"><a href="#Binary-Tree-Postorder-Traversal（Leetcode-145）" class="headerlink" title="Binary Tree Postorder Traversal（Leetcode #145）"></a>Binary Tree Postorder Traversal（Leetcode #145）</h1><h2 id="解题思路-2"><a href="#解题思路-2" class="headerlink" title="解题思路"></a>解题思路</h2><p>后序遍历的难度远大于前序与中序，这里将给出stack与morris的实现。</p>
+<h2 id="解题方案-2"><a href="#解题方案-2" class="headerlink" title="解题方案"></a>解题方案</h2><h3 id="栈（借助stack还需要cur与pre）"><a href="#栈（借助stack还需要cur与pre）" class="headerlink" title="栈（借助stack还需要cur与pre）"></a>栈（借助stack还需要cur与pre）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">postorderTraversal</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">        <span class="built_in">stack</span>&lt;TreeNode*&gt; stk;</span><br><span class="line">        TreeNode* cur=root,*pre=<span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">while</span>(cur || !stk.empty())&#123;</span><br><span class="line">            <span class="keyword">if</span>(cur)&#123;</span><br><span class="line">                stk.push(cur);</span><br><span class="line">                cur=cur-&gt;left;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                TreeNode* top = stk.top();</span><br><span class="line">                <span class="keyword">if</span>(top-&gt;right==pre || top-&gt;right==<span class="literal">nullptr</span>)&#123;</span><br><span class="line">                    <span class="comment">// has no right child or right child has been visited</span></span><br><span class="line">                    res.push_back(top-&gt;val);</span><br><span class="line">                    pre=top;</span><br><span class="line">                    stk.pop();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    cur=top-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="栈配合双端队列（反转前序的过程）"><a href="#栈配合双端队列（反转前序的过程）" class="headerlink" title="栈配合双端队列（反转前序的过程）"></a>栈配合双端队列（反转前序的过程）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">postorderTraversal</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        <span class="built_in">stack</span>&lt;TreeNode*&gt; stk;</span><br><span class="line">        <span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">        stk.push(root);</span><br><span class="line">        <span class="keyword">while</span>(!stk.empty())&#123;</span><br><span class="line">            TreeNode* top = stk.top();</span><br><span class="line">            stk.pop();</span><br><span class="line">            res.push_front(top-&gt;val);</span><br><span class="line">            <span class="keyword">if</span>(top-&gt;left) stk.push(top-&gt;left);</span><br><span class="line">            <span class="keyword">if</span>(top-&gt;right) stk.push(top-&gt;right);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;(res.cbegin(),res.cend());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="morris"><a href="#morris" class="headerlink" title="morris"></a>morris</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">postorderTraversal</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">        <span class="function">TreeNode <span class="title">dummy</span><span class="params">(<span class="number">-1</span>)</span></span>;</span><br><span class="line">        TreeNode *cur, *pre = <span class="literal">nullptr</span>;</span><br><span class="line">        function&lt;<span class="keyword">void</span> (TreeNode*)&gt; visit = [&amp;res](TreeNode* node) &#123;res.push_back(node-&gt;val); &#125;;</span><br><span class="line">        dummy.left = root; cur = &amp;dummy;</span><br><span class="line">        <span class="keyword">while</span> (cur) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!cur-&gt;left) &#123;</span><br><span class="line">                pre = cur;</span><br><span class="line">                cur = cur-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                TreeNode *node = cur-&gt;left;</span><br><span class="line">                <span class="keyword">while</span> (node-&gt;right &amp;&amp; node-&gt;right != cur) &#123;</span><br><span class="line">                    node = node-&gt;right;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (!node-&gt;right) &#123;</span><br><span class="line">                    node-&gt;right = cur;</span><br><span class="line">                    pre = cur;</span><br><span class="line">                    cur = cur-&gt;left;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    visit_reverse(cur-&gt;left, prev, visit);</span><br><span class="line">                    prev-&gt;right = <span class="literal">nullptr</span>;</span><br><span class="line">                    prev = cur;</span><br><span class="line">                    cur = cur-&gt;right;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reverse</span><span class="params">(TreeNode* from, TreeNode* to)</span> </span>&#123;</span><br><span class="line">        TreeNode* x = from, *y = from-&gt;right, *z;</span><br><span class="line">        <span class="keyword">if</span> (from == to) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">while</span> (x != to) &#123;</span><br><span class="line">            z = y-&gt;right;</span><br><span class="line">            y-&gt;right = x;</span><br><span class="line">            x = y;</span><br><span class="line">            y = z;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">visit_reverse</span><span class="params">(TreeNode* from, TreeNode* to, function&lt;<span class="keyword">void</span> (TreeNode*)&gt; &amp;visit)</span> </span>&#123;</span><br><span class="line">        TreeNode* p = to;</span><br><span class="line">        reverse(from, to);</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            visit(p);</span><br><span class="line">            <span class="keyword">if</span> (p == from) <span class="keyword">break</span>;</span><br><span class="line">            p = p-&gt;right;</span><br><span class="line">        &#125;</span><br><span class="line">        reverse(to, from);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Binary-Tree-Level-Order-Traversal（Leetcode-102）"><a href="#Binary-Tree-Level-Order-Traversal（Leetcode-102）" class="headerlink" title="Binary Tree Level Order Traversal（Leetcode #102）"></a>Binary Tree Level Order Traversal（Leetcode #102）</h1><h2 id="解题思路-3"><a href="#解题思路-3" class="headerlink" title="解题思路"></a>解题思路</h2><p>如果仅输出一个vector，层序遍历和前序遍历几乎一致，只需要把stack换成queue。如果需要输出vector&lt;vector&lt;vector&lt;int&gt; &gt;,则递归的思路写起来十分清晰。此外，也可以使用两个queue来解决问题。</p>
+<h2 id="解题方案-3"><a href="#解题方案-3" class="headerlink" title="解题方案"></a>解题方案</h2><h3 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; <span class="title">levelOrder</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; res;</span><br><span class="line">        aux(root,<span class="number">1</span>,res);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">aux</span><span class="params">(TreeNode* root,<span class="keyword">size_t</span> level,<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt;&amp; res)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span>(level&gt;res.<span class="built_in">size</span>())</span><br><span class="line">            res.push_back(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;());</span><br><span class="line">        res[level<span class="number">-1</span>].push_back(root-&gt;val);</span><br><span class="line">        aux(root-&gt;left,level+<span class="number">1</span>,res);</span><br><span class="line">        aux(root-&gt;right,level+<span class="number">1</span>,res);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="双queue"><a href="#双queue" class="headerlink" title="双queue"></a>双queue</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; <span class="title">levelOrder</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">deque</span>&lt;TreeNode*&gt; current,next;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; res;</span><br><span class="line">        <span class="keyword">if</span> (!root) <span class="keyword">return</span> res;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; level;</span><br><span class="line">        current.push_back(root);</span><br><span class="line">        <span class="keyword">while</span> (!current.empty())&#123;</span><br><span class="line">            <span class="keyword">while</span>(!current.empty())&#123;</span><br><span class="line">                root = current.front();</span><br><span class="line">                current.pop_front();</span><br><span class="line">                level.push_back(root-&gt;val);</span><br><span class="line">                <span class="keyword">if</span> (root-&gt;left) next.push_back(root-&gt;left);</span><br><span class="line">                <span class="keyword">if</span> (root-&gt;right) next.push_back(root-&gt;right);</span><br><span class="line">            &#125;</span><br><span class="line">            res.push_back(level);</span><br><span class="line">            level.<span class="built_in">clear</span>();</span><br><span class="line">            swap(next, current);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（-Binary-Tree-Level-Order-Traversal-II-Leetocde107）"><a href="#扩展（-Binary-Tree-Level-Order-Traversal-II-Leetocde107）" class="headerlink" title="扩展（ Binary Tree Level Order Traversal II Leetocde107）"></a>扩展（ Binary Tree Level Order Traversal II Leetocde107）</h2><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a binary tree, return the bottom-up level order traversal of its nodes’ values. (ie, from left to right, level by level from leaf to root).<br>For example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Given binary tree [3,9,20,null,null,15,7],</span><br><span class="line">    3</span><br><span class="line">   &#x2F; \</span><br><span class="line">  9  20</span><br><span class="line">    &#x2F;  \</span><br><span class="line">   15   7</span><br><span class="line">return its bottom-up level order traversal as:</span><br><span class="line">[</span><br><span class="line">  [15,7],</span><br><span class="line">  [9,20],</span><br><span class="line">  [3]</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-4"><a href="#解题思路-4" class="headerlink" title="解题思路"></a>解题思路</h2><p>如果要偷懒的话，直接reverse上一题的答案即可，但我辈当然不齿这种方案。那只能先获取整个树的高度，然后对于指定的位置的vector执行push_back，总得来说问题不大。</p>
+<h2 id="解题方案-4"><a href="#解题方案-4" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; <span class="title">levelOrderBottom</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> <span class="built_in">size</span> = <span class="built_in">height</span>(root);</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">size</span>==<span class="number">0</span>) <span class="keyword">return</span> <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt;();</span><br><span class="line">        <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; <span class="title">res</span><span class="params">(<span class="built_in">size</span>)</span></span>;</span><br><span class="line">        aux(root,<span class="number">1</span>,res);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">height</span><span class="params">(TreeNode* root)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(<span class="built_in">height</span>(root-&gt;left),<span class="built_in">height</span>(root-&gt;right))+<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">aux</span><span class="params">(TreeNode* root,<span class="keyword">int</span> level,<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt;&amp; res)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root) <span class="keyword">return</span>;</span><br><span class="line">        res[res.<span class="built_in">size</span>()-level].push_back(root-&gt;val);</span><br><span class="line">        aux(root-&gt;left,level+<span class="number">1</span>,res);</span><br><span class="line">        aux(root-&gt;right,level+<span class="number">1</span>,res);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Binary-Tree-Zigzag-Order-Traversal（Leetcode-103）"><a href="#Binary-Tree-Zigzag-Order-Traversal（Leetcode-103）" class="headerlink" title="Binary Tree Zigzag Order Traversal（Leetcode #103）"></a>Binary Tree Zigzag Order Traversal（Leetcode #103）</h1><h2 id="解题思路-5"><a href="#解题思路-5" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题的思路和上一题类似，但是遇到奇数层就push_back，遇到偶数层就push_front即可。但对于vector来说，在头端插入需要线性的时间，因此需要别的数据结构并加以转化，此题也许用迭代效果更佳。（利用stack实现倒序）</p>
+<h2 id="解题方案-5"><a href="#解题方案-5" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; <span class="title">zigzagLevelOrder</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">       	<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; res;</span><br><span class="line">	    <span class="keyword">if</span> (!root) <span class="keyword">return</span> res;</span><br><span class="line">	    <span class="built_in">deque</span>&lt;TreeNode*&gt; dtn;</span><br><span class="line">	    dtn.push_back(root);</span><br><span class="line">	    <span class="keyword">bool</span> <span class="built_in">leftToRight</span> = <span class="literal">true</span>;</span><br><span class="line">	    <span class="keyword">while</span> (!dtn.empty()) &#123;</span><br><span class="line">		    <span class="keyword">int</span> <span class="built_in">size</span> = dtn.<span class="built_in">size</span>();</span><br><span class="line">		    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">row</span><span class="params">(<span class="built_in">size</span>)</span></span>;</span><br><span class="line">		    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">size</span>; i++) &#123;</span><br><span class="line">			    TreeNode* node = dtn.front();</span><br><span class="line">			    dtn.pop_front();</span><br><span class="line">			    <span class="comment">// find position to fill node's value</span></span><br><span class="line">			    <span class="keyword">int</span> index = (<span class="built_in">leftToRight</span>) ? i : (<span class="built_in">size</span> - <span class="number">1</span> - i);</span><br><span class="line">			    row[index] = node-&gt;val;</span><br><span class="line">			    <span class="keyword">if</span> (node-&gt;left) dtn.push_back(node-&gt;left);</span><br><span class="line">			    <span class="keyword">if</span> (node-&gt;right) dtn.push_back(node-&gt;right);</span><br><span class="line">		    &#125;</span><br><span class="line">		    <span class="comment">//after this level</span></span><br><span class="line">		    <span class="built_in">leftToRight</span> = !<span class="built_in">leftToRight</span>;</span><br><span class="line">		    res.push_back(row);</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Recover-Binary-Search-Tree-Leetcode-99"><a href="#Recover-Binary-Search-Tree-Leetcode-99" class="headerlink" title="Recover Binary Search Tree (Leetcode #99)"></a>Recover Binary Search Tree (Leetcode #99)</h1><h2 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h2><p>Two elements of a binary search tree (BST) are swapped by mistake.Recover the tree without changing its structure.<br><strong>Example1:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Input: [1,3,null,null,2]</span><br><span class="line"></span><br><span class="line">   1</span><br><span class="line">  &#x2F;</span><br><span class="line"> 3</span><br><span class="line">  \</span><br><span class="line">   2</span><br><span class="line"></span><br><span class="line">Output: [3,1,null,null,2]</span><br><span class="line"></span><br><span class="line">   3</span><br><span class="line">  &#x2F;</span><br><span class="line"> 1</span><br><span class="line">  \</span><br><span class="line">   2</span><br></pre></td></tr></table></figure><br><strong>Example2:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Input: [3,1,4,null,null,2]</span><br><span class="line"></span><br><span class="line">  3</span><br><span class="line"> &#x2F; \</span><br><span class="line">1   4</span><br><span class="line">   &#x2F;</span><br><span class="line">  2</span><br><span class="line"></span><br><span class="line">Output: [2,1,4,null,null,3]</span><br><span class="line"></span><br><span class="line">  2</span><br><span class="line"> &#x2F; \</span><br><span class="line">1   4</span><br><span class="line">   &#x2F;</span><br><span class="line">  3</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-6"><a href="#解题思路-6" class="headerlink" title="解题思路"></a>解题思路</h2><p>中序遍历将其存在一个vector中，通过查看逆序对就能明确哪两个需要交换。如果不能使用辅助存储空间，则需要借助morris遍历实现。</p>
+<p>此外，该问题亦存在递归解法，采用pre与first、second三个指针记录中序遍历下的逆序对。若存在逆序对，若first尚不明确，将pre赋予first（乱序的两个节点在中序下相邻），再将root赋予sec。</p>
+<h2 id="解题方案-6"><a href="#解题方案-6" class="headerlink" title="解题方案"></a>解题方案</h2><h3 id="空间O-n-的中序遍历"><a href="#空间O-n-的中序遍历" class="headerlink" title="空间O(n)的中序遍历"></a>空间O(n)的中序遍历</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">recoverTree</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;TreeNode*&gt; store;</span><br><span class="line">        inOrderTraverse(root, store);</span><br><span class="line">        swapValue(store);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">inOrderTraverse</span><span class="params">(TreeNode* &amp;root, <span class="built_in">vector</span>&lt;TreeNode*&gt; &amp;res)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!root) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span> (root-&gt;left) inOrderTraverse(root-&gt;left, res);</span><br><span class="line">        res.push_back(root);</span><br><span class="line">        <span class="keyword">if</span> (root-&gt;right) inOrderTraverse(root-&gt;right, res);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swapValue</span><span class="params">(<span class="built_in">vector</span>&lt;TreeNode*&gt; &amp;vtn)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (vtn.empty() || vtn.<span class="built_in">size</span>() == <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i != vtn.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">size_t</span> j = <span class="number">0</span>; j != vtn.<span class="built_in">size</span>() - i - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">                <span class="keyword">if</span> (vtn[j]-&gt;val &gt; vtn[j + <span class="number">1</span>]-&gt;val) swap(vtn[j]-&gt;val, vtn[j + <span class="number">1</span>]-&gt;val);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="递归（DFS）"><a href="#递归（DFS）" class="headerlink" title="递归（DFS）"></a>递归（DFS）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">recoverTree</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        TreeNode* pre=<span class="literal">nullptr</span>,*first=pre,*sec=pre;</span><br><span class="line">        aux(root,pre,first,sec);</span><br><span class="line">        <span class="keyword">if</span>(first &amp;&amp; sec) swap(first-&gt;val,sec-&gt;val);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">aux</span><span class="params">(TreeNode* root,TreeNode* &amp;pre,TreeNode* &amp;first,TreeNode* &amp;sec )</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root) <span class="keyword">return</span>;</span><br><span class="line">        aux(root-&gt;left,pre,first,sec);</span><br><span class="line">        <span class="keyword">if</span>(pre &amp;&amp; pre-&gt;val&gt;root-&gt;val)&#123;</span><br><span class="line">            <span class="keyword">if</span>(!first) first=pre;</span><br><span class="line">            sec=root;</span><br><span class="line">        &#125;</span><br><span class="line">        pre=root;</span><br><span class="line">        aux(root-&gt;right,pre,first,sec);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="Morris中序遍历"><a href="#Morris中序遍历" class="headerlink" title="Morris中序遍历"></a>Morris中序遍历</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">recoverTree</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        pair&lt;TreeNode*, TreeNode*&gt; broken;</span><br><span class="line">        TreeNode* prev = <span class="literal">nullptr</span>;</span><br><span class="line">        TreeNode* curr = root;</span><br><span class="line">        <span class="keyword">while</span> (curr)&#123;</span><br><span class="line">            <span class="keyword">if</span> (!curr-&gt;left) &#123;</span><br><span class="line">                detect(broken, prev, curr);</span><br><span class="line">                prev = curr;</span><br><span class="line">                curr = curr-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">auto</span> node = curr-&gt;left;</span><br><span class="line">                <span class="keyword">while</span> (node-&gt;right &amp;&amp; node-&gt;right!=curr)&#123;</span><br><span class="line">                    node = node-&gt;right;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (!node-&gt;right) &#123;</span><br><span class="line">                    node-&gt;right = curr;</span><br><span class="line">                    curr = curr-&gt;left;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    detect(broken, prev, curr);</span><br><span class="line">                    node-&gt;right = <span class="literal">nullptr</span>;</span><br><span class="line">                    prev = curr;</span><br><span class="line">                    curr = curr-&gt;right;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        swap(broken.first-&gt;val, broken.second-&gt;val);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">detect</span><span class="params">(pair&lt;TreeNode*, TreeNode*&gt; &amp;broken, TreeNode* prev, TreeNode* curr)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (prev &amp;&amp; prev-&gt;val &gt; curr-&gt;val) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!broken.first) broken.first = prev;</span><br><span class="line">            broken.second = curr;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Same-Tree-Leetcode-100"><a href="#Same-Tree-Leetcode-100" class="headerlink" title="Same Tree (Leetcode #100)"></a>Same Tree (Leetcode #100)</h1><h2 id="解题思路-7"><a href="#解题思路-7" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题可以引申出子树问题（剑指offer已经解答），值得留意。</p>
+<h2 id="解题方案-7"><a href="#解题方案-7" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isSameTree</span><span class="params">(TreeNode* p, TreeNode* q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!p &amp;&amp; !q) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(!p || !q) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(p-&gt;val!=q-&gt;val) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> isSameTree(p-&gt;left,q-&gt;left) &amp;&amp; isSameTree(p-&gt;right,q-&gt;right);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（Symmetric-Tree-Leetcode-101"><a href="#扩展（Symmetric-Tree-Leetcode-101" class="headerlink" title="扩展（Symmetric Tree Leetcode #101)"></a>扩展（Symmetric Tree Leetcode #101)</h2><h3 id="解题方案-8"><a href="#解题方案-8" class="headerlink" title="解题方案"></a>解题方案</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isSymmetric</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">return</span> aux(root-&gt;left,root-&gt;right);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">aux</span><span class="params">(TreeNode* left,TreeNode* right)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!left &amp;&amp; !right) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(!left || !right) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(left-&gt;val!=right-&gt;val) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> aux(left-&gt;left,right-&gt;right) &amp;&amp; aux(left-&gt;right,right-&gt;left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="扩展（Invert-Binary-Tree-Leetcode-226）"><a href="#扩展（Invert-Binary-Tree-Leetcode-226）" class="headerlink" title="扩展（Invert Binary Tree Leetcode #226）"></a>扩展（Invert Binary Tree Leetcode #226）</h2><h3 id="解题思路-8"><a href="#解题思路-8" class="headerlink" title="解题思路"></a>解题思路</h3><p>用递归的话十分容易，用迭代则需要一个queue作为辅助空间走一次BFS。</p>
+<h3 id="解题方案-9"><a href="#解题方案-9" class="headerlink" title="解题方案"></a>解题方案</h3><h4 id="递归-1"><a href="#递归-1" class="headerlink" title="递归"></a>递归</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">invertTree</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root)&#123;</span><br><span class="line">            invertTree(root-&gt;left);</span><br><span class="line">            invertTree(root-&gt;right);</span><br><span class="line">            <span class="built_in">std</span>::swap(root-&gt;left,root-&gt;right);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">TreeNode* <span class="title">invertTree</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">queue</span>&lt;TreeNode*&gt; q;</span><br><span class="line">        q.push(root);</span><br><span class="line">        <span class="keyword">while</span>(!q.empty())&#123;</span><br><span class="line">            TreeNode* temp=q.front();</span><br><span class="line">            q.pop();</span><br><span class="line">            <span class="keyword">if</span>(temp)&#123;</span><br><span class="line">                q.push(temp-&gt;left);</span><br><span class="line">                q.push(temp-&gt;right);</span><br><span class="line">                swap(temp-&gt;left,temp-&gt;right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Balanced-Binary-Tree-Leetcode-110"><a href="#Balanced-Binary-Tree-Leetcode-110" class="headerlink" title="Balanced Binary Tree (Leetcode #110)"></a>Balanced Binary Tree (Leetcode #110)</h1><h2 id="解题思路-9"><a href="#解题思路-9" class="headerlink" title="解题思路"></a>解题思路</h2><p>注意剪枝</p>
+<h2 id="解题方案-10"><a href="#解题方案-10" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isBalanced</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> deepth(root)&gt;=<span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">deepth</span><span class="params">(TreeNode* root)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> left = deepth(root-&gt;left);</span><br><span class="line">        <span class="keyword">int</span> right = deepth(root-&gt;right);</span><br><span class="line">        <span class="keyword">if</span>( left &lt; <span class="number">0</span> || right &lt; <span class="number">0</span> || <span class="built_in">abs</span>(left-right)&gt;<span class="number">1</span>) </span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(left,right)+<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Flatten-Binary-Tree-to-Linked-List（Leetcode-114）"><a href="#Flatten-Binary-Tree-to-Linked-List（Leetcode-114）" class="headerlink" title="Flatten Binary Tree to Linked List（Leetcode #114）"></a>Flatten Binary Tree to Linked List（Leetcode #114）</h1><h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a binary tree, flatten it to a linked list in-place.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">For example, given the following tree:</span><br><span class="line">    1</span><br><span class="line">   &#x2F; \</span><br><span class="line">  2   5</span><br><span class="line"> &#x2F; \   \</span><br><span class="line">3   4   6</span><br><span class="line">The flattened tree should look like:</span><br><span class="line">1</span><br><span class="line"> \</span><br><span class="line">  2</span><br><span class="line">   \</span><br><span class="line">    3</span><br><span class="line">     \</span><br><span class="line">      4</span><br><span class="line">       \</span><br><span class="line">        5</span><br><span class="line">         \</span><br><span class="line">          6</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-10"><a href="#解题思路-10" class="headerlink" title="解题思路"></a>解题思路</h2><p>既然要求就地，那只能寻找规律了。可以设立cur表征当前节点，当cur==nullptr时终止循环。若其左右子树健全，寻找其中序遍历下的pre，令pre-&gt;right=cur-&gt;right。接着将右子树绑定到左子树cur-&gt;right=cur-&gt;left。最后切断左子树与根的联系，转向右子树。</p>
+<h2 id="解题方案-11"><a href="#解题方案-11" class="headerlink" title="解题方案"></a>解题方案</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">flatten</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        TreeNode* cur=root;</span><br><span class="line">        <span class="keyword">while</span>(cur)&#123;</span><br><span class="line">            <span class="keyword">if</span>(cur-&gt;left &amp;&amp; cur-&gt;right)&#123;</span><br><span class="line">                TreeNode* pre = cur-&gt;left;</span><br><span class="line">                <span class="keyword">while</span>(pre-&gt;right) pre=pre-&gt;right;</span><br><span class="line">                pre-&gt;right=cur-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(cur-&gt;left)</span><br><span class="line">                cur-&gt;right=cur-&gt;left;</span><br><span class="line">            cur-&gt;left=<span class="literal">nullptr</span>;</span><br><span class="line">            cur=cur-&gt;right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="Populating-Next-Right-Pointers-in-Each-NodeⅡ-Leetcode-117）"><a href="#Populating-Next-Right-Pointers-in-Each-NodeⅡ-Leetcode-117）" class="headerlink" title="Populating Next Right Pointers in Each NodeⅡ (Leetcode #117）"></a>Populating Next Right Pointers in Each NodeⅡ (Leetcode #117）</h1><h2 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h2><p>Given a binary tree<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TreeLinkNode</span> &#123;</span></span><br><span class="line">  TreeLinkNode *left;</span><br><span class="line">  TreeLinkNode *right;</span><br><span class="line">  TreeLinkNode *next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>Populate each next pointer to point to its next right node. If there is no next right node, the next pointer should be set to NULL.<br>Initially, all next pointers are set to NULL.<br><strong>Note:</strong><br>You may only use constant extra space.<br>Recursive approach is fine, implicit stack space does not count as extra space for this problem.<br><strong>Example:</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Given the following binary tree,</span><br><span class="line">     1</span><br><span class="line">   &#x2F;  \</span><br><span class="line">  2    3</span><br><span class="line"> &#x2F; \    \</span><br><span class="line">4   5    7</span><br><span class="line">After calling your function, the tree should look like:</span><br><span class="line">     1 -&gt; NULL</span><br><span class="line">   &#x2F;  \</span><br><span class="line">  2 -&gt; 3 -&gt; NULL</span><br><span class="line"> &#x2F; \    \</span><br><span class="line">4-&gt; 5 -&gt; 7 -&gt; NULL</span><br></pre></td></tr></table></figure></p>
+<h2 id="解题思路-11"><a href="#解题思路-11" class="headerlink" title="解题思路"></a>解题思路</h2><p>由于需要常量空间,BFS不可行，因此只能再次通过设立cur，head，tail的方案，逐层地扫描建立。算法核心思想为：head与tail分别表征下一层的起点与重点（横向），若cur存在左子，若tail存在则更新tail，否则初始化tail与head。存在右子时亦是如此。cur左右子扫描完毕后cur=cur-&gt;next。若其为空，则令cur转向下一层头部，并将tail与head置零。</p>
+<p>如果去除常量空间这个条件，那么BFS算法如下所示。</p>
+<h2 id="解题方案（优解）"><a href="#解题方案（优解）" class="headerlink" title="解题方案（优解）"></a>解题方案（优解）</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">connect</span><span class="params">(TreeLinkNode *root)</span> </span>&#123;</span><br><span class="line">        TreeLinkNode* cur=root,*head=<span class="literal">nullptr</span>,*tail=<span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">while</span>(cur)&#123;</span><br><span class="line">            <span class="keyword">if</span>(cur-&gt;left)&#123;</span><br><span class="line">                <span class="keyword">if</span>(tail)&#123;</span><br><span class="line">                    tail-&gt;next=cur-&gt;left;</span><br><span class="line">                    tail=tail-&gt;next;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    tail=cur-&gt;left;</span><br><span class="line">                    head=tail;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(cur-&gt;right)&#123;</span><br><span class="line">               <span class="keyword">if</span>(tail)&#123;</span><br><span class="line">                    tail-&gt;next=cur-&gt;right;</span><br><span class="line">                    tail=tail-&gt;next;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    tail=cur-&gt;right;</span><br><span class="line">                    head=tail;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            cur=cur-&gt;next;</span><br><span class="line">            <span class="keyword">if</span>(!cur)&#123;</span><br><span class="line">                cur=head;</span><br><span class="line">                head=tail=<span class="literal">nullptr</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="解题方案（BFS）"><a href="#解题方案（BFS）" class="headerlink" title="解题方案（BFS）"></a>解题方案（BFS）</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">connect</span><span class="params">(TreeLinkNode *root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!root) <span class="keyword">return</span>;</span><br><span class="line">        <span class="built_in">queue</span>&lt;TreeLinkNode*&gt; q;</span><br><span class="line">        q.push(root);</span><br><span class="line">        <span class="keyword">while</span>(!q.empty())&#123;</span><br><span class="line">            <span class="keyword">int</span> <span class="built_in">size</span> = q.<span class="built_in">size</span>();</span><br><span class="line">            <span class="keyword">while</span>(<span class="built_in">size</span>--)&#123;</span><br><span class="line">                root=q.front();</span><br><span class="line">                q.pop();</span><br><span class="line">                <span class="keyword">if</span>(<span class="built_in">size</span>) root-&gt;next=q.front();</span><br><span class="line">                <span class="keyword">else</span> root-&gt;next=<span class="literal">nullptr</span>;</span><br><span class="line">                <span class="keyword">if</span>(root-&gt;left) q.push(root-&gt;left);</span><br><span class="line">                <span class="keyword">if</span>(root-&gt;right) q.push(root-&gt;right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Data-Structures-and-Algorithms/" rel="tag"># Data Structures and Algorithms</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/16/OJ%20exercise15/" rel="next" title="OJ每日练习（15）">
+                <i class="fa fa-chevron-left"></i> OJ每日练习（15）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/18/OJ%20exercise17/" rel="prev" title="OJ每日练习（17）">
+                OJ每日练习（17） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#题目名称"><span class="nav-number">1.</span> <span class="nav-text">题目名称</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Binary-Tree-Preorder-Traversal（Leetcode-144）"><span class="nav-number">2.</span> <span class="nav-text">Binary Tree Preorder Traversal（Leetcode #144）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路"><span class="nav-number">2.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案"><span class="nav-number">2.2.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#栈（先进后出，所以先放右子）"><span class="nav-number">2.2.1.</span> <span class="nav-text">栈（先进后出，所以先放右子）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Morris"><span class="nav-number">2.2.2.</span> <span class="nav-text">Morris</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Binary-Tree-Inorder-Traversal（Leetcode-94）"><span class="nav-number">3.</span> <span class="nav-text">Binary Tree Inorder Traversal（Leetcode #94）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-1"><span class="nav-number">3.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-1"><span class="nav-number">3.2.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#栈-一直向左，直至五路可走转向右）"><span class="nav-number">3.2.1.</span> <span class="nav-text">栈(一直向左，直至五路可走转向右）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Morris-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">Morris</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Binary-Tree-Postorder-Traversal（Leetcode-145）"><span class="nav-number">4.</span> <span class="nav-text">Binary Tree Postorder Traversal（Leetcode #145）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-2"><span class="nav-number">4.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-2"><span class="nav-number">4.2.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#栈（借助stack还需要cur与pre）"><span class="nav-number">4.2.1.</span> <span class="nav-text">栈（借助stack还需要cur与pre）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#栈配合双端队列（反转前序的过程）"><span class="nav-number">4.2.2.</span> <span class="nav-text">栈配合双端队列（反转前序的过程）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#morris"><span class="nav-number">4.2.3.</span> <span class="nav-text">morris</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Binary-Tree-Level-Order-Traversal（Leetcode-102）"><span class="nav-number">5.</span> <span class="nav-text">Binary Tree Level Order Traversal（Leetcode #102）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-3"><span class="nav-number">5.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-3"><span class="nav-number">5.2.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#递归"><span class="nav-number">5.2.1.</span> <span class="nav-text">递归</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双queue"><span class="nav-number">5.2.2.</span> <span class="nav-text">双queue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（-Binary-Tree-Level-Order-Traversal-II-Leetocde107）"><span class="nav-number">5.3.</span> <span class="nav-text">扩展（ Binary Tree Level Order Traversal II Leetocde107）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述"><span class="nav-number">5.4.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-4"><span class="nav-number">5.5.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-4"><span class="nav-number">5.6.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Binary-Tree-Zigzag-Order-Traversal（Leetcode-103）"><span class="nav-number">6.</span> <span class="nav-text">Binary Tree Zigzag Order Traversal（Leetcode #103）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-5"><span class="nav-number">6.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-5"><span class="nav-number">6.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Recover-Binary-Search-Tree-Leetcode-99"><span class="nav-number">7.</span> <span class="nav-text">Recover Binary Search Tree (Leetcode #99)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-1"><span class="nav-number">7.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-6"><span class="nav-number">7.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-6"><span class="nav-number">7.3.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#空间O-n-的中序遍历"><span class="nav-number">7.3.1.</span> <span class="nav-text">空间O(n)的中序遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#递归（DFS）"><span class="nav-number">7.3.2.</span> <span class="nav-text">递归（DFS）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Morris中序遍历"><span class="nav-number">7.3.3.</span> <span class="nav-text">Morris中序遍历</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Same-Tree-Leetcode-100"><span class="nav-number">8.</span> <span class="nav-text">Same Tree (Leetcode #100)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-7"><span class="nav-number">8.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-7"><span class="nav-number">8.2.</span> <span class="nav-text">解题方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（Symmetric-Tree-Leetcode-101"><span class="nav-number">8.3.</span> <span class="nav-text">扩展（Symmetric Tree Leetcode #101)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-8"><span class="nav-number">8.3.1.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展（Invert-Binary-Tree-Leetcode-226）"><span class="nav-number">8.4.</span> <span class="nav-text">扩展（Invert Binary Tree Leetcode #226）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解题思路-8"><span class="nav-number">8.4.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解题方案-9"><span class="nav-number">8.4.2.</span> <span class="nav-text">解题方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#递归-1"><span class="nav-number">8.4.2.1.</span> <span class="nav-text">递归</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#迭代"><span class="nav-number">8.4.2.2.</span> <span class="nav-text">迭代</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Balanced-Binary-Tree-Leetcode-110"><span class="nav-number">9.</span> <span class="nav-text">Balanced Binary Tree (Leetcode #110)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-9"><span class="nav-number">9.1.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-10"><span class="nav-number">9.2.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Flatten-Binary-Tree-to-Linked-List（Leetcode-114）"><span class="nav-number">10.</span> <span class="nav-text">Flatten Binary Tree to Linked List（Leetcode #114）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-2"><span class="nav-number">10.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-10"><span class="nav-number">10.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案-11"><span class="nav-number">10.3.</span> <span class="nav-text">解题方案</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Populating-Next-Right-Pointers-in-Each-NodeⅡ-Leetcode-117）"><span class="nav-number">11.</span> <span class="nav-text">Populating Next Right Pointers in Each NodeⅡ (Leetcode #117）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目描述-3"><span class="nav-number">11.1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路-11"><span class="nav-number">11.2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案（优解）"><span class="nav-number">11.3.</span> <span class="nav-text">解题方案（优解）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题方案（BFS）"><span class="nav-number">11.4.</span> <span class="nav-text">解题方案（BFS）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

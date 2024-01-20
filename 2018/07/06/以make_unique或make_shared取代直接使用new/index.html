@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="三大make函数&amp;nbsp;C++11加入了make_shared,C++14加入了make_unique，如果你处于C++11环境也不必担心，因为make_unique很容易实现：1234template&amp;lt;typename T, typename... Ts&amp;gt;std::unique_ptr&amp;lt;T&amp;gt; make_unique(Ts&amp;amp;&amp;amp;... params)&amp;#1">
+<meta name="keywords" content="C++,Modern C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="21.以make_unique或make_shared取代直接使用new">
+<meta property="og:url" content="https://xander.wiki/2018/07/06/%E4%BB%A5make_unique%E6%88%96make_shared%E5%8F%96%E4%BB%A3%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8new/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="三大make函数&amp;nbsp;C++11加入了make_shared,C++14加入了make_unique，如果你处于C++11环境也不必担心，因为make_unique很容易实现：1234template&amp;lt;typename T, typename... Ts&amp;gt;std::unique_ptr&amp;lt;T&amp;gt; make_unique(Ts&amp;amp;&amp;amp;... params)&amp;#1">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/07/06/以make_unique或make_shared取代直接使用new/"/>
+
+
+
+
+
+  <title>21.以make_unique或make_shared取代直接使用new | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/06/%E4%BB%A5make_unique%E6%88%96make_shared%E5%8F%96%E4%BB%A3%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8new/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">21.以make_unique或make_shared取代直接使用new</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-06T07:42:00+08:00">
+                2018-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="三大make函数"><a href="#三大make函数" class="headerlink" title="三大make函数"></a>三大make函数</h1><p>&nbsp;<br>C++11加入了make_shared,C++14加入了make_unique，如果你处于C++11环境也不必担心，因为make_unique很容易实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... Ts&gt;</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;T&gt; <span class="title">make_unique</span><span class="params">(Ts&amp;&amp;... params)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;T&gt;(<span class="keyword">new</span> T(<span class="built_in">std</span>::forward&lt;Ts&gt;(params)...));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如你所见，make_unique只是将其参数完美转发给待创建对象的构造函数，并返回一个由原始指针初始化得到的unique_ptr。 这种实现形式并不支持数组或自定义删除器，但它至少表明实现make_unique并不困难。</p>
+<p>std::make_unique和std::make_shared是三个make函数中的两个：接受任意参数集,并将它们完美转发给动态分配对象的构造函数，并返回指向该对象的智能指针。第三个make函数是std::allocate_shared,其作用类似于std::make_shared，不过它的第一个参数是一个用于动态内存分配的allocator对象。</p>
+<hr>
+<h1 id="make函数的优越性"><a href="#make函数的优越性" class="headerlink" title="make函数的优越性"></a>make函数的优越性</h1><h2 id="代码明晰程度"><a href="#代码明晰程度" class="headerlink" title="代码明晰程度"></a>代码明晰程度</h2><p>就算不看性能，光看代码也能看出make函数较为优越：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">upw1</span><span class="params">(<span class="built_in">std</span>::make_unique&lt;Widget&gt;())</span></span>; <span class="comment">// with make func</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt; <span class="title">upw2</span><span class="params">(<span class="keyword">new</span> Widget)</span></span>; <span class="comment">// without make func</span></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">spw1</span><span class="params">(<span class="built_in">std</span>::make_shared&lt;Widget&gt;())</span></span>; <span class="comment">// with make func</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw2</span><span class="params">(<span class="keyword">new</span> Widget)</span></span>; <span class="comment">// without make func</span></span><br></pre></td></tr></table></figure><br>显然，使用new的版本需要陈述两次对象类型，这违背了软件工程的基本原则：应尽量避免代码重复。源代码中的重复会增加编译时间，从而导致生成庞大的目标码，并且通常会使代码难以使用。它经常会生成不一致的代码，而这种不一致性是某些bug的起源所在。最后，使用make函数打字也省力一些。</p>
+<hr>
+<h2 id="异常安全性（可见Effective-C-Item-17）"><a href="#异常安全性（可见Effective-C-Item-17）" class="headerlink" title="异常安全性（可见Effective C++ Item 17）"></a>异常安全性（可见Effective C++ Item 17）</h2><p>make函数的优越性也与异常安全有关。假设我们当前有一个函数负责处理某些具备优先级的Widget：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processWidget</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; spw, <span class="keyword">int</span> priority)</span></span>;</span><br></pre></td></tr></table></figure><br>值传递std::shared_ptr看起来似乎很奇怪，但是Item41中解释说，如果processWidget总是复制std::shared_ptr（例如将其存储在某个跟踪已处理Widget的数据结构中），这是一个合理的选择。<br>更进一步地假设我们有一个计算优先级的函数:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">computePriority</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure><br>我们将其返回值与new操作得到的shared_ptr作为参数传递给processWidget:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt;(<span class="keyword">new</span> Widget),computePriority()); <span class="comment">// potential resource leak</span></span><br></pre></td></tr></table></figure><br>为何可能会发生资源泄露与编译器将源代码转换为目标代码的过程有关。在运行期必须保证一个函数的参数在调用该函数前被明确evaluate，因此在调用processWidget之前，必须执行以下操作：</p>
+<ol>
+<li><strong>new Widget必然会执行，届时会在堆上创建一个Widget对象。</strong></li>
+<li><strong>shared_ptr的构造函数必然会执行，其以new的返回值为初始值。</strong></li>
+<li><strong>computePriority必然会执行。</strong></li>
+</ol>
+<p>编译器并不保证按照上述顺序执行程序。 显然，必须在调用std::shared_ptr构造函数之前执行”new Widget”，但是computePriority可以发生在任何时期，比如说在步骤1之前，又或者步骤1、2之间。假设编译器按照以下顺序执行程序：</p>
+<ol>
+<li><strong>执行new Widget</strong></li>
+<li><strong>执行computePriority</strong></li>
+<li><strong>执行std::shared_ptr构造函数</strong></li>
+</ol>
+<p>如果在运行时，computePriority抛出了异常，则步骤1中动态分配的Widget将被泄漏，因此它将永远无法被访问到。<br>若使用std::make_shared则可以完美避开上述问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="built_in">std</span>::make_shared&lt;Widget&gt;(),computePriority()); <span class="comment">// no potential resource leak</span></span><br></pre></td></tr></table></figure><br>在上述代码运行时，将首先调用make_shared或computePriority。如果首先调用了make_shared，则动态分配的资源必然已被置入智能指针，此时computePriority抛出异常会导致shared_ptr发生析构，资源被合理释放。若是先调用computePriority，则make_shared不会执行，资源泄露无从谈起。make_unique亦是同理。</p>
+<hr>
+<h2 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h2><p>std::make_shared相较于new而言效率更高，使用std::make_shared允许编译器生成更小，更快的代码，使用更精简的数据结构。若我们直接使用new operator:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw</span><span class="params">(<span class="keyword">new</span> Widget)</span></span>;</span><br></pre></td></tr></table></figure><br>显然，上述程序需要执行内存分配操作，但实际上它执行了两次内存分配。在Item19中我们曾经提及每个std::shared_ptr都指向一个control block，其中包含指向对象的引用计数。 此control block的内存在std::shared_ptr构造函数中分配。此外，new operator将为Widget对象分配一块内存，因此一共执行了两次内存分配。<br>我们现以make_shared函数替换new：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> spw = <span class="built_in">std</span>::make_shared&lt;Widget&gt;();</span><br></pre></td></tr></table></figure><br>如此一来，一次内存分配足矣。std::make_shared一次性分配了Widget与control block的内存，这种优化减少了程序的静态大小（因为代码只包含一个内存分配调用），并且它增加了可执行代码的速度，因为内存只分配了一次。此外，使用std::make_shared不需要control block中的某些bookkeeping information，可能会减少程序的总内存占用量。std::allocate_shared效率分析亦类似于std::make_shared。</p>
+<hr>
+<h1 id="make函数的不足"><a href="#make函数的不足" class="headerlink" title="make函数的不足"></a>make函数的不足</h1><p>&nbsp;<br>尽管make函数无论是代码可读性、异常安全性、效率均优于new，但其存在使用条件，在某些情况下make函数无法使用。</p>
+<h2 id="自定义删除器"><a href="#自定义删除器" class="headerlink" title="自定义删除器"></a>自定义删除器</h2><p>举例而言，make函数不支持自定义删除器，若当前存在删除器如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> widgetDeleter = [](Widget* pw) &#123; … &#125;;</span><br></pre></td></tr></table></figure><br>使用new来创建一个具备自定义删除器的智能指针很容易：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::unique_ptr&lt;Widget, decltype(widgetDeleter)&gt; upw(new Widget, widgetDeleter);</span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw</span><span class="params">(<span class="keyword">new</span> Widget, widgetDeleter)</span></span>;</span><br></pre></td></tr></table></figure><br>make函数却不支持这种行为。</p>
+<h2 id="大括号初始化器"><a href="#大括号初始化器" class="headerlink" title="大括号初始化器"></a>大括号初始化器</h2><p>make函数的第二个限制源于其实现的语法细节。在Item7中我们曾经明确说明，若一个对象存在参数为initializer_list类型的构造函数，那么当构造实参带有大括号时几乎必然会调用该函数，而带有小括号的构造实参则会调用其他构造函数。make函数负责将实参完美转发给智能指针的构造函数，但这些实参是带有大括号还是小括号make函数却一无所知。对于某些类型而言，构造时使用大括号还是小括号将导致完全不同的结果，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> upv = <span class="built_in">std</span>::make_unique&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt;(<span class="number">10</span>, <span class="number">20</span>);</span><br><span class="line"><span class="keyword">auto</span> spv = <span class="built_in">std</span>::make_shared&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt;(<span class="number">10</span>, <span class="number">20</span>);</span><br></pre></td></tr></table></figure><br>到底应该是生成一个内含10个元素，其值均为20的vector，还是生成内含10、20两个元素的vector？又或者说结果是不确定的？有一个好消息和一个坏消息在等着我们。<br>好消息是答案并非不确定：两个调用都将创建一个智能指针指向一个内含10个元素的vector，这意味着在make函数中完美转发使用小括号而不是大括号。坏消息是如果你要使用大括号实参构造指向对象，则必须直接使用new opertaor来完成。由此看来，使用make函数需要支持完美转发的大括号初始化，但Item30中将会提及，大括号初始化并不支持完美转发。但Item30描述了一种解决方案：使用auto类型推衍利用大括号初始化器创建std::initializer_list对象，然后通过make函数传递auto对象(显式地以initializer_list作为构造实参）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// create std::initializer_list</span></span><br><span class="line"><span class="keyword">auto</span> initList = &#123; <span class="number">10</span>, <span class="number">20</span> &#125;;</span><br><span class="line"><span class="comment">// create std::vector using std::initializer_list ctor</span></span><br><span class="line"><span class="keyword">auto</span> spv = <span class="built_in">std</span>::make_shared&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt;(initList);</span><br></pre></td></tr></table></figure></p>
+<p>对于unique_str而言，make函数仅在上述两个场景下存在些许问题，但对于shared_ptr而言，还有两个问题需要解决。         </p>
+<h2 id="自定义内存管理"><a href="#自定义内存管理" class="headerlink" title="自定义内存管理"></a>自定义内存管理</h2><p>对于某些自定义了opertaor new与operator delete的class而言，使用全局new与delete似乎不太合适。一般而言，new与delete负责分配或释放指定大小（通常为sizeof(Widget))的内存，但shared_ptr并非如此，它所需要分配与释放的不仅仅是对象的大小，还需要加上一个control block的大小。因此，使用make函数创建具备自定义内存管理的对象是一个十分糟糕的想法。</p>
+<p>std::make_shared的速度优势来源于在分配对象所需要的内存时control block所需要的内存也被一并放置，但我们所需要明确的是，当对象被析构时其所占内存并未立即释放，因为此时control block所占用的内存尚未被释放。</p>
+<h2 id="内存释放延迟"><a href="#内存释放延迟" class="headerlink" title="内存释放延迟"></a>内存释放延迟</h2><p>正如之前指出，control block中含有两个引用计数相关信息，其中第二个被称为弱引用计数，当一个weak_ptr检查其是否处于空悬状态时，它通过检查第一个引用计数（而非若引用计数）来确保正确性，如果引用计数为0，weak_ptr即为空悬，否则不是。但control block所占用内存的释放与弱引用计数有关，也就是说，即使对象已经析构，但只要仍然存在一个weak_ptr指向它（弱引用计数不为0），该control block的内存便需要一直存在，直到最后一个指向shared_ptr的weak_ptr被析构。如果对象非常大，销毁最后一个shared_ptr与weak_ptr之间又存在着大量时间，那么可能在内存释放期间会出现延迟：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ReallyBigType</span> &#123;</span> … &#125;;</span><br><span class="line"><span class="keyword">auto</span> pBigObj =<span class="built_in">std</span>::make_shared&lt;ReallyBigType&gt;();</span><br><span class="line">… <span class="comment">// create std::shared_ptrs and std::weak_ptrs to large object, use them to work with it</span></span><br><span class="line">… <span class="comment">// final std::shared_ptr to object destroyed here,but std::weak_ptrs to it remain</span></span><br><span class="line">… <span class="comment">// during this period, memory formerly occupied by large object remains allocated</span></span><br><span class="line">… <span class="comment">// final std::weak_ptr to object destroyed here;memory for control block and object is released</span></span><br></pre></td></tr></table></figure><br>使用new则可以完成瞬间内存释放。</p>
+<hr>
+<h1 id="在无法使用make函数时的替代"><a href="#在无法使用make函数时的替代" class="headerlink" title="在无法使用make函数时的替代"></a>在无法使用make函数时的替代</h1><p>&nbsp;<br>如果当前并不适合使用std::make_shared，我们需要考虑异常安全性问题。最好的解决方案方法是确保直接使用new时，立即将结果传递给智能指针构造函数，该语句不执行任何其他操作（即Effective C++ Item17所述）。仍以具备自定义删除其的Widget为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processWidget</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; spw,<span class="keyword">int</span> priority)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">cusDel</span><span class="params">(Widget *ptr)</span></span>; <span class="comment">// custom deleter</span></span><br></pre></td></tr></table></figure><br>以下为一个不具备异常安全性的调用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt;(<span class="keyword">new</span> Widget, cusDel),computePriority());</span><br></pre></td></tr></table></figure><br>如果我们将其改写为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">spw</span><span class="params">(<span class="keyword">new</span> Widget, cusDel)</span></span>;</span><br><span class="line">processWidget(spw, computePriority()); <span class="comment">// correct, but not optimal; see below</span></span><br></pre></td></tr></table></figure><br>这段代码具备异常安全性，因为即使spw构造失败（例如无法为control block分配内存），仍然能够通过自定义删除器析构刚刚构造的widget对象，只是其性能还可以被改善。</p>
+<p>在刚才不具备异常安全性的程序中，我们试图将一个右值传递给ProcessWidget，但在异常安全的版本中，我们传递的是一个左值。因为processWidget中的参数pass-by-value，因此右值的构造只需要移动，而来自左值的构造需要复制，这一点对于std::shared_ptr可能会带来很大的差异，因为复制std::shared_ptr时其引用计数自增是原子操作，而移动std::shared_ptr则根本不需要关心引用计数。我们将原先的左值转为右值可以大幅度提升性能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="built_in">std</span>::<span class="built_in">move</span>(spw),computePriority());</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>与直接使用new相比，make函数不存在代码重复且具备异常安全性，std::make_shared和std::allocate_shared可以生成更快更短的目标码。</strong></li>
+<li><strong>在需要自定义删除器及以大括号初始化时make函数无能为力。</strong></li>
+<li><strong>对于shared_ptr,具备自定义内存管理与weak_ptr生存期比shared_ptr长的情况亦不可使用make函数。</strong></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"># Modern C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/05/%E7%B1%BBshared_ptr%E4%BD%86%E5%8F%AF%E7%A9%BA%E6%82%AC%E7%9A%84%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88weak_ptr/" rel="next" title="20.类shared_ptr但可空悬的智能指针——std::weak_ptr">
+                <i class="fa fa-chevron-left"></i> 20.类shared_ptr但可空悬的智能指针——std::weak_ptr
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/11/%E5%9C%A8%E4%BD%BF%E7%94%A8Pimpl%E6%97%B6%EF%BC%8C%E8%AE%B0%E5%BE%97%E5%9C%A8%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%AD%E5%AE%9A%E4%B9%89special%20function/" rel="prev" title="22.在使用Pimpl时，记得在实现文件中定义special function">
+                22.在使用Pimpl时，记得在实现文件中定义special function <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#三大make函数"><span class="nav-number">1.</span> <span class="nav-text">三大make函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#make函数的优越性"><span class="nav-number">2.</span> <span class="nav-text">make函数的优越性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#代码明晰程度"><span class="nav-number">2.1.</span> <span class="nav-text">代码明晰程度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常安全性（可见Effective-C-Item-17）"><span class="nav-number">2.2.</span> <span class="nav-text">异常安全性（可见Effective C++ Item 17）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#效率"><span class="nav-number">2.3.</span> <span class="nav-text">效率</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#make函数的不足"><span class="nav-number">3.</span> <span class="nav-text">make函数的不足</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义删除器"><span class="nav-number">3.1.</span> <span class="nav-text">自定义删除器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#大括号初始化器"><span class="nav-number">3.2.</span> <span class="nav-text">大括号初始化器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义内存管理"><span class="nav-number">3.3.</span> <span class="nav-text">自定义内存管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存释放延迟"><span class="nav-number">3.4.</span> <span class="nav-text">内存释放延迟</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在无法使用make函数时的替代"><span class="nav-number">4.</span> <span class="nav-text">在无法使用make函数时的替代</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

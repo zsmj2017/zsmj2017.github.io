@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,对象模型," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。  运行期类型判断&amp;nbsp;为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实">
+<meta name="keywords" content="C++,对象模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Function语义学——Virtual Member Function">
+<meta property="og:url" content="https://xander.wiki/2018/05/15/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Virtual%20Member%20Function/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。  运行期类型判断&amp;nbsp;为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/9vsxcigr9ham7p8mc2l5y3w9/image_1cdha351o116i11o21cr67nojva9.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/3k4rtxf4owdv3ldih5gi6rqj/image_1cdhf6elj1btn1ocfv1n19tgjucm.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/t692yspb77s1ta8evg4ysyzt/image_1cdhlsdfr1406v33m71ipd1pej13.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/o41pbxhobsbgk79prj3jpwvl/image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/9vsxcigr9ham7p8mc2l5y3w9/image_1cdha351o116i11o21cr67nojva9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/05/15/Function语义学——Virtual Member Function/"/>
+
+
+
+
+
+  <title>Function语义学——Virtual Member Function | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/15/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Virtual%20Member%20Function/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Function语义学——Virtual Member Function</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-15T12:42:00+08:00">
+                2018-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。</p>
+<hr>
+<h1 id="运行期类型判断"><a href="#运行期类型判断" class="headerlink" title="运行期类型判断"></a>运行期类型判断</h1><p>&nbsp;<br>为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实体。</p>
+<h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><p>考虑下述语句：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure><br>最直接了当的做法就是把必要的信息加上ptr身上，如此一来，pointer或者reference至少包含两个信息：</p>
+<ol>
+<li>内容（它所指向的object的地址）</li>
+<li>对象的动态类型</li>
+</ol>
+<p>这个方法有两个缺点：</p>
+<ol>
+<li>增加了空间负担，即使程序并不体现出多态性</li>
+<li>破坏了与C的兼容性</li>
+</ol>
+<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>如果不能在pointer或erference中加入信息，那么势必只能在对象中添加信息。显然并非所有的对象都应该被加入信息，我们应该在“可能会运行期多态”的class中加入RTTI信息。识别一个class是否支持多态，只需要去看他是否具备任何virtual function即可。</p>
+<hr>
+<h1 id="单一继承下virtual-function的实现"><a href="#单一继承下virtual-function的实现" class="headerlink" title="单一继承下virtual function的实现"></a>单一继承下virtual function的实现</h1><p>&nbsp;<br>在明确了需要有信息插入class object之后，我们需要明确：哪些信息需要被插入class？仍以下述语句为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure><br>我们需要了解：</p>
+<ol>
+<li>ptr的动态类型，以方便调用正确的z()实体。</li>
+<li>z()实体位置</li>
+</ol>
+<p>落实到具体实现，我们需要在每一个具备多态的class object身上增加两个members：</p>
+<ol>
+<li>一个用以表示动态类型的字符串或者数字</li>
+<li>一个指向某个table的指针，该table内部存放着virtual functions的执行期地址</li>
+</ol>
+<p>上述工作均由编译器完成，执行期只是按图索骥而已。</p>
+<p>一个class只会有一个vtbl，每一个vtbl内部含有所有virtual functions函数实体的地址，这些virtual functions包括：</p>
+<ul>
+<li>该class定义的函数实体，它可能会overriding一个可能存在的base class virtual function函数实体。</li>
+<li>继承自base class的函数实体，这是在derived class不覆写时发生的情况。</li>
+<li>一个pure_virtual_called函数实体，它既可以扮演pure virtual function的空间保卫者，也可以当做执行期异常处理函数。</li>
+</ul>
+<h2 id="具体实例"><a href="#具体实例" class="headerlink" title="具体实例"></a>具体实例</h2><p>考虑下述定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Point&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>=<span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>现有Point2d derived from Point:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function">Point2d&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>;<span class="comment">//override</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//override</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>并有Point3d derived from Point2d:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line">     ...</span><br><span class="line">    <span class="function">Point2d&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>;<span class="comment">//override</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//override</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其具体的vtbl如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/9vsxcigr9ham7p8mc2l5y3w9/image_1cdha351o116i11o21cr67nojva9.png" alt="image_1cdha351o116i11o21cr67nojva9.png-369.9kB"><br>当一个class派生自另一个class，一共具备三种可能性：</p>
+<ol>
+<li><strong>继承声明与实现</strong><br>在该情况下virtual functions的地址将会被拷贝到derived class的vtbl中，且保持原有的slot。</li>
+<li><strong>只继承声明</strong><br>此时函数实体的地址被置于对应的slot中。</li>
+<li><strong>增加新的virtual function</strong><br>此时derived class的vtbl会被扩充，新的virtual function会对应于新的slot。</li>
+</ol>
+<p>当我们遇到<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure><br>如何完成运行期virtual function的调用呢？</p>
+<ol>
+<li>尽管我们并不了解ptr的动态类型，但我们了解其vptr的位置，并由vptr找到vtbl</li>
+<li>尽管并不明确哪一个z()实体会被调用，但我们明确了解z()必然位于slot4</li>
+</ol>
+<p>因此，上述语句被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(*ptr-&gt;vptr[<span class="number">4</span>])(ptr);</span><br></pre></td></tr></table></figure><br>尽管该语句的效果在执行期才能被确定（调用哪个z实体），但至少在编译期我们完成了正确的转化。</p>
+<p>在单一继承体系中，virtual function运转良好，但在多继承和虚继承中实际情况却较为麻烦。</p>
+<hr>
+<h1 id="多重继承下的virtual-function"><a href="#多重继承下的virtual-function" class="headerlink" title="多重继承下的virtual function"></a>多重继承下的virtual function</h1><p>&nbsp;<br>多重继承下支持virtual function的难点在于后继base class，以及在执行期调整this指针。<br>以下述继承体系为例：<br><img src="http://static.zybuluo.com/zsmj2017/3k4rtxf4owdv3ldih5gi6rqj/image_1cdhf6elj1btn1ocfv1n19tgjucm.png" alt="image_1cdhf6elj1btn1ocfv1n19tgjucm.png-15.9kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base1</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Base1();</span><br><span class="line">    <span class="keyword">virtual</span> ~Base1();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">speakClearly</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Base1 *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Base1;<span class="comment">//抽象工厂</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base2</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Base2();</span><br><span class="line">    <span class="keyword">virtual</span> ~Base2();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mumble</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Base2 *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Base2;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>：<span class="title">public</span> <span class="title">Base1</span>,<span class="title">public</span> <span class="title">Base2</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived();</span><br><span class="line">    <span class="keyword">virtual</span> ~Derived();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Derived *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Derived;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>Derived支持virtual function的难点统统落在Base2 subobject上，其中大致有三个问题：</p>
+<ol>
+<li>virtual destructor</li>
+<li>被继承的Base2::mumble()</li>
+<li>一组clone()函数实体</li>
+</ol>
+<hr>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>首先，我们将一个从heap中配置得到的Derived对象的地址指定给一个Base2指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base2 *pbase2 = <span class="keyword">new</span> Derived;</span><br></pre></td></tr></table></figure><br>新的Derived对象的地址必须调整，以指向Base2 subobject。在编译期间会有如下代码产生：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Derived *temp = <span class="keyword">new</span> Derived;</span><br><span class="line">Base2* pbase2 = temp?temp+<span class="keyword">sizeof</span>(Base1):<span class="number">0</span>;</span><br></pre></td></tr></table></figure><br>当开发者需要释放pbase2所指向的对象时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> pbase2;</span><br></pre></td></tr></table></figure><br>指针必须被再一次调整，以指向Derived对象的起始处。但在这里我们并不能像绑定操作那样在编译期完成offset添加，因为我们只有在运行期才能明确对象的真正类型。</p>
+<p>如果我们经由类型为后继base class的指针或者引用来调用virtual function，该调用所连带的this指针调整操作必须在执行期完成，也就是说，编译器所做的关于扩充代码的操作，必须在某个地方插入。关键问题便是在哪里插入。</p>
+<h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>cfront编译器的做法是将vtbl增大，使它容纳此处所需要的this指针。每一个virtual table slot不再是一个指针，而是一个struct，内含可能的offset以及地址。于是调用操作由：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*(pbase2-&gt;vptr[<span class="number">1</span>])(pbase2);</span><br></pre></td></tr></table></figure><br>转变为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*(pbase2-&gt;vptr[<span class="number">1</span>].faddr)(pbase2+pbase2-&gt;vptr[<span class="number">1</span>].offset)</span><br></pre></td></tr></table></figure><br>这方法的缺点是增加了间接性，无论是否需要offset都需要去执行上述语句，并且vtbl的大小也扩大了。</p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>比较有效率的解决方案是使用thunk。所谓thunk是一小段assembly码，用来完成以下两个任务：</p>
+<ol>
+<li>以适当的offset调整this指针</li>
+<li>跳转至virtual function</li>
+</ol>
+<p>举例而言，经由一个Base2指针调用Derived destructor，其相关的thunk大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pbase2_dtor_thunk:</span><br><span class="line">    <span class="keyword">this</span>+=<span class="keyword">sizeof</span>(base1);</span><br><span class="line">    Derived::~Derived(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure><br>thunk技术保证了vtbl继续内含一个简单的指针，因此多重继承不再需要任何空间上的额外负担。slots中的地址可以指向virtual function，也可以指向一个相关的thunk（如果需要调整this指针）。</p>
+<p>调整this指针的第二个额外负担是，函数的调用由于两种不同的可能：</p>
+<ol>
+<li>经由derived class或第一base class调用</li>
+<li>经由后继base class调用</li>
+</ol>
+<p>同一函数需要在vtbl中存放多笔对应的slots,例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Base1* pbase1 = <span class="keyword">new</span> Derived;</span><br><span class="line">Base2* pbase2 = <span class="keyword">new</span> Derived;</span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> pbase1;</span><br><span class="line"><span class="keyword">delete</span> pbase2;</span><br></pre></td></tr></table></figure><br>虽然两个delete操作导致相同的derived destructor，但它们需要两个不同的vtbl slots：</p>
+<ol>
+<li>pbase1不需要调整this指针，其vtbl放置的是真正的destructor地址</li>
+<li>pbase2需要调整指针，其vtbl slot需要放置相关的thunk地址。</li>
+</ol>
+<p>在多重继承下，一个derived class内含n-1个额外的vtbl，n表示上一层base classes的数目。对于实例中的Derived，它会有两个vtbl：</p>
+<ol>
+<li>一个主要实体，与Base1共享</li>
+<li>一个次要实体，与Base2有关</li>
+</ol>
+<p>针对每一个vtbl，derived对象中有相应的vptr。具体内存结构如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/t692yspb77s1ta8evg4ysyzt/image_1cdhlsdfr1406v33m71ipd1pej13.png" alt="image_1cdhlsdfr1406v33m71ipd1pej13.png-379.6kB"></p>
+<hr>
+<h2 id="后继base-class对virtual-function的影响"><a href="#后继base-class对virtual-function的影响" class="headerlink" title="后继base class对virtual function的影响"></a>后继base class对virtual function的影响</h2><p>在三种情况下后继base class会影响对virtual function的支持：</p>
+<ul>
+<li><p><strong>通过指向后继base class的指针来调用derived virtual function</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Base2 *ptr = <span class="keyword">new</span> Derived;</span><br><span class="line"><span class="comment">//ptr必须向后调整sizeof(Base1)</span></span><br><span class="line"><span class="keyword">delete</span> ptr;</span><br></pre></td></tr></table></figure>
+<p>显然，ptr初始情况下指向了base2 subobject，为了能够正确执行，ptr必须调整指向Derived对象的起始处。</p>
+</li>
+<li><p><strong>通过一个指向derived class的指针调用继承自后继base class的virtual function</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Derived *pder = <span class="keyword">new</span> Derived;</span><br><span class="line"><span class="comment">//pder必须向前调整sizeof(Base1)</span></span><br><span class="line">pder-&gt;mumble();</span><br></pre></td></tr></table></figure>
+<p>此时，指针必须再次调整。</p>
+</li>
+<li><p>返回值不相同</p>
+<p>具体来说就是clone的实现原理。</p>
+</li>
+</ul>
+<hr>
+<h1 id="虚继承下的virtual-functions"><a href="#虚继承下的virtual-functions" class="headerlink" title="虚继承下的virtual functions"></a>虚继承下的virtual functions</h1><p>&nbsp;<br>考虑下述继承体系：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">virtual</span> ~Point2d();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mumble</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~Point3d();</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>Point3d和Point2d的起始部分并不和“非虚拟的单一继承”一致。由于Point2d和Point3d的对象不再相符，两者之间的转换也就需要调整this指针。它们的内存布局：<br><img src="http://static.zybuluo.com/zsmj2017/o41pbxhobsbgk79prj3jpwvl/image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png" alt="image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png-283.1kB"><br>（这个图似乎有点问题，右下角发生了错误）</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/" rel="tag"># 对象模型</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/15/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Member%E7%9A%84%E5%90%84%E7%A7%8D%E8%B0%83%E7%94%A8%E6%96%B9%E5%BC%8F/" rel="next" title="Function语义学——Member的各种调用方式">
+                <i class="fa fa-chevron-left"></i> Function语义学——Member的各种调用方式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/16/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E7%9A%84%E6%95%88%E8%83%BD/" rel="prev" title="Function语义学——函数的效能">
+                Function语义学——函数的效能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#运行期类型判断"><span class="nav-number">2.</span> <span class="nav-text">运行期类型判断</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法一"><span class="nav-number">2.1.</span> <span class="nav-text">方法一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法二"><span class="nav-number">2.2.</span> <span class="nav-text">方法二</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单一继承下virtual-function的实现"><span class="nav-number">3.</span> <span class="nav-text">单一继承下virtual function的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#具体实例"><span class="nav-number">3.1.</span> <span class="nav-text">具体实例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多重继承下的virtual-function"><span class="nav-number">4.</span> <span class="nav-text">多重继承下的virtual function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">4.1.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方案一"><span class="nav-number">4.1.1.</span> <span class="nav-text">方案一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案二"><span class="nav-number">4.1.2.</span> <span class="nav-text">方案二</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后继base-class对virtual-function的影响"><span class="nav-number">4.2.</span> <span class="nav-text">后继base class对virtual function的影响</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#虚继承下的virtual-functions"><span class="nav-number">5.</span> <span class="nav-text">虚继承下的virtual functions</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

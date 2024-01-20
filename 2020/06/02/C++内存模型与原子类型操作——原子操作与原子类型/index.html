@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,并发编程," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;nbsp;原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。 如若某线程正在以原子操作load一个对象的值（对该对象的所有修改都由原子操作完成），那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。">
+<meta name="keywords" content="C++,并发编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++内存模型与原子类型操作——原子操作与原子类型">
+<meta property="og:url" content="https://xander.wiki/2020/06/02/C++%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%AD%90%E7%B1%BB%E5%9E%8B%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E4%B8%8E%E5%8E%9F%E5%AD%90%E7%B1%BB%E5%9E%8B/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言&amp;nbsp;原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。 如若某线程正在以原子操作load一个对象的值（对该对象的所有修改都由原子操作完成），那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/jut87ru9vyn16t0qv66fsr0w/image-20210610152408616.png">
+<meta property="og:image" content="http://static.zybuluo.com/zsmj2017/l5jxrrnhm2mvnxa1cda7vzhj/image.png">
+<meta property="og:updated_time" content="2021-06-24T07:00:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2020/06/02/C++内存模型与原子类型操作——原子操作与原子类型/"/>
+
+
+
+
+
+  <title>C++内存模型与原子类型操作——原子操作与原子类型 | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2020/06/02/C++%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%AD%90%E7%B1%BB%E5%9E%8B%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E4%B8%8E%E5%8E%9F%E5%AD%90%E7%B1%BB%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C++内存模型与原子类型操作——原子操作与原子类型</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-06-02T17:00:00+08:00">
+                2020-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" itemprop="url" rel="index">
+                    <span itemprop="name">C++并发编程实战</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>原子类型操作(atomic operation)具备不可分割性，其仅存在执行完成与未执行两种状态。</p>
+<p>如若某线程正在以原子操作load一个对象的值（对该对象的所有修改都由原子操作完成），那么它仅能读取到该对象在修改前，亦或某一次修改后的值（无法获取中间状态）。非原子类型操作不具备此性质，因此线程很可能读取到某个对象的中间状态，从而造成数据竞争。</p>
+<a id="more"></a>
+<hr>
+<h1 id="标准原子类型"><a href="#标准原子类型" class="headerlink" title="标准原子类型"></a>标准原子类型</h1><p>&nbsp;<br>所有标准原子类型都可以在<code>&lt;atomic&gt;</code>头文件中找到。尽管从理论角度出发，开发者可以使用互斥锁保证任何数据类型均对外展现出原子性，但从C++语言定义而言，仅有这些类型是真正的原子类型。</p>
+<p>事实上，可能标准原子类型也是通过使用锁实现了原子性。为了探究这一点，几乎所有标准原子类型（特例为<code>std::atomic_flag</code>）都具备这样一个接口<code>is_lock_free()</code>，开发者可以通过调用此接口来判断，当前行为究竟是语义上的原子行为（此时该接口返回true）还是编译器或者函数库内部在执行加锁操作模拟原子性（此时该接口返回false）。了解原子类型是否具备语义上的原子性在性能优化领域较为重要：如果某类型内部同样使用了mutex，那么可能将无法带来期望的性能收益。</p>
+<p>除了直接使用<code>std::atomic</code>类模板外，标准库也提供了一系列名称来引用原子类型。但由于历史原因，在较老的编译器上，这些替代类型名称可能引用对应 std::atomic&lt;&gt;的特化类或这个特化类的一个基类，支持C++17的编译器则不存在此问题。因此，如果混合使用类型名与<code>std::atomic&lt;&gt;</code>特化类，可能导致代码不可移植。</p>
+<p>类型名与<code>std::atomic&lt;&gt;</code>特化类映射表如下：<br><img src="http://static.zybuluo.com/zsmj2017/ulsub2apkxgv7hlabpfxrdxv/WechatIMG13.png" alt="WechatIMG13.png-417kB"></p>
+<p>除此以外，C++标准库还针对<code>std::size_t</code>等非基本原子类型提供typedef，其映射表如下：<br><img src="http://static.zybuluo.com/zsmj2017/jut87ru9vyn16t0qv66fsr0w/image-20210610152408616.png" alt="image-20210610152408616.png-298.2kB"></p>
+<p>标准原子类型理论上不可复制或赋值，因为它们没有<code>copy ctor</code>或<code>copy assignment operator</code>。但它们支持通过诸如<code>load()</code>,<code>store</code>，<code>exchange</code>等被相应的内置类型赋值或隐式转换。此外，它们也支持相应的相关计算符，例如<code>+=</code>,<code>-=</code>等等。整形与指针的原子类型还支持<code>++</code>，<code>--</code>。这些计算符同样具备实现同样功能的成员函数，如<code>fetch_add()</code>、<code>fetch_or()</code>等等。<br>一般而言，对象的赋值运算符往往返回引用，如果将该惯例应用于原子类型，则获取存储数据时程序中势必存在一个特殊的读操作，这可能导致数据竞争（在assign和read之间可能存在一个线程正在修改数据）。因此，对于赋值运算符而言，其返回值是被存储的数据，而对于命名成员函数而言，返回值是操作前的数据。</p>
+<p><code>std::atomic&lt;&gt;</code>类模板不仅仅是一组特化。它确实存在一个主模板，可用于创建用户自定义类型的原子变体。其操作被限定为<code>load()</code>、<code>store()</code>、<code>exchange()</code>、<code>compare_exchange_weak()</code>和<code>compare_exchange_strong()</code>。</p>
+<p>每个原子类型上操作都有一个可选的内存顺序参数，它是<code>std::memory_order</code>枚举类型的某个值，可以用来指定所需的内存顺序语义。<code>std::memory_order</code>枚举值分别为：<br>1.std::memory_order_relaxed<br>2.std::memory_order_acquire<br>3.std::memory_order_consume<br>4.std::memory_order_acq_rel<br>5.std::memory_order_release<br>6.std::memory_order_seq_cst</p>
+<p>该内存顺序参数依赖于操作的类别，在不指定的情况下，默认使用<code>std::memory_order_seq_cst</code>。</p>
+<hr>
+<h1 id="std-atomic-flag"><a href="#std-atomic-flag" class="headerlink" title="std::atomic_flag"></a>std::atomic_flag</h1><p>&nbsp;<br><code>std::atomic_flag</code>是最简单的标准原子类型，表征布尔量，此类型的对象仅有两种状态:set或clear。实际上，它被设计为一种基础构建模块，很少应用于实际工程。以下将简称<code>std::atomic_flag</code>类型对象为flag对象。</p>
+<p>flag对象必须用<code>ATOMIC_FLAG_INIT</code>初始化，即初始化为clear状态，这也意味着它无法被初始化为set状态。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic_flag f = ATOMIC_FLAG_INIT;</span><br></pre></td></tr></table></figure><br>它是唯一在初始化时需要这种特殊处理的原子类型，也是唯一保证无锁的原子类型。此外，static flag对象保证其具备静态初始化特性，即该对象总在首次使用前完成初始化。</p>
+<p>flag对象在完成初始化后，仅能对其施加三种操作：destroy，clear，test_and_set（读取值后set），分别对应着析构函数，<code>clear()</code>成员函数以及<code>test_and_set()</code>成员函数。<code>clear()</code>和<code>test_and_set()</code>都可以指定内存顺序。</p>
+<p>所有原子类型均不支持copy ctor &amp;&amp; copy assignment，flag对象也不例外。原因很简单：应用于原子类型的所有操作均应具备原子性，但赋值和拷贝构造涉及到两个独立对象。在执行拷贝构造或拷贝赋值操作时，必须先从一个对象读取值，然后将其写入另一个对象，这一组合行为不可能具备原子性。</p>
+<p><code>std::atomic_flag</code>所具备的特性使其非常适合实现自旋互斥锁，具体实现如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">spinlock_mutex</span> &#123;</span></span><br><span class="line">  <span class="built_in">std</span>::atomic_flag flag; </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  spinlock_mutex(): flag(ATOMIC_FLAG_INIT) &#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(flag.test_and_set(<span class="built_in">std</span>::memory_order_acquire)); <span class="comment">// 忙-等待</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    flag.<span class="built_in">clear</span>(<span class="built_in">std</span>::memory_order_release); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>flag对象类似于bool，但其未提供标准get接口（C++20引入<code>test()</code>成员函数），因此如存在相关需求，请使用<code>std::atomic&lt;bool&gt;</code>。</p>
+<hr>
+<h1 id="std-atomic-lt-bool-gt"><a href="#std-atomic-lt-bool-gt" class="headerlink" title="std::atomic&lt;bool&gt;"></a>std::atomic&lt;bool&gt;</h1><p>&nbsp;<br>相较于flag对象，<code>std::atomic&lt;bool&gt;</code>的灵活程度大为提高。尽管不支持copy ctor与copy assign，但可以使用内置的bool类型构造它——这意味着它可以被初始化为true或false。此外，<code>std::atomic&lt;bool&gt;</code>对象亦可接受来自内置bool类型的赋值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; <span class="title">b</span><span class="params">(<span class="literal">true</span>)</span></span>;</span><br><span class="line">b=<span class="literal">false</span>;</span><br></pre></td></tr></table></figure>
+<p>这里需要注意一点：不同于常规赋值操作，原子类型的赋值操作返回的并非引用，而是被赋予的值。原因很简单，返回引用可能会导致另一个线程修改当前存储数据，这将导致数据竞争。</p>
+<p><code>std::atomic&lt;bool&gt;</code>使用<code>strore()</code>成员函数写入true或false值，使用<code>exchange()</code>成员函数完成对原始值的检索与替换，读取操作使用的是成员函数<code>load()</code>。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; b;</span><br><span class="line"><span class="keyword">bool</span> x=b.load(<span class="built_in">std</span>::memory_order_acquire);</span><br><span class="line">b.store(<span class="literal">true</span>);</span><br><span class="line">x=b.exchange(<span class="literal">false</span>, <span class="built_in">std</span>::memory_order_acq_rel);</span><br></pre></td></tr></table></figure></p>
+<p>除<code>exchange</code>外，<code>std::atomic&lt;bool&gt;</code>还有两个”read-change-write”操作，分别是<code>compare_exchange_weak()</code>和<code>compare_exchange_strong()</code>。</p>
+<p>compare-exchange操作是使用原子类型进行编程的基石——它将原子变量的值与提供的预期值进行比较，若相等，则存储提供的值。如果值不相等，则预期值将被更新为原子变量存储的值。该操作返回布尔量，若执行了存储操作（值相等）且存储成功则为true，否则为false。</p>
+<p><code>compare_exchange_weak()</code>的weak之处在于，即使原始值与预期值一致时，存储也可能会不成功，此时原始值不变，<code>compare_exchange_weak()</code>返回false。这种情况多见于当前机器不支持compare-exchange指令（意味着无法保证操作原子性），若此时执行操作的线程在必要的指令序列中被切换出去，而操作系统在其位置调度了另一个线程，将导致数据存储失败。因此<code>compare_exchange_weak()</code>通常应用于循环内：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> expected=<span class="literal">false</span>;</span><br><span class="line"><span class="keyword">extern</span> atomic&lt;<span class="keyword">bool</span>&gt; b; <span class="comment">// 在其他某个地方设置</span></span><br><span class="line"><span class="comment">// b内部数据为存储值</span></span><br><span class="line"><span class="comment">// expected为期待值</span></span><br><span class="line"><span class="comment">// true为提供值</span></span><br><span class="line"><span class="keyword">while</span>(!b.compare_exchange_weak(expected,<span class="literal">true</span>) &amp;&amp; !expected); <span class="comment">// 若存储失败，将持续执行</span></span><br></pre></td></tr></table></figure><br><code>compare_exchange_strong()</code>的strong之处在于，当存储值等于期待值时，该函数返回ture（即使存储失败），否则返回false。</p>
+<p>若当前提供值依赖于存储值，则开发者可以利用期待值被更新为存储值的特性，利用期待值计算提供值。这里需要注意，若这种计算过程非常耗时，则使用strong优于weak，因为weak所在的循环将导致提供值被反复计算，即使期待值未发生变更。</p>
+<p>除flag外，原子类型并不保证无锁性，若有需要，<code>std::atomic&lt;bool&gt;</code>可以通过<code>is_lock_free()</code>成员函数检查其操作是否具备无锁性。</p>
+<hr>
+<h1 id="std-atomic-lt-T-gt"><a href="#std-atomic-lt-T-gt" class="headerlink" title="std::atomic&lt;T*&gt;"></a>std::atomic&lt;T*&gt;</h1><p>&nbsp;<br>std::atomic&lt;T*&gt;具备所有std::atomic<bool>的接口与性质，本节主要描述其特性。</p>
+<p>std::atomic<T*>支持指针运算，类似于普通指针，其行为是在存储的地址上做原子加法与减法，其接口也类似与普通指针类型，有+=，-=，++(前置&amp;&amp;后置)， —(前置&amp;&amp;后置)，它们的返回值是一个普通的T*，指向增加/减少后的内存地址。</p>
+<p>除上述接口外，std::atomic<T*>还提供了接口<code>fetch_add()</code>与<code>fetch_sub()</code>，其返回值与上述接口不同，返回执行加/减操作前的原始值。</p>
+<p>std::atomic<T*>具体使用示例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>&#123;</span>&#125;;</span><br><span class="line">Foo some_array[<span class="number">5</span>];</span><br><span class="line"><span class="function"><span class="built_in">std</span>::atomic&lt;Foo*&gt; <span class="title">p</span><span class="params">(some_array)</span></span>; </span><br><span class="line">Foo*x=p.fetch_add(<span class="number">2</span>); <span class="comment">//p加2，并返回老的值 </span></span><br><span class="line">assert(x==some_array); </span><br><span class="line">assert(p.load()==&amp;some_array[<span class="number">2</span>]);</span><br><span class="line">x=(p-=<span class="number">1</span>); <span class="comment">//p减1，并返回新的值 </span></span><br><span class="line">assert(x==&amp;some_array[<span class="number">1</span>]); </span><br><span class="line">assert(p.load()==&amp;some_array[<span class="number">1</span>]);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="标准整形原子类型"><a href="#标准整形原子类型" class="headerlink" title="标准整形原子类型"></a>标准整形原子类型</h1><p>&nbsp;<br>除load(), store(), exchange(), compare_exchange_weak(),compare_exchange_strong()接口外，原子整形类型如std::atomic<int>和 std::atomic<unsigned long long>有相当全面的一整套运算接口:fetch_add(), fetch_sub(), fetch_and(), fetch_or(), fetch_xor()，以及复合赋值形式的操作((+=, -=, &amp;=, |=和^=)，++和—(前置&amp;&amp;后置)。因为原子整数值通常用作计数器或位掩码，因此缺失乘法，除法，移位操作符也许并不能算作遗憾。如有需要，在循环内反复调用compare_exchange_weak()即可。</p>
+<p>类似于指针操作，<code>fetch()</code>接口均返回修改前的旧值，前置操作符返回修改后的新值，后置操作符返回修改前的旧值。</p>
+<hr>
+<h1 id="std-atomic-lt-T-gt-1"><a href="#std-atomic-lt-T-gt-1" class="headerlink" title="std::atomic&lt;T&gt;"></a>std::atomic&lt;T&gt;</h1><p>&nbsp;<br>给定用户自定义的类型UDT，std::atomic&lt;UDT&gt;提供了与std::atomic&lt;bool&gt;相同的接口，当然，与存储值相关的返回类型为UDT，而非bool。</p>
+<p>并非任意UDT均可与std::atomic&lt;&gt;搭配使用：UDT必须具备一个trivial拷贝赋值操作符，这意味着该类型必须没有虚函数和虚基类，并且必须使用编译器生成的拷贝赋值操作符——这一要求对其基类和非静态数据成员同样生效。这保证了编译器可以使用memcpy（或一个等价操作）来完成赋值。此外，compare_exchange使用的是memcmp式的比较操作，因此不支持bitwise相等的UDT实例在执行compare_exchange操作时将会不符合预期，即使比较值满足自定义operator==（顺带提一嘴，std::atomic&lt;double&gt;与std::atomic&lt;float&gt;尽管是标准类型，使用<code>compare_exchange_strong</code>时也存在同样的坑，原因在于数据的存储形式不同）。</p>
+<p>这些限制背后的原因前文已经提及——不要将指针和引用作为参数传递给用户提供的函数，从而在锁范围外传递受保护数据。一般来说，编译器无法为std::atomic&lt;UDT生成无锁代码，因此它必须生成和使用一个内部锁。如果允许用户提供自定义拷贝赋值或比较操作符，则需要将对受保护数据的引用作为参数传递给用户提供的函数，这可能导致数据竞争。此外，这些限制增加了编译器直接为 std::atomic&lt;UDT&gt;使用原子指令的机会，因为它可以直接将UDT实例视为一组原始字节。</p>
+<p>这些限制意味着开发者不能创建一些较为复杂的原子数据类型，例如<code>std::atomic&lt;std::vector&lt;int&gt;&gt;</code>(它有一个特殊的拷贝构造和拷贝赋值操作符)。但这并不算大问题——数据结构越复杂，对其进行复杂操作的可能性越高，而不只是原子操作里简单的赋值和比较，此类数据最好使用<code>std::mutex</code>，以确保为所需操作适当地保护数据。</p>
+<p>如果UDT的大小 &lt;= int或void*，那么大多数平台都能够对std::atomic&lt;UDT&gt;使用原子指令。一些平台还能对两倍于int或void*大小的用户自定义类型使用原子指令。这些平台通常支持所谓的双字比较-交换(double-word-compare-and-swap)指令，该指令对应于compare_exchange_xxx函数。</p>
+<p>综上，下表展示了std::atomic&lt;T&gt;上可使用的各项操作：<br><img src="http://static.zybuluo.com/zsmj2017/l5jxrrnhm2mvnxa1cda7vzhj/image.png" alt="image.png-224.6kB"></p>
+<hr>
+<h1 id="应用于原子操作的自由函数"><a href="#应用于原子操作的自由函数" class="headerlink" title="应用于原子操作的自由函数"></a>应用于原子操作的自由函数</h1><p>TODO::不甚重要，日后补充</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag"># 并发编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/05/VimTutor/" rel="next" title="VimTutor小结">
+                <i class="fa fa-chevron-left"></i> VimTutor小结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/06/24/C++%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%AD%90%E7%B1%BB%E5%9E%8B%E6%93%8D%E4%BD%9C%E2%80%94%E2%80%94%E5%90%8C%E6%AD%A5%E6%93%8D%E4%BD%9C%E4%B8%8E%E5%BC%BA%E5%88%B6%E9%A1%BA%E5%BA%8F/" rel="prev" title="C++内存模型与原子类型操作——同步操作与强制顺序">
+                C++内存模型与原子类型操作——同步操作与强制顺序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准原子类型"><span class="nav-number">2.</span> <span class="nav-text">标准原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-flag"><span class="nav-number">3.</span> <span class="nav-text">std::atomic_flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-bool-gt"><span class="nav-number">4.</span> <span class="nav-text">std::atomic&lt;bool&gt;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt"><span class="nav-number">5.</span> <span class="nav-text">std::atomic&lt;T*&gt;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准整形原子类型"><span class="nav-number">6.</span> <span class="nav-text">标准整形原子类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#std-atomic-lt-T-gt-1"><span class="nav-number">7.</span> <span class="nav-text">std::atomic&lt;T&gt;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用于原子操作的自由函数"><span class="nav-number">8.</span> <span class="nav-text">应用于原子操作的自由函数</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

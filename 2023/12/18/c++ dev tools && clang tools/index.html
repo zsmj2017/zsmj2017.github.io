@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,tools,clang," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="abstract C++ dev tools clang tools">
+<meta name="keywords" content="C++,tools,clang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cpp dev tools &amp;&amp; clang tools">
+<meta property="og:url" content="https://xander.wiki/2023/12/18/c++%20dev%20tools%20&&%20clang%20tools/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="abstract C++ dev tools clang tools">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2024-01-20T19:25:42.585Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2023/12/18/c++ dev tools && clang tools/"/>
+
+
+
+
+
+  <title>cpp dev tools && clang tools | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2023/12/18/c++%20dev%20tools%20&&%20clang%20tools/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">cpp dev tools && clang tools</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-12-18T18:07:00+08:00">
+                2023-12-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index">
+                    <span itemprop="name">杂项</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="abstract"><a href="#abstract" class="headerlink" title="abstract"></a>abstract</h1><ol>
+<li>C++ dev tools</li>
+<li>clang tools</li>
+</ol>
+<a id="more"></a>
+<hr>
+<h1 id="C-dev-tools"><a href="#C-dev-tools" class="headerlink" title="C++ dev tools"></a>C++ dev tools</h1><h2 id="why-we-need-tools"><a href="#why-we-need-tools" class="headerlink" title="why we need tools"></a>why we need tools</h2><p>C makes it easy to shoot yourself in the foot;<br>C++ makes it harder, but when you do it blows your whole leg off.                             </p>
+<p align="right">-- Bjarne Stroustrup</p>                 
+
+<p>C++ is a powerful language, but it is also a complex language, so it is easy to import bad smell code into cur project.<br>We can keep our code high quality by code review, but it is not efficient and not enough.<br>CR is a human work, it cost too many time and energy to find some simple or hide bugs.<br>So we need some tools to help us to find the simple bugs automatically and bring our attention to the important &amp;&amp; interesting things.</p>
+<h3 id="what-is-good-code"><a href="#what-is-good-code" class="headerlink" title="what is good code"></a>what is good code</h3><ul>
+<li>easy to read</li>
+<li>easy to maintain</li>
+<li>easy to use</li>
+<li>work as expected</li>
+<li>work fast</li>
+</ul>
+<h2 id="tools-help-us-write-good-code"><a href="#tools-help-us-write-good-code" class="headerlink" title="tools help us write good code"></a>tools help us write good code</h2><ol>
+<li>formatter</li>
+<li>code generator</li>
+<li>code analyzer</li>
+<li>code refactor tools</li>
+<li>test framework</li>
+<li>benchmark (test) framework</li>
+</ol>
+<hr>
+<h3 id="formatter"><a href="#formatter" class="headerlink" title="formatter"></a>formatter</h3><h4 id="why-we-need-formatter"><a href="#why-we-need-formatter" class="headerlink" title="why we need formatter"></a>why we need formatter</h4><ul>
+<li>ensure consistent code style accross the code data base</li>
+<li>reduce time on code style discussions</li>
+<li>keep CR reviewer focus on logic</li>
+<li>automatically format code to save time</li>
+</ul>
+<h4 id="when-we-format-code"><a href="#when-we-format-code" class="headerlink" title="when we format code"></a>when we format code</h4><ul>
+<li>save file</li>
+<li>pre-commit hook</li>
+<li>CI</li>
+</ul>
+<h4 id="formatter-tools-list"><a href="#formatter-tools-list" class="headerlink" title="formatter tools list"></a>formatter tools list</h4><ul>
+<li>clang-format</li>
+<li>astyle</li>
+<li>…</li>
+</ul>
+<hr>
+<h3 id="code-generator"><a href="#code-generator" class="headerlink" title="code generator"></a>code generator</h3><h4 id="why-we-need-code-generator"><a href="#why-we-need-code-generator" class="headerlink" title="why we need code generator"></a>why we need code generator</h4><ul>
+<li>reduce time on boring work</li>
+<li>keep code style guidelines</li>
+<li>use common design patterns</li>
+<li>avoid human error</li>
+</ul>
+<h4 id="when-we-use-code-generator"><a href="#when-we-use-code-generator" class="headerlink" title="when we use code generator"></a>when we use code generator</h4><ul>
+<li>generate implementation codesnippet from a interface</li>
+<li>generate ctor &amp;&amp; dtor &amp;&amp; copy ctor &amp;&amp; move ctor &amp;&amp; copy assignment &amp;&amp; move assignment </li>
+<li>generate getter &amp;&amp; setter member function</li>
+<li>generate implementation codesnippet from a proto</li>
+<li>…</li>
+</ul>
+<h4 id="code-generator-tools-list"><a href="#code-generator-tools-list" class="headerlink" title="code generator tools list"></a>code generator tools list</h4><ul>
+<li>IDES(Visual Studio, CLion, …)</li>
+<li>protoc</li>
+<li>…</li>
+</ul>
+<hr>
+<h3 id="code-analyzer"><a href="#code-analyzer" class="headerlink" title="code analyzer"></a>code analyzer</h3><h4 id="why-we-need-code-analyzer-linter"><a href="#why-we-need-code-analyzer-linter" class="headerlink" title="why we need code analyzer (linter)"></a>why we need code analyzer (linter)</h4><ul>
+<li>find undefined behavior &amp;&amp; potential bugs automatically</li>
+<li>find bad smell code automatically</li>
+<li>keep code style guidelines (modernize, readability, performance, …)</li>
+<li>…</li>
+</ul>
+<h4 id="static-analyzer"><a href="#static-analyzer" class="headerlink" title="static analyzer"></a>static analyzer</h4><ul>
+<li>Build warnings</li>
+<li>Other tools<ul>
+<li>clang-tidy</li>
+<li>coverity</li>
+<li>cppcheck</li>
+<li>…</li>
+</ul>
+</li>
+</ul>
+<h4 id="dynamic-analyzer"><a href="#dynamic-analyzer" class="headerlink" title="dynamic analyzer"></a>dynamic analyzer</h4><ul>
+<li>valgrind</li>
+<li>address sanitizer</li>
+<li>…</li>
+</ul>
+<hr>
+<h3 id="code-refactor-tools"><a href="#code-refactor-tools" class="headerlink" title="code refactor tools"></a>code refactor tools</h3><h4 id="what-is-refactor"><a href="#what-is-refactor" class="headerlink" title="what is refactor"></a>what is refactor</h4><ul>
+<li>Basic set<ul>
+<li>rename</li>
+<li>extract function</li>
+<li>…</li>
+</ul>
+</li>
+<li>Profound set<ul>
+<li>change function signature</li>
+<li>push/pull data member up/down in class hierarchy</li>
+<li>modernize</li>
+<li>…</li>
+</ul>
+</li>
+</ul>
+<h4 id="why-we-need-refactor-tools"><a href="#why-we-need-refactor-tools" class="headerlink" title="why we need refactor tools"></a>why we need refactor tools</h4><p>Maybe you will say, we can do refactor by hand or use regex, why we need tools to do it?</p>
+<p>Just think about rename:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// example for confusing names</span></span><br><span class="line">Struct stat stat; <span class="comment">// stat is a struct name, but also a variable name</span></span><br><span class="line">stat(<span class="string">"file"</span>, &amp;stat); <span class="comment">// stat is a function name</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"%d"</span>, stat.<span class="built_in">size</span>);</span><br></pre></td></tr></table></figure>
+<p>If we want to rename struct name ‘stat’ to ‘Mystat’, how can we do it?<br>We can use refactor tools such like clang-rename to do it, thanks clangParse, clangSema, clangAST and many other tools did the hard work.</p>
+<h4 id="code-refactor-tools-list"><a href="#code-refactor-tools-list" class="headerlink" title="code refactor tools list"></a>code refactor tools list</h4><ul>
+<li>IDES(Visual Studio, CLion, …)</li>
+<li>clangRefactor</li>
+<li>clangMR(MapReduce)</li>
+<li>…</li>
+</ul>
+<hr>
+<h3 id="test-framework"><a href="#test-framework" class="headerlink" title="test framework"></a>test framework</h3><p>Every one know test is important, so I will not talk about why we need test.</p>
+<h4 id="test-framework-list"><a href="#test-framework-list" class="headerlink" title="test framework list"></a>test framework list</h4><ul>
+<li>Google Test</li>
+<li>Boost.Test</li>
+<li>…</li>
+</ul>
+<hr>
+<h3 id="benchmark-test-framework"><a href="#benchmark-test-framework" class="headerlink" title="benchmark (test) framework"></a>benchmark (test) framework</h3><h4 id="what-is-benchmark"><a href="#what-is-benchmark" class="headerlink" title="what is benchmark"></a>what is benchmark</h4><h5 id="Example-1"><a href="#Example-1" class="headerlink" title="Example 1"></a>Example 1</h5><p>For example, we want to compare the performance of two implements.<br>First one use <code>std::unordered_map</code> to store the data, and second one use <code>std::map</code> to store the data.<br>We know <code>std::unordered_map</code> is faster than <code>std::map</code>, but we don’t know how much find faster when we use them store 10000 int and with a O2 optimization.<br>So we write benchmark code to compare them.  </p>
+<p><a href="https://quick-bench.com/q/JMw0rZ4-Ucaytj2j0uduX8kAHbA" target="_blank" rel="noopener">benchmark_result</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;benchmark/benchmark.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unordered_map&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;map&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;random&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">RandomNumber</span><span class="params">()</span> </span>&#123; </span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">std</span>::random_device rd;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="built_in">std</span>::mt19937 <span class="title">gen</span><span class="params">(rd())</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="built_in">std</span>::uniform_int_distribution&lt;&gt; <span class="title">dis</span><span class="params">(<span class="number">1</span>, <span class="number">1000000</span>)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> dis(gen);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Benchmark for std::unordered_map</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BM_UnorderedMap_Read</span><span class="params">(benchmark::State&amp; state)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="keyword">int</span>, <span class="keyword">int</span>&gt; <span class="built_in">unordered_map</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; ++i) &#123;</span><br><span class="line">        <span class="keyword">int</span> num = RandomNumber();</span><br><span class="line">        <span class="built_in">unordered_map</span>[num] = num;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> _ : state) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; ++i) &#123;</span><br><span class="line">            benchmark::DoNotOptimize(<span class="built_in">unordered_map</span>.<span class="built_in">find</span>(RandomNumber()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BENCHMARK(BM_UnorderedMap_Read);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Benchmark for std::map</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BM_Map_Read</span><span class="params">(benchmark::State&amp; state)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">map</span>&lt;<span class="keyword">int</span>, <span class="keyword">int</span>&gt; <span class="built_in">map</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; ++i) &#123;</span><br><span class="line">        <span class="keyword">int</span> num = RandomNumber();</span><br><span class="line">        <span class="built_in">map</span>[num] = num;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> _ : state) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; ++i) &#123;</span><br><span class="line">            benchmark::DoNotOptimize(<span class="built_in">map</span>.<span class="built_in">find</span>(RandomNumber()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BENCHMARK(BM_Map_Read);</span><br><span class="line"></span><br><span class="line">BENCHMARK_MAIN();</span><br></pre></td></tr></table></figure>
+<h5 id="Example-2"><a href="#Example-2" class="headerlink" title="Example 2"></a>Example 2</h5><p>We want to use <code>std::string_view</code> instead of <code>const std::string&amp;</code> to pass string parameter to a function.<br>But how much performance improvement we can get?<br>Suppose we use both const char* and std::string to pass a string parameter to a function.<br>We write benchmark code to compare them.  </p>
+<p><a href="https://quick-bench.com/q/qoswOAQLY-J5ve2dgwHYNDM_HO8" target="_blank" rel="noopener">benchmark_result</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;benchmark/benchmark.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string_view&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;random&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Function that generates random strings</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">GenerateRandomString</span><span class="params">(<span class="keyword">size_t</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> chars = <span class="string">"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"</span>;</span><br><span class="line">    <span class="built_in">std</span>::random_device random_device;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::mt19937 <span class="title">generator</span><span class="params">(random_device())</span></span>;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::uniform_int_distribution&lt;&gt; <span class="title">distribution</span><span class="params">(<span class="number">0</span>, chars.<span class="built_in">size</span>() - <span class="number">1</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> random_string;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; length; ++i) &#123;</span><br><span class="line">        random_string += chars[distribution(generator)];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> random_string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function that takes std::string_view</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FunctionWithStringView</span><span class="params">(<span class="built_in">std</span>::string_view str)</span> </span>&#123;</span><br><span class="line">    benchmark::DoNotOptimize(str.data());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function that takes const std::string&amp;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FunctionWithStringRef</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; str)</span> </span>&#123;</span><br><span class="line">    benchmark::DoNotOptimize(str.data());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Benchmark for std::string_view with const char*</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BM_StringViewWithChar</span><span class="params">(benchmark::State&amp; state)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> str = GenerateRandomString(<span class="number">100</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* cstr = str.c_str();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> _ : state) &#123;</span><br><span class="line">        FunctionWithStringView(cstr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BENCHMARK(BM_StringViewWithChar);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Benchmark for const std::string&amp; with const char*</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BM_StringRefWithChar</span><span class="params">(benchmark::State&amp; state)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> str = GenerateRandomString(<span class="number">100</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* cstr = str.c_str();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> _ : state) &#123;</span><br><span class="line">        FunctionWithStringRef(cstr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BENCHMARK(BM_StringRefWithChar);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Benchmark for std::string_view with std::string</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BM_StringViewWithString</span><span class="params">(benchmark::State&amp; state)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> str = GenerateRandomString(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> _ : state) &#123;</span><br><span class="line">        FunctionWithStringView(str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BENCHMARK(BM_StringViewWithString);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Benchmark for const std::string&amp; with std::string</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BM_StringRefWithString</span><span class="params">(benchmark::State&amp; state)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> str = GenerateRandomString(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> _ : state) &#123;</span><br><span class="line">        FunctionWithStringRef(str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">BENCHMARK(BM_StringRefWithString);</span><br><span class="line"></span><br><span class="line">BENCHMARK_MAIN();</span><br></pre></td></tr></table></figure>
+<h4 id="why-we-need-benchmark"><a href="#why-we-need-benchmark" class="headerlink" title="why we need benchmark"></a>why we need benchmark</h4><ul>
+<li>performance compare: compare the performance of algorithms || data structures || implementations</li>
+<li>performance optimization: identify the bottleneck</li>
+<li>performance regression: ensure the performance is not worse than before</li>
+</ul>
+<h4 id="benchmark-framework-tools"><a href="#benchmark-framework-tools" class="headerlink" title="benchmark framework tools"></a>benchmark framework tools</h4><ul>
+<li>Google Benchmark</li>
+<li>Boost.Test</li>
+<li><a href="https://quick-bench.com/" target="_blank" rel="noopener">https://quick-bench.com/</a></li>
+<li>…</li>
+</ul>
+<hr>
+<h1 id="clang-tools"><a href="#clang-tools" class="headerlink" title="clang tools"></a>clang tools</h1><h2 id="clang-family"><a href="#clang-family" class="headerlink" title="clang family"></a>clang family</h2><ul>
+<li>clang: C, C++, Objective-C and Objective-C++ compiler</li>
+<li>clang-format: code formatter</li>
+<li>clang-tidy: code analyzer &amp;&amp; code refactor tools</li>
+<li>clang-refactor: code refactor tools</li>
+<li>clangd: language server, support code completion, go to definition, find references, rename, …</li>
+<li>…</li>
+</ul>
+<h2 id="precondition-when-we-use-clang-tools"><a href="#precondition-when-we-use-clang-tools" class="headerlink" title="precondition when we use clang tools"></a>precondition when we use clang tools</h2><p>Compile your source code with clang, make sure they can be compiled successfully to a object file.<br>And then we can use clang tools to analyze &amp;&amp; refactor our code.<br>Plz take care: only need compile with clang :-), no need to use or deploy the outputs.</p>
+<h2 id="what-can-we-do-with-clang-tools"><a href="#what-can-we-do-with-clang-tools" class="headerlink" title="what can we do with clang tools"></a>what can we do with clang tools</h2><h3 id="write-our-own-checkers"><a href="#write-our-own-checkers" class="headerlink" title="write our own checkers"></a>write our own checkers</h3><p>For example, our code data base was fulled with some bad smell code, but they can pass all the clang-tidy checkers and compiled successfully without any warnings.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// slowloop.cc</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* str = GetSomeData();</span><br><span class="line"></span><br><span class="line"><span class="comment">// If compiler dont optimize strlen(str) to a const value, this loop will run as O(n^2)</span></span><br><span class="line"><span class="comment">// But dont generate any warnings</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">strlen</span>(str); ++i) &#123;</span><br><span class="line">    <span class="comment">// do something</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We can use clang-AST to make sure what happened when clang compile this code.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang++ -Xclang -ast-dump -fsyntax-only slowloop.cc</span><br></pre></td></tr></table></figure><br>And We can get a output AST such like this:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">|   `-ForStmt <span class="number">0x9759b40</span> &lt;<span class="built_in">line</span>:<span class="number">6</span>:<span class="number">3</span>, <span class="built_in">line</span>:<span class="number">8</span>:<span class="number">3</span>&gt;                                                                           <span class="comment">// for(</span></span><br><span class="line">|     |-DeclStmt <span class="number">0x97599a8</span> &lt;<span class="built_in">line</span>:<span class="number">6</span>:<span class="number">8</span>, col:<span class="number">24</span>&gt;</span><br><span class="line">|     | `-VarDecl 0x9759930 &lt;col:8, col:23&gt; col:15 used index 'size_t':'unsigned int' cinit                            // size_t index = 0;</span><br><span class="line">|     |   `-ImplicitCastExpr 0x9759998 &lt;col:23&gt; 'size_t':'unsigned int' &lt;IntegralCast&gt;</span><br><span class="line">|     |     `-IntegerLiteral 0x9759970 &lt;col:23&gt; 'int' 0</span><br><span class="line">|     |-&lt;&lt;&lt;<span class="literal">NULL</span>&gt;&gt;&gt;                                                                                                     <span class="comment">// i &lt; strlen(str);</span></span><br><span class="line">|     |-BinaryOperator 0x9759ae8 &lt;col:26, col:44&gt; 'bool' '&lt;'</span><br><span class="line">|     | |-ImplicitCastExpr 0x9759ad8 &lt;col:26&gt; 'size_t':'unsigned int' &lt;LValueToRValue&gt;</span><br><span class="line">|     | | `-DeclRefExpr 0x97599c0 &lt;col:26&gt; 'size_t':'unsigned int' lvalue Var 0x9759930 'index' 'size_t':'unsigned int'</span><br><span class="line">|     | `-CallExpr 0x9759aa8 &lt;col:34, col:44&gt; 'size_t':'unsigned int'</span><br><span class="line">|     |   |-ImplicitCastExpr 0x9759a98 &lt;col:34&gt; 'size_t (*)(const char *) __attribute__((cdecl))' &lt;FunctionToPointerDecay&gt;</span><br><span class="line">|     |   | `-DeclRefExpr 0x9759a38 &lt;col:34&gt; 'size_t (const char *) __attribute__((cdecl))':'size_t (const char *)' lvalue Function 0x92edfb8 'strlen' 'size_t (const char *) __attribute__((cdecl))':'size_t (const char *)'</span><br><span class="line">|     |   `-ImplicitCastExpr 0x9759ac8 &lt;col:41&gt; 'const char *' &lt;LValueToRValue&gt;</span><br><span class="line">|     |     `-DeclRefExpr 0x9759a18 &lt;col:41&gt; 'const char *' lvalue Var 0x9759890 'str' 'const char *'</span><br><span class="line">|     |-UnaryOperator 0x9759b20 &lt;col:47, col:49&gt; 'size_t':'unsigned int' lvalue prefix '++'                             // ++i</span><br><span class="line">|     | `-DeclRefExpr 0x9759b00 &lt;col:49&gt; 'size_t':'unsigned int' lvalue Var 0x9759930 'index' 'size_t':'unsigned int'</span><br><span class="line">|     `-CompoundStmt <span class="number">0x9759b30</span> &lt;col:<span class="number">56</span>, <span class="built_in">line</span>:<span class="number">8</span>:<span class="number">3</span>&gt;</span><br></pre></td></tr></table></figure><br>Finally, we can write our own checkers(patterns) to find this kind of bad smell code.<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">forStmt(hasCondition(hasDescendant(callExpr(callee(functionDecl(hasName(<span class="string">"strlen"</span>)))))))</span><br></pre></td></tr></table></figure></p>
+<p>For more info, u can see </p>
+<ul>
+<li><a href="https://clang.llvm.org/docs/LibASTMatchersReference.html" target="_blank" rel="noopener">LibASTMatchersReference</a></li>
+<li><a href="https://llvm.org/devmtg/2020-09/slides/Clang-tidy_for_Customized_Checkers_and_Large_Scale.pdf" target="_blank" rel="noopener">Clang-tidy CustomizedCheckers</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/tools/" rel="tag"># tools</a>
+          
+            <a href="/tags/clang/" rel="tag"># clang</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/08/05/C++%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B%E5%85%A5%E9%97%A8/" rel="next" title="C++模板元编程入门">
+                <i class="fa fa-chevron-left"></i> C++模板元编程入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/21/clang-tidy%20customized%20checker%20example/" rel="prev" title="clang-tidy customized checker example">
+                clang-tidy customized checker example <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#abstract"><span class="nav-number">1.</span> <span class="nav-text">abstract</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-dev-tools"><span class="nav-number">2.</span> <span class="nav-text">C++ dev tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#why-we-need-tools"><span class="nav-number">2.1.</span> <span class="nav-text">why we need tools</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#what-is-good-code"><span class="nav-number">2.1.1.</span> <span class="nav-text">what is good code</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tools-help-us-write-good-code"><span class="nav-number">2.2.</span> <span class="nav-text">tools help us write good code</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#formatter"><span class="nav-number">2.2.1.</span> <span class="nav-text">formatter</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#why-we-need-formatter"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">why we need formatter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#when-we-format-code"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">when we format code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#formatter-tools-list"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">formatter tools list</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#code-generator"><span class="nav-number">2.2.2.</span> <span class="nav-text">code generator</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#why-we-need-code-generator"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">why we need code generator</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#when-we-use-code-generator"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">when we use code generator</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#code-generator-tools-list"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">code generator tools list</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#code-analyzer"><span class="nav-number">2.2.3.</span> <span class="nav-text">code analyzer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#why-we-need-code-analyzer-linter"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">why we need code analyzer (linter)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#static-analyzer"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">static analyzer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dynamic-analyzer"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">dynamic analyzer</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#code-refactor-tools"><span class="nav-number">2.2.4.</span> <span class="nav-text">code refactor tools</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#what-is-refactor"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">what is refactor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#why-we-need-refactor-tools"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">why we need refactor tools</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#code-refactor-tools-list"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">code refactor tools list</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#test-framework"><span class="nav-number">2.2.5.</span> <span class="nav-text">test framework</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#test-framework-list"><span class="nav-number">2.2.5.1.</span> <span class="nav-text">test framework list</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#benchmark-test-framework"><span class="nav-number">2.2.6.</span> <span class="nav-text">benchmark (test) framework</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#what-is-benchmark"><span class="nav-number">2.2.6.1.</span> <span class="nav-text">what is benchmark</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Example-1"><span class="nav-number">2.2.6.1.1.</span> <span class="nav-text">Example 1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Example-2"><span class="nav-number">2.2.6.1.2.</span> <span class="nav-text">Example 2</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#why-we-need-benchmark"><span class="nav-number">2.2.6.2.</span> <span class="nav-text">why we need benchmark</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#benchmark-framework-tools"><span class="nav-number">2.2.6.3.</span> <span class="nav-text">benchmark framework tools</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#clang-tools"><span class="nav-number">3.</span> <span class="nav-text">clang tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#clang-family"><span class="nav-number">3.1.</span> <span class="nav-text">clang family</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#precondition-when-we-use-clang-tools"><span class="nav-number">3.2.</span> <span class="nav-text">precondition when we use clang tools</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#what-can-we-do-with-clang-tools"><span class="nav-number">3.3.</span> <span class="nav-text">what can we do with clang tools</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#write-our-own-checkers"><span class="nav-number">3.3.1.</span> <span class="nav-text">write our own checkers</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

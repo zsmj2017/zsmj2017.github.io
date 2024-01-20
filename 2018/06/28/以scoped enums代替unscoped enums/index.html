@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,Modern C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="unscoped enum与命名空间污染&amp;nbsp;通常，在大括号内声明某名称会导致该名称可见性仅限于大括号范围之内，但对于C++98中的枚举类型来说并非如此。这些枚举变量名的作用域等价于枚举所存在的作用域，因此直接导致别的变量再也无法使用这些名字：12enum Color &amp;#123; black, white, red &amp;#125;; &#x2F;&#x2F; black, white, red are in s">
+<meta name="keywords" content="C++,Modern C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="10.以scoped enums代替unscoped enums">
+<meta property="og:url" content="https://xander.wiki/2018/06/28/%E4%BB%A5scoped%20enums%E4%BB%A3%E6%9B%BFunscoped%20enums/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="unscoped enum与命名空间污染&amp;nbsp;通常，在大括号内声明某名称会导致该名称可见性仅限于大括号范围之内，但对于C++98中的枚举类型来说并非如此。这些枚举变量名的作用域等价于枚举所存在的作用域，因此直接导致别的变量再也无法使用这些名字：12enum Color &amp;#123; black, white, red &amp;#125;; &#x2F;&#x2F; black, white, red are in s">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-06-23T07:44:08.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2018/06/28/以scoped enums代替unscoped enums/"/>
+
+
+
+
+
+  <title>10.以scoped enums代替unscoped enums | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/28/%E4%BB%A5scoped%20enums%E4%BB%A3%E6%9B%BFunscoped%20enums/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">10.以scoped enums代替unscoped enums</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-28T15:42:00+08:00">
+                2018-06-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="unscoped-enum与命名空间污染"><a href="#unscoped-enum与命名空间污染" class="headerlink" title="unscoped enum与命名空间污染"></a>unscoped enum与命名空间污染</h1><p>&nbsp;<br>通常，在大括号内声明某名称会导致该名称可见性仅限于大括号范围之内，但对于C++98中的枚举类型来说并非如此。这些枚举变量名的作用域等价于枚举所存在的作用域，因此直接导致别的变量再也无法使用这些名字：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Color &#123; black, white, red &#125;; <span class="comment">// black, white, red are in same scope as Color</span></span><br><span class="line"><span class="keyword">auto</span> white = <span class="literal">false</span>; <span class="comment">// error! white already declared in this scope</span></span><br></pre></td></tr></table></figure><br>这种污染命名空间的行为被定义为：unscoped。C++11对此提出了解决方案scoped enums：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">Color</span> &#123;</span> black, white, red &#125;; <span class="comment">// black, white, red are scoped to Color</span></span><br><span class="line"><span class="keyword">auto</span> white = <span class="literal">false</span>; <span class="comment">// fine, no other</span></span><br><span class="line">Color c = white; <span class="comment">// error! no enumerator named "white" is in this scope</span></span><br><span class="line">Color c = Color::white; <span class="comment">// fine</span></span><br><span class="line"><span class="keyword">auto</span> c = Color::white; <span class="comment">// also fine (and in accord with Item 5's advice)</span></span><br></pre></td></tr></table></figure><br>这种技法亦被称为enum classes。</p>
+<hr>
+<h1 id="scoped的强类型保证"><a href="#scoped的强类型保证" class="headerlink" title="scoped的强类型保证"></a>scoped的强类型保证</h1><p>&nbsp;<br>scoped enum除了不会污染命名空间之外还具备一大优势：其成员均为强类型枚举量。unsoped enum的成员总是可以被隐式转换为int型（并可以藉由此转为浮点型），例如下文的转换是完全有效的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Color &#123; black, white, red &#125;; <span class="comment">// unscoped enum</span></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="keyword">size_t</span>&gt; <span class="title">primeFactors</span><span class="params">(<span class="built_in">std</span>::<span class="keyword">size_t</span> x)</span></span>; <span class="comment">// returning prime factors of x</span></span><br><span class="line">Color c = red;</span><br><span class="line">…</span><br><span class="line"><span class="keyword">if</span> (c &lt; <span class="number">14.5</span>) &#123; <span class="comment">// compare Color to double (!)</span></span><br><span class="line">    <span class="keyword">auto</span> factors = primeFactors(c);<span class="comment">//compute prime factors of a color</span></span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果将其转变为scoped enum，上述问题都将不复存在：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">Color</span> &#123;</span> black, white, red &#125;; <span class="comment">// enum is now scoped</span></span><br><span class="line">Color c = Color::red; <span class="comment">// as before, but with scope qualifier</span></span><br><span class="line"><span class="keyword">if</span> (c &lt; <span class="number">14.5</span>) &#123; <span class="comment">// error! can't compare Color and double</span></span><br><span class="line">    <span class="keyword">auto</span> factors = <span class="comment">// error! can't pass Color to</span></span><br><span class="line">    primeFactors(c); <span class="comment">// function expecting std::size_t</span></span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果你非要进行转换也不是不可以，只要你使用static_cast:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">static_cast</span>&lt;<span class="keyword">double</span>&gt;(c) &lt; <span class="number">14.5</span>) &#123; <span class="comment">// odd code, but it's valid</span></span><br><span class="line">    <span class="keyword">auto</span> factors = primeFactors(<span class="keyword">static_cast</span>&lt;<span class="built_in">std</span>::<span class="keyword">size_t</span>&gt;(c)); <span class="comment">// // suspect, but it compiles</span></span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="forward—declartion"><a href="#forward—declartion" class="headerlink" title="forward—declartion"></a>forward—declartion</h1><p>&nbsp;<br>scoped enum似乎还有一大优点在于可以完成forward—declartion,即可以在不具备定义的情况下直接声明枚举类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Color; <span class="comment">// error!</span></span><br><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">Color</span>;</span> <span class="comment">// fine</span></span><br></pre></td></tr></table></figure><br>但事实并非如此。在C++11中，unscoped enum亦可完成forward—declartion，但是需要一点点额外的工作。由于在C++语言中每一个枚举量都具备一个由编译器决定的整形底层类型，对于下述这个枚举量：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Color &#123; black, white, red &#125;;</span><br></pre></td></tr></table></figure><br>编译器可能会选择char作为其底层类型，因为只有三个值可以表示。但也有可能会出现枚举值范围很大的情况：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Status &#123; good = <span class="number">0</span>,failed = <span class="number">1</span>,incomplete = <span class="number">100</span>,corrupt = <span class="number">200</span>,indeterminate = <span class="number">0xFFFFFFFF</span>&#125;;</span><br></pre></td></tr></table></figure><br>此时编译器将会选择一个大于char的类型作为底层类型。</p>
+<p>为了保证高效使用内存，编译器通常会选择最合适（最小）的数据类型作为底层类型。但在某些情况下，编译器会倾向于在保证速度的前提下使用较小内存。为了保证这种实现的可行性，C++98仅支持枚举定义而不支持枚举声明，这一特性使得编译器可以在使用枚举之前为每个枚举选择底层类型。</p>
+<p>无法forward—declartion存在一定的缺陷，其中最显著的缺陷即在于编译依存性被显著提升。仍以Status enum为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Status &#123; good = <span class="number">0</span>,failed = <span class="number">1</span>,incomplete = <span class="number">100</span>,corrupt = <span class="number">200</span>,indeterminate = <span class="number">0xFFFFFFFF</span>&#125;;</span><br></pre></td></tr></table></figure><br>如果该枚举被定义于某个头文件中并且被#include多次，那么如果我们想要向其中增加一个新的状态，整个系统都需要被重新编译。C++11修复了这个问题，例如以下则是一个枚举声明以及将枚举类型作为参数的函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">Status</span>;</span> <span class="comment">// forward declaration</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">continueProcessing</span><span class="params">(Status s)</span></span>; <span class="comment">// use of fwd-declared enum</span></span><br></pre></td></tr></table></figure><br>如果Status的定义发生了改变，那么包含这个声明的头文件无需重新编译。此外，只要continueProcessing保持行为一致，continueProcessing的实现亦不需要重新编译。</p>
+<hr>
+<h2 id="手动指定enum底层类型"><a href="#手动指定enum底层类型" class="headerlink" title="手动指定enum底层类型"></a>手动指定enum底层类型</h2><p>&nbsp;<br>如果编译器需要在使用enum前了解其大小，C++11是如何做到完成forward—declartion的？答案十分简单：scoped enum的底层类型总是已知的，而unscoped enum则可以手动指定。</p>
+<p>在默认情况下，scoped enum的底层类型是int：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">Status</span>;</span> <span class="comment">// underlying type is int</span></span><br></pre></td></tr></table></figure><br>当然你也可以手动地指定其类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">Status</span>:</span> <span class="built_in">std</span>::<span class="keyword">uint32_t</span>; <span class="comment">// underlying type for is std::uint32_t(from &lt;cstdint&gt;)</span></span><br></pre></td></tr></table></figure><br>无论如何，编译器总是在声明时即明确了scoped enum的底层类型。</p>
+<p>unscoped enum也可以这样操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Color: <span class="built_in">std</span>::<span class="keyword">uint8_t</span>; <span class="comment">// fwd decl for unscoped enum;</span></span><br></pre></td></tr></table></figure><br>甚至我们还可以在定义时指定其底层类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">Status</span>:</span> <span class="built_in">std</span>::<span class="keyword">uint32_t</span> &#123; good = <span class="number">0</span>,</span><br><span class="line">                                   failed = <span class="number">1</span>,</span><br><span class="line">                                   incomplete = <span class="number">100</span>,</span><br><span class="line">                                   corrupt = <span class="number">200</span>,</span><br><span class="line">                                   audited = <span class="number">500</span>,</span><br><span class="line">                                   indeterminate = <span class="number">0xFFFFFFFF</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="unscoped-enum的可取之处"><a href="#unscoped-enum的可取之处" class="headerlink" title="unscoped enum的可取之处"></a>unscoped enum的可取之处</h1><p>&nbsp;<br>scoped enum可以避免污染命名空间，并且不易受到无意义隐式类型转换的影响，但它并非毫无可取之处：在C++11的std::tuple中起到了一定的作用。举例而言，我们现有一个tuple，它持有社交网站用户的姓名、电子邮件地址与信誉值：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UserInfo = <span class="built_in">std</span>::tuple&lt;<span class="built_in">std</span>::<span class="built_in">string</span>,<span class="built_in">std</span>::<span class="built_in">string</span>,<span class="built_in">std</span>::<span class="keyword">size_t</span>&gt;;<span class="comment">// type alias;</span></span><br></pre></td></tr></table></figure><br>作为一名开发者，我们需要关注很多东西，但这其中可能并不包括记住tuple的字段1对应着用户email。使用unscoped enum可以将名称与字段号关联，从此不必费心记忆：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> UserInfoFields &#123; uiName, uiEmail, uiReputation &#125;;</span><br><span class="line">UserInfo uInfo; <span class="comment">// as before</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">auto</span> val = <span class="built_in">std</span>::<span class="built_in">get</span>&lt;uiEmail&gt;(uInfo); <span class="comment">// ah, get value of email field</span></span><br></pre></td></tr></table></figure><br>通过隐式类型转换，我们将enum变为了std::get所需要的类型。如果你坚持使用scoped enum，那么效果可能会非常惨烈：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">UserInfoFields</span> &#123;</span> uiName, uiEmail, uiReputation &#125;;</span><br><span class="line">UserInfo uInfo; <span class="comment">// as before</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">auto</span> val = <span class="built_in">std</span>::<span class="built_in">get</span>&lt;<span class="keyword">static_cast</span>&lt;<span class="built_in">std</span>::<span class="keyword">size_t</span>&gt;(UserInfoFields::uiEmail)&gt;(uInfo);</span><br></pre></td></tr></table></figure><br>当然，我们也可以编写一个形参为eunm且返回值为std::size_t的函数来降低语句复杂程度，但这稍微有点麻烦。std::get是一个模板，因此你所需要提供的值是一个模板参数（必须在编译期确定），那也就是说，该函数必须是一个constexpr函数。<br>实际上光是constexpr函数还不够，这个转换必须得是一个constexpr函数模板，因为它必须能够支持所有类型的enum，同样地，我们也需要对返回值进行泛型化处理。在泛型设计中我们将不再返回std::size_t，而是返回enum的底层类型（该操作通过std::underlying_type实现)。最后，我们将其声明为noexcept，因为它永远不会抛出异常，最终转换函数实现如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">typename</span> <span class="built_in">std</span>::underlying_type&lt;E&gt;::type</span><br><span class="line">toUType(E enumerator) <span class="keyword">noexcept</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;<span class="keyword">typename</span> <span class="built_in">std</span>::underlying_type&lt;E&gt;::type&gt;(enumerator);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在C++14中，toUType可以简化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> E&gt; <span class="comment">// C++14</span></span><br><span class="line"><span class="keyword">constexpr</span> <span class="built_in">std</span>::<span class="keyword">underlying_type_t</span>&lt;E&gt;</span><br><span class="line">toUType(E enumerator) <span class="keyword">noexcept</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;<span class="built_in">std</span>::<span class="keyword">underlying_type_t</span>&lt;E&gt;&gt;(enumerator);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当然我们也可以通过使用auto来更进一步地简化它：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> E&gt; <span class="comment">// C++14</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="keyword">auto</span> <span class="title">toUType</span><span class="params">(E enumerator)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;<span class="built_in">std</span>::<span class="keyword">underlying_type_t</span>&lt;E&gt;&gt;(enumerator);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在具备了toUType后，tuple的使用如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> val = <span class="built_in">std</span>::<span class="built_in">get</span>&lt;toUType(UserInfoFields::uiEmail)&gt;(uInfo);</span><br></pre></td></tr></table></figure><br>看起来还是比使用unscoped enum麻烦多了，但至少它避免了命名空间污染与无意义的转换，这二者的破坏力都十分巨大，因此最好还是心甘情愿地多写几个字符吧。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;</p>
+<ol>
+<li><strong>C++98中的enum被称为unscoped enum。</strong></li>
+<li><strong>scoped enum不会污染命名空间，仅在cast下才能完成转换。</strong></li>
+<li><strong>scoped enum 与 unscoped enum都支持底层类型指定，scoped enum默认为int类型。</strong></li>
+<li><strong>scoped enum支持forward declaration，unscoped enum需要指定其底层类型方可。</strong></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/Modern-C/" rel="tag"># Modern C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/27/%E4%BD%BF%E7%94%A8alias%20declarations%E8%80%8C%E9%9D%9Etypedefs/" rel="next" title="9.使用alias declarations而非typedefs">
+                <i class="fa fa-chevron-left"></i> 9.使用alias declarations而非typedefs
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/%E4%BB%A5deleted%E5%87%BD%E6%95%B0%E5%8F%96%E4%BB%A3private%20undefined%E5%87%BD%E6%95%B0/" rel="prev" title="11.以deleted函数取代private undefined函数">
+                11.以deleted函数取代private undefined函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#unscoped-enum与命名空间污染"><span class="nav-number">1.</span> <span class="nav-text">unscoped enum与命名空间污染</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#scoped的强类型保证"><span class="nav-number">2.</span> <span class="nav-text">scoped的强类型保证</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#forward—declartion"><span class="nav-number">3.</span> <span class="nav-text">forward—declartion</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#手动指定enum底层类型"><span class="nav-number">3.1.</span> <span class="nav-text">手动指定enum底层类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#unscoped-enum的可取之处"><span class="nav-number">4.</span> <span class="nav-text">unscoped enum的可取之处</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
