@@ -291,6 +291,160 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E4%BB%A5pass-by-refernce-to-const%E4%BB%A3%E6%9B%BFpass-by-value/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/12/%E4%BB%A5pass-by-refernce-to-const%E4%BB%A3%E6%9B%BFpass-by-value/" itemprop="url">21.以pass-by-refernce-to-const代替pass-by-value</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-12T11:02:00+08:00">
+                2018-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br><strong>默认情况下c++以by value方式传递对象至函数</strong>。除非你另外指定，否则函数形参都是实参的副本，返回值也是一个副本。这些副本都由对象的copy构造函数生成，并同时需要析构。反复的构造与析构造就了大量的开销。</p>
+<hr>
+<h1 id="以pass-by-refernce-to-const代替pass-by-value的优势"><a href="#以pass-by-refernce-to-const代替pass-by-value的优势" class="headerlink" title="以pass-by-refernce-to-const代替pass-by-value的优势"></a>以pass-by-refernce-to-const代替pass-by-value的优势</h1><h2 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h2><p>pass-by-refernce-to-const效率极高，因为没有任何构造、析构函数被调用。使用const则使用户不必担心传入的对象遭到任何更改。</p>
+<h2 id="避免slicing"><a href="#避免slicing" class="headerlink" title="避免slicing"></a>避免slicing</h2><p>当一个derived class对象以by value的方式传递给base class对象，base class的构造函数会被调用，而derived class的特性却被切割，导致最终得到的就是一个base class对象。<br>pass-by-refernce-to-const 不会导致上述问题，这是由于动态绑定的原因。</p>
+<hr>
+<h1 id="内置类型与pass-by—reference"><a href="#内置类型与pass-by—reference" class="headerlink" title="内置类型与pass-by—reference"></a>内置类型与pass-by—reference</h1><p>&lt;/br&gt;<br>在编译器的底层实现中，reference往往以指针的形式表现出来，因此pass-by-refernce手法实际上传递的是一个指针。如果你有一个对象是内置类型，那可能用pass-by-value的效率更高一些，stl的迭代器和函数对象也是pass-by-value的效率更高。</p>
+<hr>
+<h1 id="小型对象与pass-by-reference"><a href="#小型对象与pass-by-reference" class="headerlink" title="小型对象与pass-by-reference"></a>小型对象与pass-by-reference</h1><p>&lt;/br&gt;<br>有读者误以为内置类型使用pass-by_value效率更高，就应该对所有的小型对象使用pass-by-value.这种思想是错误的，对象小并不意味着copy构造函数不昂贵（比如复制该对象需要复制其所有指向的东西，详情可见Effective STL 15）。就算它真的不昂贵，你也不能保证它以后还是不昂贵（未来时态编程 More Effective C++ 32)�，甚至有的时候不同的编译器都会改变type的大小。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>尽量以pass-by-refernce-to-const代替pass-by-value，前者是高效且正确的代名词。</li>
+<li>规则1并不适用于内置类型，以及stl的迭代器与函数对象。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E4%BB%A4%E6%AF%94%E8%BE%83%E5%87%BD%E6%95%B0%E5%9C%A8%E7%AD%89%E5%80%BC%E6%83%85%E5%86%B5%E4%B8%8B%E8%BF%94%E5%9B%9Efalse%EF%BC%88%E4%B8%A5%E6%A0%BC%E5%BC%B1%E5%BA%8F%E5%8C%96%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1699,161 +1853,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/10/%E5%9C%A8%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E7%B1%BB%E4%B8%AD%E6%8F%90%E4%BE%9B%E5%AF%B9%E5%8E%9F%E5%A7%8B%E8%B5%84%E6%BA%90%E7%9A%84%E8%AE%BF%E9%97%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/10/%E5%9C%A8%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E7%B1%BB%E4%B8%AD%E6%8F%90%E4%BE%9B%E5%AF%B9%E5%8E%9F%E5%A7%8B%E8%B5%84%E6%BA%90%E7%9A%84%E8%AE%BF%E9%97%AE/" itemprop="url">16.在资源管理类中提供对原始资源的访问</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-10T18:28:00+08:00">
-                2018-04-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>资源管理类是排除资源泄漏的壁垒，是良好设计系统的根本性质。但有许多api直接指涉资源，有时不得不绕过资源管理对象直接访问原始资源。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&lt;/br&gt;<br>举例而言，假设有一个shared_ptr保存了factory函数生成的资源，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">shared_ptr</span>&lt;Investment&gt; <span class="title">spInv</span><span class="params">(createInvestment())</span></span>;</span><br></pre></td></tr></table></figure><br>但现在API如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">daysHeld</span><span class="params">(<span class="keyword">const</span> Investment* pi)</span></span>;</span><br></pre></td></tr></table></figure><br>我们肯定没法把spInv传入进去，因为该函数需要的是Investment*指针，而不是shared_ptr&lt;Investment&gt;类型的对象。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&lt;/br&gt;<br>有两个做法可以把RAII对象转换为原始资源：<strong>显式转换和隐式转换</strong>。</p>
-<h2 id="显式转换"><a href="#显式转换" class="headerlink" title="显式转换"></a>显式转换</h2><p>shared_ptr与auto_ptr都提供一个get成员函数，用来执行显式转换。<strong>该函数返回智能指针内部的原始指针（的副本）</strong>。我们可以写作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">daysHeld(spInv.<span class="built_in">get</span>());</span><br></pre></td></tr></table></figure><br>另外，智能指针并非仅有显式转换，它们重载了解引用操作符（operator*，operator-&gt;),这两种操作符执行了隐式转换。（我以为是调用了get().opertaor*，inline之后调用成本也不是很高，不过生成的文件可能变大了)</p>
-<h2 id="隐式转换"><a href="#隐式转换" class="headerlink" title="隐式转换"></a>隐式转换</h2><p>对于需要频繁转换的RAII classes来说，不断调用get()未免繁琐，因此我们可以提供一个隐式转换操作符。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">explict <span class="title">Widget</span><span class="params">(WidegtHandle wh)</span>:<span class="title">w</span><span class="params">(wh)</span> </span>&#123;&#125;</span><br><span class="line">    ~Widget() &#123;<span class="built_in">release</span>(w);&#125;</span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">WidegtHandle</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> w;&#125;<span class="comment">//隐式转换</span></span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    WidgetHandle w;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如此一来，在API中直接可以将RAII对象作为参数传入。<br>这样有时候会发生崩盘，比如原意是拷贝一个RAII对象，但实际上却（发生隐式转换）拷贝了资源。</p>
-<hr>
-<h1 id="转换接口的合理性"><a href="#转换接口的合理性" class="headerlink" title="转换接口的合理性"></a>转换接口的合理性</h1><p>&lt;/br&gt;<br>是否应该提供转换，以及哪一种转换取决于你是否需要转换或者转换的频率。要记住一切操作都是为了令接口更加灵活且不易被误用。<br>你可能会认为转换接口与封装发生了矛盾。但事实并非如此，RAII对象负责资源管理，而非起封装数据的作用。作为类的设计者，我们有责任隐藏用户不需要了解的内容，同时提供给用户一切他们需要的东西。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>APIs往往要求访问原始资源，所以每一个RAII class应该提供一个获取原始资源的函数。</li>
-<li>显式转换比较安全，但隐式转换对客户比较方便，当然也更容易出错。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1904,7 +1903,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1915,7 +1914,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1926,7 +1925,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

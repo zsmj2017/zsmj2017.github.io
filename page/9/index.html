@@ -291,6 +291,184 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/30/%E4%BD%BF%E7%94%A8override%E6%9D%A5%E4%BF%AE%E9%A5%B0%E9%9C%80%E8%A6%81%E8%A6%86%E5%86%99%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/30/%E4%BD%BF%E7%94%A8override%E6%9D%A5%E4%BF%AE%E9%A5%B0%E9%9C%80%E8%A6%81%E8%A6%86%E5%86%99%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0/" itemprop="url">12.使用override来修饰需要覆写的虚函数</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-30T07:42:00+08:00">
+                2018-06-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>OOP的最重要的特性即为多态，其具体表现为派生类中的虚函数实现override了基类的实现。本节将重点讨论使用override确保你真正完成了override操作。</p>
+<hr>
+<h1 id="override约束"><a href="#override约束" class="headerlink" title="override约束"></a>override约束</h1><p>&nbsp;<br>尽管override与overload长得很像，但实际上根本就不是一回事。下面将通过一个实例展示如何通过一个基类接口调用派生类函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">doWork</span><span class="params">()</span></span>; <span class="comment">// base class virtual function</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">doWork</span><span class="params">()</span></span>; <span class="comment">// overrides Base::doWork virtual" is optional here</span></span><br><span class="line">    … </span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Base&gt; upb = <span class="built_in">std</span>::make_unique&lt;Derived&gt;();</span><br><span class="line">upb-&gt;doWork(); <span class="comment">// call doWork through base class ptr derived class function is invoked</span></span><br></pre></td></tr></table></figure></p>
+<p>发生需要满足以下要求：</p>
+<ol>
+<li><strong>基类函数必须为虚函数。</strong></li>
+<li><strong>基类函数与派生类函数名称必须相同（析构函数除外）。</strong></li>
+<li><strong>基类函数与派生类函数形参类型必须相同。</strong></li>
+<li><strong>基类函数与派生类函数必须具备同样的constness。</strong></li>
+<li><strong>基类函数与派生类函数返回值类型与异常规格必须匹配（至少可以转换？）</strong></li>
+</ol>
+<p>在这些基础之上，C++11又增加了一个新的要求：</p>
+<ol>
+<li><strong>基类函数与派生类函数的reference qualifier（引用限定符）必须相同。</strong><br>成员函数reference qualifier是C++11不太为人所熟知的特性之一，其功能为将成员函数的使用限定为左值或右值，它们的存在与virtual不具备关联性，以下为实例展示：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">   …</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">doWork</span><span class="params">()</span> &amp;</span>; <span class="comment">// this version of doWork applies only when *this is an lvalue</span></span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">doWork</span><span class="params">()</span> &amp;&amp;</span>; <span class="comment">// this version of doWork applies only when *this is an rvalue</span></span><br><span class="line">&#125;;</span><br><span class="line">…</span><br><span class="line"><span class="function">Widget <span class="title">makeWidget</span><span class="params">()</span></span>; <span class="comment">// factory function (returns rvalue)</span></span><br><span class="line">Widget w; <span class="comment">// normal object (an lvalue)</span></span><br><span class="line">…</span><br><span class="line">w.doWork(); <span class="comment">// calls Widget::doWork for lvalues (i.e., Widget::doWork &amp;)</span></span><br><span class="line">makeWidget().doWork(); <span class="comment">// calls Widget::doWork for rvalues (i.e., Widget::doWork &amp;&amp;)</span></span><br></pre></td></tr></table></figure>
+有关reference qualifier的介绍以后再说，这里需要强调的是，如果派生类需要override基类函数，那么它们需要具备同样的refernce qualifier，否则基类版本将依旧出现在派生类之中并且不会被override。</li>
+</ol>
+<hr>
+<h1 id="override声明"><a href="#override声明" class="headerlink" title="override声明"></a>override声明</h1><p>&nbsp;<br>上述约束表明即使一个很小的失误也可能会导致override无法成功，并且编译器将不会对没有发生override的情况进行通知。例如下个实例中并没有发生override，你能够定位出是哪些地方出了问题吗？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf2</span><span class="params">(<span class="keyword">int</span> x)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf3</span><span class="params">()</span> &amp;</span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">mf4</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf2</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> x)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf3</span><span class="params">()</span> &amp;&amp;</span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">mf4</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>答案分别为：</p>
+<ol>
+<li><strong>mf1在基类中为const</strong></li>
+<li><strong>mf2在基类中形参为int</strong></li>
+<li><strong>mf3在基类中被限定为左值</strong></li>
+<li><strong>mf4在基类中没有被声明为virtual</strong></li>
+</ol>
+<p>鉴于派生类中声明的virtual函数很容易无法覆写基类中对应的函数，并且编译器并不会对未发生override的行为发出警告，因此C++11提供了一种显式的声明方式表示当前函数需要override基类中对应的函数，其使用方式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span><span class="params">()</span> <span class="keyword">override</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf2</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> x)</span> <span class="keyword">override</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf3</span><span class="params">()</span> &amp;&amp; <span class="keyword">override</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf4</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">override</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>上述代码将无法通过编译，因为编译器会认真地检查其是否如实override了基类版本，这正是我们想要的。真正能够通过编译的代码有形式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf2</span><span class="params">(<span class="keyword">int</span> x)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf3</span><span class="params">()</span> &amp;</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf4</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span> <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">override</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf2</span><span class="params">(<span class="keyword">int</span> x)</span> <span class="keyword">override</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf3</span><span class="params">()</span> &amp; <span class="keyword">override</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">mf4</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">override</span></span>; <span class="comment">// adding "virtual" is OK,</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="override优点"><a href="#override优点" class="headerlink" title="override优点"></a>override优点</h1><p>&nbsp;<br>使用override不仅仅能够让编译器告诉你某函数是否发生了override，还能够在你试图更改基类虚函数签名时观察到对派生类的影响。只需要在更改签名后查看有多少派生类函数编译失败，即可权衡更改签名是否值得。如果没有override声明，那你则不得不需要一个全面的单元测试以判断所有分支。</p>
+<p>C++11引入的两个新关键词final与override均为contextual keywords，即只有在特定环境下才有其存在意义。以override来说，它仅出现于成员函数声明式末尾。这也就是说历史遗留代码中的名称override依然合法，不会触发标识符不合法的行为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Warning</span> &#123;</span> <span class="comment">// potential legacy class from C++98</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">override</span><span class="params">()</span></span>; <span class="comment">// legal in both C++98 and C++11 with the same meaning</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="reference-qualifier"><a href="#reference-qualifier" class="headerlink" title="reference qualifier"></a>reference qualifier</h1><p>&nbsp;<br>如果你希望某个函数只接受左值或右值参数，那你完全可以这样声明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(Widget&amp; w)</span></span>; <span class="comment">// accepts only lvalue Widgets</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(Widget&amp;&amp; w)</span></span>; <span class="comment">// accepts only rvalue Widgets</span></span><br></pre></td></tr></table></figure><br>reference qualifier的作用与之类似，其形参可以看作为*this，它通过判断*this的左右属性来进行决断，从某种意义而言，非常类似于const成员函数。</p>
+<p>举例而言，我们的Widget类有一个std::vector数据成员，并且我们给用户提供了一个接口以确保用户可以直接访问它：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> DataType = <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt;; <span class="comment">// see in Item9</span></span><br><span class="line">    <span class="function">DataType&amp; <span class="title">data</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> values; &#125;</span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    DataType values;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>显然这个东西根本不能体现出一丝一毫的封装性，但我们先不管他，看看用户可能进行的操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line">…</span><br><span class="line"><span class="keyword">auto</span> vals1 = w.data(); <span class="comment">// copy w.values into vals1</span></span><br></pre></td></tr></table></figure><br>由于w.data()返回一个左值引用，因此vals的类型被推衍为vector<double>,利用values初始化之。<br>假设我们当前有一个工厂函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Widget <span class="title">makeWidget</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure><br>并且我们希望利用工厂函数生成的无名对象（临时对象）来初始化一个vector：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> vals2 = makeWidget().data(); <span class="comment">// copy values inside the Widget into vals2</span></span><br></pre></td></tr></table></figure><br>和上一次不同的是，本次设计不应当执行copy操作，因为从临时对象中获取数据使用move更好，但由于data返回一个左值引用，所以拷贝依然会发生。显然这里存在可以优化之处，但试图让编译器给你优化是不切实际的。因此我们需要使用reference qualifier来限定当widget为右值时data()返回值也应当是一个右值：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> DataType = <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt;;</span><br><span class="line">    …</span><br><span class="line">    <span class="function">DataType&amp; <span class="title">data</span><span class="params">()</span> &amp; </span>&#123; <span class="keyword">return</span> values; &#125; <span class="comment">// for lvalue Widgets,return lvalue</span></span><br><span class="line">    <span class="function">DataType <span class="title">data</span><span class="params">()</span> &amp;&amp; </span>&#123; <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">move</span>(values); &#125; <span class="comment">// for rvalue Widgets,return rvalue</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    DataType values;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>一切大功告成。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;</p>
+<ol>
+<li><strong>将需要覆写的函数声明为override。</strong></li>
+<li><strong>reference qualifier可以针对对象的左右值属性实现重载。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/29/%E4%BB%A5deleted%E5%87%BD%E6%95%B0%E5%8F%96%E4%BB%A3private%20undefined%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1726,171 +1904,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/23/%E4%BA%86%E8%A7%A3auto%E6%8A%80%E6%9C%AF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/23/%E4%BA%86%E8%A7%A3auto%E6%8A%80%E6%9C%AF/" itemprop="url">2.了解auto技术</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-23T07:10:00+08:00">
-                2018-06-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br><code>auto</code>的类型推衍法则除了一个特例之外与template function保持一致。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>在上一节中，template function的类型推衍有实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(ParamType param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(expr);</span><br></pre></td></tr></table></figure><br>在函数调用过程中，编译器将使用expr推衍T与ParamType的类型。</p>
-<p>当开发者使用<code>auto</code>来声明一个变量时，<code>auto</code>将扮演T在template中的角色，同时，type specifier（类型说明符）则类似于ParamType，如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = <span class="number">27</span>;<span class="comment">//type specifier为auto</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> cx = x;<span class="comment">//type specifier为const auto</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span>&amp;rx = x;<span class="comment">//type specifier为const auto&amp;</span></span><br></pre></td></tr></table></figure><br>为了推衍出x、cx、rx的类型，编译器会像调用fun template那样执行操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func_for_x</span><span class="params">(T param)</span></span>;<span class="comment">//conceptual template</span></span><br><span class="line">func_for_x(<span class="number">27</span>);<span class="comment">//conceptual call</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func_for_cx</span><span class="params">(<span class="keyword">const</span> T param)</span></span>;</span><br><span class="line">func_for_cx(x);</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func_for_rx</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>;</span><br><span class="line">func_for_rx(cx);</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h1><p>&nbsp;<br>在template function类型推衍中我们根据ParamType的特点将情况分为了三种，使用<code>auto</code>的变量声明表达式与之类似，根据type specifier也分为了三种情况：</p>
-<ol>
-<li><strong>type specifier是一个pointer或一个reference，但不是一个universal reference；</strong></li>
-<li><strong>type specifier是一个universal reference</strong>；</li>
-<li><strong>type specifier既不是pointer也不是reference；</strong></li>
-</ol>
-<p>显然,前文所述的实例分为对应为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = <span class="number">27</span>;<span class="comment">//case 3</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> cx = x;<span class="comment">//case 3</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span>&amp; rx = cx;<span class="comment">//case 1</span></span><br></pre></td></tr></table></figure><br>Case2有推衍实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span>&amp;&amp; uref1 = x;<span class="comment">//x is int and lvalue,so uref1's type is int&amp;</span></span><br><span class="line"><span class="keyword">auto</span>&amp;&amp; uref2 = cx;<span class="comment">// cx is const int and lvalue,so urfe2's type is const int&amp;</span></span><br><span class="line"><span class="keyword">auto</span>&amp;&amp; uref3 = <span class="number">27</span>;<span class="comment">//27 is int and rvalue,so urfe3's type is int&amp;&amp;</span></span><br></pre></td></tr></table></figure><br>在Item1中描述了数组名与函数名在遇到非引用type specifier时会退化为指针的情况，这一特性在auto类型推衍过程中也同样适用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> name[]=<span class="string">"R.N.Briggs"</span>;</span><br><span class="line"><span class="keyword">auto</span> arr1 = name;<span class="comment">//arr1's type is const char*</span></span><br><span class="line"><span class="keyword">auto</span>&amp; arr2 = name;<span class="comment">//arr2's type is const char(&amp;)[13]</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">someFunc</span><span class="params">(<span class="keyword">int</span>,<span class="keyword">double</span>)</span></span>;</span><br><span class="line"><span class="keyword">auto</span> func1 = someFunc;<span class="comment">//func1's type is void(*)(int,double)</span></span><br><span class="line"><span class="keyword">auto</span>&amp; func2 = someFunc;<span class="comment">//func2's type is void(&amp;)(int,double)</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="auto与template-function类型推衍的不同之处"><a href="#auto与template-function类型推衍的不同之处" class="headerlink" title="auto与template function类型推衍的不同之处"></a>auto与template function类型推衍的不同之处</h1><p>&nbsp;<br>如果我们想要声明一个值为27的int型变量，C++98为我们提供了两种方式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x1 = <span class="number">27</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">x2</span><span class="params">(<span class="number">27</span>)</span></span>;</span><br></pre></td></tr></table></figure><br>C++11引入了列表初始化的概念，因此增加了两种声明方式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x3 = &#123;<span class="number">27</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> x4&#123;<span class="number">27</span>&#125;;</span><br></pre></td></tr></table></figure><br>我们将会在Item5中说明，使用<code>auto</code>来声明变量比指定类型更佳，那我们试着把上述声明改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x1 = <span class="number">27</span>;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">x2</span><span class="params">(<span class="number">27</span>)</span></span>;</span><br><span class="line"><span class="keyword">auto</span> x3 = &#123;<span class="number">27</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span> x4&#123;<span class="number">27</span>&#125;;</span><br></pre></td></tr></table></figure><br>上述声明均能够通过编译，只是其含义略有差别，前两个声明式仍然保持着声明一个值为27的int变量的含义，但后两个却发生了变化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x3 = &#123;<span class="number">27</span>&#125;;<span class="comment">//x3's type is std::initializer_list&lt;int&gt;,value is &#123;27&#125;</span></span><br><span class="line"><span class="keyword">auto</span> x4&#123;<span class="number">27</span>&#125;;<span class="comment">//ditto</span></span><br></pre></td></tr></table></figure><br>造成这一变化的根本原因在于auto的推衍法则：当被声明的变量值被大括号包围时，其变量类型会被推衍为std::initializer_list，当包括中的类型不一致时，类型推衍将无法完成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x5 = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3.0</span>&#125;;<span class="comment">//error can not deduce</span></span><br></pre></td></tr></table></figure><br>需要明确的是在上述语句中发生了两种类型推衍，第一种类型推衍将x5推衍为initializer_list类型（因为其值被大括号包围），但initializer_list本身是一个template，所以我们需要继续执行类型推衍。</p>
-<p>这种将大括号初始化推衍为initializer_list是auto与template function唯一不同的地方，后者不允许这种推衍方式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = &#123;<span class="number">11</span>,<span class="number">23</span>,<span class="number">9</span>&#125;;<span class="comment">//x's type is initializer_list&lt;int&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(&#123;<span class="number">11</span>,<span class="number">23</span>,<span class="number">9</span>&#125;);<span class="comment">//error!can't deduce type for T</span></span><br></pre></td></tr></table></figure><br>但是如果你将template function中的参数声明为std::initializer_list，只是其元素类型T不明确的话，template function可以完成推衍：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;T&gt; param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(&#123;<span class="number">11</span>,<span class="number">23</span>,<span class="number">9</span>&#125;);<span class="comment">//T's type is int</span></span><br></pre></td></tr></table></figure></p>
-<p>综上，auto与template function唯一的推衍区别在于：auto总是假定一个大括号初始化列表代表着一个initializer_list,而template function不作这种假设。</p>
-<hr>
-<h1 id="C-14中的auto"><a href="#C-14中的auto" class="headerlink" title="C++14中的auto"></a>C++14中的auto</h1><p>&nbsp;<br>在C++14中，auto还可以用来表征函数的返回值类型，并且lambda表达式也经常使用auto来声明参数。不过这两种auto的使用方式遵从template function类型推衍法则，而非auto推衍法则，因此返回一个初始化列表的函数将无法用auto推衍：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">createInitList</span><span class="params">()</span></span>&#123;<span class="comment">//error,can't deduce type for &#123;1,2,3&#125;</span></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>lambda表达式中亦是如此：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">auto</span> resetV = [&amp;v](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; newValue)&#123; v = newValue;&#125;</span><br><span class="line">...</span><br><span class="line">resetV(&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;);<span class="comment">//error,can't deduce type for &#123;1,2,3&#125;</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;</p>
-<ol>
-<li><strong>auto的推衍法则类似于template function，唯一的不同在于auto会假定大括号初始化列表为std::initializer_list,template function则不会。</strong></li>
-<li><strong>对函数返回值或lambda表达式参数使用auto时遵从template function类型推衍法则，而非auto自己的法则。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1941,7 +1954,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1952,7 +1965,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1963,7 +1976,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%9A%90%E5%BC%8F%E8%BD%AC%E6%8D%A2%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/24/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%9A%90%E5%BC%8F%E8%BD%AC%E6%8D%A2%E5%87%BD%E6%95%B0/" itemprop="url">5.自定义隐式转换函数</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T10:50:00+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>除了c++提供的四种强制类型转换操作外，自定义类型在建立时我们可以提供某些函数以供编译器拿来作隐式转换。有两种函数允许编译器执行这样的转换：<strong>单自变量构造函数与隐式类型转换操作符。</strong></p>
+<hr>
+<h1 id="隐式类型转换函数"><a href="#隐式类型转换函数" class="headerlink" title="隐式类型转换函数"></a>隐式类型转换函数</h1><h2 id="单自变量构造函数"><a href="#单自变量构造函数" class="headerlink" title="单自变量构造函数"></a>单自变量构造函数</h2><p>所谓单自变量构造函数，指的是能够以单一自变量成功调用的构造函数。该构造函数分为两种情况：</p>
+<ol>
+<li>拥有单一形参</li>
+<li>具备多个形参，但第一个形参之后的所有形参均具备默认值</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Name</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Name(<span class="keyword">const</span> <span class="built_in">string</span>&amp; s);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Rational(<span class="keyword">int</span> numerator = <span class="number">0</span>,<span class="keyword">int</span> denominator = <span class="number">1</span>); <span class="comment">// 有理数类</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="隐式类型转换操作符"><a href="#隐式类型转换操作符" class="headerlink" title="隐式类型转换操作符"></a>隐式类型转换操作符</h2><p>隐式类型转换操作，是一个拥有奇怪名字的成员函数：operator关键词之后加一个类型名称。我们无法指定其返回值类型，因为其返回类型就体现在名称上。举例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">double</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>该函数会在以下情况被自动调用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational <span class="title">r</span><span class="params">(<span class="number">1</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line"><span class="keyword">double</span> d=<span class="number">0.5</span>*r;<span class="comment">//转换r，从Rational至double</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="自定义类型转换函数的弊端"><a href="#自定义类型转换函数的弊端" class="headerlink" title="自定义类型转换函数的弊端"></a>自定义类型转换函数的弊端</h1><p>隐式转换可能会在你并未打算调用他们的时候被调用，从而产生不正确的后果，我们很难调试中发现这一问题。</p>
+<h2 id="隐式类型转换操作符-1"><a href="#隐式类型转换操作符-1" class="headerlink" title="隐式类型转换操作符"></a>隐式类型转换操作符</h2><h3 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h3><p>假设存在一个如上所述的 Rational类，我们希望他能够像内置类型一样兼容opertaor&lt;&lt;。但由于我们的疏忽，忘记了为Ration对象定义opertaor&lt;&lt;，你会惊奇地发现，如下语句还是能够编译和运行：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational <span class="title">r</span><span class="params">(<span class="number">1</span>, <span class="number">2</span>)</span></span>;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; r;<span class="comment">//本意是打印“1/2”，现在打印出了“0.5”</span></span><br></pre></td></tr></table></figure><br>这揭示了隐式转换符的缺点：<strong>它们可能会导致非预期的函数被调用</strong>。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>解决方法很简单，以一个功能对等的函数取代它，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">double</span> <span class="title">asDouble</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>在多数情况下，这种显式转换函数的使用不够方便，但是至少我们保证了一切按照预期运行，付出一些代价也是值得的。</p>
+<hr>
+<h2 id="单自变量构造函数-1"><a href="#单自变量构造函数-1" class="headerlink" title="单自变量构造函数"></a>单自变量构造函数</h2><p>通过单自变量constructors完成的隐式转换难于消除，且其破坏性也较大。</p>
+<h3 id="问题实例-1"><a href="#问题实例-1" class="headerlink" title="问题实例"></a>问题实例</h3><p>现有一个针对数组结构写的class template。这些数组允许用户指定索引值的上界与下界：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Array</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Array(<span class="keyword">int</span> lowBound, <span class="keyword">int</span> highBound);</span><br><span class="line">    Array(<span class="keyword">int</span> <span class="built_in">size</span>);<span class="comment">//单自变量构造函数</span></span><br><span class="line">    T&amp; <span class="keyword">operator</span>[](<span class="keyword">int</span> index);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>以下代码试图比较Array&lt;int&gt;对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> <span class="keyword">operator</span>==( <span class="keyword">const</span> Array&lt;<span class="keyword">int</span>&gt;&amp; lhs,<span class="keyword">const</span> Array&lt;<span class="keyword">int</span>&gt;&amp; rhs);</span><br><span class="line"><span class="function">Array&lt;<span class="keyword">int</span>&gt; <span class="title">a</span><span class="params">(<span class="number">10</span>)</span></span>;</span><br><span class="line"><span class="function">Array&lt;<span class="keyword">int</span>&gt; <span class="title">b</span><span class="params">(<span class="number">10</span>)</span></span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i)</span><br><span class="line">    <span class="keyword">if</span> (a == b[i]) &#123;<span class="comment">//误将a[i]写作a</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure><br>编译器对此并不会报错，事实上，它调用构造函数，将b[i]转为了一个Array&lt;int&gt;对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i)</span><br><span class="line">    <span class="keyword">if</span> (a == <span class="keyword">static_cast</span>&lt; Array&lt;<span class="keyword">int</span>&gt; &gt;(b[i]))</span><br></pre></td></tr></table></figure></p>
+<h3 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h3><p>我们不能禁止单参数构造函数，但同时我们也希望防止编译器不加鉴别地调用这个构造函数，因此我们可以使用explicit关键词。构造函数用 explicit 声明后，编译器会拒绝为了隐式类型转换而调用构造函数，同时显式类型转换依然合法。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>让编译器进行隐式类型转换所带来的弊端要大于它所带来的好处，因此除非确实需要，否则不要定义隐式类型转换函数。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E4%BA%86%E8%A7%A3new-handler/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1732,155 +1892,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/21/%E6%AD%A3%E7%A1%AE%E7%9A%84include/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/21/%E6%AD%A3%E7%A1%AE%E7%9A%84include/" itemprop="url">48.正确的include</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-21T15:12:00+08:00">
-                2018-04-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>STL头文件概要：</p>
-<ul>
-<li>所有的容器都在同名的头文件中</li>
-<li>几乎所有算法都在algorithm中</li>
-<li>上一句之所以用”几乎”是因为accumulate、inner_product、adjacent_difference、partial_sum，它们4个在numeric中</li>
-<li>特殊的迭代器在iterator中声明</li>
-<li>标准仿函数(<code>less&lt;T&gt;</code>等)和仿函数适配器（<code>not1</code>、<code>bind2nd</code>等）在functional中声明</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1931,7 +1942,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1942,7 +1953,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1953,7 +1964,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

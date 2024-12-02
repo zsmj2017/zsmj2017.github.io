@@ -291,6 +291,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/23/%E4%BA%86%E8%A7%A3auto%E6%8A%80%E6%9C%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/23/%E4%BA%86%E8%A7%A3auto%E6%8A%80%E6%9C%AF/" itemprop="url">2.了解auto技术</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-23T07:10:00+08:00">
+                2018-06-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br><code>auto</code>的类型推衍法则除了一个特例之外与template function保持一致。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>在上一节中，template function的类型推衍有实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(ParamType param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(expr);</span><br></pre></td></tr></table></figure><br>在函数调用过程中，编译器将使用expr推衍T与ParamType的类型。</p>
+<p>当开发者使用<code>auto</code>来声明一个变量时，<code>auto</code>将扮演T在template中的角色，同时，type specifier（类型说明符）则类似于ParamType，如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = <span class="number">27</span>;<span class="comment">//type specifier为auto</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> cx = x;<span class="comment">//type specifier为const auto</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span>&amp;rx = x;<span class="comment">//type specifier为const auto&amp;</span></span><br></pre></td></tr></table></figure><br>为了推衍出x、cx、rx的类型，编译器会像调用fun template那样执行操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func_for_x</span><span class="params">(T param)</span></span>;<span class="comment">//conceptual template</span></span><br><span class="line">func_for_x(<span class="number">27</span>);<span class="comment">//conceptual call</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func_for_cx</span><span class="params">(<span class="keyword">const</span> T param)</span></span>;</span><br><span class="line">func_for_cx(x);</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func_for_rx</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>;</span><br><span class="line">func_for_rx(cx);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h1><p>&nbsp;<br>在template function类型推衍中我们根据ParamType的特点将情况分为了三种，使用<code>auto</code>的变量声明表达式与之类似，根据type specifier也分为了三种情况：</p>
+<ol>
+<li><strong>type specifier是一个pointer或一个reference，但不是一个universal reference；</strong></li>
+<li><strong>type specifier是一个universal reference</strong>；</li>
+<li><strong>type specifier既不是pointer也不是reference；</strong></li>
+</ol>
+<p>显然,前文所述的实例分为对应为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = <span class="number">27</span>;<span class="comment">//case 3</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> cx = x;<span class="comment">//case 3</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span>&amp; rx = cx;<span class="comment">//case 1</span></span><br></pre></td></tr></table></figure><br>Case2有推衍实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span>&amp;&amp; uref1 = x;<span class="comment">//x is int and lvalue,so uref1's type is int&amp;</span></span><br><span class="line"><span class="keyword">auto</span>&amp;&amp; uref2 = cx;<span class="comment">// cx is const int and lvalue,so urfe2's type is const int&amp;</span></span><br><span class="line"><span class="keyword">auto</span>&amp;&amp; uref3 = <span class="number">27</span>;<span class="comment">//27 is int and rvalue,so urfe3's type is int&amp;&amp;</span></span><br></pre></td></tr></table></figure><br>在Item1中描述了数组名与函数名在遇到非引用type specifier时会退化为指针的情况，这一特性在auto类型推衍过程中也同样适用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> name[]=<span class="string">"R.N.Briggs"</span>;</span><br><span class="line"><span class="keyword">auto</span> arr1 = name;<span class="comment">//arr1's type is const char*</span></span><br><span class="line"><span class="keyword">auto</span>&amp; arr2 = name;<span class="comment">//arr2's type is const char(&amp;)[13]</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">someFunc</span><span class="params">(<span class="keyword">int</span>,<span class="keyword">double</span>)</span></span>;</span><br><span class="line"><span class="keyword">auto</span> func1 = someFunc;<span class="comment">//func1's type is void(*)(int,double)</span></span><br><span class="line"><span class="keyword">auto</span>&amp; func2 = someFunc;<span class="comment">//func2's type is void(&amp;)(int,double)</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="auto与template-function类型推衍的不同之处"><a href="#auto与template-function类型推衍的不同之处" class="headerlink" title="auto与template function类型推衍的不同之处"></a>auto与template function类型推衍的不同之处</h1><p>&nbsp;<br>如果我们想要声明一个值为27的int型变量，C++98为我们提供了两种方式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x1 = <span class="number">27</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">x2</span><span class="params">(<span class="number">27</span>)</span></span>;</span><br></pre></td></tr></table></figure><br>C++11引入了列表初始化的概念，因此增加了两种声明方式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x3 = &#123;<span class="number">27</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> x4&#123;<span class="number">27</span>&#125;;</span><br></pre></td></tr></table></figure><br>我们将会在Item5中说明，使用<code>auto</code>来声明变量比指定类型更佳，那我们试着把上述声明改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x1 = <span class="number">27</span>;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">x2</span><span class="params">(<span class="number">27</span>)</span></span>;</span><br><span class="line"><span class="keyword">auto</span> x3 = &#123;<span class="number">27</span>&#125;;</span><br><span class="line"><span class="keyword">auto</span> x4&#123;<span class="number">27</span>&#125;;</span><br></pre></td></tr></table></figure><br>上述声明均能够通过编译，只是其含义略有差别，前两个声明式仍然保持着声明一个值为27的int变量的含义，但后两个却发生了变化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x3 = &#123;<span class="number">27</span>&#125;;<span class="comment">//x3's type is std::initializer_list&lt;int&gt;,value is &#123;27&#125;</span></span><br><span class="line"><span class="keyword">auto</span> x4&#123;<span class="number">27</span>&#125;;<span class="comment">//ditto</span></span><br></pre></td></tr></table></figure><br>造成这一变化的根本原因在于auto的推衍法则：当被声明的变量值被大括号包围时，其变量类型会被推衍为std::initializer_list，当包括中的类型不一致时，类型推衍将无法完成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x5 = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3.0</span>&#125;;<span class="comment">//error can not deduce</span></span><br></pre></td></tr></table></figure><br>需要明确的是在上述语句中发生了两种类型推衍，第一种类型推衍将x5推衍为initializer_list类型（因为其值被大括号包围），但initializer_list本身是一个template，所以我们需要继续执行类型推衍。</p>
+<p>这种将大括号初始化推衍为initializer_list是auto与template function唯一不同的地方，后者不允许这种推衍方式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = &#123;<span class="number">11</span>,<span class="number">23</span>,<span class="number">9</span>&#125;;<span class="comment">//x's type is initializer_list&lt;int&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(&#123;<span class="number">11</span>,<span class="number">23</span>,<span class="number">9</span>&#125;);<span class="comment">//error!can't deduce type for T</span></span><br></pre></td></tr></table></figure><br>但是如果你将template function中的参数声明为std::initializer_list，只是其元素类型T不明确的话，template function可以完成推衍：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">initializer_list</span>&lt;T&gt; param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(&#123;<span class="number">11</span>,<span class="number">23</span>,<span class="number">9</span>&#125;);<span class="comment">//T's type is int</span></span><br></pre></td></tr></table></figure></p>
+<p>综上，auto与template function唯一的推衍区别在于：auto总是假定一个大括号初始化列表代表着一个initializer_list,而template function不作这种假设。</p>
+<hr>
+<h1 id="C-14中的auto"><a href="#C-14中的auto" class="headerlink" title="C++14中的auto"></a>C++14中的auto</h1><p>&nbsp;<br>在C++14中，auto还可以用来表征函数的返回值类型，并且lambda表达式也经常使用auto来声明参数。不过这两种auto的使用方式遵从template function类型推衍法则，而非auto推衍法则，因此返回一个初始化列表的函数将无法用auto推衍：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">createInitList</span><span class="params">()</span></span>&#123;<span class="comment">//error,can't deduce type for &#123;1,2,3&#125;</span></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>lambda表达式中亦是如此：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">auto</span> resetV = [&amp;v](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; newValue)&#123; v = newValue;&#125;</span><br><span class="line">...</span><br><span class="line">resetV(&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;);<span class="comment">//error,can't deduce type for &#123;1,2,3&#125;</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;</p>
+<ol>
+<li><strong>auto的推衍法则类似于template function，唯一的不同在于auto会假定大括号初始化列表为std::initializer_list,template function则不会。</strong></li>
+<li><strong>对函数返回值或lambda表达式参数使用auto时遵从template function类型推衍法则，而非auto自己的法则。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/20/%E6%A8%A1%E6%9D%BF%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1752,151 +1917,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/29/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%AF%BC%E8%AF%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/29/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%AF%BC%E8%AF%BB/" itemprop="url">执行期语义学——导读</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-29T18:05:00+08:00">
-                2018-05-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>当前我们有一个简单的表达式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(yy==xx.getValue()) ...</span><br></pre></td></tr></table></figure><br>其中xx与yy分别有定义为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">X xx;</span><br><span class="line">Y yy;</span><br></pre></td></tr></table></figure><br>而X与Y有定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">X</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    X();</span><br><span class="line">    ~X();</span><br><span class="line">    <span class="function"><span class="keyword">operator</span> <span class="title">Y</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function">X <span class="title">getValue</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Y</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Y();</span><br><span class="line">    ~Y();</span><br><span class="line">    <span class="keyword">bool</span> <span class="keyword">operator</span>==(<span class="keyword">const</span> Y&amp;) <span class="keyword">const</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h1><p>&nbsp;<br>在得到了上述定义之后，我们对之前那个简单的表达式进行剖析。<br>首先，我们决定equality运算符所参考到的真正实体。在本次实例中，它被resloved为“被overloaded的Y成员实体”。下面是该表达式的第一次转换：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(yy.<span class="keyword">operator</span>==(xx.getValue()))</span><br></pre></td></tr></table></figure><br>Y的equality运算符需要一个类型为Y的参数，然而getValue()传回的却是一个类型为X的object，因此，在实际执行时，上述表达式发生了隐式转换：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(yy.<span class="keyword">operator</span>==(xx.getValue().<span class="keyword">operator</span> Y()))</span><br></pre></td></tr></table></figure><br>上述扩张是编译器根据class的语意自动补全的操作，你可以明确地写出它们，这样编译速度可能会快上一丢丢。</p>
-<p>实际上这并非上述表达式的完全形态，在实际使用中我们生成了相对应的临时对象，用来放置函数调用所传回的值，最终，实际表达式被扩张成为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    X temp1 = xx.getValue();</span><br><span class="line">    Y temp2 = temp1.<span class="keyword">operator</span> Y();</span><br><span class="line">    <span class="keyword">int</span> temp3 = yy.<span class="keyword">operator</span>==(temp2);</span><br><span class="line">    <span class="keyword">if</span>(temp3) ....</span><br><span class="line">    temp2.Y::~Y();</span><br><span class="line">    temp1.X::~X();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如此看来，这个表达式似乎并不简单。这也是C++的一大困难之处：无法从程序代码看出表达式的复杂程度。在本章，我们将升入探究执行期所发生的一些转换。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1947,7 +1967,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1958,7 +1978,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1969,7 +1989,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/27/%E4%BB%A5op=%E4%BB%A3%E6%9B%BFop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/27/%E4%BB%A5op=%E4%BB%A3%E6%9B%BFop/" itemprop="url">22.以op=代替op</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-27T12:57:00+08:00">
+                2018-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>对于c++而言，运算符operator+、operator=、operator+=之间并没有任何关联，对于其他运算也同理，如果你期望使用效果犹如内置类型，那你必须自己实现。</p>
+<hr>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>&nbsp;<br>为了确保operator+=与operator+之间存在正常的关系，建议根据operator+=实现出operator+：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    Rational&amp; <span class="keyword">operator</span>+=(<span class="keyword">const</span> Rational&amp; rhs);</span><br><span class="line">    Rational&amp; <span class="keyword">operator</span>-=(<span class="keyword">const</span> Rational&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">const</span> Rational <span class="keyword">operator</span>+(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">return</span> Rational(lhs) += rhs;<span class="comment">//返回值优化</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种方法将赋值形式作为了成员函数，维护性得到了提高，同时避免了operator+成为了类的友元。（提高封装性）</p>
+<hr>
+<h1 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h1><p>&nbsp;<br>赋值的效率高于单独形式，原因在于赋值返回引用，无需构建析构临时对象。<br>但需要记住，提供赋值的同时必须提供标准形式，以方便用户能够作出权衡，因为标准形式的可读性高于赋值，在大多数情况下，可读性很重要。<br>作为一个库编写者，必须给客户提供这两种操作。但作为使用者，我们必须明白赋值的效率更高。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/27/%E9%80%9A%E8%BF%87%E9%87%8D%E8%BD%BD%E9%81%BF%E5%85%8D%E9%9A%90%E5%BC%8F%E8%BD%AC%E6%8D%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1663,175 +1809,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/25/%E4%BA%86%E8%A7%A3%E5%BC%82%E5%B8%B8%E7%9A%84%E6%8A%9B%E5%87%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/25/%E4%BA%86%E8%A7%A3%E5%BC%82%E5%B8%B8%E7%9A%84%E6%8A%9B%E5%87%BA/" itemprop="url">12.了解异常的抛出</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-25T19:20:00+08:00">
-                2018-04-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="异常的抛出与函数传递参数"><a href="#异常的抛出与函数传递参数" class="headerlink" title="异常的抛出与函数传递参数"></a>异常的抛出与函数传递参数</h1><p>&nbsp;<br>从语法角度看，传递参数和捕获异常其简直一摸一样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> ... &#125;; </span><br><span class="line"><span class="comment">//函数调用</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f1</span><span class="params">(Widget w)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f2</span><span class="params">(Widget&amp; w)</span></span>; </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f3</span><span class="params">(<span class="keyword">const</span> Widget&amp; w)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f4</span><span class="params">(Widget *pw)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f5</span><span class="params">(<span class="keyword">const</span> Widget *pw)</span></span>;</span><br><span class="line"><span class="comment">//异常捕获</span></span><br><span class="line"><span class="keyword">catch</span> (Widget w) ... </span><br><span class="line"><span class="keyword">catch</span> (Widget&amp; w) ... </span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget&amp; w) ... </span><br><span class="line"><span class="keyword">catch</span> (Widget *pw) ... </span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget *pw) ...</span><br></pre></td></tr></table></figure><br>它们确实有相同点，但是也存在巨大差异。</p>
-<ul>
-<li>相同点在于：传递过程都是可以传值、传递引用、传递指针。</li>
-<li>不同点在于：调用函数时，程序控制权终将返回调用处，但当你抛出异常时，控制权将永远回不到抛出异常的地方。</li>
-</ul>
-<hr>
-<h1 id="异常与拷贝"><a href="#异常与拷贝" class="headerlink" title="异常与拷贝"></a>异常与拷贝</h1><p>&nbsp;<br>以如下函数举例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">istream <span class="keyword">operator</span>&gt;&gt;(istream&amp; s, Widget&amp; w);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">passAndThrowWidget</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Widget localWidget;</span><br><span class="line">    <span class="built_in">cin</span> &gt;&gt; localWidget;<span class="comment">//传递参数</span></span><br><span class="line">    <span class="keyword">throw</span> localWidget;<span class="comment">//抛出异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当我们传递参数时，其实是把w绑定到localwidget，任何施加于w的操作都施加于它。但throw则不同<strong>，无论通过传值还是引用，异常都会被拷贝</strong>，原因很简单，localwidget一旦离开了生存空间后析构函数就会被调用。如果我们把localwidget本身传递出去，catch只能接受到一个析构了的widget，因此异常抛出的对象必须被复制。</p>
-<h2 id="static异常"><a href="#static异常" class="headerlink" title="static异常"></a>static异常</h2><p>即使对象是static，不会被析构，抛出异常的时候也会进行复制：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">passAndThrowWidget</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Widget localWidget;</span><br><span class="line">    <span class="built_in">cin</span> &gt;&gt; localWidget;</span><br><span class="line">    <span class="keyword">throw</span> localWidget; <span class="comment">// 拷贝操作</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这表明哪怕是使用引用捕获异常，我们永远也无法通过catch来修改localwidget本身，仅仅只能修改对象的拷贝。这也证明了抛出异常与参数传递的第二个差异：抛出异常速度比参数传递要慢。</p>
-<h2 id="静态类型"><a href="#静态类型" class="headerlink" title="静态类型"></a>静态类型</h2><p>当异常对象被拷贝时，拷贝操作是由对象的拷贝构造函数完成的。该拷贝构造函数是对象的静态类型所对应类的拷贝构造函数，而不是对象的动态类型对应类的拷贝构造函数。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> ... &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWidget</span>:</span> <span class="keyword">public</span> Widget &#123; ... &#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">passAndThrowWidget</span><span class="params">()</span></span>&#123;</span><br><span class="line">    SpecialWidget localSpecialWidget;</span><br><span class="line">    ...</span><br><span class="line">    Widget&amp; rw = localSpecialWidget;</span><br><span class="line">    <span class="keyword">throw</span> rw;<span class="comment">//抛出一个类型为Widget的异常</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="catch中的异常"><a href="#catch中的异常" class="headerlink" title="catch中的异常"></a>catch中的异常</h1><p>&nbsp;<br>异常是其它对象的拷贝，这个事实影响到你如何在catch块中再抛出一个异常。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget&amp; w)&#123;<span class="comment">// 捕获 Widget 异常</span></span><br><span class="line">    ... <span class="comment">// 处理异常</span></span><br><span class="line">    <span class="keyword">throw</span>; <span class="comment">// 重新抛出异常，让它继续传递</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (Widget&amp; w)&#123;<span class="comment">// 捕获 Widget 异常</span></span><br><span class="line">    ... <span class="comment">// 处理异常</span></span><br><span class="line">    <span class="keyword">throw</span> w; <span class="comment">// 传递被捕获异常的拷贝</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这两个catch块中，第一个catch块重新抛出的是当前捕获的异常，第二个抛出的是当前捕获的异常的一个拷贝。<br>第一个块中抛出的类型不需要静态动态类型，因为它没有进行拷贝操作。<br>第二个块中重新抛出的是新异常，其类型必然是widget.<br>一般来说，推荐使用throw，这样不会改变异常的类型，也不用生成额外的异常临时变量了。（临时变量详见More Effective C++ 19）</p>
-<hr>
-<h1 id="异常的捕获方式"><a href="#异常的捕获方式" class="headerlink" title="异常的捕获方式"></a>异常的捕获方式</h1><p>&nbsp;<br>异常一般有传值、传引用、传指向const的引用三种：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget w) ... <span class="comment">// 通过传值捕获异常</span></span><br><span class="line"><span class="keyword">catch</span> (Widget&amp; w) ... <span class="comment">// 通过传递引用捕获异常</span></span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget&amp; w) ... <span class="comment">//通过传递指向const的引用捕获异常</span></span><br></pre></td></tr></table></figure><br>通过比对我们又发现了一大差异，我们已经知道抛出的拷贝其实是一个临时变量，而在传递参数时临时变量无法被普通引用绑定，只能通过const reference。</p>
-<h2 id="不同捕获方式之间的差异"><a href="#不同捕获方式之间的差异" class="headerlink" title="不同捕获方式之间的差异"></a>不同捕获方式之间的差异</h2><h3 id="传值"><a href="#传值" class="headerlink" title="传值"></a>传值</h3><p>当我们声明这样的一个catch子句时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget w) ...<span class="comment">//传值捕获</span></span><br></pre></td></tr></table></figure><br>该表达式会建立<strong>两个</strong>被抛出对象的拷贝，一个是所有异常都必须建立的临时对象，另一个是把临时对象拷贝进w中。</p>
-<h3 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h3><p>当我们声明使用引用捕获时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span> (Widget&amp; w) ... <span class="comment">// 通过引用捕获</span></span><br><span class="line"><span class="keyword">catch</span> (<span class="keyword">const</span> Widget&amp; w) ... <span class="comment">//也通过引用捕获</span></span><br></pre></td></tr></table></figure><br>只会建立一个拷贝，该拷贝是一个临时对象，并且被引用绑定，但我们使用引用传递参数时则不会发生拷贝。</p>
-<h3 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h3><p>对于指针而言，传递参数与传递异常差不多，都是一个指针的拷贝被传递，只不过要记得用指针传递异常时异常必须是全局的或者在堆中，否则catch子句只能通过指针去往一个已经被析构的地方。</p>
-<hr>
-<h1 id="异常与类型转换"><a href="#异常与类型转换" class="headerlink" title="异常与类型转换"></a>异常与类型转换</h1><h2 id="隐式转换"><a href="#隐式转换" class="headerlink" title="隐式转换"></a>隐式转换</h2><p>异常传递中不允许出现隐式转换，但传递参数时可以。</p>
-<h2 id="异常传递中允许发生的转换"><a href="#异常传递中允许发生的转换" class="headerlink" title="异常传递中允许发生的转换"></a>异常传递中允许发生的转换</h2><p>第一种是派生类与基类间的转换。（is-a)<br>另一种就是允许从一个类型化指针转变为无类型指针，所以参数为const void*的catch语句能捕获任何类型的指针类型异常。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">catch</span>(<span class="keyword">const</span> <span class="keyword">void</span>*) ...</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="catch语句匹配"><a href="#catch语句匹配" class="headerlink" title="catch语句匹配"></a>catch语句匹配</h1><p>&nbsp;<br>传递函数与传递异常的差别还在于catch语句匹配不按最合适的，而是总是按照先后顺序，因此可能会发生派生类异常永远总是处理不到的情形：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (logic_error&amp; ex) &#123;<span class="comment">//base</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (invalid_argument&amp; ex) &#123;<span class="comment">//derived</span></span><br><span class="line">    ...<span class="comment">//永远不会被执行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>虚函数采用的是最优匹配法，而异常处理采用的是最先适合法。但如果一个派生类的catch在一个基类的catch后面，通常编译器会发出警告。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>一个对象传递给函数,一个对象调用虚函,把一个对象做为异常抛出，它们之间有三个主要区别：</p>
-<ul>
-<li>异常在传递时总被拷贝，传值时被拷贝了两次</li>
-<li>异常的类型转换很少（2种）</li>
-<li>异常采用最先匹配法</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1882,7 +1859,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1893,7 +1870,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1904,7 +1881,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,155 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/07/%E4%BA%86%E8%A7%A3C++%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E4%B8%8E%E8%B0%83%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/07/%E4%BA%86%E8%A7%A3C++%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E4%B8%8E%E8%B0%83%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/" itemprop="url">6.了解C++自动生成与调用的函数</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-07T14:47:00+08:00">
+                2018-04-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>即使我们写下<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Empty</span>&#123;</span>&#125;;</span><br></pre></td></tr></table></figure><br>这样的空类，它本质上也不是空的，而是类似于：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Empty</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Empty()&#123;&#125;</span><br><span class="line">    Empty(<span class="keyword">const</span> Empty&amp; rhs) &#123;&#125;</span><br><span class="line">    ~Empty() &#123;&#125;</span><br><span class="line">    Empty&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Empty&amp; rhs) &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在我们没有写的情况下，编译器会自动地生成​default构造函数，copy构造函数，copy assignment操作符和析构函数。<br><strong>这些函数都是inline并且public的。只有在他们被调用时，编译器才会创建它们。</strong></p>
+<hr>
+<h1 id="自动生成的函数的性质与作用"><a href="#自动生成的函数的性质与作用" class="headerlink" title="自动生成的函数的性质与作用"></a>自动生成的函数的性质与作用</h1><h2 id="default构造与default析构"><a href="#default构造与default析构" class="headerlink" title="default构造与default析构"></a>default构造与default析构</h2><p>default构造函数和析构主要是给编译器调用base clssses和non-static成员变量的构造函数和析构函数。这里需要注意的是，编译器生成的析构函数为non-virtual，<strong>除非this class 的base class自身声明有virtual析构函数。（此时thisclass的析构函数的virtualness源自base class）</strong></p>
+<h2 id="copy构造函数与copy-assignment操作符"><a href="#copy构造函数与copy-assignment操作符" class="headerlink" title="copy构造函数与copy assignment操作符"></a>copy构造函数与copy assignment操作符</h2><p>至于copy构造函数与assignment操作符，编译器只是单纯地将来自源对象的non-static成员变量copy到目标对象。假设现有一个Widget Template,它允许你将一个string与一个T类型的数据发生关联：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">const</span> <span class="keyword">char</span>* name,<span class="keyword">const</span> T&amp; name);</span><br><span class="line">    Widget(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name,<span class="keyword">const</span> T&amp; name);</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> thename;</span><br><span class="line">    T value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>因为已经声明了构造函数，所以编译器不会自动生成default构造函数，也就是说，<strong>一旦你创建了一个class，其对象需要一个参数才能构建，那你无需担心编译器会自动帮它生成无参构造函数。</strong>（关于无参构造函数的弊端可见More Effective 4)</p>
+<p>Wideget既没有声明copy构造函数，也没有声明copy assignment操作符。因此编译器会自动生成它们，那么具体是如何实现的？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Widget&lt;<span class="keyword">int</span>&gt; <span class="title">a</span><span class="params">(<span class="string">"sth"</span>,<span class="number">5</span>)</span></span>;</span><br><span class="line"><span class="function">Widget <span class="title">b</span><span class="params">(a)</span></span>;<span class="comment">//调用自动生成的copy构造函数</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="copy构造函数"><a href="#copy构造函数" class="headerlink" title="copy构造函数"></a>copy构造函数</h3><p>编译器生成的copy构造函数会以<code>a.thename</code>与<code>a.value</code>为初值构造<code>b.thename</code>与<code>b.value</code>,因为string存在copy构造函数，因此它调用了string的copy构造函数生成了<code>b.thename</code>,int属于内置类型，不存在copy构造函数,因此<code>b.value</code>将会copy<code>a.value</code>的每一个bits来完成初始化。</p>
+<h3 id="copy-assignment操作符"><a href="#copy-assignment操作符" class="headerlink" title="copy assignment操作符"></a>copy assignment操作符</h3><p>copy assignment操作符和copy构造函数略有不同，原因在于并非任何成员对象都可以被赋值（const成员变量，reference）。<br>在c++中，不允许reference改指向不同对象，也不允许const对象被赋值。因此，此时copy assignment无法完成，编译器拒绝生成此操作。也就是说<strong>，当class内含const成员与reference成员时，C++不会生成copy assignment操作符。</strong><br>如果我们试图令内含reference成员或const成员的class支持copy assignment，那我们必须要自定义copy assignment操作符。<br>还有一种情况<strong>C++也不会生成copy assignment操作符，就是base class将copy assignment定义为private.</strong>原因很简单，如果编译器为derived class生成了copy assignment操作符，那它必定会试图调用base class的copy assignment操作符来操作base class的数据成员，可惜它没有这个权限来调用。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>编译器会自动生成某些函数，谨记它们的性质、作用、以及在什么情况下不会自动生成。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/07/%E6%B3%A8%E6%84%8FC++%E7%9A%84%E5%88%86%E6%9E%90%E6%9C%BA%E5%88%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1674,180 +1823,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/05/%E4%BB%94%E7%BB%86%E9%80%89%E6%8B%A9%E5%AE%B9%E5%99%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/05/%E4%BB%94%E7%BB%86%E9%80%89%E6%8B%A9%E5%AE%B9%E5%99%A8/" itemprop="url">1.仔细选择容器</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-05T21:45:12+08:00">
-                2018-04-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="可选容器："><a href="#可选容器：" class="headerlink" title="可选容器："></a>可选容器：</h1><blockquote>
-<ul>
-<li>标准STL序列容器：vector,list,sequence</li>
-<li>标准STL关联容器：set,multiset,map,mutimap</li>
-<li>非标准序列容器slist与rope<br>其中，slist是单向链表，rope为重型string</li>
-<li>非标准关联容器hash_set,hash_mutiset,hash_map,hash_mutimap</li>
-<li>vector<char>作为string的替代</li>
-<li>标准非STL容器，诸如array,bitset，stack之类</li>
-</ul>
-</blockquote>
-<hr>
-<p>在选择容器时需要顾虑的有很多，vector，list，deque之间的选择也就不说了，大家都懂。</p>
-<hr>
-<p>根据内部元素物理地址的相互关联性，STL容器可以分为两类</p>
-<blockquote>
-<p>1.连续内存容器<br>2.基于节点的容器</p>
-</blockquote>
-<p>这两种容器其实也说得很多了，在这里要强调的是rope是连续的，而关联容器和散列容器是基于节点的。</p>
-<hr>
-<h1 id="选择容器时需要判断的一些依据"><a href="#选择容器时需要判断的一些依据" class="headerlink" title="选择容器时需要判断的一些依据"></a>选择容器时需要判断的一些依据</h1><blockquote>
-<ul>
-<li>是否需要在任意位置插入？<br>如果是则不可选择关联容器</li>
-<li>容器内元素是否需要排序？<br>是则不可选择散列容器</li>
-<li>是否必须是标准c++？<br>否则不可使用slist，rope与散列容器</li>
-<li>迭代器是否有要求？<br>随机访问迭代器需要vector，string，deque.slist不可以使用双向迭代器</li>
-<li>是否需要频繁插入删除？<br>是则选择基于节点</li>
-<li>是否需要兼容c接口？<br>是则选择vector</li>
-<li>是否对查找速度有要求？<br>是则选择散列容器，sorted vector以及标准关联容器</li>
-<li>是否介意容器内部的引用计数？<br>是则需要避免string与rope</li>
-<li>插入和删除如果失败是否需要回滚？<br>是则需要选择基于节点的容器，如果是区间形式的操作，那只能使用list.</li>
-<li>是否需要尽可能少地让迭代器失效？<br>是则选择基于节点的容器（他们的插入和删除操作从来不会让迭代器，指针，或者引用失效）<br>deque的插入操作仅发生在末尾时，迭代器可能失效，但指针和引用不会失效，它是唯一会有这种情况的容器。</li>
-</ul>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1898,7 +1873,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1909,7 +1884,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1920,7 +1895,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

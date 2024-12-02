@@ -291,6 +291,180 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/05/%E4%BB%94%E7%BB%86%E9%80%89%E6%8B%A9%E5%AE%B9%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/05/%E4%BB%94%E7%BB%86%E9%80%89%E6%8B%A9%E5%AE%B9%E5%99%A8/" itemprop="url">1.仔细选择容器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-05T21:45:12+08:00">
+                2018-04-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="可选容器："><a href="#可选容器：" class="headerlink" title="可选容器："></a>可选容器：</h1><blockquote>
+<ul>
+<li>标准STL序列容器：vector,list,sequence</li>
+<li>标准STL关联容器：set,multiset,map,mutimap</li>
+<li>非标准序列容器slist与rope<br>其中，slist是单向链表，rope为重型string</li>
+<li>非标准关联容器hash_set,hash_mutiset,hash_map,hash_mutimap</li>
+<li>vector<char>作为string的替代</li>
+<li>标准非STL容器，诸如array,bitset，stack之类</li>
+</ul>
+</blockquote>
+<hr>
+<p>在选择容器时需要顾虑的有很多，vector，list，deque之间的选择也就不说了，大家都懂。</p>
+<hr>
+<p>根据内部元素物理地址的相互关联性，STL容器可以分为两类</p>
+<blockquote>
+<p>1.连续内存容器<br>2.基于节点的容器</p>
+</blockquote>
+<p>这两种容器其实也说得很多了，在这里要强调的是rope是连续的，而关联容器和散列容器是基于节点的。</p>
+<hr>
+<h1 id="选择容器时需要判断的一些依据"><a href="#选择容器时需要判断的一些依据" class="headerlink" title="选择容器时需要判断的一些依据"></a>选择容器时需要判断的一些依据</h1><blockquote>
+<ul>
+<li>是否需要在任意位置插入？<br>如果是则不可选择关联容器</li>
+<li>容器内元素是否需要排序？<br>是则不可选择散列容器</li>
+<li>是否必须是标准c++？<br>否则不可使用slist，rope与散列容器</li>
+<li>迭代器是否有要求？<br>随机访问迭代器需要vector，string，deque.slist不可以使用双向迭代器</li>
+<li>是否需要频繁插入删除？<br>是则选择基于节点</li>
+<li>是否需要兼容c接口？<br>是则选择vector</li>
+<li>是否对查找速度有要求？<br>是则选择散列容器，sorted vector以及标准关联容器</li>
+<li>是否介意容器内部的引用计数？<br>是则需要避免string与rope</li>
+<li>插入和删除如果失败是否需要回滚？<br>是则需要选择基于节点的容器，如果是区间形式的操作，那只能使用list.</li>
+<li>是否需要尽可能少地让迭代器失效？<br>是则选择基于节点的容器（他们的插入和删除操作从来不会让迭代器，指针，或者引用失效）<br>deque的插入操作仅发生在末尾时，迭代器可能失效，但指针和引用不会失效，它是唯一会有这种情况的容器。</li>
+</ul>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/05/%E5%AF%BC%E8%AF%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -478,7 +652,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -489,7 +663,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -500,7 +674,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,179 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/18/%E8%80%83%E8%99%91virtual%E4%BB%A5%E5%A4%96%E7%9A%84%E9%80%89%E6%8B%A9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/18/%E8%80%83%E8%99%91virtual%E4%BB%A5%E5%A4%96%E7%9A%84%E9%80%89%E6%8B%A9/" itemprop="url">36.考虑virtual以外的选择</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-18T14:18:00+08:00">
+                2018-04-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>（本节虽然带有面向对象标签，但描述的是如何跳出面向对象的思维看待问题）</p>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假定我们在编写一款游戏，其中的角色带有一个血条(int)，不同的人计算血量的方式不同，所以把该函数声明为virtual似乎很合适：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>该函数并未定义为pure virtual，这说明我们有一个缺省方法。<br>让我们现在跳出面向对象设计的常规轨道，考虑一些其他的实现可能。</p>
+<hr>
+<h1 id="Template-Method-模式（Non-virtual-Interface"><a href="#Template-Method-模式（Non-virtual-Interface" class="headerlink" title="Template Method 模式（Non-virtual Interface)"></a>Template Method 模式（Non-virtual Interface)</h1><p><strong>有一些人主张virtual函数必须全是private</strong>。以实际问题举例，上个例子保留healthvalue为public non-virtual成员函数，并调用一个private virtual函数来进行实际操作。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        ...<span class="comment">//事前处理</span></span><br><span class="line">        <span class="keyword">int</span> retVal = getHealthValue();</span><br><span class="line">        ...<span class="comment">//事后处理</span></span><br><span class="line">        <span class="keyword">return</span> retVal;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">getHealth</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;...&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这一基本设计被称为non-virtual interface（NVI）手法。它是所<strong>谓template method设计模式（与c++的templates无关）的独特表现形式</strong>。我们习惯于把non-virtual函数称为virtual函数的外覆器（wrapper）。</p>
+<h2 id="NVI的优点"><a href="#NVI的优点" class="headerlink" title="NVI的优点"></a>NVI的优点</h2><p>NVI手法的一大优点在于<strong>wrapper确保了virtual函数在调用前的场景已被设计好，并且调用结束后场景得到了清理。</strong>（实例中的注释处）举例而言，这些工作可能包括：锁定互斥器、记录日志、验证约束条件、互斥器解锁等等。如果你让客户直接调用virtual，那么可能没办法做好这些事。<br>在这里需要注意的是：NVI手法涉及在dc内重新定义了private virtual函数。<strong>重定义virtual函数表示“某事应当被如何完成”，外覆器的non-virtual属性则表示“某事应当何时完成”（函数何时被调用），这二者并不冲突。</strong></p>
+<h2 id="NVI的不足"><a href="#NVI的不足" class="headerlink" title="NVI的不足"></a>NVI的不足</h2><p>在NVI手法下不一定virtual一定得是private，它们也可以是portected.(详见Effective C++ 28 Windows实例）有时候virtual甚至必须是public（具有多态性质的bc的析构函数），这么一来就不能实施NVI手法了。</p>
+<hr>
+<h1 id="Strategy模式（Function-Pointers"><a href="#Strategy模式（Function-Pointers" class="headerlink" title="Strategy模式（Function Pointers)"></a>Strategy模式（Function Pointers)</h1><p>&nbsp;<br>NVI手法本质上还是在用virtual函数，只是调用时颇为巧妙而已。针对游戏实例，另有一些人主张“人物血条的计算与人物类型无关”，这种计算不需要“人物”成分。<br>例如我们可能会要求<strong>每一个人物构造函数接受一个指针指向血条计算函数</strong>，我们调用该函数进行实际操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharcter</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">defaultHealthCalc</span><span class="params">(<span class="keyword">const</span> GameCharacter &amp;gc)</span></span>;<span class="comment">//默认计算函数</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">(*HealthCalc)</span><span class="params">(<span class="keyword">const</span> GameCharacter&amp;)</span></span>;</span><br><span class="line">    explicit GameCharcter(HealthCalc hc = defaultHealthCalc)：HealthFunc(hc) &#123;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    HealthCalc healthFunc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Strategy的优点"><a href="#Strategy的优点" class="headerlink" title="Strategy的优点"></a>Strategy的优点</h2><p>上述做法是strategy设计模式的一个简单应用，和普通的virtual函数相比，其优点如下：</p>
+<ul>
+<li>同一人物类型的不同实体可以有不同的计算函数（构造时绑定不同的函数指针）。</li>
+<li>血条计算函数可以在人物的不同时期发生变更（比如设置个setHealthcalc函数接受一个函数指针并且替换私有成员）。</li>
+</ul>
+<h2 id="Strategy的缺点"><a href="#Strategy的缺点" class="headerlink" title="Strategy的缺点"></a>Strategy的缺点</h2><p>在Strategy模式下，血条计算函数已经不再是gamecharacter继承体系内的成员函数，也就是说，它将无法访问对象的non-public部分。<br>解决方法只有弱化class的封装：</p>
+<ul>
+<li>将函数声明为friends</li>
+<li>为其需要的数据提供一个public访问接口</li>
+</ul>
+<p>至于strategy模式的优点（每个对象拥有各自的函数以及动态更改的能力）能否抵消缺点（降低class的封装程度），必须根据设计情况的不同进行抉择。</p>
+<hr>
+<h1 id="Strategy模式（Function"><a href="#Strategy模式（Function" class="headerlink" title="Strategy模式（Function)"></a>Strategy模式（Function)</h1><p>&nbsp;<br>为什么血条计算必须得是一个函数呢？它完全可以是一个类似函数的对象。如果我们使用function对象，很多刚才提及的约束一下子就消失了。funcion对象持有一切可调用物（函数指针、函数对象、成员函数指针),因此刚才的设计可以改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharcter</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">defaultHealthCalc</span><span class="params">(<span class="keyword">const</span> GameCharacter &amp;gc)</span></span>;<span class="comment">//默认计算函数</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>:</span></span><br><span class="line">    function&lt;<span class="keyword">int</span> (<span class="keyword">const</span> GameCharacter&amp;)&gt; healthCalcFunc;</span><br><span class="line">    explicit GameCharcter(healthCalcFunc hcf = defaultHealthCalc)：HealthFunc(hcf) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getHealthValue</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> healthFunc(*<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    healthCalcFunc healthFunc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>和前一个相比，这个设计几乎完全一样，唯一的不同之处是如今class持有的是一个function对象，相当于一个指向函数的泛化指针。然而这个改变为客户带来了更加惊人的弹性（原书中使用了bind增加了形参）也就是说，如今的设计允许客户在计算人物健康指数时使用任何兼容的可调用物。</p>
+<hr>
+<p>传统Strategy模式<br>&nbsp;<br><strong>传统Strategy模式更倾向于将当前virtual函数做成一个分离的继承体系中的virtual成员函数</strong>，其设计结果大概像这样：<br><img src="http://static.zybuluo.com/zsmj2017/96205qmwt5vn3xjwgmttayaq/image_1cbc0cklns971g0h14mt1fed1h3s9.png" alt="image_1cbc0cklns971g0h14mt1fed1h3s9.png-24.5kB"><br>其核心在于GameCharacter与HealthcalcFunc成为了base class，并且Gamecharacter中含有一个指针，指向HealthcalcFunc继承体系中的对象。具体实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HealthCalcFunc</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">calc</span><span class="params">(<span class="keyword">const</span> GameCharacter&amp; gc)</span> <span class="keyword">const</span> </span>&#123;...&#125;;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">HealthCalcFunc defaultHealthCalc;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">GameCharacter</span><span class="params">(HealthCalcFunc* phcf = &amp;defaultHealthCalc)</span></span></span><br><span class="line"><span class="function">                    :<span class="title">pHealthC</span><span class="params">(phcf)</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> pHealthCalc0&gt;calc(*<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    HealthCalcFunc* pHealthCalc;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>当你为解决当前问题而寻找设计方法时，不妨考虑virtual的以下几个替代方案：</p>
+<ul>
+<li>NVI手法，template method设计模式的特殊形式。<br>它以public non-virtual成员函数包裹较低访问性（private、protected）的virtual函数。</li>
+<li>将virtual函数替换为函数指针</li>
+<li>将函数指针变成function对象，以上两种都是strategy的某种表现形式。</li>
+<li>将继承体系内的virtual换成另一个继承体系内的virtual，这是strategy设计模式的传统实现。</li>
+</ul>
+<p>面向对象固然博大精深，但这个世界上还有许多条路值得我们去探索。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/18/%E4%BA%86%E8%A7%A3accumulate%E4%B8%8Efor_each/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1712,171 +1885,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/15/inline%E5%87%BD%E6%95%B0%E5%89%96%E6%9E%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/15/inline%E5%87%BD%E6%95%B0%E5%89%96%E6%9E%90/" itemprop="url">31.inline函数剖析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-15T17:48:00+08:00">
-                2018-04-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>inline函数无论是看起来还是用起来都比宏更像函数而且更好用，调用它们又无需承受函数调用的额外开销。另外，编译器会对不含函数调用的程序执行语境相关最优化。然而，inline函数并不是完美无缺的。</p>
-<hr>
-<h1 id="inline的成本"><a href="#inline的成本" class="headerlink" title="inline的成本"></a>inline的成本</h1><p>&nbsp;<br>inline的本质是“对函数的每一个调用”都以函数本体替换，这无疑增加了目标码（object code）大小，过度热衷inline可能会导致程序体积太大，随之导致额外的换页行为（page过多）。但是，如果inline函数很小，可能“函数本体”比“函数调用”所产出的代码更小，那当然是再好不过了。</p>
-<hr>
-<h1 id="inline申请"><a href="#inline申请" class="headerlink" title="inline申请"></a>inline申请</h1><p>&nbsp;<br><strong>inline只是对编译器提出的申请。</strong>这个申请可以显式提出也可以隐式提出。</p>
-<h2 id="隐式inline"><a href="#隐式inline" class="headerlink" title="隐式inline"></a>隐式inline</h2><p>隐式就是把函数定义在class内部。一般而言这种隐式申请都是成员函数，不过friend函数也能被定义在class内（Effective C++ 47），如果真是那样，那它们也被隐式声明为inline.</p>
-<h2 id="显式inline"><a href="#显式inline" class="headerlink" title="显式inline"></a>显式inline</h2><p>显式声明方法是在函数定义式前加上inline。以&lt;algorithm&gt;中的<code>max template</code>为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">const</span> T&amp; <span class="title">max</span><span class="params">(<span class="keyword">const</span> T&amp; a,<span class="keyword">const</span> T&amp; b)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a&lt;b?b:a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="inline与template"><a href="#inline与template" class="headerlink" title="inline与template"></a>inline与template</h1><p>&nbsp;<br>inline函数和template函数通常都会被定义在头文件中，所以有人会误以为function template一定是inline.这一点是错误的。<br>inline放在头文件的原因很简单，编译器需要在编译期将某个“函数调用”替换为“被调用函数的本体”。<br>template通常也放在头文件里，因为它一旦被使用，编译器为了具现化必须知道它的样子。<br>总之，<strong>template的具现化与inlining无关</strong>，如果你觉得所有据此template产生的function应该inline，那就声明它为inline，否则不必如此。</p>
-<hr>
-<h1 id="编译器决定是否inline"><a href="#编译器决定是否inline" class="headerlink" title="编译器决定是否inline"></a>编译器决定是否inline</h1><p>&nbsp;<br><strong>编译器拒绝将过于复杂的函数inline（带有循环或者递归），并且任何virtual函数的调用也会使inline落空。</strong>这是十分显然的，因为virtual意味着运行时才知道调用哪个函数，inline却是在编译期就必须确定。不过幸运的是，如果编译器拒绝了你的inline请求，会反馈一个警告信息。</p>
-<p>有时候虽然编译器愿意inlining某个函数，但还是可能为该函数生成一个函数本体。<br>举例而言，如果某个函数需要取某一个inline函数的地址，那编译器会生成一个outlined函数本体，毕竟编译器无法去提出一个指针指向一个不存在的函数。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span> </span>&#123;..&#125;;</span><br><span class="line"><span class="keyword">void</span> (*pf)() = f;<span class="comment">//pf指向f</span></span><br><span class="line">...</span><br><span class="line">f();<span class="comment">//确实inline</span></span><br><span class="line">pf();<span class="comment">//生成了函数实体并产生了调用</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="inline与构造、析构函数"><a href="#inline与构造、析构函数" class="headerlink" title="inline与构造、析构函数"></a>inline与构造、析构函数</h1><p>&nbsp;<br>假设有base class与derived class如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> str;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span>:<span class="keyword">public</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived() &#123;&#125;<span class="comment">//空构造函数</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br><code>Derived::Derived()</code>看起来似乎很适合被inline，因为它根本不含任何代码，但实际并非如此。<br>构造或者析构函数内部存在着大量处理异常的程序，并且肯定存在着Base类的构造函数或者Derived析构函数。对这些函数的调用影响了编译器是否会对此空白函数inlining.<br>此外，这些代码如果被inline，那他们必然化身为object code充斥着各类Derived class.<br>总而言之，<strong>构造函数和析构函数不适合被声明为inline.</strong></p>
-<hr>
-<h1 id="inline与程序库"><a href="#inline与程序库" class="headerlink" title="inline与程序库"></a>inline与程序库</h1><p>&nbsp;<br>程序库设计者使用inline之前必须考虑其影响性：<strong>inline无法随着程序库升级而升级</strong>。也就是说如果一旦某一个inline函数被改写，所有用到它的客户端程序都要重新编译。如果是non-inline，那用户只需要重新连接就好了。</p>
-<hr>
-<h1 id="inline与debug"><a href="#inline与debug" class="headerlink" title="inline与debug"></a>inline与debug</h1><p>&nbsp;<br>我们<strong>无法在inline函数中设置断点</strong>，因为实际上并不存在这个函数。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;</p>
-<ol>
-<li>将inline函数限制在小型、频繁调用的函数身上，这会使潜在的代码膨胀问题最小化，程序速度提升机会最大化。</li>
-<li>不要因为function template出现在头文件就把它声明为inline，这二者并不相关。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1927,7 +1935,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1938,7 +1946,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1949,7 +1957,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

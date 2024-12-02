@@ -291,6 +291,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%80%E4%B8%AA%E4%B8%8D%E6%8A%9B%E5%BC%82%E5%B8%B8%E7%9A%84swap%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/14/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%80%E4%B8%AA%E4%B8%8D%E6%8A%9B%E5%BC%82%E5%B8%B8%E7%9A%84swap%E5%87%BD%E6%95%B0/" itemprop="url">26.自定义一个不抛异常的swap函数</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-14T09:48:00+08:00">
+                2018-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>swap原先只是STL的一部分，而后成为异常安全性编程的脊柱，以及用来处理自赋值的常见机制。（详见Effective C++ 12）。swap实现的复杂程度极高，本节主要探讨其复杂程度以及应对策略。</p>
+<hr>
+<h1 id="swap的具体实现"><a href="#swap的具体实现" class="headerlink" title="swap的具体实现"></a>swap的具体实现</h1><h2 id="STL的swap实现"><a href="#STL的swap实现" class="headerlink" title="STL的swap实现"></a>STL的swap实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>&#123;</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(T&amp; a,T&amp; b)</span></span>&#123;</span><br><span class="line">        <span class="function">T <span class="title">temp</span><span class="params">(a)</span></span>;</span><br><span class="line">        a=b;</span><br><span class="line">        b=temp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只要类型T支持copying操作，该swap就一定能正常运行。<br>该行为必然是正确的，只是对于某些类型而言，其copying行为是不必要的，降低了程序运行的性能。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>对于”内部仅含指针，指针指向具体数据”的class而言，STL版本的swap函数过于低效。这种类型的常见表现形式是所谓的“pimpl”(pointer to implementation)(详见Effective C++ 32)。具体如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetImpl</span>&#123;</span><span class="comment">//具体实现类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> a,b,c;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; vs;<span class="comment">//内部存有大量数据,复制占用时间极大</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">const</span> Widget&amp; rhs);</span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;<span class="comment">//复制具体实现（其实这里也可以直接复制指针，引用计数）</span></span><br><span class="line">        *pImpl=*(rhs.pImpl);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    WidgetImpl* pImpl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然,如果我们需要swap两个widget对象，只需要交换两个指针值。如果使用STL::swap，它<strong>不仅复制3个widget，还复制了3个widgetImpl.</strong>何以说是三个？</p>
+<ol>
+<li>temp(a)<br>此时调用拷贝构造，复制了一个Widget,在复制Widget时，其拷贝构造必然构造了一个WidgetImpl</li>
+<li>a=b<br>调用Widget::operator=,复制了一个WidgetImpl</li>
+<li>b=temp<br>同上</li>
+</ol>
+<h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><p>我们希望告诉std::swap,置换widget只需要置换内部指针。无疑我们需要将std::swap针对Widget特例化，以下是无法通过编译的基本构思：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>｛</span><br><span class="line">    <span class="keyword">template</span>&lt;&gt;</span><br><span class="line">    <span class="keyword">void</span> swap&lt;Widget&gt;(Widget&amp;a,Widget&amp;b)&#123;</span><br><span class="line">        swap(a.Impl,b.Impl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在一般情况下不允许改变std命名空间的任何东西，但是这里只是添加了某个特例化版本，属于安全行为。（Effective STL 42 也这样做了）<br>之所以无法编译是因为我们试图去访问private成员。使用friend函数当然是可耻的：封装性被破坏。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定义一个member function做真正的swap工作，然后再令STL的swap函数调用它：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widget&amp; other)</span></span>&#123;</span><br><span class="line">        <span class="keyword">using</span> <span class="built_in">std</span>::swap;<span class="comment">//必须声明</span></span><br><span class="line">        swap(pImpl.other.pImpl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namesapce <span class="built_in">std</span>&#123;</span><br><span class="line">    <span class="keyword">template</span>&lt;&gt;</span><br><span class="line">    <span class="keyword">void</span> swap&lt;Widget&gt;(Widget&amp; a,Widget&amp; b)&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种写法不仅能够通过编译，并且还与stl容器兼容，因为stl容器也提供了public swap成员函数与std::swap特例化版本。</p>
+<h2 id="template下的swap实现"><a href="#template下的swap实现" class="headerlink" title="template下的swap实现"></a>template下的swap实现</h2><h3 id="无法完成function-template偏特化"><a href="#无法完成function-template偏特化" class="headerlink" title="无法完成function template偏特化"></a>无法完成function template偏特化</h3><p>假定现在Widget与WidgetImpl都是template class：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;typenmae T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetImpl</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span>...&#125;;</span><br></pre></td></tr></table></figure><br>此时在Widget::swap照旧，但试图特化std::swap时却遇到了麻烦：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>&#123;<span class="comment">//无法编译</span></span><br><span class="line">    <span class="keyword">template</span>&lt;typenmae T&gt;</span><br><span class="line">    <span class="keyword">void</span> swap&lt;Widget&lt;T&gt; &gt;(Widget&lt;T&gt;&amp; a,Widget&lt;T&gt;&amp; b)&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>不能编译的理由是：<strong>我们企图偏特化（partially specialize)一个function template(std::swap),但C++只允许对class template执行偏特化</strong>。（所谓偏特化就是针对某个部分执行特例化，但特例化之后得到的却仍然是一个模板而非实例，在本例中，swap本身是一个function template，我们试图针对其参数为Widget&lt;T&gt;时特例化，但特例化得到的仍然是一个function template，而非像上文那样的实例函数。关于偏特化的介绍，详见C++ Primer P628）</p>
+<h3 id="std命名空间禁止添加新的重载template"><a href="#std命名空间禁止添加新的重载template" class="headerlink" title="std命名空间禁止添加新的重载template"></a>std命名空间禁止添加新的重载template</h3><p>如果你需要偏特化一个template function，那么常规做法为其添加一个重载版本：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>&#123;<span class="comment">//这也是不合法的</span></span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widget&lt;T&gt;&amp; a,Widget&lt;T&gt;&amp; b)</span></span>&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>对于std命名空间，客户可以全特化其中的template，但不允许添加任何新的template进入，上述代码属于新的swap。</p>
+<h3 id="声明non-member-swap"><a href="#声明non-member-swap" class="headerlink" title="声明non-member swap"></a>声明non-member swap</h3><p>我们将定义一个non-member swap函数，由它调用member swap，但不再将non-member swap声明为std::swap的特例化，为了简化说明，我们将一切与Widget相关的机能都置入WidgetStuff命名空间：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> WidgetStuff&#123;</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span>...&#125;</span><br><span class="line">    <span class="keyword">template</span>&lt;typenmae T&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widget&lt;T&gt;&amp; a,Widget&lt;T&gt; &amp;b)</span></span>&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如此一来，根据C++的名称查找法则，每当试图swap Widgte对象时，都会第一时间找到我们所定义的non-member版本，这并非令客户失去了定制操作的能力。只要加上<code>using std::swap</code>,那么他们的swap又会回归STL版本，这也是我们的member swap使用using的原因。</p>
+<hr>
+<h1 id="swap与异常"><a href="#swap与异常" class="headerlink" title="swap与异常"></a>swap与异常</h1><p>&lt;/br&gt;<br><strong>member swap禁止抛出异常</strong>，但非成员版允许抛出异常，因为默认swap以copying函数为基础，而copying行为允许抛出异常。<br>自定义swap意味着高效交换，并且不抛出异常。这两个特性其实彼此相关：高效交换的基础是基于内置类型的操作，而内置类型的操作绝不会抛出异常。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>当std::swap对class效率不高时，提供一个swap成员函数并且确定其noexcept</li>
+<li>如果你提供了member swap函数，也应该提供一个non-member来调用前者。对于classes（并非templates），也请特例化std::swap</li>
+<li>调用swap时应该先声明使用的是哪个命名空间内的swap</li>
+<li>std命名空间允许全特例化，但禁止在其内部加入一些对std而言全新的东西</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/const_iterator%E5%88%B0iterator%E7%9A%84%E8%BD%AC%E6%8D%A2(distance%E3%80%81advance)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1654,160 +1819,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E4%BB%A5pass-by-refernce-to-const%E4%BB%A3%E6%9B%BFpass-by-value/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/%E4%BB%A5pass-by-refernce-to-const%E4%BB%A3%E6%9B%BFpass-by-value/" itemprop="url">21.以pass-by-refernce-to-const代替pass-by-value</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-12T11:02:00+08:00">
-                2018-04-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br><strong>默认情况下c++以by value方式传递对象至函数</strong>。除非你另外指定，否则函数形参都是实参的副本，返回值也是一个副本。这些副本都由对象的copy构造函数生成，并同时需要析构。反复的构造与析构造就了大量的开销。</p>
-<hr>
-<h1 id="以pass-by-refernce-to-const代替pass-by-value的优势"><a href="#以pass-by-refernce-to-const代替pass-by-value的优势" class="headerlink" title="以pass-by-refernce-to-const代替pass-by-value的优势"></a>以pass-by-refernce-to-const代替pass-by-value的优势</h1><h2 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h2><p>pass-by-refernce-to-const效率极高，因为没有任何构造、析构函数被调用。使用const则使用户不必担心传入的对象遭到任何更改。</p>
-<h2 id="避免slicing"><a href="#避免slicing" class="headerlink" title="避免slicing"></a>避免slicing</h2><p>当一个derived class对象以by value的方式传递给base class对象，base class的构造函数会被调用，而derived class的特性却被切割，导致最终得到的就是一个base class对象。<br>pass-by-refernce-to-const 不会导致上述问题，这是由于动态绑定的原因。</p>
-<hr>
-<h1 id="内置类型与pass-by—reference"><a href="#内置类型与pass-by—reference" class="headerlink" title="内置类型与pass-by—reference"></a>内置类型与pass-by—reference</h1><p>&lt;/br&gt;<br>在编译器的底层实现中，reference往往以指针的形式表现出来，因此pass-by-refernce手法实际上传递的是一个指针。如果你有一个对象是内置类型，那可能用pass-by-value的效率更高一些，stl的迭代器和函数对象也是pass-by-value的效率更高。</p>
-<hr>
-<h1 id="小型对象与pass-by-reference"><a href="#小型对象与pass-by-reference" class="headerlink" title="小型对象与pass-by-reference"></a>小型对象与pass-by-reference</h1><p>&lt;/br&gt;<br>有读者误以为内置类型使用pass-by_value效率更高，就应该对所有的小型对象使用pass-by-value.这种思想是错误的，对象小并不意味着copy构造函数不昂贵（比如复制该对象需要复制其所有指向的东西，详情可见Effective STL 15）。就算它真的不昂贵，你也不能保证它以后还是不昂贵（未来时态编程 More Effective C++ 32)�，甚至有的时候不同的编译器都会改变type的大小。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>尽量以pass-by-refernce-to-const代替pass-by-value，前者是高效且正确的代名词。</li>
-<li>规则1并不适用于内置类型，以及stl的迭代器与函数对象。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1858,7 +1869,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1869,7 +1880,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1880,7 +1891,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

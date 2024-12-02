@@ -291,6 +291,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/15/inline%E5%87%BD%E6%95%B0%E5%89%96%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/15/inline%E5%87%BD%E6%95%B0%E5%89%96%E6%9E%90/" itemprop="url">31.inline函数剖析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-15T17:48:00+08:00">
+                2018-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>inline函数无论是看起来还是用起来都比宏更像函数而且更好用，调用它们又无需承受函数调用的额外开销。另外，编译器会对不含函数调用的程序执行语境相关最优化。然而，inline函数并不是完美无缺的。</p>
+<hr>
+<h1 id="inline的成本"><a href="#inline的成本" class="headerlink" title="inline的成本"></a>inline的成本</h1><p>&nbsp;<br>inline的本质是“对函数的每一个调用”都以函数本体替换，这无疑增加了目标码（object code）大小，过度热衷inline可能会导致程序体积太大，随之导致额外的换页行为（page过多）。但是，如果inline函数很小，可能“函数本体”比“函数调用”所产出的代码更小，那当然是再好不过了。</p>
+<hr>
+<h1 id="inline申请"><a href="#inline申请" class="headerlink" title="inline申请"></a>inline申请</h1><p>&nbsp;<br><strong>inline只是对编译器提出的申请。</strong>这个申请可以显式提出也可以隐式提出。</p>
+<h2 id="隐式inline"><a href="#隐式inline" class="headerlink" title="隐式inline"></a>隐式inline</h2><p>隐式就是把函数定义在class内部。一般而言这种隐式申请都是成员函数，不过friend函数也能被定义在class内（Effective C++ 47），如果真是那样，那它们也被隐式声明为inline.</p>
+<h2 id="显式inline"><a href="#显式inline" class="headerlink" title="显式inline"></a>显式inline</h2><p>显式声明方法是在函数定义式前加上inline。以&lt;algorithm&gt;中的<code>max template</code>为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">const</span> T&amp; <span class="title">max</span><span class="params">(<span class="keyword">const</span> T&amp; a,<span class="keyword">const</span> T&amp; b)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a&lt;b?b:a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="inline与template"><a href="#inline与template" class="headerlink" title="inline与template"></a>inline与template</h1><p>&nbsp;<br>inline函数和template函数通常都会被定义在头文件中，所以有人会误以为function template一定是inline.这一点是错误的。<br>inline放在头文件的原因很简单，编译器需要在编译期将某个“函数调用”替换为“被调用函数的本体”。<br>template通常也放在头文件里，因为它一旦被使用，编译器为了具现化必须知道它的样子。<br>总之，<strong>template的具现化与inlining无关</strong>，如果你觉得所有据此template产生的function应该inline，那就声明它为inline，否则不必如此。</p>
+<hr>
+<h1 id="编译器决定是否inline"><a href="#编译器决定是否inline" class="headerlink" title="编译器决定是否inline"></a>编译器决定是否inline</h1><p>&nbsp;<br><strong>编译器拒绝将过于复杂的函数inline（带有循环或者递归），并且任何virtual函数的调用也会使inline落空。</strong>这是十分显然的，因为virtual意味着运行时才知道调用哪个函数，inline却是在编译期就必须确定。不过幸运的是，如果编译器拒绝了你的inline请求，会反馈一个警告信息。</p>
+<p>有时候虽然编译器愿意inlining某个函数，但还是可能为该函数生成一个函数本体。<br>举例而言，如果某个函数需要取某一个inline函数的地址，那编译器会生成一个outlined函数本体，毕竟编译器无法去提出一个指针指向一个不存在的函数。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span> </span>&#123;..&#125;;</span><br><span class="line"><span class="keyword">void</span> (*pf)() = f;<span class="comment">//pf指向f</span></span><br><span class="line">...</span><br><span class="line">f();<span class="comment">//确实inline</span></span><br><span class="line">pf();<span class="comment">//生成了函数实体并产生了调用</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="inline与构造、析构函数"><a href="#inline与构造、析构函数" class="headerlink" title="inline与构造、析构函数"></a>inline与构造、析构函数</h1><p>&nbsp;<br>假设有base class与derived class如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> str;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span>:<span class="keyword">public</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived() &#123;&#125;<span class="comment">//空构造函数</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br><code>Derived::Derived()</code>看起来似乎很适合被inline，因为它根本不含任何代码，但实际并非如此。<br>构造或者析构函数内部存在着大量处理异常的程序，并且肯定存在着Base类的构造函数或者Derived析构函数。对这些函数的调用影响了编译器是否会对此空白函数inlining.<br>此外，这些代码如果被inline，那他们必然化身为object code充斥着各类Derived class.<br>总而言之，<strong>构造函数和析构函数不适合被声明为inline.</strong></p>
+<hr>
+<h1 id="inline与程序库"><a href="#inline与程序库" class="headerlink" title="inline与程序库"></a>inline与程序库</h1><p>&nbsp;<br>程序库设计者使用inline之前必须考虑其影响性：<strong>inline无法随着程序库升级而升级</strong>。也就是说如果一旦某一个inline函数被改写，所有用到它的客户端程序都要重新编译。如果是non-inline，那用户只需要重新连接就好了。</p>
+<hr>
+<h1 id="inline与debug"><a href="#inline与debug" class="headerlink" title="inline与debug"></a>inline与debug</h1><p>&nbsp;<br>我们<strong>无法在inline函数中设置断点</strong>，因为实际上并不存在这个函数。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;</p>
+<ol>
+<li>将inline函数限制在小型、频繁调用的函数身上，这会使潜在的代码膨胀问题最小化，程序速度提升机会最大化。</li>
+<li>不要因为function template出现在头文件就把它声明为inline，这二者并不相关。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/15/erase_remove%E6%83%AF%E7%94%A8%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1730,171 +1895,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%80%E4%B8%AA%E4%B8%8D%E6%8A%9B%E5%BC%82%E5%B8%B8%E7%9A%84swap%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/14/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%80%E4%B8%AA%E4%B8%8D%E6%8A%9B%E5%BC%82%E5%B8%B8%E7%9A%84swap%E5%87%BD%E6%95%B0/" itemprop="url">26.自定义一个不抛异常的swap函数</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-14T09:48:00+08:00">
-                2018-04-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>swap原先只是STL的一部分，而后成为异常安全性编程的脊柱，以及用来处理自赋值的常见机制。（详见Effective C++ 12）。swap实现的复杂程度极高，本节主要探讨其复杂程度以及应对策略。</p>
-<hr>
-<h1 id="swap的具体实现"><a href="#swap的具体实现" class="headerlink" title="swap的具体实现"></a>swap的具体实现</h1><h2 id="STL的swap实现"><a href="#STL的swap实现" class="headerlink" title="STL的swap实现"></a>STL的swap实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>&#123;</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(T&amp; a,T&amp; b)</span></span>&#123;</span><br><span class="line">        <span class="function">T <span class="title">temp</span><span class="params">(a)</span></span>;</span><br><span class="line">        a=b;</span><br><span class="line">        b=temp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>只要类型T支持copying操作，该swap就一定能正常运行。<br>该行为必然是正确的，只是对于某些类型而言，其copying行为是不必要的，降低了程序运行的性能。</p>
-<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>对于”内部仅含指针，指针指向具体数据”的class而言，STL版本的swap函数过于低效。这种类型的常见表现形式是所谓的“pimpl”(pointer to implementation)(详见Effective C++ 32)。具体如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetImpl</span>&#123;</span><span class="comment">//具体实现类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> a,b,c;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; vs;<span class="comment">//内部存有大量数据,复制占用时间极大</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">const</span> Widget&amp; rhs);</span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;<span class="comment">//复制具体实现（其实这里也可以直接复制指针，引用计数）</span></span><br><span class="line">        *pImpl=*(rhs.pImpl);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    WidgetImpl* pImpl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然,如果我们需要swap两个widget对象，只需要交换两个指针值。如果使用STL::swap，它<strong>不仅复制3个widget，还复制了3个widgetImpl.</strong>何以说是三个？</p>
-<ol>
-<li>temp(a)<br>此时调用拷贝构造，复制了一个Widget,在复制Widget时，其拷贝构造必然构造了一个WidgetImpl</li>
-<li>a=b<br>调用Widget::operator=,复制了一个WidgetImpl</li>
-<li>b=temp<br>同上</li>
-</ol>
-<h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><p>我们希望告诉std::swap,置换widget只需要置换内部指针。无疑我们需要将std::swap针对Widget特例化，以下是无法通过编译的基本构思：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>｛</span><br><span class="line">    <span class="keyword">template</span>&lt;&gt;</span><br><span class="line">    <span class="keyword">void</span> swap&lt;Widget&gt;(Widget&amp;a,Widget&amp;b)&#123;</span><br><span class="line">        swap(a.Impl,b.Impl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在一般情况下不允许改变std命名空间的任何东西，但是这里只是添加了某个特例化版本，属于安全行为。（Effective STL 42 也这样做了）<br>之所以无法编译是因为我们试图去访问private成员。使用friend函数当然是可耻的：封装性被破坏。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定义一个member function做真正的swap工作，然后再令STL的swap函数调用它：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widget&amp; other)</span></span>&#123;</span><br><span class="line">        <span class="keyword">using</span> <span class="built_in">std</span>::swap;<span class="comment">//必须声明</span></span><br><span class="line">        swap(pImpl.other.pImpl);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namesapce <span class="built_in">std</span>&#123;</span><br><span class="line">    <span class="keyword">template</span>&lt;&gt;</span><br><span class="line">    <span class="keyword">void</span> swap&lt;Widget&gt;(Widget&amp; a,Widget&amp; b)&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种写法不仅能够通过编译，并且还与stl容器兼容，因为stl容器也提供了public swap成员函数与std::swap特例化版本。</p>
-<h2 id="template下的swap实现"><a href="#template下的swap实现" class="headerlink" title="template下的swap实现"></a>template下的swap实现</h2><h3 id="无法完成function-template偏特化"><a href="#无法完成function-template偏特化" class="headerlink" title="无法完成function template偏特化"></a>无法完成function template偏特化</h3><p>假定现在Widget与WidgetImpl都是template class：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;typenmae T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetImpl</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span>...&#125;;</span><br></pre></td></tr></table></figure><br>此时在Widget::swap照旧，但试图特化std::swap时却遇到了麻烦：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>&#123;<span class="comment">//无法编译</span></span><br><span class="line">    <span class="keyword">template</span>&lt;typenmae T&gt;</span><br><span class="line">    <span class="keyword">void</span> swap&lt;Widget&lt;T&gt; &gt;(Widget&lt;T&gt;&amp; a,Widget&lt;T&gt;&amp; b)&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>不能编译的理由是：<strong>我们企图偏特化（partially specialize)一个function template(std::swap),但C++只允许对class template执行偏特化</strong>。（所谓偏特化就是针对某个部分执行特例化，但特例化之后得到的却仍然是一个模板而非实例，在本例中，swap本身是一个function template，我们试图针对其参数为Widget&lt;T&gt;时特例化，但特例化得到的仍然是一个function template，而非像上文那样的实例函数。关于偏特化的介绍，详见C++ Primer P628）</p>
-<h3 id="std命名空间禁止添加新的重载template"><a href="#std命名空间禁止添加新的重载template" class="headerlink" title="std命名空间禁止添加新的重载template"></a>std命名空间禁止添加新的重载template</h3><p>如果你需要偏特化一个template function，那么常规做法为其添加一个重载版本：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span>&#123;<span class="comment">//这也是不合法的</span></span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widget&lt;T&gt;&amp; a,Widget&lt;T&gt;&amp; b)</span></span>&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>对于std命名空间，客户可以全特化其中的template，但不允许添加任何新的template进入，上述代码属于新的swap。</p>
-<h3 id="声明non-member-swap"><a href="#声明non-member-swap" class="headerlink" title="声明non-member swap"></a>声明non-member swap</h3><p>我们将定义一个non-member swap函数，由它调用member swap，但不再将non-member swap声明为std::swap的特例化，为了简化说明，我们将一切与Widget相关的机能都置入WidgetStuff命名空间：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> WidgetStuff&#123;</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span>...&#125;</span><br><span class="line">    <span class="keyword">template</span>&lt;typenmae T&gt;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widget&lt;T&gt;&amp; a,Widget&lt;T&gt; &amp;b)</span></span>&#123;</span><br><span class="line">        a.swap(b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如此一来，根据C++的名称查找法则，每当试图swap Widgte对象时，都会第一时间找到我们所定义的non-member版本，这并非令客户失去了定制操作的能力。只要加上<code>using std::swap</code>,那么他们的swap又会回归STL版本，这也是我们的member swap使用using的原因。</p>
-<hr>
-<h1 id="swap与异常"><a href="#swap与异常" class="headerlink" title="swap与异常"></a>swap与异常</h1><p>&lt;/br&gt;<br><strong>member swap禁止抛出异常</strong>，但非成员版允许抛出异常，因为默认swap以copying函数为基础，而copying行为允许抛出异常。<br>自定义swap意味着高效交换，并且不抛出异常。这两个特性其实彼此相关：高效交换的基础是基于内置类型的操作，而内置类型的操作绝不会抛出异常。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>当std::swap对class效率不高时，提供一个swap成员函数并且确定其noexcept</li>
-<li>如果你提供了member swap函数，也应该提供一个non-member来调用前者。对于classes（并非templates），也请特例化std::swap</li>
-<li>调用swap时应该先声明使用的是哪个命名空间内的swap</li>
-<li>std命名空间允许全特例化，但禁止在其内部加入一些对std而言全新的东西</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1945,7 +1945,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1956,7 +1956,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1967,7 +1967,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

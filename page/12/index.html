@@ -291,6 +291,242 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/15/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Virtual%20Member%20Function/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/15/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Virtual%20Member%20Function/" itemprop="url">Function语义学——Virtual Member Function</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-15T12:42:00+08:00">
+                2018-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>我们已经初步了解了virtual function的实现原理：vtbl与vptr。在本节中，我们将根据一个实例，分析单一继承、多重继承、虚拟继承等各种情况，从细节上探究virtual function模型。</p>
+<hr>
+<h1 id="运行期类型判断"><a href="#运行期类型判断" class="headerlink" title="运行期类型判断"></a>运行期类型判断</h1><p>&nbsp;<br>为了完成virtual function机制，我们能够在执行期判断出当前pointer或reference的动态类型，如此才能找到并调用相应的函数实体。</p>
+<h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><p>考虑下述语句：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure><br>最直接了当的做法就是把必要的信息加上ptr身上，如此一来，pointer或者reference至少包含两个信息：</p>
+<ol>
+<li>内容（它所指向的object的地址）</li>
+<li>对象的动态类型</li>
+</ol>
+<p>这个方法有两个缺点：</p>
+<ol>
+<li>增加了空间负担，即使程序并不体现出多态性</li>
+<li>破坏了与C的兼容性</li>
+</ol>
+<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>如果不能在pointer或erference中加入信息，那么势必只能在对象中添加信息。显然并非所有的对象都应该被加入信息，我们应该在“可能会运行期多态”的class中加入RTTI信息。识别一个class是否支持多态，只需要去看他是否具备任何virtual function即可。</p>
+<hr>
+<h1 id="单一继承下virtual-function的实现"><a href="#单一继承下virtual-function的实现" class="headerlink" title="单一继承下virtual function的实现"></a>单一继承下virtual function的实现</h1><p>&nbsp;<br>在明确了需要有信息插入class object之后，我们需要明确：哪些信息需要被插入class？仍以下述语句为例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure><br>我们需要了解：</p>
+<ol>
+<li>ptr的动态类型，以方便调用正确的z()实体。</li>
+<li>z()实体位置</li>
+</ol>
+<p>落实到具体实现，我们需要在每一个具备多态的class object身上增加两个members：</p>
+<ol>
+<li>一个用以表示动态类型的字符串或者数字</li>
+<li>一个指向某个table的指针，该table内部存放着virtual functions的执行期地址</li>
+</ol>
+<p>上述工作均由编译器完成，执行期只是按图索骥而已。</p>
+<p>一个class只会有一个vtbl，每一个vtbl内部含有所有virtual functions函数实体的地址，这些virtual functions包括：</p>
+<ul>
+<li>该class定义的函数实体，它可能会overriding一个可能存在的base class virtual function函数实体。</li>
+<li>继承自base class的函数实体，这是在derived class不覆写时发生的情况。</li>
+<li>一个pure_virtual_called函数实体，它既可以扮演pure virtual function的空间保卫者，也可以当做执行期异常处理函数。</li>
+</ul>
+<h2 id="具体实例"><a href="#具体实例" class="headerlink" title="具体实例"></a>具体实例</h2><p>考虑下述定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Point&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>=<span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>现有Point2d derived from Point:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function">Point2d&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>;<span class="comment">//override</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//override</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>并有Point3d derived from Point2d:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line">     ...</span><br><span class="line">    <span class="function">Point2d&amp; <span class="title">mult</span><span class="params">(<span class="keyword">float</span>)</span></span>;<span class="comment">//override</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//override</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其具体的vtbl如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/9vsxcigr9ham7p8mc2l5y3w9/image_1cdha351o116i11o21cr67nojva9.png" alt="image_1cdha351o116i11o21cr67nojva9.png-369.9kB"><br>当一个class派生自另一个class，一共具备三种可能性：</p>
+<ol>
+<li><strong>继承声明与实现</strong><br>在该情况下virtual functions的地址将会被拷贝到derived class的vtbl中，且保持原有的slot。</li>
+<li><strong>只继承声明</strong><br>此时函数实体的地址被置于对应的slot中。</li>
+<li><strong>增加新的virtual function</strong><br>此时derived class的vtbl会被扩充，新的virtual function会对应于新的slot。</li>
+</ol>
+<p>当我们遇到<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();</span><br></pre></td></tr></table></figure><br>如何完成运行期virtual function的调用呢？</p>
+<ol>
+<li>尽管我们并不了解ptr的动态类型，但我们了解其vptr的位置，并由vptr找到vtbl</li>
+<li>尽管并不明确哪一个z()实体会被调用，但我们明确了解z()必然位于slot4</li>
+</ol>
+<p>因此，上述语句被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(*ptr-&gt;vptr[<span class="number">4</span>])(ptr);</span><br></pre></td></tr></table></figure><br>尽管该语句的效果在执行期才能被确定（调用哪个z实体），但至少在编译期我们完成了正确的转化。</p>
+<p>在单一继承体系中，virtual function运转良好，但在多继承和虚继承中实际情况却较为麻烦。</p>
+<hr>
+<h1 id="多重继承下的virtual-function"><a href="#多重继承下的virtual-function" class="headerlink" title="多重继承下的virtual function"></a>多重继承下的virtual function</h1><p>&nbsp;<br>多重继承下支持virtual function的难点在于后继base class，以及在执行期调整this指针。<br>以下述继承体系为例：<br><img src="http://static.zybuluo.com/zsmj2017/3k4rtxf4owdv3ldih5gi6rqj/image_1cdhf6elj1btn1ocfv1n19tgjucm.png" alt="image_1cdhf6elj1btn1ocfv1n19tgjucm.png-15.9kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base1</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Base1();</span><br><span class="line">    <span class="keyword">virtual</span> ~Base1();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">speakClearly</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Base1 *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Base1;<span class="comment">//抽象工厂</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base2</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Base2();</span><br><span class="line">    <span class="keyword">virtual</span> ~Base2();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mumble</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Base2 *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Base2;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>：<span class="title">public</span> <span class="title">Base1</span>,<span class="title">public</span> <span class="title">Base2</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Derived();</span><br><span class="line">    <span class="keyword">virtual</span> ~Derived();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Derived *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">float</span> data_Derived;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>Derived支持virtual function的难点统统落在Base2 subobject上，其中大致有三个问题：</p>
+<ol>
+<li>virtual destructor</li>
+<li>被继承的Base2::mumble()</li>
+<li>一组clone()函数实体</li>
+</ol>
+<hr>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>首先，我们将一个从heap中配置得到的Derived对象的地址指定给一个Base2指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Base2 *pbase2 = <span class="keyword">new</span> Derived;</span><br></pre></td></tr></table></figure><br>新的Derived对象的地址必须调整，以指向Base2 subobject。在编译期间会有如下代码产生：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Derived *temp = <span class="keyword">new</span> Derived;</span><br><span class="line">Base2* pbase2 = temp?temp+<span class="keyword">sizeof</span>(Base1):<span class="number">0</span>;</span><br></pre></td></tr></table></figure><br>当开发者需要释放pbase2所指向的对象时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> pbase2;</span><br></pre></td></tr></table></figure><br>指针必须被再一次调整，以指向Derived对象的起始处。但在这里我们并不能像绑定操作那样在编译期完成offset添加，因为我们只有在运行期才能明确对象的真正类型。</p>
+<p>如果我们经由类型为后继base class的指针或者引用来调用virtual function，该调用所连带的this指针调整操作必须在执行期完成，也就是说，编译器所做的关于扩充代码的操作，必须在某个地方插入。关键问题便是在哪里插入。</p>
+<h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>cfront编译器的做法是将vtbl增大，使它容纳此处所需要的this指针。每一个virtual table slot不再是一个指针，而是一个struct，内含可能的offset以及地址。于是调用操作由：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*(pbase2-&gt;vptr[<span class="number">1</span>])(pbase2);</span><br></pre></td></tr></table></figure><br>转变为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*(pbase2-&gt;vptr[<span class="number">1</span>].faddr)(pbase2+pbase2-&gt;vptr[<span class="number">1</span>].offset)</span><br></pre></td></tr></table></figure><br>这方法的缺点是增加了间接性，无论是否需要offset都需要去执行上述语句，并且vtbl的大小也扩大了。</p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>比较有效率的解决方案是使用thunk。所谓thunk是一小段assembly码，用来完成以下两个任务：</p>
+<ol>
+<li>以适当的offset调整this指针</li>
+<li>跳转至virtual function</li>
+</ol>
+<p>举例而言，经由一个Base2指针调用Derived destructor，其相关的thunk大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pbase2_dtor_thunk:</span><br><span class="line">    <span class="keyword">this</span>+=<span class="keyword">sizeof</span>(base1);</span><br><span class="line">    Derived::~Derived(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure><br>thunk技术保证了vtbl继续内含一个简单的指针，因此多重继承不再需要任何空间上的额外负担。slots中的地址可以指向virtual function，也可以指向一个相关的thunk（如果需要调整this指针）。</p>
+<p>调整this指针的第二个额外负担是，函数的调用由于两种不同的可能：</p>
+<ol>
+<li>经由derived class或第一base class调用</li>
+<li>经由后继base class调用</li>
+</ol>
+<p>同一函数需要在vtbl中存放多笔对应的slots,例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Base1* pbase1 = <span class="keyword">new</span> Derived;</span><br><span class="line">Base2* pbase2 = <span class="keyword">new</span> Derived;</span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span> pbase1;</span><br><span class="line"><span class="keyword">delete</span> pbase2;</span><br></pre></td></tr></table></figure><br>虽然两个delete操作导致相同的derived destructor，但它们需要两个不同的vtbl slots：</p>
+<ol>
+<li>pbase1不需要调整this指针，其vtbl放置的是真正的destructor地址</li>
+<li>pbase2需要调整指针，其vtbl slot需要放置相关的thunk地址。</li>
+</ol>
+<p>在多重继承下，一个derived class内含n-1个额外的vtbl，n表示上一层base classes的数目。对于实例中的Derived，它会有两个vtbl：</p>
+<ol>
+<li>一个主要实体，与Base1共享</li>
+<li>一个次要实体，与Base2有关</li>
+</ol>
+<p>针对每一个vtbl，derived对象中有相应的vptr。具体内存结构如下所示：<br><img src="http://static.zybuluo.com/zsmj2017/t692yspb77s1ta8evg4ysyzt/image_1cdhlsdfr1406v33m71ipd1pej13.png" alt="image_1cdhlsdfr1406v33m71ipd1pej13.png-379.6kB"></p>
+<hr>
+<h2 id="后继base-class对virtual-function的影响"><a href="#后继base-class对virtual-function的影响" class="headerlink" title="后继base class对virtual function的影响"></a>后继base class对virtual function的影响</h2><p>在三种情况下后继base class会影响对virtual function的支持：</p>
+<ul>
+<li><p><strong>通过指向后继base class的指针来调用derived virtual function</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Base2 *ptr = <span class="keyword">new</span> Derived;</span><br><span class="line"><span class="comment">//ptr必须向后调整sizeof(Base1)</span></span><br><span class="line"><span class="keyword">delete</span> ptr;</span><br></pre></td></tr></table></figure>
+<p>显然，ptr初始情况下指向了base2 subobject，为了能够正确执行，ptr必须调整指向Derived对象的起始处。</p>
+</li>
+<li><p><strong>通过一个指向derived class的指针调用继承自后继base class的virtual function</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Derived *pder = <span class="keyword">new</span> Derived;</span><br><span class="line"><span class="comment">//pder必须向前调整sizeof(Base1)</span></span><br><span class="line">pder-&gt;mumble();</span><br></pre></td></tr></table></figure>
+<p>此时，指针必须再次调整。</p>
+</li>
+<li><p>返回值不相同</p>
+<p>具体来说就是clone的实现原理。</p>
+</li>
+</ul>
+<hr>
+<h1 id="虚继承下的virtual-functions"><a href="#虚继承下的virtual-functions" class="headerlink" title="虚继承下的virtual functions"></a>虚继承下的virtual functions</h1><p>&nbsp;<br>考虑下述继承体系：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">virtual</span> ~Point2d();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mumble</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~Point3d();</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>Point3d和Point2d的起始部分并不和“非虚拟的单一继承”一致。由于Point2d和Point3d的对象不再相符，两者之间的转换也就需要调整this指针。它们的内存布局：<br><img src="http://static.zybuluo.com/zsmj2017/o41pbxhobsbgk79prj3jpwvl/image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png" alt="image_1cdhu6f6t1uoo1qge1sc61avn1to1m.png-283.1kB"><br>（这个图似乎有点问题，右下角发生了错误）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/15/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Member%E7%9A%84%E5%90%84%E7%A7%8D%E8%B0%83%E7%94%A8%E6%96%B9%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1686,166 +1922,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/10/%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Member%20Initialization%20List/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/10/%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Member%20Initialization%20List/" itemprop="url">构造函数语义学——Member Initialization List</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-10T10:47:00+08:00">
-                2018-05-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>（5.4-5.9由于开题事宜断更，即日起恢复更新）</p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>当写下一个constructor时我们可以设定class members的初值：它们要么经由Member Initialization List，要么在construtor内部处理（除了4种情况必须使用member initialization list）。</p>
-<hr>
-<h1 id="何时必须使用member-initialization-list"><a href="#何时必须使用member-initialization-list" class="headerlink" title="何时必须使用member initialization list"></a>何时必须使用member initialization list</h1><p>&nbsp;<br>以下四种情况必须使用member initialization list：</p>
-<ol>
-<li>初始化一个reference member</li>
-<li>初始化一个const member</li>
-<li>调用一个base class的constructor，而它拥有一组参数</li>
-<li>当调用一个member class的constructor，而它拥有一组参数</li>
-</ol>
-<hr>
-<h1 id="member-initialization-list详解"><a href="#member-initialization-list详解" class="headerlink" title="member initialization list详解"></a>member initialization list详解</h1><h2 id="不使用member-initialization-list"><a href="#不使用member-initialization-list" class="headerlink" title="不使用member initialization list"></a>不使用member initialization list</h2><p>考虑如下程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Word</span>&#123;</span></span><br><span class="line">    <span class="keyword">String</span> _name;</span><br><span class="line">    <span class="keyword">int</span> _cnt;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Word()&#123;</span><br><span class="line">        _name=<span class="number">0</span>;</span><br><span class="line">        _cnt=<span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>该程序能够正确编译并执行，只是效率偏低。编译器在执行上述程序扩张代码使之生成一个临时对象，如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Word::Word(<span class="comment">/*this poniter*/</span>)&#123;</span><br><span class="line">    _name.<span class="keyword">String</span>::<span class="keyword">String</span>();</span><br><span class="line">    <span class="keyword">String</span> temp = <span class="keyword">String</span>(<span class="literal">nullptr</span>);</span><br><span class="line">    _name.<span class="keyword">String</span>::<span class="keyword">operator</span>=(temp);</span><br><span class="line">    temp.<span class="keyword">String</span>::~<span class="keyword">String</span>();</span><br><span class="line">    _cnt=<span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>为了保证高效，我们应当做到对任何初始化操作都执行member initialization list。</p>
-<h2 id="member-initialization-list的作用"><a href="#member-initialization-list的作用" class="headerlink" title="member initialization list的作用"></a>member initialization list的作用</h2><p>当构造函数中出现member initialization list后，编译器会一一操作member initialization list，以<strong>member声明次序（而非list内部次序）</strong>在constructor之内安插初始化操作，次序问题极易引发危险操作，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">X</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    X(<span class="keyword">int</span> val):j(val),i(j) &#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>将会被扩张为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="keyword">int</span> val)&#123;</span><br><span class="line">    i=j;<span class="comment">//初始化失败</span></span><br><span class="line">    j=bal;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="member-initialization-list的疑难点"><a href="#member-initialization-list的疑难点" class="headerlink" title="member initialization list的疑难点"></a>member initialization list的疑难点</h1><h2 id="二探次序"><a href="#二探次序" class="headerlink" title="二探次序"></a>二探次序</h2><p>如果member initialization list中的项目被安插到constructor中，会继续保存声明次序吗？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="keyword">int</span> val)</span><br><span class="line">    :j(val)&#123;</span><br><span class="line">        i=j;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>j的初始化操作会安插在explicit user assignment之前或者是之后？答案是initialization list的项目总会被放在explicit user code之前。</p>
-<h2 id="initialization-list与member-function"><a href="#initialization-list与member-function" class="headerlink" title="initialization list与member function"></a>initialization list与member function</h2><p>能否调用一个member function以设定一个member的初值？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="keyword">int</span> val)</span><br><span class="line">    :i(xfoo(val)),j(val)<span class="comment">//xfoo是X的一个member function</span></span><br><span class="line">    &#123;&#125;</span><br></pre></td></tr></table></figure><br>答案是可行的。但是…务必使用“存在于constructor体内的一个member”，而非“存在于member initialization list中的member”，来为另一个member设定初值。因为我们无法了解xfoo()对object的依赖性，在确保了xfoo()在constructor内部之后，对于“究竟是哪一个member在xfoo()执行时被设立初值”，就不会造成歧义。</p>
-<p>member function的使用是合法的，是建立在和此object相关的this指针已经就位（我们暂且忽略与该member function相关的member），此时原代码大致被扩张为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">X::X(<span class="comment">/*this pointer*/</span>)&#123;</span><br><span class="line">    i = <span class="keyword">this</span>-&gt;xfoo(val);</span><br><span class="line">    j = val;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果一个derived class member function被调用，其返回值作为base class constructor的参数呢？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FooBar</span>:</span><span class="keyword">public</span> X&#123;</span><br><span class="line">    <span class="keyword">int</span> _fval;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">fval</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> _fval;&#125;</span><br><span class="line">    FooBar(<span class="keyword">int</span> val):_fval(val),X(fval()) &#123;&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其扩张结果如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">FooBar::FooBar(<span class="comment">/*this pointer*/</span>)&#123;</span><br><span class="line">    X::X(<span class="keyword">this</span>,<span class="keyword">this</span>-&gt;fval());</span><br><span class="line">    _fval =val;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然，这确实不合时宜。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>简单地说，编译器会对initialization list一一处理并且重新排序，以反映出member的声明次序。它会安插部分代码到constructor体内，并置于任何explicit user code之前。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1896,7 +1972,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1907,7 +1983,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1918,7 +1994,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

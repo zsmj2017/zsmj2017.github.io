@@ -291,6 +291,174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF/" itemprop="url">41.多重继承</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T09:27:00+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>一旦谈及multiple inheritance(MI)，C++程序员总会分为两个阵营：</p>
+<ol>
+<li>single inheritance(SI)不错，MI更好。</li>
+<li>SI不错，MI垃圾</li>
+</ol>
+<hr>
+<h1 id="多重继承带来的歧义"><a href="#多重继承带来的歧义" class="headerlink" title="多重继承带来的歧义"></a>多重继承带来的歧义</h1><p>&nbsp;<br>抛开争论，首先我们必须要认清：只要我们在设计中使用了MI，程度便有可能从一个以上的classes<strong>继承相同名称</strong>，这会引发一些歧义，举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BorrowableItem</span>&#123;</span><span class="comment">//允许借阅物</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">checkOut</span><span class="params">()</span></span>;<span class="comment">//离开时检查</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ElectronicGadget</span>&#123;</span><span class="comment">//电子设备</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">checkOut</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//执行自我检测</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MP3player</span>:</span><span class="comment">//Mp3是借阅物也是电子设备</span></span><br><span class="line">    <span class="keyword">public</span> BorrowableItem,</span><br><span class="line">    <span class="keyword">public</span> ElectronicGadget</span><br><span class="line">&#123;...&#125;;</span><br><span class="line">MP3Player mp;</span><br><span class="line">mp.checkOut();<span class="comment">//歧义产生,改掉用哪个？</span></span><br></pre></td></tr></table></figure><br>为了避免这些歧义，我们应该使用作用域运算符::来指明具体调用哪个版本。例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mp.BorrowableItem::checkout();</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="“钻石型”多重继承"><a href="#“钻石型”多重继承" class="headerlink" title="“钻石型”多重继承"></a>“钻石型”多重继承</h1><p>&nbsp;<br>多重继承是指继承一个以上的base classes，但这些base class一般不作为另一些class 的derived class，因为那会导致”钻石型”多重继承。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p><img src="http://static.zybuluo.com/zsmj2017/pzhukd2yiq6wmp7vii4uf3ul/image_1cbgc9k62aed55ka6o18k2qon9.png" alt="image_1cbgc9k62aed55ka6o18k2qon9.png-11.6kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">File</span> &#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InputFile</span>:</span><span class="keyword">public</span> <span class="built_in">File</span> &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OutputFile</span>:</span><span class="keyword">public</span> <span class="built_in">File</span> &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IOFile</span>:</span></span><br><span class="line">    <span class="keyword">public</span> InputFile,</span><br><span class="line">    <span class="keyword">public</span> OutputFile</span><br><span class="line">&#123;...&#125;;</span><br></pre></td></tr></table></figure><br>具体到这个实例，有问题如下：假定File内有一个名为FileName的成员变量，那么IOFile对象内应该有几个此成员呢？它可能会忠实地完全复制从InputFile和OutputFile继承而来的所有成员，从而导致存在两个FileName，也可以只继承其中的一个。</p>
+<h2 id="virtual-base-class-与-virtual继承"><a href="#virtual-base-class-与-virtual继承" class="headerlink" title="virtual base class 与 virtual继承"></a>virtual base class 与 virtual继承</h2><p>C++对上述的两种方案都支持，但默认执行完全复制。如果这并非你所愿，那你必须<strong>令带有重复数据的class（也就是File）成为一个virtual base class，同时，你还必须令所有直接继承它（file）的class采用virtual继承</strong>。实例如下：<br><img src="http://static.zybuluo.com/zsmj2017/mlo0kukn5qzc4lm0guxfxtll/image_1cbgcplh31qd81lsv19o8c62bagm.png" alt="image_1cbgcplh31qd81lsv19o8c62bagm.png-11.4kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">File</span> &#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InputFile</span>:</span><span class="keyword">virtual</span> <span class="keyword">public</span> <span class="built_in">File</span> &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OutputFile</span>:</span><span class="keyword">virtual</span> <span class="keyword">public</span> <span class="built_in">File</span> &#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IOFile</span>:</span></span><br><span class="line">    <span class="keyword">public</span> InputFile,</span><br><span class="line">    <span class="keyword">public</span> OutputFile</span><br><span class="line">&#123;...&#125;;</span><br></pre></td></tr></table></figure><br>STL中就有一个结构类似的多重继承体系，只不过其classes是class templates，名称分别是basic_ios,basic_istream,basic_ostream,basic_iostream。</p>
+<h2 id="virtual继承的成本（详见More-Effective-C-24"><a href="#virtual继承的成本（详见More-Effective-C-24" class="headerlink" title="virtual继承的成本（详见More Effective C++ 24)"></a>virtual继承的成本（详见More Effective C++ 24)</h2><p>从行为正确的观点看，public继承应该总是virtual。但是实际上，为了避免继承得来的变量重复，编译器不得不使用一些其它操作（因此付出了成本），使用virtual继承的class所产生的对象一般比用non-virtual继承产生的对象要大，而且访问速度也慢。</p>
+<p>virtual继承的成本还体现在其他方面，比如说virtual base classes初始化规则比起non-virtual bases的情况远为复杂而去不直观。<strong>virtual base class的初始化责任是由继承体系中的最底层class负责</strong>，这意味着：</p>
+<ol>
+<li>classes若派生自virtual base class而需要初始化，则其必须认知virtual base—无论他们离的多远。</li>
+<li>当一个新的dc加入继承体系，它必须承担起其virtual base的初始化责任。</li>
+</ol>
+<p>对于virtual base(或者说virtual继承），我们应该保证非必要不使用。如果必须使用，则尽力避免在virtual base中放置任何数据，如此则不必担心初始化等等问题。（这不得不让人想起了Java的Interface，它在相当多的情况下兼容于C++中的virtual base class）。</p>
+<hr>
+<h1 id="Interface-class（详见Effective-C-32）"><a href="#Interface-class（详见Effective-C-32）" class="headerlink" title="Interface class（详见Effective C++ 32）"></a>Interface class（详见Effective C++ 32）</h1><h2 id="问题实例-1"><a href="#问题实例-1" class="headerlink" title="问题实例"></a>问题实例</h2><p>（课本中接着描述了Person interface与具体实现的class)<br>如果我们需要用某个类的现有接口，又希望使用另一个类现有的具体实现，无疑，我们可以public from interface &amp;&amp; private from implement。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;</p>
+<ol>
+<li>多重继承比单一继承复杂，并且有可能导致歧义性，以及对virtual继承的需要。</li>
+<li>virtual继承会增加大小，速度，初始化各方面的成本，但如果virtual base不带有任何数据，其使用颇有价值。</li>
+<li>多重继承确有正当用途，比如public继承interface且private继承implement class.</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E7%94%A8less%E8%A1%A8%E7%A4%BAoperator/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1650,179 +1818,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/18/%E8%80%83%E8%99%91virtual%E4%BB%A5%E5%A4%96%E7%9A%84%E9%80%89%E6%8B%A9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/18/%E8%80%83%E8%99%91virtual%E4%BB%A5%E5%A4%96%E7%9A%84%E9%80%89%E6%8B%A9/" itemprop="url">36.考虑virtual以外的选择</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-18T14:18:00+08:00">
-                2018-04-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>（本节虽然带有面向对象标签，但描述的是如何跳出面向对象的思维看待问题）</p>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假定我们在编写一款游戏，其中的角色带有一个血条(int)，不同的人计算血量的方式不同，所以把该函数声明为virtual似乎很合适：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>该函数并未定义为pure virtual，这说明我们有一个缺省方法。<br>让我们现在跳出面向对象设计的常规轨道，考虑一些其他的实现可能。</p>
-<hr>
-<h1 id="Template-Method-模式（Non-virtual-Interface"><a href="#Template-Method-模式（Non-virtual-Interface" class="headerlink" title="Template Method 模式（Non-virtual Interface)"></a>Template Method 模式（Non-virtual Interface)</h1><p><strong>有一些人主张virtual函数必须全是private</strong>。以实际问题举例，上个例子保留healthvalue为public non-virtual成员函数，并调用一个private virtual函数来进行实际操作。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        ...<span class="comment">//事前处理</span></span><br><span class="line">        <span class="keyword">int</span> retVal = getHealthValue();</span><br><span class="line">        ...<span class="comment">//事后处理</span></span><br><span class="line">        <span class="keyword">return</span> retVal;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">getHealth</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;...&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这一基本设计被称为non-virtual interface（NVI）手法。它是所<strong>谓template method设计模式（与c++的templates无关）的独特表现形式</strong>。我们习惯于把non-virtual函数称为virtual函数的外覆器（wrapper）。</p>
-<h2 id="NVI的优点"><a href="#NVI的优点" class="headerlink" title="NVI的优点"></a>NVI的优点</h2><p>NVI手法的一大优点在于<strong>wrapper确保了virtual函数在调用前的场景已被设计好，并且调用结束后场景得到了清理。</strong>（实例中的注释处）举例而言，这些工作可能包括：锁定互斥器、记录日志、验证约束条件、互斥器解锁等等。如果你让客户直接调用virtual，那么可能没办法做好这些事。<br>在这里需要注意的是：NVI手法涉及在dc内重新定义了private virtual函数。<strong>重定义virtual函数表示“某事应当被如何完成”，外覆器的non-virtual属性则表示“某事应当何时完成”（函数何时被调用），这二者并不冲突。</strong></p>
-<h2 id="NVI的不足"><a href="#NVI的不足" class="headerlink" title="NVI的不足"></a>NVI的不足</h2><p>在NVI手法下不一定virtual一定得是private，它们也可以是portected.(详见Effective C++ 28 Windows实例）有时候virtual甚至必须是public（具有多态性质的bc的析构函数），这么一来就不能实施NVI手法了。</p>
-<hr>
-<h1 id="Strategy模式（Function-Pointers"><a href="#Strategy模式（Function-Pointers" class="headerlink" title="Strategy模式（Function Pointers)"></a>Strategy模式（Function Pointers)</h1><p>&nbsp;<br>NVI手法本质上还是在用virtual函数，只是调用时颇为巧妙而已。针对游戏实例，另有一些人主张“人物血条的计算与人物类型无关”，这种计算不需要“人物”成分。<br>例如我们可能会要求<strong>每一个人物构造函数接受一个指针指向血条计算函数</strong>，我们调用该函数进行实际操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharcter</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">defaultHealthCalc</span><span class="params">(<span class="keyword">const</span> GameCharacter &amp;gc)</span></span>;<span class="comment">//默认计算函数</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">(*HealthCalc)</span><span class="params">(<span class="keyword">const</span> GameCharacter&amp;)</span></span>;</span><br><span class="line">    explicit GameCharcter(HealthCalc hc = defaultHealthCalc)：HealthFunc(hc) &#123;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    HealthCalc healthFunc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="Strategy的优点"><a href="#Strategy的优点" class="headerlink" title="Strategy的优点"></a>Strategy的优点</h2><p>上述做法是strategy设计模式的一个简单应用，和普通的virtual函数相比，其优点如下：</p>
-<ul>
-<li>同一人物类型的不同实体可以有不同的计算函数（构造时绑定不同的函数指针）。</li>
-<li>血条计算函数可以在人物的不同时期发生变更（比如设置个setHealthcalc函数接受一个函数指针并且替换私有成员）。</li>
-</ul>
-<h2 id="Strategy的缺点"><a href="#Strategy的缺点" class="headerlink" title="Strategy的缺点"></a>Strategy的缺点</h2><p>在Strategy模式下，血条计算函数已经不再是gamecharacter继承体系内的成员函数，也就是说，它将无法访问对象的non-public部分。<br>解决方法只有弱化class的封装：</p>
-<ul>
-<li>将函数声明为friends</li>
-<li>为其需要的数据提供一个public访问接口</li>
-</ul>
-<p>至于strategy模式的优点（每个对象拥有各自的函数以及动态更改的能力）能否抵消缺点（降低class的封装程度），必须根据设计情况的不同进行抉择。</p>
-<hr>
-<h1 id="Strategy模式（Function"><a href="#Strategy模式（Function" class="headerlink" title="Strategy模式（Function)"></a>Strategy模式（Function)</h1><p>&nbsp;<br>为什么血条计算必须得是一个函数呢？它完全可以是一个类似函数的对象。如果我们使用function对象，很多刚才提及的约束一下子就消失了。funcion对象持有一切可调用物（函数指针、函数对象、成员函数指针),因此刚才的设计可以改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharcter</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">defaultHealthCalc</span><span class="params">(<span class="keyword">const</span> GameCharacter &amp;gc)</span></span>;<span class="comment">//默认计算函数</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>:</span></span><br><span class="line">    function&lt;<span class="keyword">int</span> (<span class="keyword">const</span> GameCharacter&amp;)&gt; healthCalcFunc;</span><br><span class="line">    explicit GameCharcter(healthCalcFunc hcf = defaultHealthCalc)：HealthFunc(hcf) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getHealthValue</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> healthFunc(*<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    healthCalcFunc healthFunc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>和前一个相比，这个设计几乎完全一样，唯一的不同之处是如今class持有的是一个function对象，相当于一个指向函数的泛化指针。然而这个改变为客户带来了更加惊人的弹性（原书中使用了bind增加了形参）也就是说，如今的设计允许客户在计算人物健康指数时使用任何兼容的可调用物。</p>
-<hr>
-<p>传统Strategy模式<br>&nbsp;<br><strong>传统Strategy模式更倾向于将当前virtual函数做成一个分离的继承体系中的virtual成员函数</strong>，其设计结果大概像这样：<br><img src="http://static.zybuluo.com/zsmj2017/96205qmwt5vn3xjwgmttayaq/image_1cbc0cklns971g0h14mt1fed1h3s9.png" alt="image_1cbc0cklns971g0h14mt1fed1h3s9.png-24.5kB"><br>其核心在于GameCharacter与HealthcalcFunc成为了base class，并且Gamecharacter中含有一个指针，指向HealthcalcFunc继承体系中的对象。具体实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HealthCalcFunc</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">calc</span><span class="params">(<span class="keyword">const</span> GameCharacter&amp; gc)</span> <span class="keyword">const</span> </span>&#123;...&#125;;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">HealthCalcFunc defaultHealthCalc;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameCharacter</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">GameCharacter</span><span class="params">(HealthCalcFunc* phcf = &amp;defaultHealthCalc)</span></span></span><br><span class="line"><span class="function">                    :<span class="title">pHealthC</span><span class="params">(phcf)</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">healthValue</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> pHealthCalc0&gt;calc(*<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    HealthCalcFunc* pHealthCalc;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>当你为解决当前问题而寻找设计方法时，不妨考虑virtual的以下几个替代方案：</p>
-<ul>
-<li>NVI手法，template method设计模式的特殊形式。<br>它以public non-virtual成员函数包裹较低访问性（private、protected）的virtual函数。</li>
-<li>将virtual函数替换为函数指针</li>
-<li>将函数指针变成function对象，以上两种都是strategy的某种表现形式。</li>
-<li>将继承体系内的virtual换成另一个继承体系内的virtual，这是strategy设计模式的传统实现。</li>
-</ul>
-<p>面向对象固然博大精深，但这个世界上还有许多条路值得我们去探索。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1873,7 +1868,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">261</span>
+                  <span class="site-state-item-count">262</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1884,7 +1879,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1895,7 +1890,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
