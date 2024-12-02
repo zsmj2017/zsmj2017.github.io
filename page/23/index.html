@@ -291,6 +291,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E7%A6%81%E6%AD%A2%E7%9B%B4%E6%8E%A5%E4%BF%AE%E6%94%B9set%E6%88%96mutiset%E7%9A%84key/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/12/%E7%A6%81%E6%AD%A2%E7%9B%B4%E6%8E%A5%E4%BF%AE%E6%94%B9set%E6%88%96mutiset%E7%9A%84key/" itemprop="url">21.禁止直接修改set或mutiset的key</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-12T12:35:00+08:00">
+                2018-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><br><br>正如所有标准关联容器，set和multiset保证元素有序，而且容器的行为之所以能够正确也是建立在内部元素有序的基础之上。如果你修改了关联容器里的元素的key，那么元素的有序可能得不到保证。</p>
+<hr>
+<h1 id="修改map的key"><a href="#修改map的key" class="headerlink" title="修改map的key"></a>修改map的key</h1><p>&lt;/br&gt;<br>本节标题只提到了set与mutiset，因此有读者会发生疑问：难道map或mutimap的key就可以改变吗？实则不然：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">map</span>&lt;<span class="keyword">int</span>, <span class="built_in">string</span>&gt; m;</span><br><span class="line">...</span><br><span class="line">m.<span class="built_in">begin</span>()-&gt;first = <span class="number">10</span>; <span class="comment">//error</span></span><br><span class="line"><span class="built_in">multimap</span>&lt;<span class="keyword">int</span>, <span class="built_in">string</span>&gt; mm;</span><br><span class="line">...</span><br><span class="line">mm.<span class="built_in">begin</span>()-&gt;first = <span class="number">20</span>; <span class="comment">//error</span></span><br></pre></td></tr></table></figure><br>map的key根本无法改变，任何试图改变其key的操作都无法通过编译，这也就是本节不涉及map的原因。<br>之所以map的key无法改变，那是因为<code>map&lt;K,V&gt;</code>或者<code>multimap&lt;K,V&gt;</code>类型的对象中元素的类型是<code>pair&lt;const K,V&gt;</code>，const保证了其key不可赋值。</p>
+<hr>
+<h1 id="为何set的key不能设为const"><a href="#为何set的key不能设为const" class="headerlink" title="为何set的key不能设为const"></a>为何set的key不能设为const</h1><p>&lt;/br&gt;<br>对于<code>set&lt;T&gt;</code>或<code>multiset&lt;T&gt;</code>类型的对象来说，储存在容器里的元素类型只不过是T，并非constT。因此，set或multiset里的元素可能在你想要的任何时候改变。那这个时候问题来了，为何set内的元素不能设置为const呢？</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>假设存在一个关于雇员的class:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">const</span> <span class="built_in">string</span>&amp; <span class="title">name</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setName</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">const</span> <span class="built_in">string</span>&amp; <span class="title">getTitle</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setTitle</span><span class="params">(<span class="built_in">string</span>&amp; title)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">idNumber</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>假定雇员ID唯一，建立一个内部元素为Employee对象的set，显然应该以ID来排序set：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">IDNumberLess</span>:</span></span><br><span class="line">    <span class="keyword">public</span> binary_function&lt;Employee, Employee, <span class="keyword">bool</span>&gt; &#123; </span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> Employees lhs,<span class="keyword">const</span> Employee&amp; rhs)</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> lhs.idNumber() &lt; rhs.idNumber();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">set</span>&lt;Employee, IDNumberLess&gt; EmpIDSet;</span><br><span class="line">EmpIDSet se;</span><br></pre></td></tr></table></figure><br>在此实例中，ID是set的key，其他东西自然可以任意更改：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Employee selectedID;</span><br><span class="line"><span class="keyword">auto</span> i = se.<span class="built_in">find</span>(selectedID);</span><br><span class="line"><span class="keyword">if</span> (i != se.<span class="built_in">end</span>())&#123;</span><br><span class="line">    i-&gt;setTitle(<span class="string">"Corporate Deity"</span>);<span class="comment">//更换头衔</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>我们可以自由地改变set中对象的某一部分成员，那说明set内部的元素并没有用const修饰，那也就是说，set内部的一切都可以改变。改变set的key是存在巨大风险的，但编译器允许这种行为。</p>
+<p>(Effective STL的作者接下来花了大量的篇幅讲述映射，我认为其内容并非一定需要了解）</p>
+<hr>
+<h1 id="如何安全地改变set内部的元素"><a href="#如何安全地改变set内部的元素" class="headerlink" title="如何安全地改变set内部的元素"></a>如何安全地改变set内部的元素</h1><p>&lt;/br&gt;<br>想要安全地更改set内部的元素，必须按照以下流程执行</p>
+<ol>
+<li>定位到需要修改的元素</li>
+<li>拷贝并修改</li>
+<li>从set中删除原元素</li>
+<li>插入新元素</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">EmpIDSet se; </span><br><span class="line">Employee selectedID; </span><br><span class="line">...</span><br><span class="line"><span class="keyword">auto</span> i =se.<span class="built_in">find</span>(selectedID);</span><br><span class="line"><span class="keyword">if</span>(i!=se.<span class="built_in">end</span>())&#123;</span><br><span class="line">    <span class="function">Employee <span class="title">e</span><span class="params">(*i)</span></span>; <span class="comment">//copy</span></span><br><span class="line">    se.erase(i++);<span class="comment">//自增保证迭代器有效</span></span><br><span class="line">    e.setTitle(<span class="string">"Corporate Deity"</span>);<span class="comment">//修改副本</span></span><br><span class="line">    se.insert(i, e);<span class="comment">//在原先位置插入新值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>笔者认为在关联容器内部指定位置插入的做法不足取，但本节也仅仅只是权宜之举。对于set，记住不要试图去修改key就好了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E4%BB%A5pass-by-refernce-to-const%E4%BB%A3%E6%9B%BFpass-by-value/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1703,156 +1861,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/swap%E5%8E%BB%E9%99%A4%E5%A4%9A%E4%BD%99%E5%AE%B9%E9%87%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/11/swap%E5%8E%BB%E9%99%A4%E5%A4%9A%E4%BD%99%E5%AE%B9%E9%87%8F/" itemprop="url">17.swap去除多余容量</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T08:10:00+08:00">
-                2018-04-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>当我们的容器内存储了海量的元素之后，可能在某个阶段会进行大量的删除，此时容器已经没有必要再持有过多的内存，为了避免浪费，应该使用某种shrink_to_fit的手法将其cap缩减到合适的大小（<strong>resize与reserve都无法减小cap</strong>）。</p>
-<h1 id="Swap技巧"><a href="#Swap技巧" class="headerlink" title="Swap技巧"></a>Swap技巧</h1><h2 id="Swap与shrink-to-fit"><a href="#Swap与shrink-to-fit" class="headerlink" title="Swap与shrink_to_fit"></a>Swap与shrink_to_fit</h2><p>收缩容器的技巧在操作上十分简单：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sth</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="built_in">vector</span>&lt;Sth&gt; v;</span><br><span class="line">...<span class="comment">//Now v need to be shrinked to the fit capacity</span></span><br><span class="line"><span class="built_in">vector</span>&lt;Sth&gt;(v).swap(v);</span><br></pre></td></tr></table></figure><br>该技巧的执行流程：</p>
-<ol>
-<li>建立了一个临时变量，并调用拷贝构造函数复制了v中元素<br><strong>拷贝构造只使用了需要的内存，并没有分配所有内存</strong></li>
-<li>将临时对象与v交换。</li>
-<li>完成此表达式后临时对象被析构。</li>
-</ol>
-<p>同理，收缩string也是如此：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">string</span> s;</span><br><span class="line">...</span><br><span class="line"><span class="built_in">string</span>(s).swap(s);</span><br></pre></td></tr></table></figure></p>
-<h2 id="Swap与容器清除"><a href="#Swap与容器清除" class="headerlink" title="Swap与容器清除"></a>Swap与容器清除</h2><p>Swap技巧同样也能够直接<strong>清除容器内部所有元素，并减小其容量至最小值</strong>，其原理是使用刚初始化过的临时变量与需要清除的vector或string交换，如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;Sth&gt; v;</span><br><span class="line"><span class="built_in">string</span> s;</span><br><span class="line">...</span><br><span class="line"><span class="built_in">vector</span>&lt;Sth&gt;().swap(v);</span><br><span class="line"><span class="built_in">string</span>().swap(s);</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1903,7 +1911,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1925,7 +1933,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

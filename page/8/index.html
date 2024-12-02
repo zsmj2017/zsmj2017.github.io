@@ -291,6 +291,170 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/11/%E5%9C%A8%E4%BD%BF%E7%94%A8Pimpl%E6%97%B6%EF%BC%8C%E8%AE%B0%E5%BE%97%E5%9C%A8%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%AD%E5%AE%9A%E4%B9%89special%20function/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/11/%E5%9C%A8%E4%BD%BF%E7%94%A8Pimpl%E6%97%B6%EF%BC%8C%E8%AE%B0%E5%BE%97%E5%9C%A8%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%AD%E5%AE%9A%E4%B9%89special%20function/" itemprop="url">22.在使用Pimpl时，记得在实现文件中定义special function</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-11T13:14:00+08:00">
+                2018-07-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Pimpl技术"><a href="#Pimpl技术" class="headerlink" title="Pimpl技术"></a>Pimpl技术</h1><p>&nbsp;<br>Pimpl技术在Effective C++中多有涉及，详见Effective C++ Item31。</p>
+<h2 id="Pimpl声明"><a href="#Pimpl声明" class="headerlink" title="Pimpl声明"></a>Pimpl声明</h2><p>举例而言，假设Widget定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// in header "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; data;</span><br><span class="line">    Gadget g1, g2, g3; <span class="comment">// Gadget is some user-defined type</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>因为Widget的数据成员是std::string，std::vector和Gadget，这意味着Widget客户端程序必须#include&lt;string&gt;，&lt;vector&gt;和gadget.h。</p>
+<p>在C++ 98中应用Pimpl Idiom可以让Widget用原始指针替换其数据成员，该指针指向已声明但尚未定义的结构：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// still in header "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    ~Widget(); <span class="comment">// dtor is needed—see below</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Impl</span>;</span> <span class="comment">// declare implementation struct</span></span><br><span class="line">    Impl *pImpl; <span class="comment">// and pointer to it</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>已声明但未定义的类型称为incomplete类型,Widget::Impl就是这种类型。使用不完整类型可以做的事情非常少，但至少可以声明一个指向它的指针。由于Widget不再涉及std::string，std::vector和Gadget，因此客户端代码不再需要#include上述头文件。这不仅仅加快了编译速度，这也意味着如果这些头文件的某些内容发生变化，Widget客户端不会受到影响（编译分离）。</p>
+<hr>
+<h2 id="Pimpl实现"><a href="#Pimpl实现" class="headerlink" title="Pimpl实现"></a>Pimpl实现</h2><p>Pimpl Idiom关于data member分配和释放代码在实现文件中，对于widget.cpp中的Widget，有：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"widget.h"</span> <span class="comment">// in impl. file "widget.cpp"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"gadget.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Widget</span>:</span>:Impl &#123; <span class="comment">// definition of Widget::Impl</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; data;</span><br><span class="line">    Gadget g1, g2, g3;</span><br><span class="line">&#125;;</span><br><span class="line">Widget::Widget():pImpl(<span class="keyword">new</span> Impl)&#123;&#125;</span><br><span class="line">Widget::~Widget()&#123; <span class="keyword">delete</span> pImpl; &#125;</span><br></pre></td></tr></table></figure><br>我们可以看到，原先的头文件依存性仍然存在，只不过现在由Widget.cpp执行#include语句，Widget.cpp仅由其实现者使用，而Widget.h由客户端代码使用，这保证了编译分离性质，此外，Widget析构必须释放impl对象，这是pimpl的必要条件。但上述都是C++98中的实现，现在看来，原始指针似乎过于粗糙了一些，因此我们理当追随时代的进步，以std::unique_ptr取代raw pointer:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// in "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Impl</span>;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Impl&gt; pImpl; <span class="comment">// use smart pointer</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>实现文件如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"widget.h"</span> <span class="comment">// in "widget.cpp"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"gadget.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Widget</span>:</span>:Impl &#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; data;</span><br><span class="line">    Gadget g1, g2, g3;</span><br><span class="line">&#125;;</span><br><span class="line">Widget::Widget():pImpl(<span class="built_in">std</span>::make_unique&lt;Impl&gt;())&#123;&#125; <span class="comment">// C++14</span></span><br></pre></td></tr></table></figure><br>显然。智能指针的引入至少帮助我们省去了写析构函数的烦恼。<br>上述代码可以编译，但客户端代码在使用时会出现问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"widget.h"</span></span></span><br><span class="line">Widget w; <span class="comment">// error!</span></span><br></pre></td></tr></table></figure><br>一般来说，报错内容关于无法将sizeof或delete应用于incomplete type。但众所周知，unique_ptr支持incomplete type且Pimpl是unique_ptr大展身手的最佳场景之一，让上述代码能够工作很容易，但我们需要加深对该问题的理解。</p>
+<hr>
+<h1 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h1><p>&nbsp;<br>问题之所以会产生在于析构Widget时存在问题。根据Item17所述的通用规则，编译器应当在用户并未声明析构函数时为我们生成析构函数。在该析构函数中，编译器插入代码以调用Widget的数据成员pImpl的析构函数。pImpl是一个std::unique_ptr&lt;Widget::Impl&gt;，即使用默认删除器的std :: unique_ptr。默认删除器是一个在std ::unique_ptr内的原始指针上使用delete的函数,其会使用C++11中的static_assert确保原始指针并未指向一个incomplete类型。当编译器生成用于析构Widget的代码时，它会遇到一个失败的static_assert，而这正是导致错误的原因。</p>
+<hr>
+<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><p>&nbsp;<br>要解决上述问题，只需要确保在生成析构std::unique_ptr&lt;Widget::Impl&gt;的代码时，Widget::Impl是一个complete类型。一个类型将会在编译器看到其定义时变为complete，且我们在widget.cpp中定义了Widget::Impl。 那么，成功编译的关键在于让编译器在Impl已被声明后，在Widget.cpp中看到Widget的析构函数（在其中编译器会生成析构unique_ptr的代码）已被定义。那么解决方案来了：在Widget.h中声明析构函数，但不作出定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// as before, in "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    ~Widget(); <span class="comment">// declaration only</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>: <span class="comment">// as before</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Impl</span>;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Impl&gt; pImpl;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>在定义了Widget::Impl后在Widget.cpp中定义析构函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"widget.h"</span> <span class="comment">// as before, in "widget.cpp"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"gadget.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Widget</span>:</span>:Impl &#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> name;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; data;</span><br><span class="line">    Gadget g1, g2, g3;</span><br><span class="line">&#125;;</span><br><span class="line">Widget::Widget():pImpl(<span class="built_in">std</span>::make_unique&lt;Impl&gt;())&#123;&#125;</span><br><span class="line">Widget::~Widget()&#123;&#125;</span><br></pre></td></tr></table></figure><br>上述程序已经很好地完成了需求，如果你想要强调析构函数只需为默认生成的即可，你可以使用<code>=default</code>修饰之：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Widget::~Widget() = <span class="keyword">default</span>; <span class="comment">// same effect as above</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="Pimpl与move"><a href="#Pimpl与move" class="headerlink" title="Pimpl与move"></a>Pimpl与move</h1><p>&nbsp;<br>使用Pimpl Idiom的类简直与move操作天生一对，在底层unique_ptr上执行move操作既高效又优雅。但正如Item 17所述，Widget中的析构函数声明阻止了编译器生成移动操作，因此如果要移动支持，则必须自己声明这些函数。鉴于默认生成的move操作没毛病，因此你可能会这样声明它们：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// still in "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    ~Widget();</span><br><span class="line">    Widget(Widget&amp;&amp; rhs) = <span class="keyword">default</span>; <span class="comment">// right idea, wrong code!</span></span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(Widget&amp;&amp; rhs) = <span class="keyword">default</span>; </span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>: <span class="comment">// as before</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Impl</span>;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Impl&gt; pImpl;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这种方法导致的问题与产生问题的根本原因都类似于之前。编译器生成的move operator=需要在重新分配之前销毁pImpl指向的对象，但在Widget头文件中，pImpl指向不完整的类型。而移动构造函数的问题在于编译器通常会生成代码以在移动构造函数内部出现异常时析构pImpl，但析构pImpl需要Impl为complete。</p>
+<p>由于这个问题与之前完全一样，因此它们的解决方案也一样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// still in "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    ~Widget();</span><br><span class="line">    Widget(Widget&amp;&amp; rhs); <span class="comment">// declarations</span></span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(Widget&amp;&amp; rhs); <span class="comment">// only</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>: <span class="comment">// as before</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Impl</span>;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Impl&gt; pImpl;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt; // as before,in "widget.cpp"</span></span></span><br><span class="line">… </span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Widget</span>:</span>:Impl &#123; … &#125;; <span class="comment">// as before</span></span><br><span class="line">Widget::Widget():pImpl(<span class="built_in">std</span>::make_unique&lt;Impl&gt;())&#123;&#125;</span><br><span class="line">Widget::~Widget() = <span class="keyword">default</span>; <span class="comment">// as before</span></span><br><span class="line">Widget::Widget(Widget&amp;&amp; rhs) = <span class="keyword">default</span>;</span><br><span class="line">Widget&amp; Widget::<span class="keyword">operator</span>=(Widget&amp;&amp; rhs) = <span class="keyword">default</span>;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="Pimpl与copy"><a href="#Pimpl与copy" class="headerlink" title="Pimpl与copy"></a>Pimpl与copy</h1><p>&nbsp;<br>编译器不会为具备move-only data member的class生成copy操作，因此我们应当手动完成声明（就算编译器真的完成了拷贝，它针对unique_ptr执行的也是浅拷贝（仅仅复制指针），而我们需要的是深拷贝（复制unique_ptr所指向的对象））。</p>
+<p>照样画葫芦，我们在头文件中对copy操作完成声明,在原文件中完成定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// still in "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    … <span class="comment">// other funcs, as before</span></span><br><span class="line">    Widget(<span class="keyword">const</span> Widget&amp; rhs); <span class="comment">// declarations only</span></span><br><span class="line">    Widget&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs);</span><br><span class="line"><span class="keyword">private</span>: <span class="comment">// as before</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Impl</span>;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Impl&gt; pImpl;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"widget.h"</span> <span class="comment">// as before,</span></span></span><br><span class="line">… <span class="comment">// in "widget.cpp"</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Widget</span>:</span>:Impl &#123; … &#125;; <span class="comment">// as before</span></span><br><span class="line">Widget::~Widget() = <span class="keyword">default</span>; <span class="comment">// other funcs, as before</span></span><br><span class="line">Widget::Widget(<span class="keyword">const</span> Widget&amp; rhs):pImpl(<span class="built_in">std</span>::make_unique&lt;Impl&gt;(*rhs.pImpl))&#123;&#125;</span><br><span class="line">Widget&amp; Widget::<span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">    *pImpl = *rhs.pImpl;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>值得注意的是，我们在copy操作中调用的是impl所具备的copy操作，从而确保了拷贝的正确性，此外，在构造函数中使用了make_unique以取代new。</p>
+<hr>
+<h1 id="Pimpl与shared-ptr"><a href="#Pimpl与shared-ptr" class="headerlink" title="Pimpl与shared_ptr"></a>Pimpl与shared_ptr</h1><p>&nbsp;<br>unique_ptr应用于Pimpl十分自然，这体现了资源的独占性，但如果我们将shared_ptr应用于Pimpl，则不必理会本小节所提倡的“将special function在头文件中声明，源文件中定义”，也就是说，下述代码是完全正确的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// in "widget.h"</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    … <span class="comment">// no declarations for dtor or move operations</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Impl</span>;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">shared_ptr</span>&lt;Impl&gt; pImpl; <span class="comment">// std::shared_ptr instead of std::unique_ptr</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>客户端执行下述程序并不会报错：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w1;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">w2</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">move</span>(w1))</span></span>; <span class="comment">// move-construct w2</span></span><br><span class="line">w1 = <span class="built_in">std</span>::<span class="built_in">move</span>(w2); <span class="comment">// move-assign w1</span></span><br></pre></td></tr></table></figure><br>造成这一行为的原因很简单：unique_ptr的删除器是自身的一部分，而shared_ptr不是。为了保证高效性，unique_ptr删除器必须保证raw pointer为complete，而shared_ptr无需这种保证。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>Pimpl可以保证编译分离。</strong></li>
+<li><strong>Pimpl中若是使用unique_ptr，则必须在头文件中声明special function，在源文件中定义special function。</strong></li>
+<li><strong>第2条规则并不适用于shared_ptr</strong>。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/06/%E4%BB%A5make_unique%E6%88%96make_shared%E5%8F%96%E4%BB%A3%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8new/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1841,163 +2005,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/01/13.%E4%BB%A5const_iterator%E4%BB%A3%E6%9B%BFiterator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/01/13.%E4%BB%A5const_iterator%E4%BB%A3%E6%9B%BFiterator/" itemprop="url">13.以const_iterator代替iterator</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-01T15:42:00+08:00">
-                2018-07-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>(建议将本节与Effective STL Item26、27结合阅读）<br>理论上来说，当你不需要改变迭代器所指对象时，你应当尽量使用const_iterator，这条规则对于C++98与C++11都适用。但实际上在C++98中，使用const_iterator会面临处处受限的窘境。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>举例而言，假若你希望在一个vector&lt;int&gt;中搜索1983第一次出现的位置，并在其位置插入一个1998，如果当前vector内不存在1983，则在vector尾端插入。使用C++98中的iterator可以轻松完成上述操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; values;</span><br><span class="line">…</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::iterator it = <span class="built_in">std</span>::<span class="built_in">find</span>(values.<span class="built_in">begin</span>(),values.<span class="built_in">end</span>(), <span class="number">1983</span>);</span><br><span class="line">values.insert(it, <span class="number">1998</span>);</span><br></pre></td></tr></table></figure><br>由于我们并没有改变iterator指向的元素，理论上我们应当将其改为const_iterator。话虽如此，但在C++98中却并不简单，下面展示了一个似是而非的修正版本：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::iterator IterT; </span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::const_iterator ConstIterT; </span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; values;</span><br><span class="line">…</span><br><span class="line">ConstIterT ci = <span class="built_in">std</span>::<span class="built_in">find</span>(<span class="keyword">static_cast</span>&lt;ConstIterT&gt;(values.<span class="built_in">begin</span>()),</span><br><span class="line">                          <span class="keyword">static_cast</span>&lt;ConstIterT&gt;(values.<span class="built_in">end</span>()),</span><br><span class="line">                          <span class="number">1983</span>);</span><br><span class="line">values.insert(<span class="keyword">static_cast</span>&lt;IterT&gt;(ci), <span class="number">1998</span>); <span class="comment">// may not compile</span></span><br></pre></td></tr></table></figure><br>find函数中使用了强制转换，原因在于：在C++98中，从一个non-const容器中获取const_iterator并非易事。当然了，也不一定非要使用强制转换，你可以定义一个常量引用指向values，然后在源代码中以该常量引用替换values。但不管怎么说，从获取一个指向non-const容器内部元素的const_iterator总是很麻烦。</p>
-<p>即使你真的获取到了const_iterator，事情也未必会发展地如你所愿。在C++98中，插入和删除函数参数必须为iterator类型，这也就是上述代码最后千方百计将const_iterator转换回来的原因。不过，在上述代码的注释中标明强制转换可能无法编译（正确的转换方法与为何会无法编译可见Effective STL Item26、27）。</p>
-<hr>
-<h1 id="C-11中的const-iterator"><a href="#C-11中的const-iterator" class="headerlink" title="C++11中的const_iterator"></a>C++11中的const_iterator</h1><p>&nbsp;<br>C++11中一切都发生了改变，通过cbegin与cend成员函数，non-const容器也可以轻松获取const_iterator。此外，以往STL中需要以iterator标明位置的成员函数（例如insert、erase等等）现如今也可以用const_iterator作为参数,现在我们用C++11再次完成刚才所说的功能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; values; <span class="comment">// as before</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">auto</span> it = <span class="built_in">std</span>::<span class="built_in">find</span>(values.cbegin(),values.cend(), <span class="number">1983</span>);</span><br><span class="line">values.insert(it, <span class="number">1998</span>);</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="C-14中的const-iterator"><a href="#C-14中的const-iterator" class="headerlink" title="C++14中的const_iterator"></a>C++14中的const_iterator</h1><p>&nbsp;<br>尽管C++11中的const_iterator已经大幅度提高了我们的生产力，但其对于开发通用库程序时还是略显不足。这些程序可能会接收一个容器，返回其数据结构起始和结束的位置。我们认为真正的泛型应当以非成员函数的形式出现，而非成员函数。</p>
-<p>假设我们需要泛型之前的findAndInsert程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> V&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">findAndInsert</span><span class="params">(C&amp; container, <span class="keyword">const</span> V&amp; targetVal,<span class="keyword">const</span> V&amp; insertVal)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="built_in">std</span>::cbegin;</span><br><span class="line">    <span class="keyword">using</span> <span class="built_in">std</span>::cend;</span><br><span class="line">    <span class="keyword">auto</span> it = <span class="built_in">std</span>::<span class="built_in">find</span>(cbegin(container),cend(container),targetVal);</span><br><span class="line">    container.insert(it, insertVal);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>遗憾的是上述程序只能在C++14中生效，原因在于C++11只添加了begin、end这两种非成员函数泛型版本，C++14才完成了cbegin、cend的加入。</p>
-<p>但我们也可以稍加变动，在C++11中实现自己的cbegin：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">C</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">auto</span> <span class="title">cbegin</span>(<span class="title">const</span> <span class="title">C</span>&amp; <span class="title">container</span>)-&gt;<span class="title">decltype</span>(<span class="title">std</span>:</span>:<span class="built_in">begin</span>(container))&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">begin</span>(container); <span class="comment">// see explanation below</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其工作原理为：如果实参为non-const,那么container将会成为一个const C&amp;，并且对container调用begin将得到一个const_iterator。这种实现的一大优点在于对于那些带有begin成员函数却不带有cbegin成员函数的容器，你甚至可以直接在函数内部调用begin转换之。</p>
-<p>如果C是一个内置数组，那么这个模板函数也能够正确地运行，因为container被推衍为一个const数组的引用，C++11的非成员函数begin会返回一个指向数组首元素的指针，又由于数组现为const，因此指针类型为一个指向const的指针，这与const_iterator是等价的。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>以const_iterator代替iterator。</strong></li>
-<li><strong>begin，end之类函数的非成员函数版本比其成员函数版本更加适合于泛型程序。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2048,7 +2055,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2070,7 +2077,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

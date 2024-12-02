@@ -291,6 +291,165 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/STL%E5%AE%B9%E5%99%A8%E7%9A%84%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/09/STL%E5%AE%B9%E5%99%A8%E7%9A%84%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%80%A7/" itemprop="url">12. STL容器的线程安全性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T09:59:00+08:00">
+                2018-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="STL提供的线程安全性"><a href="#STL提供的线程安全性" class="headerlink" title="STL提供的线程安全性"></a>STL提供的线程安全性</h1><p>&nbsp;<br>基本上STL容器提供的线程安全性只有以下两点：</p>
+<ol>
+<li><strong>多个线程读取是安全的</strong><br>多个线程可以读同一个容器内的数据，读时不允许写操作</li>
+<li><strong>多个线程对不同的容器写入是安全的</strong></li>
+</ol>
+<hr>
+<h1 id="如何实现线程安全性"><a href="#如何实现线程安全性" class="headerlink" title="如何实现线程安全性"></a>如何实现线程安全性</h1><p>&nbsp;<br>完全的线程安全很难实现，一个库可能试图以下列方式实现这样完全线程安全的容器：</p>
+<ol>
+<li>对于容器成员函数的每一次调用都锁住该容器直到调用完成。</li>
+<li>在容器返回的迭代器生存期结束之前锁住容器</li>
+<li>对于作用于容器的每个算法，在算法执行期间都锁住容器。（实际上这一点毫无必要，因为算法无法识别它们正在操作的容器)</li>
+</ol>
+<hr>
+<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><p>&nbsp;<br>现在考虑一个例子：将vector内的第一个5改成0，如果它存在的话。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line"><span class="keyword">auto</span> first5 = <span class="built_in">find</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), <span class="number">5</span>);</span><br><span class="line"><span class="keyword">if</span> (first5 != v.<span class="built_in">end</span>())&#123;</span><br><span class="line">    *first5 = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在多线程运行环境中，另一个线程可能在find操作完成后立刻修改v中的数据。那样第三行与v.end的检测将毫无意义，因为v的元素已经不再是原来的元素。并且如果执行了插入或者删除操作，first5也已经失效。<br>之前列举的3个方法都无法防止上述问题，迭代器调用返回得很快，生存期只有一行，find也是，无法帮助锁定。</p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&nbsp;<br>为了保证上述代码的线程安全，v必须从行1到行3都保持锁定，STL无法做到自动判断容器是否需要锁定，因此必须手动完成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">...</span><br><span class="line">getMutexFor(v);<span class="comment">//需要自己实现的容器锁操作</span></span><br><span class="line"><span class="keyword">auto</span> first5 = <span class="built_in">find</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), <span class="number">5</span>);</span><br><span class="line"><span class="keyword">if</span> (first5 != v.<span class="built_in">end</span>()) &#123;</span><br><span class="line">    *first5 = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">releaseMutexFor(v);</span><br></pre></td></tr></table></figure><br>从面向对象的角度而言，解决方法是构建一个lock类，其类模板大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Template&lt;<span class="keyword">typename</span> Container&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lock</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>: </span><br><span class="line">    Lock(<span class="keyword">const</span> Containers container)</span><br><span class="line">        : c(container)&#123;</span><br><span class="line">            getMutexFor(c);</span><br><span class="line">        &#125;</span><br><span class="line">    ~Lock()&#123;</span><br><span class="line">        releaseMutexFor(c); </span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">const</span> Container&amp; c;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>显然，这种方法是在用类来管理资源的生存期（RAII)，其使用案例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">...</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function">Lock&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; <span class="title">lock</span><span class="params">(v)</span></span>;</span><br><span class="line">    <span class="keyword">auto</span> first5 = <span class="built_in">find</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), <span class="number">5</span>);</span><br><span class="line">    <span class="keyword">if</span> (first5 != v.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        *first5 = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...<span class="comment">//lock对象析构，v解锁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>另外，这种解决方案是异常安全的，因<strong>为在异常发生的情况下，局部对象会被销毁，此时lock也会释放互斥量</strong>。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>STL允许在一个容器上的多线程读取和不同容器上的多线程写入，除此之外不能依赖任何库自带的线程安全性。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/%E4%BB%A4operator=%E8%BF%94%E5%9B%9E%E8%87%AA%E8%BA%AB%E7%9A%84reference/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1651,154 +1810,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/07/%E5%9C%A8%E6%9E%90%E6%9E%84%E5%89%8D%E8%AE%B0%E5%BE%97delete%E5%AE%B9%E5%99%A8%E5%86%85%E9%80%9A%E8%BF%87new%E5%BE%97%E5%88%B0%E7%9A%84%E6%8C%87%E9%92%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/07/%E5%9C%A8%E6%9E%90%E6%9E%84%E5%89%8D%E8%AE%B0%E5%BE%97delete%E5%AE%B9%E5%99%A8%E5%86%85%E9%80%9A%E8%BF%87new%E5%BE%97%E5%88%B0%E7%9A%84%E6%8C%87%E9%92%88/" itemprop="url">7.在析构前记得delete容器内通过new得到的指针</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-07T16:58:00+08:00">
-                2018-04-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>由于容器在析构时会自发地销毁所有容器内部的元素，因此有人会忽视容器内部元素的清除工作。大部分时候确实不用手动地清除，<strong>仅有一个例外：容器内存放的是通过new得到的指针</strong>。容器析构时指针当然被销毁了，但容器绝不会自动地调用delete释放每一个指针指向的对象，而且我们再也找不到这些对象了。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;Widget*&gt; vwp;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; SOME_MAGIC_NUMBER; ++i)</span><br><span class="line">        vwp.push_back(<span class="keyword">new</span> Widget);</span><br><span class="line">    <span class="comment">//vwp析构后资源也泄露了</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>delete这些指针并不麻烦，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;Widget*&gt; vwp;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> i = vwp.<span class="built_in">begin</span>();i != vwp.<span class="built_in">end</span>();++i) </span><br><span class="line">     <span class="keyword">delete</span> *i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>上述代码看起来似乎很美好，但是仍然存在两点不存：</p>
-<ol>
-<li>做了for_each做的事，但是不如for_each直观</li>
-<li>不具备异常安全，如果在向vwp填充指针或者从中删除指针时有异常抛出，同样会内存泄漏。</li>
-</ol>
-<p>首先解决第一个问题，将上述代码改写为for_each:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for_each(vwp.<span class="built_in">begin</span>(),vwp.<span class="built_in">end</span>(),[](Widget* pw)&#123;<span class="keyword">delete</span> pw;&#125;);</span><br></pre></td></tr></table></figure><br>(原书中描述了大量关于函数对象及其使用原理的说明，在C++11引入lambda之后，笔者跳过了这些知识）</p>
-<p>使用shared_ptr可以避免异常安全的问题，我们通过将原容器替换为包含智能指针的容器之后，一切都变得美好了起来。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1849,7 +1860,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1871,7 +1882,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,159 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/11/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/11/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/" itemprop="url">Data语义学——前言</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-11T20:39:00+08:00">
+                2018-05-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>假设现有多重继承体系如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">X</span> &#123;</span>&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Y</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> X &#123;&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Z</span>:</span><span class="keyword">public</span> <span class="keyword">virtual</span> X &#123;&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>:</span><span class="keyword">public</span> Y,<span class="keyword">public</span> Z &#123;&#125;;</span><br></pre></td></tr></table></figure><br>上述X、Y、Z、A中没有任何一个class内含明显的数据，它们之间只存在继承关系，因此理论上每一个class的大小都应该为0，但事实上，它们的大小均不为0：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sizeof</span>(X) == <span class="number">1</span>;</span><br><span class="line"><span class="keyword">sizeof</span>(Y) == <span class="number">4</span>;</span><br><span class="line"><span class="keyword">sizeof</span>(Z) == <span class="number">4</span>;</span><br><span class="line"><span class="keyword">sizeof</span>(A) == <span class="number">8</span>;</span><br></pre></td></tr></table></figure></p>
+<p>一个空的class如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class X &#123;&#125;;</span><br></pre></td></tr></table></figure><br>事实上并非是空的，它有一个隐晦的1byte，那是被编译器安插进去的一个char（Effective C++ 40）。因此这个class具现化得到的object能够在内存中配置独一无二的地址：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">X a,b;</span><br><span class="line"><span class="keyword">if</span>(&amp;a == &amp;b)...</span><br></pre></td></tr></table></figure><br>那为什么Y和Z的大小会是4呢，这与三个因素有关：</p>
+<ol>
+<li><strong>语言本身的额外负担</strong><br>当语言支持virtual base classes时，就会导致一些额外负担。在derived class中，这个额外负担反应在某种形式的指针身上，它或者指向virtual base class subobject，或者指向一个相关表格：表格中存放的是virtual base class subobject的地址或其偏移量。</li>
+<li><strong>编译器对于特殊情况所做的优化处理</strong><br>Virtual base class X subobject的1 bytes大小也出现在class Y和Z上。传统上它被放在derived class的固定（不发生变动）部分的末端。有些编译器会对empty virtual base class提供特殊支持，但有的没有。</li>
+<li><strong>Alignment的限制</strong><br>在大部分机器上，群聚的结构体大小会受到alignment的限制，使它们能够更有效的在内存中被存取。</li>
+</ol>
+<p>每一个class object都必须有足够大小来容纳其所有nonstatic data members，有时候它们的大小可能会和我们预想的要大一些，原因在于：</p>
+<ol>
+<li>由编译器自动加上的额外data members，用以支持某些语言特性（主要是virtual特性）。</li>
+<li>因为alignment的需要。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/10/%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Member%20Initialization%20List/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1807,169 +1960,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/29/%E5%B0%86%E9%9D%9E%E5%B0%BE%E7%AB%AF%E7%B1%BB%E8%AE%BE%E8%AE%A1%E4%B8%BA%E6%8A%BD%E8%B1%A1%E7%B1%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/29/%E5%B0%86%E9%9D%9E%E5%B0%BE%E7%AB%AF%E7%B1%BB%E8%AE%BE%E8%AE%A1%E4%B8%BA%E6%8A%BD%E8%B1%A1%E7%B1%BB/" itemprop="url">33.将非尾端类设计为抽象类</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-29T20:18:00+08:00">
-                2018-04-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设我们正在抽象动物，其中晰蜴和小鸡需要特别处理,当前继承体系如下：<img src="http://static.zybuluo.com/zsmj2017/ts93pmj4ugcn49y1x0pvi84z/image_1cc8lhmb189u17ud1g9qlaf1fc89.png" alt="image_1cc8lhmb189u17ud1g9qlaf1fc89.png-40.4kB"><br>动物类处理所有动物共有的特性，晰蜴类和小鸡类特别化动物类以适用这两种动物的特有行为。它们的简化版定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Animal&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lizard</span>:</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Lizard&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Lizard&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Chicken</span>:</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Chicken&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Chicken&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>考虑如下表达式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Lizard liz1;</span><br><span class="line">Lizard liz2;</span><br><span class="line">Animal *pAnimal1 = &amp;liz1;</span><br><span class="line">Animal *pAnimal2 = &amp;liz2;</span><br><span class="line">...</span><br><span class="line">*pAnimal1 = *pAnimal2;</span><br></pre></td></tr></table></figure><br>显然，最后的赋值操作符调用的是Animal的，所以直接导致了liz1只有animal部分被修改，也就是部分赋值。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h2><p>一个解决方法是将赋值运算符声明为虚函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> Animal&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lizard</span>:</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> Lizard&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Chicken</span>:</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> Chicken&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这种写法直接导致了operator=可以接受任意类型的Animal对象，也就是说，下面的代码是合法的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Lizard liz;</span><br><span class="line">Chicken chick;</span><br><span class="line">Animal *pAnimal1 = &amp;liz;</span><br><span class="line">Animal *pAnimal2 = &amp;chick;</span><br><span class="line">*pAnimal1 = *pAnimal2;</span><br></pre></td></tr></table></figure><br>显然这是一个混合类型赋值。在未引入虚函数之前，混合类型赋值会被C++的强类型原则判定非法，但引入虚函数之后它们变为了合法。</p>
-<hr>
-<h3 id="动态转换与同类型赋值"><a href="#动态转换与同类型赋值" class="headerlink" title="动态转换与同类型赋值"></a>动态转换与同类型赋值</h3><p>我们真正想要通过指针来完成同类型赋值，而非通过指针完成混合类型赋值，于是我们可以使用动态转换完成这一操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Lizard&amp; Lizard::<span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs)&#123;</span><br><span class="line">    <span class="comment">//make sure rhs is really a lizard</span></span><br><span class="line">    <span class="keyword">const</span> Lizard&amp; rhs_liz = <span class="keyword">dynamic_cast</span>&lt;<span class="keyword">const</span> Lizard&amp;&gt;(rhs);</span><br><span class="line">    proceed with a normal assignment of rhs_liz to *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在上述代码中，如果可以转换则顺利执行operator=，否则抛出bad_cast的异常。</p>
-<hr>
-<h3 id="重载赋值"><a href="#重载赋值" class="headerlink" title="重载赋值"></a>重载赋值</h3><p>其实我们并不需要非得在运行期使用虚函数与dynamic_cast，下面的代码规避了在常规情况下它们的成本，而仅仅只需要增加了一个普通形式的赋值操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lizard</span>:</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> Lizard&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs);</span><br><span class="line">    Lizard&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Lizard&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>事实上，有了第二个operator=后，第一个虚函数版operator=亦得到了简化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Lizard&amp; Lizard::<span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">operator</span>=(dynamic&lt;<span class="keyword">const</span> Lizard&amp;&gt;(rhs));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>现在这个函数试图将rhs转换为一个Lizard。如果转换成功，通常的赋值操作被调用；否则，一个bad_cast异常被抛出。  </p>
-<hr>
-<h2 id="私有化operator"><a href="#私有化operator" class="headerlink" title="私有化operator="></a>私有化operator=</h2><p>在看到了将operator=设置为虚函数之后的弊端后，我们应该想到重新整理代码以确保用户无法写出有问题的赋值语句，最好能够在编译期就会被拒绝。比较容易的方法是在Animal类中把operator=设为private：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Animal&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lizard</span>:</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Lizard&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Lizard&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Chicken</span>:</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Chicken&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Chicken&amp; rhs);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>但需要注意的是Animal本身是一个具象类，也就是说这样一来Animal对象就无法执行opertaor=操作，另外，Lizard与Chicken的赋值也不可能正确完成，因为派生类的赋值操作函数需要调用基类的赋值操作函数。第二个问题可以通过将Animal中的operator=设为protected实现，但“不允许混合类型赋值”的任务并未完成，因为Lizard与Chicken仍然可以通过Animal的指针来互相赋值。</p>
-<hr>
-<h2 id="修改继承体系"><a href="#修改继承体系" class="headerlink" title="修改继承体系"></a>修改继承体系</h2><p>最简单的方法就是修改继承体系。由于我们之前认定Animal必须作为一个实体类存在且有其意义，因此我们创建一个新类 AbstractAnimal，来包含 Animal、 Lizard、Chikcen的共有属性，并把它设为抽象类， 各具象类均由该抽象类派生而出，修改后的继承体系如下所示：<img src="http://static.zybuluo.com/zsmj2017/ftaqwnn4yqyivbvangkycc69/image_1cc8mt77im8l89b6ns12b710grm.png" alt="image_1cc8mt77im8l89b6ns12b710grm.png-32kB"><br>类的定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractAnimal</span> &#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    AbstractAnimal&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> AbstractAnimal&amp; rhs);</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~AbstractAnimal() = <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span>:</span> <span class="keyword">public</span> AbstractAnimal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Animal&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Animal&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lizard</span>:</span> <span class="keyword">public</span> AbstractAnimal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Lizard&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Lizard&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Chicken</span>:</span> <span class="keyword">public</span> AbstractAnimal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Chicken&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Chicken&amp; rhs);...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>至此，一切工作均已完成。同类型间的赋值被允许，部分赋值或不同类型间的赋值被禁止；派生类的赋值操作函数可以调用基类的赋值操作函数。 </p>
-<hr>
-<h1 id="纯虚析构函数"><a href="#纯虚析构函数" class="headerlink" title="纯虚析构函数"></a>纯虚析构函数</h1><p>&nbsp;<br>当我们找不到一个函数可以作为纯虚函数时，我们定义可以析构函数为纯虚函数，<strong>把析构函数设置为纯虚函数时需要记住必须在类的定义之外实现它。</strong><br>声明一个函数为纯虚函数并不意味着它没有实现，它意味着：</p>
-<ol>
-<li>当前类是抽象类</li>
-<li>任何从此类派生的实体类必须将此函数申明为一个“普通”的虚函数（不能带“= 0”）</li>
-</ol>
-<p>尽管大部分纯虚函数都没有实现，但纯虚函数是一个特例，他必须被实现。因为它们在派生类析构函数被调用时也将被调用。而且，它们经常执行有用的任务，诸如释放资源或记录消息。  </p>
-<hr>
-<h1 id="非尾端类与抽象类"><a href="#非尾端类与抽象类" class="headerlink" title="非尾端类与抽象类"></a>非尾端类与抽象类</h1><p>&nbsp;<br>用如AbstractAnimal这样的抽象基类替换如Animal这样的实体基类，其好处并不只有保证operator=的行为正常，它同时减少了你试图对数组使用多态的可能（More Effective C++ 3）。但该技巧最大的好处发生在设计层，因为我们强迫认定所有实体都具备明确行为准则，仅有抽象类承担了抽象的义务。<br>我们并没有方法明确判断未来情况是否需要抽象类，但我们可以肯定，如果存在两个具象类需要以公有继承的方式相互联系，那么通常表示当前情况需要一个抽象类：<br><img src="http://static.zybuluo.com/zsmj2017/d10a84bsw0sea0bsbc07hhtv/image_1cc8ne4hf1aflqd51cd7oq0liv13.png" alt="image_1cc8ne4hf1aflqd51cd7oq0liv13.png-35.7kB"><br>显然，C1和C2具有共性，我们通过建立抽象类将它们的共性抽取出来，使其具备明确的语义。但实际使用中我们可能会发现自己没有权限取更改类库。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>非尾端类应该是抽象类。我们对类库中的程序可能没有办法，但对于能控制的代码，遵守这一约定可以提高程序的可靠性、健壮性、可读性、可扩展性。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2020,7 +2010,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2042,7 +2032,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

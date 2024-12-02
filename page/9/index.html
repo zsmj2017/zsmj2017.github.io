@@ -291,6 +291,163 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/01/13.%E4%BB%A5const_iterator%E4%BB%A3%E6%9B%BFiterator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/01/13.%E4%BB%A5const_iterator%E4%BB%A3%E6%9B%BFiterator/" itemprop="url">13.以const_iterator代替iterator</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-01T15:42:00+08:00">
+                2018-07-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>(建议将本节与Effective STL Item26、27结合阅读）<br>理论上来说，当你不需要改变迭代器所指对象时，你应当尽量使用const_iterator，这条规则对于C++98与C++11都适用。但实际上在C++98中，使用const_iterator会面临处处受限的窘境。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>举例而言，假若你希望在一个vector&lt;int&gt;中搜索1983第一次出现的位置，并在其位置插入一个1998，如果当前vector内不存在1983，则在vector尾端插入。使用C++98中的iterator可以轻松完成上述操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; values;</span><br><span class="line">…</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::iterator it = <span class="built_in">std</span>::<span class="built_in">find</span>(values.<span class="built_in">begin</span>(),values.<span class="built_in">end</span>(), <span class="number">1983</span>);</span><br><span class="line">values.insert(it, <span class="number">1998</span>);</span><br></pre></td></tr></table></figure><br>由于我们并没有改变iterator指向的元素，理论上我们应当将其改为const_iterator。话虽如此，但在C++98中却并不简单，下面展示了一个似是而非的修正版本：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::iterator IterT; </span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::const_iterator ConstIterT; </span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; values;</span><br><span class="line">…</span><br><span class="line">ConstIterT ci = <span class="built_in">std</span>::<span class="built_in">find</span>(<span class="keyword">static_cast</span>&lt;ConstIterT&gt;(values.<span class="built_in">begin</span>()),</span><br><span class="line">                          <span class="keyword">static_cast</span>&lt;ConstIterT&gt;(values.<span class="built_in">end</span>()),</span><br><span class="line">                          <span class="number">1983</span>);</span><br><span class="line">values.insert(<span class="keyword">static_cast</span>&lt;IterT&gt;(ci), <span class="number">1998</span>); <span class="comment">// may not compile</span></span><br></pre></td></tr></table></figure><br>find函数中使用了强制转换，原因在于：在C++98中，从一个non-const容器中获取const_iterator并非易事。当然了，也不一定非要使用强制转换，你可以定义一个常量引用指向values，然后在源代码中以该常量引用替换values。但不管怎么说，从获取一个指向non-const容器内部元素的const_iterator总是很麻烦。</p>
+<p>即使你真的获取到了const_iterator，事情也未必会发展地如你所愿。在C++98中，插入和删除函数参数必须为iterator类型，这也就是上述代码最后千方百计将const_iterator转换回来的原因。不过，在上述代码的注释中标明强制转换可能无法编译（正确的转换方法与为何会无法编译可见Effective STL Item26、27）。</p>
+<hr>
+<h1 id="C-11中的const-iterator"><a href="#C-11中的const-iterator" class="headerlink" title="C++11中的const_iterator"></a>C++11中的const_iterator</h1><p>&nbsp;<br>C++11中一切都发生了改变，通过cbegin与cend成员函数，non-const容器也可以轻松获取const_iterator。此外，以往STL中需要以iterator标明位置的成员函数（例如insert、erase等等）现如今也可以用const_iterator作为参数,现在我们用C++11再次完成刚才所说的功能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; values; <span class="comment">// as before</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">auto</span> it = <span class="built_in">std</span>::<span class="built_in">find</span>(values.cbegin(),values.cend(), <span class="number">1983</span>);</span><br><span class="line">values.insert(it, <span class="number">1998</span>);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="C-14中的const-iterator"><a href="#C-14中的const-iterator" class="headerlink" title="C++14中的const_iterator"></a>C++14中的const_iterator</h1><p>&nbsp;<br>尽管C++11中的const_iterator已经大幅度提高了我们的生产力，但其对于开发通用库程序时还是略显不足。这些程序可能会接收一个容器，返回其数据结构起始和结束的位置。我们认为真正的泛型应当以非成员函数的形式出现，而非成员函数。</p>
+<p>假设我们需要泛型之前的findAndInsert程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> C, <span class="keyword">typename</span> V&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">findAndInsert</span><span class="params">(C&amp; container, <span class="keyword">const</span> V&amp; targetVal,<span class="keyword">const</span> V&amp; insertVal)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="built_in">std</span>::cbegin;</span><br><span class="line">    <span class="keyword">using</span> <span class="built_in">std</span>::cend;</span><br><span class="line">    <span class="keyword">auto</span> it = <span class="built_in">std</span>::<span class="built_in">find</span>(cbegin(container),cend(container),targetVal);</span><br><span class="line">    container.insert(it, insertVal);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>遗憾的是上述程序只能在C++14中生效，原因在于C++11只添加了begin、end这两种非成员函数泛型版本，C++14才完成了cbegin、cend的加入。</p>
+<p>但我们也可以稍加变动，在C++11中实现自己的cbegin：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">C</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">auto</span> <span class="title">cbegin</span>(<span class="title">const</span> <span class="title">C</span>&amp; <span class="title">container</span>)-&gt;<span class="title">decltype</span>(<span class="title">std</span>:</span>:<span class="built_in">begin</span>(container))&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">begin</span>(container); <span class="comment">// see explanation below</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其工作原理为：如果实参为non-const,那么container将会成为一个const C&amp;，并且对container调用begin将得到一个const_iterator。这种实现的一大优点在于对于那些带有begin成员函数却不带有cbegin成员函数的容器，你甚至可以直接在函数内部调用begin转换之。</p>
+<p>如果C是一个内置数组，那么这个模板函数也能够正确地运行，因为container被推衍为一个const数组的引用，C++11的非成员函数begin会返回一个指向数组首元素的指针，又由于数组现为const，因此指针类型为一个指向const的指针，这与const_iterator是等价的。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>以const_iterator代替iterator。</strong></li>
+<li><strong>begin，end之类函数的非成员函数版本比其成员函数版本更加适合于泛型程序。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/30/%E4%BD%BF%E7%94%A8override%E6%9D%A5%E4%BF%AE%E9%A5%B0%E9%9C%80%E8%A6%81%E8%A6%86%E5%86%99%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1741,169 +1898,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/25/%E4%BA%86%E8%A7%A3decltype%E6%8A%80%E6%9C%AF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/%E4%BA%86%E8%A7%A3decltype%E6%8A%80%E6%9C%AF/" itemprop="url">3.了解decltype技术</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T07:10:00+08:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>decltype是一项奇特的技术，它能够告诉你某个名称或表达式的类型，尽管有时候返回的结果令你抓耳挠腮。</p>
-<hr>
-<h1 id="decltype的使用"><a href="#decltype的使用" class="headerlink" title="decltype的使用"></a>decltype的使用</h1><p>&nbsp;<br>我们首先从最简单的情况开始分析，在此情况中decltype只会鹦鹉学舌般反馈类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> i =<span class="number">0</span>;<span class="comment">//decltype(i) is const int</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> Widget&amp;w)</span></span>;<span class="comment">//decltype(w) is const Widget&amp;,decltype(f) is bool(const Widget&amp;)</span></span><br><span class="line"><span class="keyword">if</span>(f(w))<span class="comment">//decltype(f(w)) is bool</span></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;<span class="comment">//decltype(v) is vector&lt;int&gt;</span></span><br><span class="line"><span class="keyword">if</span>(v[<span class="number">0</span>]==<span class="number">0</span>)...<span class="comment">//decltype(v[0] is int&amp;</span></span><br></pre></td></tr></table></figure><br>看起来一切都很正常。</p>
-<hr>
-<h2 id="decltype与返回值"><a href="#decltype与返回值" class="headerlink" title="decltype与返回值"></a>decltype与返回值</h2><p>在C++11中，decltype主要用于声明函数返回值依赖于其类型参数的函数模板。举例来说，我们的函数可能会操作一个带有索引的容器，在返回容器内部元素的值之前，我们需要验证一下使用者的身份，此函数的返回值类型显然应当与operator[]的返回值类型一致，此时应当使用decltype。</p>
-<p>有人认为在容器类中，operator []总是返回T&amp;。对于deque来说这总是成立的，但对于vector来说，vector&lt;bool&gt;则并非返回一个bool&amp;，而是一个新对象。（代理类，这一问题详见Effective STL Item18及More Effective C++ Item30），这里我们强调的是，一个容器的operator []返回类型不仅仅与其元素类型有关，也与容器自身有关。</p>
-<p>下面的实例展示了decltype的用法，它将在后期被进一步改进：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container,<span class="keyword">typename</span> Index&gt;</span><br><span class="line">auto authAndAccess(Container&amp;c,Index i)-&gt;decltype(c[i])&#123;</span><br><span class="line">    authenticateUser();</span><br><span class="line">    <span class="keyword">return</span> c[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>函数名前的auto与类型推衍毫无关联，它只是表示此处我们使用了C++11的尾置返回类型（C++ Primer P604）。我们的返回类型取决于c、i,因此我们不可能在没有遇到它们之前声明返回值类型，这即是尾置返回类型的特性与优势所在。</p>
-<p>C++11允许使用auto推衍单语句lambda的返回值类型，C++14将其扩展至所有多语句lambda与函数。这意味着在刚才的实例中我们可以不使用尾置返回类型，仅使用auto来完成类型推衍：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container,<span class="keyword">typename</span> Index&gt;</span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">authAndAccess</span><span class="params">(Container&amp;c,Index i)</span></span>&#123;<span class="comment">//not quite correct</span></span><br><span class="line">    authenticateUser();</span><br><span class="line">    <span class="keyword">return</span> c[i];<span class="comment">//type deduction take place</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>在Item2中我们曾经说明auto用于函数返回值类型推衍时采用template function推衍法则，这一特点造成了上文实例可能推衍失败的可能，原因在于容器类operator[]的返回类型几乎都是T&amp;，但template function在作类型推衍时将忽略referenceness,如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">deque</span>&lt;<span class="keyword">int</span>&gt; d;</span><br><span class="line">authAndAccess(d,<span class="number">5</span>) = <span class="number">10</span>;<span class="comment">//can not compile</span></span><br></pre></td></tr></table></figure><br>理论上来说，等式左侧应当是一个int&amp;,但实际上由于template function推衍法则，等式左侧被推衍为int。由于该int是一个函数的返回值，所以它是一个右值，这直接导致了本语句无法编译。</p>
-<hr>
-<h2 id="C-14中的decltype-auto"><a href="#C-14中的decltype-auto" class="headerlink" title="C++14中的decltype(auto)"></a>C++14中的decltype(auto)</h2><p>&nbsp;<br>为了保证函数功能正常，我们需要使用decltype来推衍函数返回值类型.C++14引入了decltype(auto)类型说明符，其功能为：auto用以说明当前类型需要被推衍，而decltype则代表了类型推衍所需要采用的法则，修改之后的authAndAccess:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container,<span class="keyword">typename</span> Index&gt;</span><br><span class="line"><span class="function"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">authAndAccess</span><span class="params">(Container&amp; c,Index i)</span></span>&#123;<span class="comment">//still require refinement</span></span><br><span class="line">    authenticateUser();</span><br><span class="line">    <span class="keyword">return</span> c[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>decltype不仅仅可以用来作为返回值类型说明符，也可以用于在初始化语句中定义对象，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line"><span class="keyword">const</span> Widget&amp; cw = w;</span><br><span class="line"><span class="keyword">auto</span> myWidget1 = cw;<span class="comment">//auto type deduction: myWidget1's type is Widget</span></span><br><span class="line"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) myWidget2 = cw;<span class="comment">//decltype deduction:myWidget2's type is const Widget&amp;</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="authAndAccess的最终修正"><a href="#authAndAccess的最终修正" class="headerlink" title="authAndAccess的最终修正"></a>authAndAccess的最终修正</h1><p>&nbsp;<br>我们首先回顾一下authAndAccess的声明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container, <span class="keyword">typename</span> Index&gt;</span><br><span class="line"><span class="function"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">authAndAccess</span><span class="params">(Container&amp; c, Index i)</span></span>;</span><br></pre></td></tr></table></figure><br>容器对象的传递采用reference-non-const形式，如此即可保证用户可通过该函数修改容器内部元素。这种传递方式限制了rvalue的传入，因为rvalue无法被绑定至lvalue引用（除非是lvalue-reference-to-const）。</p>
-<p>诚然，传递一个右值容器对象是一种罕见的情况。一个右值容器对象必然是一个临时对象，其在authAndAccess调用完成后必将销毁，那么返回其内部元素的引用也必将造成空悬。但这种情况未必不会发生，例如客户可能希望拷贝一个临时容器中的元素：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">deque</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; <span class="title">makeStringDeque</span><span class="params">()</span></span>;<span class="comment">//Factory function</span></span><br><span class="line"><span class="keyword">auto</span> s = authAndAccess(makeStringDeque(),<span class="number">5</span>);<span class="comment">//can't compile</span></span><br></pre></td></tr></table></figure><br>为了解决这个问题，有些开发者也许会想到重载，不过那样我们需要撰写两个函数，这是没必要的，Item24将为我们介绍的universal reference可以同时绑定lvalue与rvalue：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container, <span class="keyword">typename</span> Index&gt;</span><br><span class="line"><span class="function"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">authAndAccess</span><span class="params">(Container&amp;&amp; c, Index i)</span></span>;</span><br></pre></td></tr></table></figure><br>在这个template function中我们对容器类型一无所知，这也直接导致了我们对其索引对象的类型（Index)不甚明确。对未知类型对象采用值传递的方式可能会导致性能下降、slicing等诸多问题，但有时确实存在着pass-by-value的必要，因此我们坚持对Index对象采用pass-by-value。最终，我们采用Item25所建议的std::forward对函数作出修正：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container, <span class="keyword">typename</span> Index&gt;</span><br><span class="line"><span class="keyword">decltype</span>(<span class="keyword">auto</span>)authAndAccess(Container&amp;&amp; c, Index i)&#123;</span><br><span class="line">    authenticateUser();</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::forward&lt;Container&gt;(c)[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="decltype的特殊情况"><a href="#decltype的特殊情况" class="headerlink" title="decltype的特殊情况"></a>decltype的特殊情况</h1><p>&nbsp;<br>将decltype应用于某个名称将导致对此名称的类型推衍，名称是一种左值表达式，不过这不会影响decltype的行为。但是对于比名称更为复杂的左值表达式，decltype将保证类型推衍结果必然是一个左值引用。一般来说这不会造成多大影响，因为左值表达式自带一个引用符，举例来说，一个返回左值的函数即返回左值引用。</p>
-<p>请注意下面的例子：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">0</span>;</span><br></pre></td></tr></table></figure><br>x是变量的名称，因此decltype(x)的结果是int。但如果我们用一个小括号将x包起来形成<code>(x)</code>,它就变成了一个左值表达式，那么decltype((x))的结果则会变为int&amp;，但更麻烦的还在后面，有时候这种写法会直接导致崩溃，考虑下面两个函数<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">f1</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> x;<span class="comment">//return int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">f1</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> (x);<span class="comment">//return int&amp; to a local variable!</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>由此可见，表达式类型在一定程度上可能会影响decltype(auto)的推衍结果，Item4将会介绍确保每一次推衍结果都我们所愿的方法。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>decltype在作类型推衍时几乎总是不发生任何改变。</strong></li>
-<li><strong>对于并非名称的左值表达式，decltype几乎总是返回T&amp;。</strong></li>
-<li><strong>C++14支持decltype(auto),其表示以decltype法则作类型推衍。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1954,7 +1948,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1976,7 +1970,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E8%87%AA%E5%AE%9A%E4%B9%89new%E4%B8%8Edelete/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/24/%E8%87%AA%E5%AE%9A%E4%B9%89new%E4%B8%8Edelete/" itemprop="url">51.自定义new与delete</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T12:19:00+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="为何需要自定义opertaor-new与operator-delete？"><a href="#为何需要自定义opertaor-new与operator-delete？" class="headerlink" title="为何需要自定义opertaor new与operator delete？"></a>为何需要自定义opertaor new与operator delete？</h1><p>&nbsp;<br>有三个理由:</p>
+<ol>
+<li>检测运用上的错误<br>如果new所得的内存delete失败，会导致内存泄漏。如果试图多次delete，则又会导致未定义行为。针对该误操作的解决方法是：令operator new持有一串动态分配所得地址，delete将地址从中移除。<br>各式各样的编程错误可能会导致数据overruns(写入点在分配区段尾部之后）或者underruns（起点之前）。其解决方法是：自定义operator new，分配超额内存，以额外空间放置特定的byte patterns（signature）operator delete执行时先检查这段签名是否原封不动，若否则表明出现了overrun或者underrun，log此事实以及这个指针。</li>
+<li>强化效能<br>编译器所带的operator new与operator delete总是惯于采取通用解（不针对特殊情况使用最优解），如果你针对自己的程序作出特定优化（内存大小，分配形态，持续分配与归还），性能将会得到极大的提高。</li>
+<li>统计使用数据<br>在自定义内存管理服务前我们当然需要采集目前程序对内存的使用情况，我们可以通过自定义operator new与operator delete来搜集内存使用信息。</li>
+</ol>
+<hr>
+<h1 id="自定义operator-new实例"><a href="#自定义operator-new实例" class="headerlink" title="自定义operator new实例"></a>自定义operator new实例</h1><p>&nbsp;<br>以下是一个帮助检查overruns或underruns的operator new实例，其中存在着一些小错误：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> signature = <span class="number">0xDEADBEEF</span>;<span class="comment">//签名</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> Byte;</span><br><span class="line"></span><br><span class="line"><span class="comment">//存在一些小错误</span></span><br><span class="line"><span class="function"><span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span>::<span class="built_in">std</span>;</span><br><span class="line">    <span class="keyword">size_t</span> realSize = <span class="built_in">size</span>+<span class="number">2</span>*<span class="keyword">sizeof</span>(<span class="keyword">int</span>);<span class="comment">//实际需要额外塞入两个signature</span></span><br><span class="line">    <span class="keyword">void</span>* pMem = <span class="built_in">malloc</span>(realSize);</span><br><span class="line">    <span class="keyword">if</span>(!pMem) <span class="keyword">throw</span> bad_alloc();</span><br><span class="line">    *(<span class="keyword">static_cast</span>&lt;<span class="keyword">int</span>*&gt;(pMem) = signature;</span><br><span class="line">    *(<span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">int</span>*&gt;(<span class="keyword">static_cast</span>&lt;Byte*&gt;(pMem)+realSize-<span class="keyword">sizeof</span>(<span class="keyword">int</span>))) = signature;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;Byte*&gt;(pMem) +<span class="keyword">sizeof</span>(<span class="keyword">int</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其缺点主要在于operator new应该内含某一个循环，反复调用某个new-handler函数。这个问题会在下一节具体说明，本节针对该实例讨论重点是齐位（alignment）。</p>
+<hr>
+<h1 id="齐位"><a href="#齐位" class="headerlink" title="齐位"></a>齐位</h1><p>&nbsp;<br>许多计算机体系结构会要求特定类型存放于特定的地址，比如指针的地址必须是4倍数或者double的地址必须是8倍数。有的体系不遵循该规则会导致硬件异常，有的体系则无此要求，只是如果遵循齐位则提供较佳焦虑。<br>在上一个实例中，malloc返回的指针必然是齐位的，但是自定义的operator new并没有返回得自malloc的指针，而是做了一些偏移，这可能会造成错误或效率低下。事实上，各个库的内存管理函数或者部分开源内存管理器均考虑了齐位特性。如果我们也有自定义内存管理的需求，记得考虑诸如可移植性，齐位，线程安全等等细节。</p>
+<hr>
+<h1 id="何时需要自定义opertaor-new与operator-delete"><a href="#何时需要自定义opertaor-new与operator-delete" class="headerlink" title="何时需要自定义opertaor new与operator delete"></a>何时需要自定义opertaor new与operator delete</h1><ul>
+<li>需要检测运用错误（如前所述）</li>
+<li>需要收集使用信息（如前所述）</li>
+<li>需要增加分配与归还的速度<br>举例而言，如果在profile时发现线程安全性降低了运行速度，而我们的程序只在单线程下运行，则没必要使用线程安全的operator new。</li>
+<li>需要降低默认内存管理器带来的空间额外开销</li>
+<li>弥补默认分配器带来的非最佳齐位</li>
+<li>需要将对象成簇集中<br>如果每个数据结构往往被一起使用，而你有希望使用它们时page faults的频率降至最低，那么为此创建一个heap就很有必要。new与delete的placement版本可以完成这样的行为。</li>
+<li>需要获得非传统行为<br>例如分配和归还共享内存。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%9A%90%E5%BC%8F%E8%BD%AC%E6%8D%A2%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1731,167 +1892,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/21/%E8%BF%90%E7%94%A8member%20function%20template%E6%8E%A5%E5%8F%97%E6%89%80%E6%9C%89%E5%85%BC%E5%AE%B9%E7%B1%BB%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/21/%E8%BF%90%E7%94%A8member%20function%20template%E6%8E%A5%E5%8F%97%E6%89%80%E6%9C%89%E5%85%BC%E5%AE%B9%E7%B1%BB%E5%9E%8B/" itemprop="url">46.运用member function template接受所有兼容类型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-21T15:29:00+08:00">
-                2018-04-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>所谓智能指针，指的是一些行为像指针的对象，它们可以提供指针没有的机能。STL容器的迭代器几乎总是智能指针，你不会奢望使用operator++将指针从list的一个node移至另一个node，但是迭代器可以。</p>
-<p>真实指针有一个很好用的功能：支持隐式转换。举例来说：</p>
-<ul>
-<li>derived class指针可以隐式转为base class指针</li>
-<li>指向non-const对象的指针可以指向const对象</li>
-</ul>
-<p>既然智能指针是行为如同原始指针的对象，那么我们当然希望智能指针也具备上述功能。具体来说，我们希望下述代码能够通过编译：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Top</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Middle</span>:</span><span class="keyword">public</span> Top;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Smartptr</span>&#123;</span><span class="comment">//自定义的智能指针</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Smartptr</span><span class="params">(T* realPtr)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line">Smartptr&lt;Top&gt; pt1 =Smart&lt;Middle&gt;(<span class="keyword">new</span> Middle);</span><br><span class="line">Smartptr&lt;<span class="keyword">const</span> Top&gt; pt2 = pt1;</span><br></pre></td></tr></table></figure><br>但是，同一个template的不同具现化之间并不存在继承关系，所以，<code>smartptr&lt;top&gt;</code>与<code>smartptr&lt;middle&gt;</code>完全无关，为了达到我们期望的smart classes之间的转换能力，我们必须明确地编写它们。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&nbsp;<br>我们关注的重点是应该如何编写智能指针的构造函数。经过分析不难得出结论：我们永远无法写出所有需要的构造函数。我们真正需要撰写的是一个构造模板。<br>构造函数模板具体如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SmartPtr</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> U&gt;</span><br><span class="line">    SmartPtr(<span class="keyword">const</span> SmartPtr&lt;U&gt;&amp; other);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="方案剖析"><a href="#方案剖析" class="headerlink" title="方案剖析"></a>方案剖析</h1><p>&nbsp;<br>该构造函数模板声明：对于任何类型T和任何类型U，总可以根据一个<code>SmartPtr&lt;U&gt;</code>对象来构造一个<code>SmartPtr&lt;T&gt;</code>对象。我们把这种构造函数称为泛化copy构造函数。之所以不用explicit声明，是因为原始指针之间的转换就是隐式的，我们需要保证智能指针与原始指针之间的兼容性。<br>声明固然已经完成，但是实现却值得花一番心思。并非任意的U型智能指针都能转为T型智能指针（比如把base转为derived），所以我们必须在某方面对这一member template所创建的成员函数群进行筛选。</p>
-<hr>
-<h1 id="解决方案的实现"><a href="#解决方案的实现" class="headerlink" title="解决方案的实现"></a>解决方案的实现</h1><p>&nbsp;<br>假设SmartPtr遵循shared_ptr的接口，存在一个get函数返回原始指针的副本，那我们则可以在构造模板中实现代码约束，具体如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SmartPtr</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> U&gt;</span><br><span class="line">    SmartPtr(<span class="keyword">const</span> SmartPtr&lt;U&gt; &amp;other)</span><br><span class="line">        :helder(other.<span class="built_in">get</span>()) &#123;....&#125;</span><br><span class="line">    <span class="function">T* <span class="title">get</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> heldptr;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T* heldPtr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>现在，仅在“存在某个隐式转换将U*指针转为T*指针”时才能通过编译,而这正是我们想要的。</p>
-<hr>
-<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>&nbsp;<br>member function template不仅仅单纯用于构造函数，它还常常在赋值操作时发挥作用。<br>在class中声明泛化copy构造函数并不会阻止编译器生存自己的copy构造函数（一个non-template），因此如果需要控制copy构造的方方面面（比如禁止拷贝之类），我们必须同时声明泛化copy构造函数与non-template构造函数，同样的规则也适用于赋值操作。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>可使用member function template生成“可接受所有兼容类型”的函数</li>
-<li>如果你声明了member template用于泛化操作，你还是需要声明正常的copy构造函数与copy assignment运算符。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1942,7 +1942,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1964,7 +1964,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

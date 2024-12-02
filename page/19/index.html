@@ -291,6 +291,169 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95%E4%BC%98%E4%BA%8E%E6%98%BE%E5%BC%8F%E5%BE%AA%E7%8E%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95%E4%BC%98%E4%BA%8E%E6%98%BE%E5%BC%8F%E5%BE%AA%E7%8E%AF/" itemprop="url">43.泛型算法优于显式循环</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T12:11:00+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>算法内部本身就存在循环，因此众多需要用循环实现的任务，算法可以轻松完成。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设当前有一个支持重画的class:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">redraw</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>如果我们试图将某个list内所有Widget重画，其循环版本大致如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">list</span>&lt;Widget&gt; lw;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> i = lw.<span class="built_in">begin</span>();i != lw.<span class="built_in">end</span>(); ++i) &#123;</span><br><span class="line">    i-&gt;redraw();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当然了，也可以使用for_each算法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for_each(lw.<span class="built_in">begin</span>(),lw.<span class="built_in">end</span>(),[](Widget&amp; w)&#123;w.redraw();&#125;);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="泛型算法相较于显式循环的优点"><a href="#泛型算法相较于显式循环的优点" class="headerlink" title="泛型算法相较于显式循环的优点"></a>泛型算法相较于显式循环的优点</h1><p>&nbsp;<br>一般来说，程序员通常认为循环比算法易读，但本节内容将说明算法更可取，理由有三：</p>
+<ol>
+<li>效率高</li>
+<li>正确性高</li>
+<li>更直观</li>
+</ol>
+<h2 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h2><p>相较于显式循环，算法的高效性体现在：</p>
+<ol>
+<li>避免了每一次循环结束迭代器都需要与end()作比较（<code>i != lw.end()</code>);</li>
+<li>库的实现者可以用更优化的方式来遍历容器。</li>
+<li>大佬们写的算法比我们的实现更高效。</li>
+</ol>
+<h2 id="正确性"><a href="#正确性" class="headerlink" title="正确性"></a>正确性</h2><p>众所周知，写循环时最麻烦的莫过于确保当前迭代器的有效性，并且保证它指向了正确的位置。</p>
+<h3 id="问题实例-1"><a href="#问题实例-1" class="headerlink" title="问题实例"></a>问题实例</h3><p>假设有一个数组，我们试图将其中的每一个元素都加上41然后插入到deque的前端<br>，循环体如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> data[maxNumDoubles];<span class="comment">//C API</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i&lt;numDoubles;++i)</span><br><span class="line">    d.insert(d.<span class="built_in">begin</span>(),data[i]+<span class="number">41</span>]);</span><br></pre></td></tr></table></figure><br>这段代码的问题在于:插入的元素是反序的，因为每一次都把待插入元素放在了开头。<br>于是我们做出了如下修改：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> insertLocation = d.<span class="built_in">begin</span>();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; numDoubles; ++i) &#123;</span><br><span class="line">    d.insert(insertLocation++, data[i] + <span class="number">41</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>但是实际上这个更不行，因为insert之后后面的迭代器都失效了，insertlocation自然也是如此，所有行为均未定义。<br>但最终我们还是解决了这个问题，就是每一次插入后都更新insertlocation…<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> insertLocation = d.<span class="built_in">begin</span>();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; numDoubles; ++i) &#123;</span><br><span class="line">    insertLocation=d.insert(insertLocation, data[i] + <span class="number">41</span>);</span><br><span class="line">    ++insertLocation;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当然，使用插入迭代器也是不错的主意。</p>
+<h3 id="使用算法"><a href="#使用算法" class="headerlink" title="使用算法"></a>使用算法</h3><p>刚才我们费了半天周折终于利用显示循环写出了正确的程序，那如果使用算法呢？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">transform(data, data + numDoubles,inserter(d, d.<span class="built_in">begin</span>()),[](<span class="keyword">int</span> i)&#123;i+=<span class="number">41</span>;&#125;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="直观性"><a href="#直观性" class="headerlink" title="直观性"></a>直观性</h2><p>任何一个算法在我们读到其名字时就已经了解了它的行为，但显式循环则不然。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>相对于泛型算法，显式循环稍逊风骚。但它并非一无是处，使用循环能让人更清楚地明白加诸于迭代器上的操作。<br>我们可以认为泛型算法提升了软件的抽象层次，并且使得它更容易实现、文档化、增强、维护。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E5%A4%9A%E9%87%8D%E7%BB%A7%E6%89%BF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1666,158 +1829,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/18/%E4%BB%BF%E5%87%BD%E6%95%B0%E7%B1%BB%E4%B8%8E%E5%80%BC%E4%BC%A0%E9%80%92/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/18/%E4%BB%BF%E5%87%BD%E6%95%B0%E7%B1%BB%E4%B8%8E%E5%80%BC%E4%BC%A0%E9%80%92/" itemprop="url">38.仿函数类与值传递</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-18T17:53:00+08:00">
-                2018-04-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>c与c++都不允许把函数作为参数传递给其他函数，所以我们传递给函数的是函数指针。比如下述的qsort声明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">qsort</span><span class="params">(<span class="keyword">void</span> *base, <span class="keyword">size_t</span> nmemb, <span class="keyword">size_t</span> <span class="built_in">size</span>,<span class="keyword">int</span> (*cmpfcn)(<span class="keyword">const</span> <span class="keyword">void</span>*, <span class="keyword">const</span> <span class="keyword">void</span>*))</span></span>;</span><br></pre></td></tr></table></figure><br>函数指针是值传递的。</p>
-<hr>
-<h1 id="函数对象"><a href="#函数对象" class="headerlink" title="函数对象"></a>函数对象</h1><p>&nbsp;<br>STL函数对象是函数指针的一种抽象形式，所以按照惯例，函数对象也是按值传递的，最好的证明就是for_each算法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">InputIterator</span>,<span class="title">class</span> <span class="title">Function</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">Functionfor_each</span>(<span class="title">InputIterator</span> <span class="title">first</span>,<span class="title">InputIterator</span> <span class="title">last</span>,<span class="title">Function</span> <span class="title">f</span>);</span><span class="comment">//pass-by-value</span></span><br></pre></td></tr></table></figure><br>显然，函数对象是一个copy，返回值也是一个copy.<br>其实函数对象不一定非要是值传递(显式地写为引用传递），但对于STL用户而言，这一条必须遵守，否则某些算法甚至无法编译。</p>
-<h2 id="函数对象的特点"><a href="#函数对象的特点" class="headerlink" title="函数对象的特点"></a>函数对象的特点</h2><p>既然函数对象是值传递的，那它必须满足两条属性：</p>
-<ul>
-<li>足够小，易于copy</li>
-<li>单态，否则拷贝时会造成割裂</li>
-</ul>
-<h2 id="函数对象的实现"><a href="#函数对象的实现" class="headerlink" title="函数对象的实现"></a>函数对象的实现</h2><p>因为不满足上述两条要求就不用仿函数类是愚蠢的，实际上我们有的是办法让大的或者是多态的函数对象以值传递的方式进入STL.<br>具体方法是：<strong>把所需的数据和虚函数从仿函数类中分离出来，放到新的类中；然后在仿函数类中包含一个指针，指向这个新类的对象。</strong><br>例如，我们需要建立一个包含了大量数据并且使用了多态性的函数子类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BPFC</span>:</span><span class="keyword">public</span> unary_function&lt;T, <span class="keyword">void</span>&gt; &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Widget w;<span class="comment">//存有大量数据</span></span><br><span class="line">    Int x; </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> T&amp; val)</span> <span class="keyword">const</span></span>; <span class="comment">//虚函数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这样把BPFC作为仿函数类是肯定不行的，正确做法<strong>是建立一个包含一个指向实现类的指针的小而单态的类，然后把所有数据和虚函数放到实现类</strong>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BPFCImpl</span>:</span><span class="keyword">public</span> unary_function&lt;T, <span class="keyword">void</span>&gt; &#123; </span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Widget w; </span><br><span class="line">    <span class="keyword">int</span> x;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">virtual</span> ~BPFCImpl();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> T&amp; val)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="keyword">friend</span> <span class="class"><span class="keyword">class</span> <span class="title">BPFC</span>&lt;T&gt;;</span><span class="comment">//友元类</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BPFC</span>:</span><span class="keyword">public</span> unary_function&lt;T, <span class="keyword">void</span>&gt; &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    BPFCImpl&lt;T&gt; *pImpl;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> T&amp; val)</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        pImpl-&gt;<span class="keyword">operator</span>() (val);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>显然,虽然BPFC是小而单态的，但是其内部的指针在访问时具备了多态性，并且可以访问大量数据。这种技巧在设计模式中被称为Bridge，但我们一定更熟悉另一个名字：PIMPL；</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>函数对象总是通过值传递，因此他们必须小且单态。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1868,7 +1879,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1890,7 +1901,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,153 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/16/%E5%9C%A8%E5%AE%B9%E5%99%A8%E5%85%83%E7%B4%A0%E4%B8%BA%E6%8C%87%E9%92%88%E6%97%B6%E8%B0%A8%E6%85%8E%E4%BD%BF%E7%94%A8remove/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/16/%E5%9C%A8%E5%AE%B9%E5%99%A8%E5%85%83%E7%B4%A0%E4%B8%BA%E6%8C%87%E9%92%88%E6%97%B6%E8%B0%A8%E6%85%8E%E4%BD%BF%E7%94%A8remove/" itemprop="url">33.在容器元素为指针时谨慎使用remove</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-16T08:37:00+08:00">
+                2018-04-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设我们在管理一些动态分配的Widgets*：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isCertified</span><span class="params">()</span> <span class="keyword">const</span></span>;<span class="comment">//是否达标</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">vector</span>&lt;Widget*&gt; v;</span><br><span class="line">v.push_back(<span class="keyword">new</span> Widget);<span class="comment">//在容器中存放指针</span></span><br></pre></td></tr></table></figure><br>最终需要删除所有没有通过检测的widget，所以下述写法似乎是十分自然的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//关于谓词使用,详见Effective STL 41</span></span><br><span class="line">v.erase(remove_if(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(),not1(mem_fun(&amp;Widget::isCertified))), v.<span class="built_in">end</span>());</span><br></pre></td></tr></table></figure><br>Effective STL 7 告诉过我们删除容器内部的指针其实并没有析构对象本身，那是对的，但在这里内存泄漏在调用remove时就已经发生了。</p>
+<hr>
+<h1 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h1><p>&nbsp;<br>假设在未调用remove_if之前，容器构成如下：<br><img src="http://static.zybuluo.com/zsmj2017/uijyg4ee1n6hdz9l1sxtrbny/image_1cb5uru2u1ft11g8v1s3nm5h1h1l9.png" alt="image_1cb5uru2u1ft11g8v1s3nm5h1h1l9.png-43kB"><br>那么在调用之后，容器变成了这样:<br><img src="http://static.zybuluo.com/zsmj2017/sgu0vmyrrq3f8z39zowhg30z/image_1cb5utkms19gu1r2lfl71lm61h5tm.png" alt="image_1cb5utkms19gu1r2lfl71lm61h5tm.png-44.7kB"><br>其实在这里我们就可以清楚地看到，我们再也无法通过某个指针来获取BC了，原本指向它们的指针被覆盖，BC将永远无法释放。<br>在调用erase之后，容器变成了这样：<br><img src="http://static.zybuluo.com/zsmj2017/zx95h2tvdsh16252bwy183r6/image_1cb5uva5s1req8537v7blb1m2013.png" alt="image_1cb5uva5s1req8537v7blb1m2013.png-28.4kB"><br>一般来说，在含有指针的容器中使用remove，remove_if或者unique不太合适。partition算法比较适合这类场景。（因为不存在覆盖的情况）</p>
+<hr>
+<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><h2 id="依然erase-remove"><a href="#依然erase-remove" class="headerlink" title="依然erase_remove"></a>依然erase_remove</h2><p>我们可以先删除所有要删除的指针，并把它们设置为空，然后再抹除元素内所有空指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delAndNullifyUncertified</span><span class="params">(Widget*&amp; pWidget)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!pWidget-&gt;isCertified()) &#123;</span><br><span class="line">        <span class="keyword">delete</span> pWidget;</span><br><span class="line">        pWidget = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">for_each(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(),delAndNullifyUncertified);</span><br><span class="line">v.erase(<span class="built_in">remove</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(),[](Widget* pWidget)&#123;<span class="keyword">return</span> pWidget;&#125;),v.<span class="built_in">end</span>());</span><br></pre></td></tr></table></figure></p>
+<h2 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h2><p>通过智能指针我们可以直接erase_remove:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">shared_ptr</span>&lt;Widget&gt; SPW; <span class="comment">// RCSPW = “RCSP to Widget”</span></span><br><span class="line"><span class="built_in">vector</span>&lt;SPW&gt; v;</span><br><span class="line">v.push_back(RCSPW(<span class="keyword">new</span> Widget));</span><br><span class="line">v.erase(remove_if(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(),not1 (mem_fun(&amp;Widget::isCertified))), v.<span class="built_in">end</span>());</span><br></pre></td></tr></table></figure><br>上述程序通过编译的前提是你的智能指针类型就必须可以隐式转换为相应的raw pointer。因为容器持有智能指针，但被调用的成员函数需要的是raw pointer。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/15/inline%E5%87%BD%E6%95%B0%E5%89%96%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1747,154 +1894,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/%E4%BD%BF%E7%94%A8base%E5%B0%86reverse_iterator%E8%BD%AC%E4%B8%BAiterator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/14/%E4%BD%BF%E7%94%A8base%E5%B0%86reverse_iterator%E8%BD%AC%E4%B8%BAiterator/" itemprop="url">28.使用base将reverse_iterator转为iterator</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-14T11:35:00+08:00">
-                2018-04-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>我们可以通过reverse_iterator的base函数将其转为iterator，只是其结果可能和我们预想的存在出入。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&lt;/br&gt;<br>考虑如下程序:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">v</span><span class="params">(<span class="number">5</span>)</span></span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>；i &lt; <span class="number">5</span>; ++ i) &#123;</span><br><span class="line">    v.push_back(i);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::reverse_iterator ri = <span class="built_in">find</span>(v.rbegin(), v.rend(), <span class="number">3</span>);<span class="comment">//ri指向3</span></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::<span class="function">iterator <span class="title">i</span><span class="params">(ri.base())</span></span>;</span><br></pre></td></tr></table></figure></p>
-<h2 id="转换关系图"><a href="#转换关系图" class="headerlink" title="转换关系图"></a>转换关系图</h2><p><img src="http://static.zybuluo.com/zsmj2017/3tt528o2ija2a4p7yasbbuwi/image_1cb13q24e2eq1tpbfst11rl12hjp.png" alt="image_1cb13q24e2eq1tpbfst11rl12hjp.png-14.2kB"><br>这张图清楚地展示了偏移量，但对我们解决实际问题毫无帮助。众所周知，insert与erase只接受iterator形式的参数，我们该如何通过base()来正确地完成这二者的操作呢？</p>
-<hr>
-<h1 id="base与insert、erase"><a href="#base与insert、erase" class="headerlink" title="base与insert、erase"></a>base与insert、erase</h1><h2 id="insert"><a href="#insert" class="headerlink" title="insert"></a>insert</h2><p>我们假定需要在ri指出的位置插入一个99。<br>因为ri遍历的顺序是自右向左，而且insert会把新元素插入到ri位置，并且把原先ri位置的元素依次移动到符合遍历顺序的下一个位置，综上，插入后应该是这样：<img src="http://static.zybuluo.com/zsmj2017/a5vasjdb7fmvwx4yo0w76mrg/image_1cb14faq517l4kkhivjap118oi16.png" alt="image_1cb14faq517l4kkhivjap118oi16.png-3.8kB"><br>显然，99正对应着base的位置，事实上有结论如下：<br><strong>如果要在一个reverse指出的位置上插入新元素，直接使用base即可，对于insert而言，ri.base()就是ri对应的iterator.</strong></p>
-<h2 id="erase"><a href="#erase" class="headerlink" title="erase"></a>erase</h2><p>如果要删除3肯定不能使用base了，因为base指向4.<br>但也不是没有解决办法，ri的base指向4，(++ri).base()不就指向3了吗，所以说<strong>核心在于先自增</strong>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v.erase((++ri).base());</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1945,7 +1944,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1967,7 +1966,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

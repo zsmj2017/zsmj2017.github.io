@@ -291,6 +291,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/21/%E8%BF%90%E7%94%A8member%20function%20template%E6%8E%A5%E5%8F%97%E6%89%80%E6%9C%89%E5%85%BC%E5%AE%B9%E7%B1%BB%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/21/%E8%BF%90%E7%94%A8member%20function%20template%E6%8E%A5%E5%8F%97%E6%89%80%E6%9C%89%E5%85%BC%E5%AE%B9%E7%B1%BB%E5%9E%8B/" itemprop="url">46.运用member function template接受所有兼容类型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-21T15:29:00+08:00">
+                2018-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>所谓智能指针，指的是一些行为像指针的对象，它们可以提供指针没有的机能。STL容器的迭代器几乎总是智能指针，你不会奢望使用operator++将指针从list的一个node移至另一个node，但是迭代器可以。</p>
+<p>真实指针有一个很好用的功能：支持隐式转换。举例来说：</p>
+<ul>
+<li>derived class指针可以隐式转为base class指针</li>
+<li>指向non-const对象的指针可以指向const对象</li>
+</ul>
+<p>既然智能指针是行为如同原始指针的对象，那么我们当然希望智能指针也具备上述功能。具体来说，我们希望下述代码能够通过编译：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Top</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Middle</span>:</span><span class="keyword">public</span> Top;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Smartptr</span>&#123;</span><span class="comment">//自定义的智能指针</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Smartptr</span><span class="params">(T* realPtr)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line">Smartptr&lt;Top&gt; pt1 =Smart&lt;Middle&gt;(<span class="keyword">new</span> Middle);</span><br><span class="line">Smartptr&lt;<span class="keyword">const</span> Top&gt; pt2 = pt1;</span><br></pre></td></tr></table></figure><br>但是，同一个template的不同具现化之间并不存在继承关系，所以，<code>smartptr&lt;top&gt;</code>与<code>smartptr&lt;middle&gt;</code>完全无关，为了达到我们期望的smart classes之间的转换能力，我们必须明确地编写它们。</p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&nbsp;<br>我们关注的重点是应该如何编写智能指针的构造函数。经过分析不难得出结论：我们永远无法写出所有需要的构造函数。我们真正需要撰写的是一个构造模板。<br>构造函数模板具体如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SmartPtr</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> U&gt;</span><br><span class="line">    SmartPtr(<span class="keyword">const</span> SmartPtr&lt;U&gt;&amp; other);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="方案剖析"><a href="#方案剖析" class="headerlink" title="方案剖析"></a>方案剖析</h1><p>&nbsp;<br>该构造函数模板声明：对于任何类型T和任何类型U，总可以根据一个<code>SmartPtr&lt;U&gt;</code>对象来构造一个<code>SmartPtr&lt;T&gt;</code>对象。我们把这种构造函数称为泛化copy构造函数。之所以不用explicit声明，是因为原始指针之间的转换就是隐式的，我们需要保证智能指针与原始指针之间的兼容性。<br>声明固然已经完成，但是实现却值得花一番心思。并非任意的U型智能指针都能转为T型智能指针（比如把base转为derived），所以我们必须在某方面对这一member template所创建的成员函数群进行筛选。</p>
+<hr>
+<h1 id="解决方案的实现"><a href="#解决方案的实现" class="headerlink" title="解决方案的实现"></a>解决方案的实现</h1><p>&nbsp;<br>假设SmartPtr遵循shared_ptr的接口，存在一个get函数返回原始指针的副本，那我们则可以在构造模板中实现代码约束，具体如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SmartPtr</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> U&gt;</span><br><span class="line">    SmartPtr(<span class="keyword">const</span> SmartPtr&lt;U&gt; &amp;other)</span><br><span class="line">        :helder(other.<span class="built_in">get</span>()) &#123;....&#125;</span><br><span class="line">    <span class="function">T* <span class="title">get</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> heldptr;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T* heldPtr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>现在，仅在“存在某个隐式转换将U*指针转为T*指针”时才能通过编译,而这正是我们想要的。</p>
+<hr>
+<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>&nbsp;<br>member function template不仅仅单纯用于构造函数，它还常常在赋值操作时发挥作用。<br>在class中声明泛化copy构造函数并不会阻止编译器生存自己的copy构造函数（一个non-template），因此如果需要控制copy构造的方方面面（比如禁止拷贝之类），我们必须同时声明泛化copy构造函数与non-template构造函数，同样的规则也适用于赋值操作。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>可使用member function template生成“可接受所有兼容类型”的函数</li>
+<li>如果你声明了member template用于泛化操作，你还是需要声明正常的copy构造函数与copy assignment运算符。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/21/%E6%AD%A3%E7%A1%AE%E7%9A%84include/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1673,169 +1834,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95%E4%BC%98%E4%BA%8E%E6%98%BE%E5%BC%8F%E5%BE%AA%E7%8E%AF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/20/%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95%E4%BC%98%E4%BA%8E%E6%98%BE%E5%BC%8F%E5%BE%AA%E7%8E%AF/" itemprop="url">43.泛型算法优于显式循环</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T12:11:00+08:00">
-                2018-04-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>算法内部本身就存在循环，因此众多需要用循环实现的任务，算法可以轻松完成。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设当前有一个支持重画的class:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">redraw</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>如果我们试图将某个list内所有Widget重画，其循环版本大致如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">list</span>&lt;Widget&gt; lw;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> i = lw.<span class="built_in">begin</span>();i != lw.<span class="built_in">end</span>(); ++i) &#123;</span><br><span class="line">    i-&gt;redraw();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当然了，也可以使用for_each算法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for_each(lw.<span class="built_in">begin</span>(),lw.<span class="built_in">end</span>(),[](Widget&amp; w)&#123;w.redraw();&#125;);</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="泛型算法相较于显式循环的优点"><a href="#泛型算法相较于显式循环的优点" class="headerlink" title="泛型算法相较于显式循环的优点"></a>泛型算法相较于显式循环的优点</h1><p>&nbsp;<br>一般来说，程序员通常认为循环比算法易读，但本节内容将说明算法更可取，理由有三：</p>
-<ol>
-<li>效率高</li>
-<li>正确性高</li>
-<li>更直观</li>
-</ol>
-<h2 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h2><p>相较于显式循环，算法的高效性体现在：</p>
-<ol>
-<li>避免了每一次循环结束迭代器都需要与end()作比较（<code>i != lw.end()</code>);</li>
-<li>库的实现者可以用更优化的方式来遍历容器。</li>
-<li>大佬们写的算法比我们的实现更高效。</li>
-</ol>
-<h2 id="正确性"><a href="#正确性" class="headerlink" title="正确性"></a>正确性</h2><p>众所周知，写循环时最麻烦的莫过于确保当前迭代器的有效性，并且保证它指向了正确的位置。</p>
-<h3 id="问题实例-1"><a href="#问题实例-1" class="headerlink" title="问题实例"></a>问题实例</h3><p>假设有一个数组，我们试图将其中的每一个元素都加上41然后插入到deque的前端<br>，循环体如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> data[maxNumDoubles];<span class="comment">//C API</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i&lt;numDoubles;++i)</span><br><span class="line">    d.insert(d.<span class="built_in">begin</span>(),data[i]+<span class="number">41</span>]);</span><br></pre></td></tr></table></figure><br>这段代码的问题在于:插入的元素是反序的，因为每一次都把待插入元素放在了开头。<br>于是我们做出了如下修改：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> insertLocation = d.<span class="built_in">begin</span>();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; numDoubles; ++i) &#123;</span><br><span class="line">    d.insert(insertLocation++, data[i] + <span class="number">41</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>但是实际上这个更不行，因为insert之后后面的迭代器都失效了，insertlocation自然也是如此，所有行为均未定义。<br>但最终我们还是解决了这个问题，就是每一次插入后都更新insertlocation…<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> insertLocation = d.<span class="built_in">begin</span>();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; numDoubles; ++i) &#123;</span><br><span class="line">    insertLocation=d.insert(insertLocation, data[i] + <span class="number">41</span>);</span><br><span class="line">    ++insertLocation;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当然，使用插入迭代器也是不错的主意。</p>
-<h3 id="使用算法"><a href="#使用算法" class="headerlink" title="使用算法"></a>使用算法</h3><p>刚才我们费了半天周折终于利用显示循环写出了正确的程序，那如果使用算法呢？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">transform(data, data + numDoubles,inserter(d, d.<span class="built_in">begin</span>()),[](<span class="keyword">int</span> i)&#123;i+=<span class="number">41</span>;&#125;);</span><br></pre></td></tr></table></figure></p>
-<h2 id="直观性"><a href="#直观性" class="headerlink" title="直观性"></a>直观性</h2><p>任何一个算法在我们读到其名字时就已经了解了它的行为，但显式循环则不然。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>相对于泛型算法，显式循环稍逊风骚。但它并非一无是处，使用循环能让人更清楚地明白加诸于迭代器上的操作。<br>我们可以认为泛型算法提升了软件的抽象层次，并且使得它更容易实现、文档化、增强、维护。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1886,7 +1884,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1908,7 +1906,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

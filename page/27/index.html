@@ -291,6 +291,161 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/06/%E4%B8%8D%E8%A6%81%E8%AF%95%E5%9B%BE%E7%BC%96%E5%86%99%E7%8B%AC%E7%AB%8B%E4%BA%8E%E5%AE%B9%E5%99%A8%E7%9A%84%E4%BB%A3%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/06/%E4%B8%8D%E8%A6%81%E8%AF%95%E5%9B%BE%E7%BC%96%E5%86%99%E7%8B%AC%E7%AB%8B%E4%BA%8E%E5%AE%B9%E5%99%A8%E7%9A%84%E4%BB%A3%E7%A0%81/" itemprop="url">2.不要试图编写独立于容器的代码</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-06T09:00:00+08:00">
+                2018-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>​<br>STL本身就是以泛化原则作为基础：</p>
+<blockquote>
+<ul>
+<li>数组被泛化为“以包含对象的类型”为参数的容器</li>
+<li>函数被泛化为“以使用的迭代器的类型”为参数的算法</li>
+<li>迭代器被泛化为“以其指向的对象的类型”为参数的迭代器</li>
+</ul>
+</blockquote>
+<p>有人可能会试图去开发某种程序，它对任何容器都适用，而这是无必要也是不可能的。不同容器应用场合不同，其特性也不同，我们无法再次对其泛化。<br>但是，我们也许会在某一天发现自己选取的容器并非最佳容器，所以我们试图去改变它。这个时候封装技术就显得很有必要。</p>
+<hr>
+<p>封装技术最简单的实现方式就是使用类型定义typedef。具体来说，假设原有代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span>...&#125;;</span><br><span class="line"><span class="built_in">vector</span>&lt;Widget&gt; vw;</span><br><span class="line">Widget bestWidget;</span><br><span class="line">... <span class="comment">// 给bestWidget一个值</span></span><br><span class="line"><span class="built_in">vector</span>&lt;Widget&gt;::iterator i = <span class="built_in">find</span>(vw.<span class="built_in">begin</span>(), vw.<span class="built_in">end</span>(), bestWidget);<span class="comment">//寻找等值者</span></span><br></pre></td></tr></table></figure><br>这一种写法相当常见，但下一种更好：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> ... &#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">vector</span>&lt;Widget&gt; WidgetContainer;</span><br><span class="line"><span class="keyword">typedef</span> WidgetContainer::iterator WCIterator;</span><br><span class="line">WidgetContainer cw;</span><br><span class="line">Widget bestWidget;</span><br><span class="line">...</span><br><span class="line">WCIterator i = <span class="built_in">find</span>(cw.<span class="built_in">begin</span>(), cw.<span class="built_in">end</span>(), bestWidget);</span><br></pre></td></tr></table></figure></p>
+<p>最明显的一个好处就是更换容器时代码无需发生改动。</p>
+<hr>
+<p>当然，类型定义只是词法上的修改，它并未增加什么功能。如果我们不希望让用户得知我们真正使用的容器，那我们则需要使用class来完成。要想减少在替换容器后需要修改的代码，我们可以把容器隐藏在一个class中，并且尽量减少通过类接口（而使外部）可见的，与容器相关的信息。<br>举例而言，如果我们试图编写一个顾客列表，不直接使用list，而是新建一个customerlist类，并把list隐藏于私有部分，其具体实现可以如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CustomerList</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">typedef</span> <span class="built_in">list</span>&lt;Customer&gt; CustomerContainer;</span><br><span class="line">    <span class="keyword">typedef</span> CustomerContainer::iterator CCIterator;</span><br><span class="line">    CustomerContainer customers;</span><br><span class="line"><span class="keyword">public</span>: <span class="comment">// 通过该接口限制list的可见性</span></span><br><span class="line">    ... </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这样既保证了list的私密性，也使代码易于修改。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/05/%E4%BB%94%E7%BB%86%E9%80%89%E6%8B%A9%E5%AE%B9%E5%99%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -652,7 +807,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">262</span>
+                  <span class="site-state-item-count">263</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -674,7 +829,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
