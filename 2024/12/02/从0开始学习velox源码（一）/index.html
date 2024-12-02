@@ -96,8 +96,10 @@
 <meta property="og:site_name" content="Xander&#39;s Wiki">
 <meta property="og:description" content="前言本系列是笔者学习velox源码的笔记，主要记录了我在学习velox源码时遇到的问题和解决方案。本节是最基础也是最磨人的一节————搭建开发环境。 git clone velox1git clone git@github.com:facebookincubator&#x2F;velox.git 本系列当前基于commit ac5c15eb7627b42f8d41023215d1d4a7e69d45aa。">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2024-12-02T12:48:02.757Z">
+<meta property="og:image" content="https://xander.wiki/images/clion-velox-debug-env-cmake.png">
+<meta property="og:updated_time" content="2024-12-02T12:54:15.797Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xander.wiki/images/clion-velox-debug-env-cmake.png">
 
 
 
@@ -390,7 +392,7 @@
 <p>执行该脚本会安装velox的依赖，包括<code>cmake</code>、<code>glog</code>、<code>gflags</code>、<code>fmt</code>、<code>folly</code>等。<br>笔者在安装时遇到了一些问题，解决方案可参考此isuue：<a href="https://github.com/facebookincubator/velox/issues/11701" target="_blank" rel="noopener">build issue</a></p>
 <p>大致来看，分别是<code>ccache</code>安装失败和<code>folly</code>编译失败。</p>
 <h1 id="use-clion-to-open-velox"><a href="#use-clion-to-open-velox" class="headerlink" title="use clion to open velox"></a>use clion to open velox</h1><p>本地ide使用的是<code>clion</code>，打开velox的根目录即可。<br>本地环境主要用于debug unit test, 因此cmake参数直接参考make unitest命令得到的cmake命令即可。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-DTREAT_WARNINGS_AS_ERRORS=1 -DENABLE_ALL_WARNINGS=1 -DVELOX_BUILD_MINIMAL="OFF" -DVELOX_BUILD_TESTING="ON" -DCMAKE_BUILD_TYPE=Debug -GNinja -DMAX_LINK_JOBS= -DMAX_HIGH_MEM_JOBS= -DVELOX_FORCE_COLORED_OUTPUT=ON</span><br></pre></td></tr></table></figure><br>Build dir也参考make unitest命令得到的build dir，即<code>_build/debug</code>。<br>此外，还需要额外关注环境变量<code>INSTALL_PREFIX</code>，这将制定velox优先从下载的依赖项中查找库文件。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INSTALL_PREFIX=&#123;Your-velox-code-repo&#125;/deps-install</span><br></pre></td></tr></table></figure></p>
-<p>cmake设置大致如图：<a href="/images/clion-velox-debug-env-cmake.png">clion-velox-debug-env-cmake</a></p>
+<p>cmake设置大致如图：<img src="/images/clion-velox-debug-env-cmake.png" alt="clion-velox-debug-env-cmake"></p>
 <p>此后，愉快地debug即可。</p>
 
       
