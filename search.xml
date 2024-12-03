@@ -3736,7 +3736,7 @@
   <entry>
     <title>从0开始学习velox源码（一）</title>
     <url>/2024/12/02/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0velox%E6%BA%90%E7%A0%81%EF%BC%88%E4%B8%80%EF%BC%89/</url>
-    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本系列是笔者学习velox源码的笔记，主要记录了我在学习velox源码时遇到的问题和解决方案。<br>本节是最基础也是最磨人的一节————搭建开发环境。</p>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本系列是笔者学习velox源码的笔记，主要记录在学习velox源码时遇到的问题和解决方案。<br>本节是最基础也是最磨人的一节————搭建开发环境。</p>
 <a id="more"></a>
 <h1 id="git-clone-velox"><a href="#git-clone-velox" class="headerlink" title="git clone velox"></a>git clone velox</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git clone git@github.com:facebookincubator/velox.git</span><br></pre></td></tr></table></figure>
 <p>本系列当前基于commit <code>ac5c15eb7627b42f8d41023215d1d4a7e69d45aa</code>。</p>
