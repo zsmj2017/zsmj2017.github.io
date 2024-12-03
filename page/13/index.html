@@ -1481,167 +1481,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/" itemprop="url">关于对象——前言</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-30T11:12:00+08:00">
-                2018-04-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="C语言"><a href="#C语言" class="headerlink" title="C语言"></a>C语言</h1><p>&nbsp;<br>在C语言中，“数据”及“处理数据的操作”是分开声明的，这种处理方式被称为procedural：一组“分布在各个以功能为导向的函数中”的算法驱动和处理外部数据。</p>
-<h2 id="C-struct实例"><a href="#C-struct实例" class="headerlink" title="C struct实例"></a>C struct实例</h2><p>假设我们当前存在一个struct Point3d：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">point3d</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x;</span><br><span class="line">    <span class="keyword">float</span> y;</span><br><span class="line">    <span class="keyword">float</span> z;</span><br><span class="line">&#125; Point3d;</span><br></pre></td></tr></table></figure><br>如果我们需要打印该Point3d，则必须定义这样一个函数：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d_print</span><span class="params">(<span class="keyword">const</span> Point3d *pd)</span></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>又或者为了追求效率，直接使用函数宏：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Point3d_print(pd)   printf(<span class="meta-string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span></span><br></pre></td></tr></table></figure><br>同样地，某个点的特定坐标可以直接存取：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Point3d pt;</span><br><span class="line">pt.x = <span class="number">0.0</span>;</span><br><span class="line"><span class="comment">//宏操作</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> SetX(p,xval) (p.x)=(xval);</span></span><br><span class="line">SetX(pt,<span class="number">0.0</span>);</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h1><h2 id="ADT"><a href="#ADT" class="headerlink" title="ADT"></a>ADT</h2><p>C++中实现Point3d可能会使用独立的“抽象数据类型”（abstract data type,ADT)来实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">inline</span> </span><br><span class="line">ostream&amp; <span class="keyword">operator</span>&lt;&lt;(ostream &amp;os,<span class="keyword">const</span> Point3d &amp;pt)&#123;...&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="继承体系"><a href="#继承体系" class="headerlink" title="继承体系"></a>继承体系</h2><p>又或者以一个两层到三层的继承体系完成：<img src="http://static.zybuluo.com/zsmj2017/wqlsxrhsul1mirhq8dtrp1xk/image_1ccad3v788kbnc78s3bg4bfb9.png" alt="image_1ccad3v788kbnc78s3bg4bfb9.png-9.4kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<h2 id="模板化"><a href="#模板化" class="headerlink" title="模板化"></a>模板化</h2><p>我们甚至可以更进一步地抽象，将坐标值类型甚至坐标数量参数化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> type,<span class="keyword">int</span> dim&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...<span class="comment">//内含数组或容器</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>&nbsp;<br>仅从Point来看，C与C++处理问题的方式截然不同，这并非是语言间的区别，而是过程式与面向对象的差别。<br>从软件工程的角度而言，封装性比全局数据要好，但也付出了编写和使用上的代价。</p>
-<hr>
-<h1 id="封装的成本"><a href="#封装的成本" class="headerlink" title="封装的成本"></a>封装的成本</h1><p>&nbsp;<br>从Point的角度而言，封装并未带来任何成本：</p>
-<ol>
-<li>data<br>所有的数据均存储于Object内，就如同struct中的情况一样。</li>
-<li>member function<br>成员函数虽然包含于class的声明之内，但却不会出现在object中。每一个non-inline成员函数都只会生成一个函数实体。</li>
-</ol>
-<p>C++在内存布局以及存储时间上的额外负担主要由virtual引起：</p>
-<ul>
-<li>virtual function<br>实现函数执行期绑定。</li>
-<li>virtual base class<br>实现“多次出现在继承体系中的base class在派生类中只存在一个可共享的实体”。</li>
-</ul>
-<p>一般而言，我们没有理由认为C++就一定会比C庞大且迟缓。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94C++%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1772,6 +1611,167 @@
 <li>必须加入新的程序</li>
 </ol>
 <h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>假设现有class X，定义有copy constructor，virtual destructor，以及一个virtual function foo，考虑如下函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">X <span class="title">foobar</span><span class="params">()</span></span>&#123;</span><br><span class="line">    X xx;</span><br><span class="line">    X *px = <span class="keyword">new</span> X;</span><br><span class="line">    xx.foo();</span><br><span class="line">    px-&gt;foo();</span><br><span class="line">    <span class="keyword">delete</span> px;</span><br><span class="line">    <span class="keyword">return</span> xx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>该函数可能会在内部被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foobar</span><span class="params">(X &amp;_result)</span></span>&#123;</span><br><span class="line">    <span class="comment">//构造_result并取代local xx</span></span><br><span class="line">    _result.X::X();</span><br><span class="line">    <span class="comment">//转化new语句</span></span><br><span class="line">    px = _new(<span class="keyword">sizeof</span>(X));</span><br><span class="line">    <span class="keyword">if</span>(px)</span><br><span class="line">        px-&gt;X::X();</span><br><span class="line">    <span class="comment">//执行非虚函数</span></span><br><span class="line">    foo(&amp;_result);</span><br><span class="line">    <span class="comment">//执行虚函数</span></span><br><span class="line">    （*px-&gt;vtbl[<span class="number">2</span>])(px);</span><br><span class="line">    <span class="comment">//转化delete语句</span></span><br><span class="line">    <span class="keyword">if</span>(px)&#123;</span><br><span class="line">        (*px-&gt;vtbl[<span class="number">1</span>](px));</span><br><span class="line">        _delete(px);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//不需要摧毁local object xx</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这就是对象模型将实际代码转化后的一个可能实例，其解释可见后续诸章，下图给出了部分注解：<img src="http://static.zybuluo.com/zsmj2017/u26nsqg4ilx8hibbk83hobft/image_1ccb4gg0fogo1ee2fm6k1enrmm.png" alt="image_1ccb4gg0fogo1ee2fm6k1enrmm.png-250.6kB"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/" itemprop="url">关于对象——前言</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-30T11:12:00+08:00">
+                2018-04-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="C语言"><a href="#C语言" class="headerlink" title="C语言"></a>C语言</h1><p>&nbsp;<br>在C语言中，“数据”及“处理数据的操作”是分开声明的，这种处理方式被称为procedural：一组“分布在各个以功能为导向的函数中”的算法驱动和处理外部数据。</p>
+<h2 id="C-struct实例"><a href="#C-struct实例" class="headerlink" title="C struct实例"></a>C struct实例</h2><p>假设我们当前存在一个struct Point3d：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">point3d</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x;</span><br><span class="line">    <span class="keyword">float</span> y;</span><br><span class="line">    <span class="keyword">float</span> z;</span><br><span class="line">&#125; Point3d;</span><br></pre></td></tr></table></figure><br>如果我们需要打印该Point3d，则必须定义这样一个函数：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d_print</span><span class="params">(<span class="keyword">const</span> Point3d *pd)</span></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>又或者为了追求效率，直接使用函数宏：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Point3d_print(pd)   printf(<span class="meta-string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span></span><br></pre></td></tr></table></figure><br>同样地，某个点的特定坐标可以直接存取：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Point3d pt;</span><br><span class="line">pt.x = <span class="number">0.0</span>;</span><br><span class="line"><span class="comment">//宏操作</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> SetX(p,xval) (p.x)=(xval);</span></span><br><span class="line">SetX(pt,<span class="number">0.0</span>);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h1><h2 id="ADT"><a href="#ADT" class="headerlink" title="ADT"></a>ADT</h2><p>C++中实现Point3d可能会使用独立的“抽象数据类型”（abstract data type,ADT)来实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">inline</span> </span><br><span class="line">ostream&amp; <span class="keyword">operator</span>&lt;&lt;(ostream &amp;os,<span class="keyword">const</span> Point3d &amp;pt)&#123;...&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="继承体系"><a href="#继承体系" class="headerlink" title="继承体系"></a>继承体系</h2><p>又或者以一个两层到三层的继承体系完成：<img src="http://static.zybuluo.com/zsmj2017/wqlsxrhsul1mirhq8dtrp1xk/image_1ccad3v788kbnc78s3bg4bfb9.png" alt="image_1ccad3v788kbnc78s3bg4bfb9.png-9.4kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="模板化"><a href="#模板化" class="headerlink" title="模板化"></a>模板化</h2><p>我们甚至可以更进一步地抽象，将坐标值类型甚至坐标数量参数化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> type,<span class="keyword">int</span> dim&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...<span class="comment">//内含数组或容器</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>&nbsp;<br>仅从Point来看，C与C++处理问题的方式截然不同，这并非是语言间的区别，而是过程式与面向对象的差别。<br>从软件工程的角度而言，封装性比全局数据要好，但也付出了编写和使用上的代价。</p>
+<hr>
+<h1 id="封装的成本"><a href="#封装的成本" class="headerlink" title="封装的成本"></a>封装的成本</h1><p>&nbsp;<br>从Point的角度而言，封装并未带来任何成本：</p>
+<ol>
+<li>data<br>所有的数据均存储于Object内，就如同struct中的情况一样。</li>
+<li>member function<br>成员函数虽然包含于class的声明之内，但却不会出现在object中。每一个non-inline成员函数都只会生成一个函数实体。</li>
+</ol>
+<p>C++在内存布局以及存储时间上的额外负担主要由virtual引起：</p>
+<ul>
+<li>virtual function<br>实现函数执行期绑定。</li>
+<li>virtual base class<br>实现“多次出现在继承体系中的base class在派生类中只存在一个可共享的实体”。</li>
+</ul>
+<p>一般而言，我们没有理由认为C++就一定会比C庞大且迟缓。</p>
 
           
         
