@@ -291,6 +291,162 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/26/%E5%AE%A1%E6%85%8E%E4%BD%BF%E7%94%A8%E5%BC%82%E5%B8%B8%E6%98%8E%E7%BB%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/26/%E5%AE%A1%E6%85%8E%E4%BD%BF%E7%94%A8%E5%BC%82%E5%B8%B8%E6%98%8E%E7%BB%86/" itemprop="url">14.审慎使用异常明细</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-26T10:50:00+08:00">
+                2018-04-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>（本节内容在Effective C++ 30中亦有涉及）</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>异常明细明确描述了一个函数可能抛出的异常，如果说函数抛出了一个不能存在于异常明细范围里的异常，系统将在运行时检测到该错误，并且自动地调用特殊函数unexpected。<br>unexpected默认机制是调用terminate，而terminate缺省行为是调用abort.也就是说，一旦违反了异常明细，程序将立刻终止，所有资源（甚至包括局部变量）都未得到释放。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>前言中描述的情况其实极易发生，因为编译器仅仅部分地检测异常的使用是否与异常明细保持一致。举例而言，假设函数A有一个明确的异常明细，并且调用了函数B，函数B抛出了违反函数A异常明细的异常，所以本次函数调用就违反了A的异常明细，程序将立即终止：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span>;<span class="comment">//可以抛出任意的异常</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f2</span><span class="params">()</span> <span class="title">throw</span><span class="params">(<span class="keyword">int</span>)</span></span>&#123;<span class="comment">//异常明细中只有int</span></span><br><span class="line">    ...</span><br><span class="line">    f1(); <span class="comment">//抛出非int型异常，程序终止</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="避免在带有类型参数的模板中使用异常"><a href="#避免在带有类型参数的模板中使用异常" class="headerlink" title="避免在带有类型参数的模板中使用异常"></a>避免在带有类型参数的模板中使用异常</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">bool</span> <span class="title">operator</span>==(<span class="title">const</span> <span class="title">T</span>&amp; <span class="title">lhs</span>, <span class="title">const</span> <span class="title">T</span>&amp; <span class="title">rhs</span>) <span class="title">throw</span>()&#123;</span></span><br><span class="line">    <span class="keyword">return</span> &amp;lhs == &amp;rhs;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个函数的意思是，如果类型相同的两个对象地址相同，则认为它们相等。看起来好像确实不会抛出异常，但实际上…万一某个类重载了operator &amp;，并且该函数还能抛异常，那我们就等着terminate吧。</p>
+<p>事实上，我们几乎不可能为一个模版提供一个有意义的异常明细，因为模版总是采用不同的方法使用类型参数，解决方法只能是模板和异常明细不要混用。</p>
+<hr>
+<h2 id="去除异常明细"><a href="#去除异常明细" class="headerlink" title="去除异常明细"></a>去除异常明细</h2><p>不触发terminate的另一个方法是：如果在一个具备异常明细的函数内调用其它没有异常明细的函数，那么我们应该去除该函数的异常明细。</p>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>允许用户注册一个回调函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//一个 window 系统回调函数指针</span></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*CallBackPtr)</span><span class="params">(<span class="keyword">int</span> eventXLocation,<span class="keyword">int</span> eventYLocation,<span class="keyword">void</span> *dataToPassBack)</span></span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CallBack</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    CallBack(CallBackPtr fPtr, <span class="keyword">void</span> *dataToPassBack)</span><br><span class="line">        : func(fPtr), data(dataToPassBack) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">makeCallBack</span><span class="params">(<span class="keyword">int</span> eventXLocation,<span class="keyword">int</span> eventYLocation)</span> <span class="keyword">const</span> <span class="title">throw</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CallBackPtr func;<span class="comment">//需要调用的函数</span></span><br><span class="line">    <span class="keyword">void</span> *data;<span class="comment">//传递给回调函数的数据</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CallBack::makeCallBack</span><span class="params">(<span class="keyword">int</span> eventXLocation,<span class="keyword">int</span> eventYLocation)</span> <span class="keyword">const</span> <span class="title">throw</span><span class="params">()</span></span>&#123;</span><br><span class="line">    func(eventXLocation, eventYLocation, data);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然，func可能抛出异常，违反了第二种解决方案。</p>
+<hr>
+<h2 id="处理系统本身抛出的异常"><a href="#处理系统本身抛出的异常" class="headerlink" title="处理系统本身抛出的异常"></a>处理系统本身抛出的异常</h2><p>&nbsp;<br>有人说未雨绸缪强过临阵磨枪，但实际上对于unexpected而言，直接处理unexpected异常比防止它们被抛出更有效果。<br>虽然阻止抛出unexpected异常是不现实的，但是C++允许<strong>以其它不同的异常类型替换unexpected异常</strong>。比如我们可以将所有unexpected异常都被替换为UnexpectedException对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnexpectedException</span> &#123;</span>&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">convertUnexpected</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> UnexpectedException();</span><br><span class="line">&#125;</span><br><span class="line">set_unexpected(convertUnexpected);<span class="comment">//将unexpected替换掉</span></span><br></pre></td></tr></table></figure><br>当然还有一个更安全的方法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">convertUnexpected</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">throw</span>;</span><br><span class="line">&#125;</span><br><span class="line">set_unexpected(convertUnexpected);<span class="comment">//unexpected被抛出时只是重新抛出当前异常</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>异常明细是一个应被审慎使用的特性。在编写之前，确保你已经考虑了所有可能发生的情况。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/26/%E4%BB%A5%E5%BC%95%E7%94%A8%E6%96%B9%E5%BC%8F%E6%8D%95%E8%8E%B7%E5%BC%82%E5%B8%B8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1720,159 +1876,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E8%87%AA%E5%A2%9E%EF%BC%8C%E8%87%AA%E5%87%8F%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%89%8D%E7%BD%AE%E4%B8%8E%E5%90%8E%E7%BD%AE%E7%9A%84%E5%8C%BA%E5%88%AB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/24/%E8%87%AA%E5%A2%9E%EF%BC%8C%E8%87%AA%E5%87%8F%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%89%8D%E7%BD%AE%E4%B8%8E%E5%90%8E%E7%BD%AE%E7%9A%84%E5%8C%BA%E5%88%AB/" itemprop="url">6.自增，自减操作符前置与后置的区别</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T13:18:00+08:00">
-                2018-04-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前置与后置操作符"><a href="#前置与后置操作符" class="headerlink" title="前置与后置操作符"></a>前置与后置操作符</h1><p>&nbsp;<br>重载函数间的区别在于它们参数类型上的差异，但是无论increment还是decrement的前缀与后缀都只有一个参数。为了解决问题，<strong>c++规定后缀形式有一个int类型参数，当函数被调用时编译器传递一个0作为int参数的值</strong>:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UPInt</span> &#123;</span> <span class="comment">//unlimited precision int</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    UPInt&amp; <span class="keyword">operator</span>++();</span><br><span class="line">    <span class="keyword">const</span> UPInt <span class="keyword">operator</span>++(<span class="keyword">int</span>);</span><br><span class="line">    UPInt&amp; <span class="keyword">operator</span>--();</span><br><span class="line">    <span class="keyword">const</span> UPInt <span class="keyword">operator</span>--(<span class="keyword">int</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">UPInt i;</span><br><span class="line">++i; <span class="comment">//i.operator++();</span></span><br><span class="line">i++; <span class="comment">//i.operator++(0);</span></span><br></pre></td></tr></table></figure><br><strong>仔细观察可以发现，前缀返回的是引用，后缀返回的则是一个const对象。</strong></p>
-<hr>
-<h1 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h1><p>&nbsp;<br>以自增为例，前缀表达的意思是“增加然后取出”，后缀表达的意思是“取出然后增加”，以下是具体实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">UPInt&amp; UPInt::<span class="keyword">operator</span>++()&#123;</span><br><span class="line">    *<span class="keyword">this</span> += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> UPInt UPInt::<span class="keyword">operator</span>++(<span class="keyword">int</span>)&#123;</span><br><span class="line">    UPInt oldValue = *<span class="keyword">this</span>;</span><br><span class="line">    ++(*<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">return</span> oldValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h1><p>&nbsp;<br>很明显一个后缀操作符必须返回一个对象，但是为什么必须是const对象呢？<br>假设返回值不是const 对象，下面的代码就是正确的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UPInt i;</span><br><span class="line">i++++;<span class="comment">//i.operator++(0).operator++(0);</span></span><br></pre></td></tr></table></figure><br>我们拒绝表达式编译通过，理由有二：</p>
-<ol>
-<li>保证与内置类型具备行为一致</li>
-<li>直觉上我们认为i++++应该自增2次，但实际上它只自增了一次，只有最后一个++生效</li>
-</ol>
-<p>如果后缀返回const对象，那么第二个++由于是non-const成员函数，将无法通过编译。</p>
-<hr>
-<h1 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h1><p>&nbsp;<br>由于后缀操作符需要返回对象的原因（不可避免的构造与析构），前缀比后缀的效率要高，在用户自定义类型上更是明显，因此我们在能用前缀的时候应该使用前缀。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1923,7 +1926,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1945,7 +1948,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

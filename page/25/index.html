@@ -291,6 +291,158 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/%E5%9C%A8operator=%E4%B8%AD%E5%A4%84%E7%90%86%E8%87%AA%E8%B5%8B%E5%80%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/09/%E5%9C%A8operator=%E4%B8%AD%E5%A4%84%E7%90%86%E8%87%AA%E8%B5%8B%E5%80%BC/" itemprop="url">12. 在operator=中处理自赋值</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T11:23:00+08:00">
+                2018-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>我们在重载operator=时需要注意自我赋值的情况。可能有人会认为这种情况很少发生，因为很少有人会写诸如w=w的句子。但实际上,代码中出现a[i]=a[j]（i==j),或者<em>p=</em>q（指向同一对象）的例子屡见不鲜。<br>事实上，只要你使用了pointers或者references，而且它们被用来指向多个相同类型的对象，我们就需要考虑 是否会出现自赋值的情况。确切地说，<strong>只要有多个对象来自同一个继承体系</strong>，比如一个指针指向base class类型，而另一个指向derived class类型。<strong>它们完全可能指向的是同一个对象</strong>。</p>
+<hr>
+<h1 id="不处理自赋值情况的风险"><a href="#不处理自赋值情况的风险" class="headerlink" title="不处理自赋值情况的风险"></a>不处理自赋值情况的风险</h1><p>&nbsp;<br>如果我们在class中手动地进行了资源管理，那么自赋值的处理不当可能会带来一些问题。举例而言:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bitmap</span>&#123;</span>...&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Bitmap* pb;</span><br><span class="line">&#125;;</span><br><span class="line">Widget&amp;</span><br><span class="line">Widget::<span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">delete</span> pb;</span><br><span class="line">    pb = <span class="keyword">new</span> Bitmap(*rhs.pb);<span class="comment">//如果是自赋值，pb指向的对象已经释放</span></span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>上述程序<strong>既不具备异常安全性，也直接导致了“在停止使用资源前意外地释放了它”</strong>。</p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="证同测试"><a href="#证同测试" class="headerlink" title="证同测试"></a>证同测试</h2><p>其原理很简单：在函数最前端放上这样一句话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if(this&#x3D;&#x3D;&amp;rhs) return *this;</span><br></pre></td></tr></table></figure><br>这个解决方案保证了自赋值安全性，但是不具备异常安全性。在这句话中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pb=<span class="keyword">new</span> Bitmap(*rhs.pb);<span class="comment">//已通过证同测试，此时已经执行delete</span></span><br></pre></td></tr></table></figure><br>如果new导致了一个异常（内存不足或者copy构造函数抛出异常），那么pb始终会指向一块被删除的Bitmap。我们无法安全地删除pb,甚至读取它。</p>
+<h2 id="手动保证异常安全"><a href="#手动保证异常安全" class="headerlink" title="手动保证异常安全"></a>手动保证异常安全</h2><p>因为只要解决了异常安全性，那么自赋值安全性就会必然得到解决，所以我们倾向于使用足够完美的逻辑避免异常的发生，其原理也很简单：在赋值pb前别删pb<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bitnap * porig = pb；</span><br><span class="line">pb =<span class="keyword">new</span> bitmap(rhs.pb);</span><br><span class="line"><span class="keyword">delete</span> porig;</span><br><span class="line"><span class="keyword">return</span> *<span class="keyword">this</span>;</span><br></pre></td></tr></table></figure><br>这样的好处不言自明，如果pb没能正确赋值，其对象也没有被析构。（异常发生时跳出了operator=函数，因此没有执行delete porig）。如果正确赋值，pb指向的对象被释放。</p>
+<h2 id="copy-amp-amp-swap"><a href="#copy-amp-amp-swap" class="headerlink" title="copy&amp;&amp;swap"></a>copy&amp;&amp;swap</h2><p>还有一个十分灵巧的operator=撰写技巧：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widegt&amp; rhs)</span></span>;<span class="comment">//彻底交换数据</span></span><br><span class="line">&#125;</span><br><span class="line">Widget&amp;</span><br><span class="line">Widget::<span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">    Widget temp(rhs);</span><br><span class="line">    swap(temp);</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果operator=接受的参数是by value而非by reference，那我们连temp都可以省略:</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Widget&amp;</span><br><span class="line">Widget::<span class="keyword">operator</span>=(Widget rhs)&#123;</span><br><span class="line">    swap(rhs);</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></h2><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>确保自赋值安全性。其技术包括比较lhs与rhs的地址，先做backup，以及copy-and-swap</li>
+<li>确定任何操作一个以上的对象的函数，如果其操作对象是同一个对象时，还能保持正确性。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/STL%E5%AE%B9%E5%99%A8%E7%9A%84%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%80%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1663,153 +1815,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/07/%E6%98%8E%E7%A1%AE%E6%8B%92%E7%BB%9D%E7%BC%96%E8%AF%91%E5%99%A8%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E7%9A%84%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/07/%E6%98%8E%E7%A1%AE%E6%8B%92%E7%BB%9D%E7%BC%96%E8%AF%91%E5%99%A8%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E7%9A%84%E5%87%BD%E6%95%B0/" itemprop="url">7.明确拒绝编译器自动生成的函数</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-07T17:21:00+08:00">
-                2018-04-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>某些类可能不允许被拷贝，我们可能会试图去不声明copy构造函数和copy assignment操作符来让用户无法copy，但这毫无意义，因为编译器还是会生成它们。</p>
-<p>解决的关键在于编译器所自动生成的这些函数都是public的，如果我们<strong>声明一个private</strong>的copy构造函数以及copy assignment运算符，并且<strong>不去定义</strong>它们（<strong>以防止友元访问</strong>），那么这个类自然就无法copy了。</p>
-<p>当你把它们声明为private时，如果用户试图去拷贝，此时编译器会报错，如果我们通过友元或者在成员函数内试图调用它们，因为没有定义，此时轮到连接器发出警告。</p>
-<p>当然，越早报错越好，那能不能把连接期错误移至编译期呢？答案是可行的。<br>为了实现上述理想，我们需要借助一个base class，它什么也不干，就是为了阻止copy。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Uncopyable</span>｛</span></span><br><span class="line"><span class="class"><span class="title">protected</span>:</span></span><br><span class="line">    Uncopyable() &#123;&#125;</span><br><span class="line">    ～Uncopyable()&#123;&#125;</span><br><span class="line"><span class="keyword">private</span>：</span><br><span class="line">    Uncopyable(<span class="keyword">const</span> Uncopyable&amp;);</span><br><span class="line">    Uncopyable&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Uncopyable)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果我们需要令某个类无法被copy，那我们只需要让该类私有继承Uncopyable即可（关于采用何种方式继承最为恰当，详见Effective C++ 38 39）<br>当友元或者成员函数试图拷贝时，编译器会试着生成copy构造函数或者copy assignment操作符，这两个函数又会去调用base class中的版本，发现调用失败，编译报错。</p>
-<p>Uncopyable的设计颇为微妙，值得仔细揣摩，比如说继承方式，析构函数，以及空类优化等诸多方面。但在本章，我们只关心它的作用：阻止拷贝。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>为了拒绝编译器生成的某些函数，我们可以将其<strong>设为private且不予实现</strong>。或者令该类继承类似于Uncopyable这样的基类。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1860,7 +1865,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1882,7 +1887,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

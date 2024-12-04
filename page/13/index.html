@@ -291,6 +291,156 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E7%BB%91%E5%AE%9A/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E7%BB%91%E5%AE%9A/" itemprop="url">Data语义学——Data Member的绑定</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-12T09:16:00+08:00">
+                2018-05-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>考虑以下程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">float</span> x;<span class="comment">//外部的x变量</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point3d(<span class="keyword">float</span>,<span class="keyword">float</span>,<span class="keyword">float</span>);</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">X</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> x;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">X</span><span class="params">(<span class="keyword">float</span> new_x)</span> <span class="keyword">const</span> </span>&#123;x=new_x;&#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>如果我们调用<code>Point3d::X()</code>,那么它返回的是<code>Point3d::x</code>还是<code>extern x</code>？熟悉C++的人都明白是前者，但并非一直以来都是前者。</p>
+<p>在C++最早的编译器上，如果在Point3d::X()的两个函数实例中对x进行参阅（取用）操作，这操作将会指向global x object。这种结果基本上不在开发者的预期之内，因此直接导致了C++早期的两种防御性程序设计风格：</p>
+<ol>
+<li><strong>将所有的data members放在class声明起头处，以确保正确的绑定：</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><strong>将所有的inline functions无论大小都置于声明之外</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  Point3d(<span class="keyword">float</span>,<span class="keyword">float</span>,<span class="keyword">float</span>);</span><br><span class="line">  <span class="function"><span class="keyword">float</span> <span class="title">X</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">X</span><span class="params">(<span class="keyword">float</span>)</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">float</span> <span class="title">Point3d::X</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">   <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>这些程序设计风格直至今日仍然存在，虽然已经不再具备必要性。这个古老的语言规则被称为“member scope resolution rules”，大意是“一个inline函数实体，在整个class声明未被完全看见之前，是不会被evaluated的”。C++ Standard以“member scope resolution rules”来精炼这个“rewriting rule”，其效果是，如果一个inline函数在class声明后立刻被定义的话，那么还是对其evaluate，也就是说，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">float</span> x;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//对函数的分析将延迟至class声明的右大括号出现才开始</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">X</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> x;&#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//分析在这里进行</span></span><br></pre></td></tr></table></figure><br>因此，在一个inline member function躯体内的一个data member绑定操作，会在整个class声明完成后才完成。</p>
+<p>然而，这对于member function的argument list并不为真。Argument list中的名称还是会在它们第一次遭遇时被适当地resloved。因此在extern与nested type names之间的非直觉操作绑定操作还是会发生。例如，在下面的程序段中，length的类型在两个member function signatures中都被reslove为global typedef，也就是int。当后续再有length的nested typedef声明出现时，C++<br>Standard就把之前的绑定标示为非法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">int</span> length;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//length被resloved为global</span></span><br><span class="line">    <span class="comment">//_val被resloved为Point3d::_val</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">mumble</span><span class="params">(length val)</span> </span>&#123;_val = val;&#125;</span><br><span class="line">    <span class="function">length <span class="title">mumble</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> _val;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">//length必须在“本class对它的第一个参考操作”之前被看见</span></span><br><span class="line">    <span class="comment">//该声明将使之前的参考操作不合法</span></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">float</span> length;</span><br><span class="line">    length _val;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>上述这种语言状况，仍然需要某种防御性编程风格：<strong>请始终将nested type声明放在class的起始处。</strong>在上述例子中，如果把length的nested type定义于“在class中被参考”之前，就可以确保非直觉绑定的正确性。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/11/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1807,159 +1957,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8C%E4%B8%8EC++/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/30/%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8C%E4%B8%8EC++/" itemprop="url">34.混合使用C与C++</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-30T07:12:00+08:00">
-                2018-04-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在混合编程前，首先确保你的C++编译器和C编译器兼容。确认兼容后，还有四个需要考虑的问题：名变换、静态初始化、内存动态分配、数据结构兼容。</p>
-<hr>
-<h1 id="名变换"><a href="#名变换" class="headerlink" title="名变换"></a>名变换</h1><p>&nbsp;<br>名变换，就是C++编译器给程序的每个函数换一个独一无二的名字。C没有函数重载，因此不需要该过程。重载不兼容于绝大部分链接程序，因为链接程序通常无法分辨同名的函数，它坚持函数名必须独一无二。名变换是C++对编译器的妥协。<br>在C++使用范围内用户无需考虑名变换，但在C运行库中，那么情况截然不同。</p>
-<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>举例而言，在Cpp包含的头文件中，drawline被声明为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br></pre></td></tr></table></figure><br>代码体中通常也是调用drawLine，每一个这样的调用都被编译器转换为调用名变换后的函数，所以写下的是<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drawLine(a, b, c, d);</span><br></pre></td></tr></table></figure><br>在obj中被调用的是：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xyzzy(a, b, c, d);<span class="comment">//编译器变换了名称</span></span><br></pre></td></tr></table></figure><br>但如果drawline是一个C函数，obj文件（或者是动态链接库之类的文件）中包含的编译后的drawline函数仍然叫drawline，不会发生名变换动作。这意味着链接时将发生错误，因为链接程序找不到xyzzy函数的存在。</p>
-<hr>
-<h2 id="解决方案（extern-“C”"><a href="#解决方案（extern-“C”" class="headerlink" title="解决方案（extern “C”)"></a>解决方案（extern “C”)</h2><p>我们需要某种方法告诉C++编译器不要在这个函数上进行名变换，就是使用C++的<code>extern &quot;C&quot;</code>关键词：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br></pre></td></tr></table></figure><br>不要以为有一个extern “C”，那么就应该同样有一个extern “Pascal”和extern “FORTRAN”之类。该关键词的意思是下述函数应该被当作C语言写的一样。所以汇编也是用extern “C”声明，甚至可以在C++函数上申明 extern “C”。（用C++写库给其他语言的客户使用），这样编译器就不会对你的函数执行名变换。<br>如果你需要批量地声明函数无需名变换，extern “C”可以对一组函数生效，只要将它们放入一对大括号中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">twiddleBits</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> bits)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">simulate</span><span class="params">(<span class="keyword">int</span> iterations)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种技巧普遍适用于头文件中。假设当前头文件可能被C++编译器编译也可能会被C语言编译器编译。当用C++编译时，你应该加 extern “C”，但用C编译时则不必。通过只在C++编译器下定义的宏__cplusplus，头文件的写法很简单：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span>&#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">twiddleBits</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> bits)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">simulate</span><span class="params">(<span class="keyword">int</span> iterations)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure><br>顺便提及一下，名变换没有标准规则，不同的编译器名变换不同。</p>
-<hr>
-<h1 id="静态初始化"><a href="#静态初始化" class="headerlink" title="静态初始化"></a>静态初始化</h1><p>&nbsp;<br>在C++中，main函数执行前和执行后都有大量代码被执行。具体来说，静态的类对象和定义在全局的、命名空间中的或文件体中的类对象的构造函数通常在main执行前就被调用。这个过程称为静态初始化。同样，通过静态初始化产生的对象也要在静态析构过程中调用其析构函数，这个过程通常发生在main结束<br>运行之后。<br>为了解决main应该首先被调用，而对象又需要在main执行前被构造的两难问题，许多编译器在main的最开始处插入了一个特别的函数，由它来负责静态初始化。同样地，编译器在main结束处插入了一个函数来析构静态对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123;</span><br><span class="line">    performStaticInitialization();</span><br><span class="line">    ...<span class="comment">//the statements you put in main go here;</span></span><br><span class="line">    performStaticDestruction();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>示例中函数的名称不需要在意，关注要点是：如果一个C++编译器采用这种方法来初始化和析构静态对象，那么除非你用C++写了main函数，否则这些对象既不会构造也不会析构。因此只要代码中有C++部分，就应该使用C++的main函数。<br>但有时似乎用C写main更有意义————比如当前程序的大部分都是用C写的，C++部分只是一个支持库。然而，这个C++库很可能含有静态对象（即使现在没有，以后也可能会有），所以仍然需要用C++写main函数。但我们并不需要改写C语言代码，只要将C写的main改名为realmain，然后用C++版本的main调用realMain：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">realMain</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123;<span class="comment">//in C++</span></span><br><span class="line">    <span class="keyword">return</span> realMain(argc, argv);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果不这么写，就无法确保确保静态对象是否已经构造和析构。 </p>
-<hr>
-<h1 id="动态内存分配"><a href="#动态内存分配" class="headerlink" title="动态内存分配"></a>动态内存分配</h1><p>&nbsp;<br>动态内存分配的规则很简单：C++部分使用new和delete，C部分使用malloc和free。用free释放new 分配的内存或用delete释放malloc分配的内存，其行为没有定义。<br>说起来容易，做起来未必简单。比如strdup函数，它并不存在于C和C++标准库中，却很常见：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">char</span> * <span class="title">strdup</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *ps)</span></span>; <span class="comment">// return a copy of the string pointed to by ps</span></span><br></pre></td></tr></table></figure><br>为了避免内存泄漏，strdup的调用者必须释放分配的内存。那是使用delete还是free呢？如果你调用的 strdup来自于C函数库中，使用free，否则使用delete.<br>在调用strdup后所需要做的操作，在不同的操作系统下不同，在不同的编译器下也不同。为了减少这种可移植性问题，应当尽可能避免调用那些既不在标准运行库中也没有固定形式的函数 。</p>
-<hr>
-<h1 id="数据结构兼容性"><a href="#数据结构兼容性" class="headerlink" title="数据结构兼容性"></a>数据结构兼容性</h1><p>&nbsp;<br>最后一个问题是在C++和C之间传递数据。<br>C与C++的交互必须限定在C可表示的概念上。因此，不可能传递给C语言对象或者成员函数指针。但C中存在着普通指针的概念，所以C和C++的函数可以安全地交换”指向对象的指针”和”指向非成员的函数或静态成员函数的指针”。同样，struct和内置类型的变量也可自由交换。<br>因为C++中struct兼容C中的规则，因此C编译器和C++编译器处理struct得到的结果一样。在C++ struct中增加非虚函数不会导致内存结构发生改变，因此，只有非虚函数的strcut的对象兼容于它们在C 中的孪生版本（C++成员函数并不在对象的内存布局中体现）。增加虚函数和加入继承体系会改变内存布局，此时无法完成C与C++的安全交换。<br>就数据结构而言，我们可以认为在C++和C之间相互传递数据结构是安全的（前提是结构式的定义在C和C++中都可编译）。在 C++版本中增加非虚成员函数或许不影响兼容性，但几乎其它的改变都将影响兼容。  </p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2010,7 +2007,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2032,7 +2029,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,159 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E8%87%AA%E5%A2%9E%EF%BC%8C%E8%87%AA%E5%87%8F%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%89%8D%E7%BD%AE%E4%B8%8E%E5%90%8E%E7%BD%AE%E7%9A%84%E5%8C%BA%E5%88%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/24/%E8%87%AA%E5%A2%9E%EF%BC%8C%E8%87%AA%E5%87%8F%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%89%8D%E7%BD%AE%E4%B8%8E%E5%90%8E%E7%BD%AE%E7%9A%84%E5%8C%BA%E5%88%AB/" itemprop="url">6.自增，自减操作符前置与后置的区别</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T13:18:00+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前置与后置操作符"><a href="#前置与后置操作符" class="headerlink" title="前置与后置操作符"></a>前置与后置操作符</h1><p>&nbsp;<br>重载函数间的区别在于它们参数类型上的差异，但是无论increment还是decrement的前缀与后缀都只有一个参数。为了解决问题，<strong>c++规定后缀形式有一个int类型参数，当函数被调用时编译器传递一个0作为int参数的值</strong>:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UPInt</span> &#123;</span> <span class="comment">//unlimited precision int</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    UPInt&amp; <span class="keyword">operator</span>++();</span><br><span class="line">    <span class="keyword">const</span> UPInt <span class="keyword">operator</span>++(<span class="keyword">int</span>);</span><br><span class="line">    UPInt&amp; <span class="keyword">operator</span>--();</span><br><span class="line">    <span class="keyword">const</span> UPInt <span class="keyword">operator</span>--(<span class="keyword">int</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">UPInt i;</span><br><span class="line">++i; <span class="comment">//i.operator++();</span></span><br><span class="line">i++; <span class="comment">//i.operator++(0);</span></span><br></pre></td></tr></table></figure><br><strong>仔细观察可以发现，前缀返回的是引用，后缀返回的则是一个const对象。</strong></p>
+<hr>
+<h1 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h1><p>&nbsp;<br>以自增为例，前缀表达的意思是“增加然后取出”，后缀表达的意思是“取出然后增加”，以下是具体实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">UPInt&amp; UPInt::<span class="keyword">operator</span>++()&#123;</span><br><span class="line">    *<span class="keyword">this</span> += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> UPInt UPInt::<span class="keyword">operator</span>++(<span class="keyword">int</span>)&#123;</span><br><span class="line">    UPInt oldValue = *<span class="keyword">this</span>;</span><br><span class="line">    ++(*<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">return</span> oldValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h1><p>&nbsp;<br>很明显一个后缀操作符必须返回一个对象，但是为什么必须是const对象呢？<br>假设返回值不是const 对象，下面的代码就是正确的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UPInt i;</span><br><span class="line">i++++;<span class="comment">//i.operator++(0).operator++(0);</span></span><br></pre></td></tr></table></figure><br>我们拒绝表达式编译通过，理由有二：</p>
+<ol>
+<li>保证与内置类型具备行为一致</li>
+<li>直觉上我们认为i++++应该自增2次，但实际上它只自增了一次，只有最后一个++生效</li>
+</ol>
+<p>如果后缀返回const对象，那么第二个++由于是non-const成员函数，将无法通过编译。</p>
+<hr>
+<h1 id="效率"><a href="#效率" class="headerlink" title="效率"></a>效率</h1><p>&nbsp;<br>由于后缀操作符需要返回对象的原因（不可避免的构造与析构），前缀比后缀的效率要高，在用户自定义类型上更是明显，因此我们在能用前缀的时候应该使用前缀。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E8%87%AA%E5%AE%9A%E4%B9%89new%E4%B8%8Edelete/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1734,164 +1887,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/22/%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%95%E7%94%A8%E7%9A%84%E5%8C%BA%E5%88%AB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/22/%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%95%E7%94%A8%E7%9A%84%E5%8C%BA%E5%88%AB/" itemprop="url">1.指针与引用的区别</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-22T07:29:00+08:00">
-                2018-04-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>指针与引用似乎完全不同，前者是某个对象的地址，后者是某个对象的别名，但是功能却似乎一样，都是间接引用其他对象。那么何时用指针何时用引用呢？</p>
-<hr>
-<h1 id="空值"><a href="#空值" class="headerlink" title="空值"></a>空值</h1><p>&nbsp;<br>不存在指向空值的引用，但是存在指向空值的指针。<br>但可能会有人写出这种程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *pc = <span class="literal">nullptr</span>；<span class="keyword">char</span> &amp; rc = *pc；</span><br></pre></td></tr></table></figure><br>其结果未定义，在C++的世界里我们不讨论这种无聊且低级的错误。<br><strong>引用不存在空值，所以必须要初始化</strong>，而指针则不用，虽然这样很危险。<br>引用不存在空值这一特性说明其有效性比指针高，因为我们在指针的使用中总需要判断其非空，但引用则无需如此。</p>
-<hr>
-<h1 id="重新赋值"><a href="#重新赋值" class="headerlink" title="重新赋值"></a>重新赋值</h1><p>&nbsp;<br>指针可以被重新赋值以指向另一个不同的对象。但引用则总是指向在初始化时被指定的对象，无法改变。</p>
-<hr>
-<h1 id="在何种情况下使用它们"><a href="#在何种情况下使用它们" class="headerlink" title="在何种情况下使用它们"></a>在何种情况下使用它们</h1><h2 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h2><p>使用指针的情况是：</p>
-<ul>
-<li>可能会不指向任何对象</li>
-<li>可能需要改变绑定</li>
-</ul>
-<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>使用引用的情况是：</p>
-<ul>
-<li>一旦绑定后不再更改</li>
-<li>重载某个操作符</li>
-</ul>
-<p>假设需要自定义<code>operator[]</code>，其功能是返回一个目标对象，其能被赋值:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;int&gt; v(10);</span><br><span class="line">v[5]&#x3D;10;</span><br></pre></td></tr></table></figure><br>如果<code>operator[]</code>返回值不是引用而是指针，则最后一句必须写为 <code>*v[5]=10</code>,这看起来有点像一个数组指针，容易造成不必要的误解。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1942,7 +1937,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1964,7 +1959,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

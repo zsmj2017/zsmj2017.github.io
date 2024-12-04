@@ -291,6 +291,182 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E4%BA%86%E8%A7%A3%E9%9A%90%E5%BC%8F%E6%8E%A5%E5%8F%A3%E4%B8%8E%E7%BC%96%E8%AF%91%E6%9C%9F%E5%A4%9A%E6%80%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/%E4%BA%86%E8%A7%A3%E9%9A%90%E5%BC%8F%E6%8E%A5%E5%8F%A3%E4%B8%8E%E7%BC%96%E8%AF%91%E6%9C%9F%E5%A4%9A%E6%80%81/" itemprop="url">42.了解隐式接口与编译期多态</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T12:52:00+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="OOP中的接口与多态"><a href="#OOP中的接口与多态" class="headerlink" title="OOP中的接口与多态"></a>OOP中的接口与多态</h1><p>&nbsp;<br>面向对象编程以<strong>显式接口</strong>和<strong>运行期多态</strong>解决问题。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    <span class="keyword">virtual</span> ~Widget();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">size_t</span> <span class="title">size</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">normalize</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(WidgeT&amp; other)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSth</span><span class="params">(Widget&amp; w)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(w.<span class="built_in">size</span>()&gt;<span class="number">10</span>)&#123;</span><br><span class="line">        <span class="function">Widget <span class="title">temp</span><span class="params">(w)</span></span>;</span><br><span class="line">        temp.normalize();</span><br><span class="line">        temp.swap(w);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>对于doSth中的w，我们可以这样分析：</p>
+<ol>
+<li>w被声明为Widget，因此w必须支持Widget接口。我们可以通过打开<code>Widget.h</code>观察接口，所以我们称这种接口为<strong>显式接口，即此类接口在源码中明确可见</strong>。</li>
+<li>由于Widget的部分成员函数是virtual，因此w对那些函数的调用将表现出<strong>运行期多态，即于运行期根据w的动态类型决定调用哪个函数。</strong></li>
+</ol>
+<hr>
+<h1 id="隐式接口与编译期多态"><a href="#隐式接口与编译期多态" class="headerlink" title="隐式接口与编译期多态"></a>隐式接口与编译期多态</h1><p>&nbsp;<br>Templates与泛型编程的世界，与面向对象有根本性的不同。在此世界中，显式接口和运行期多态仍然存在，但是重要性降低。反倒是隐式接口与编译期多态移到了前面。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSth</span><span class="params">(T&amp; w)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(w.<span class="built_in">size</span>()&gt;<span class="number">10</span>)&#123;</span><br><span class="line">        <span class="function">Widget <span class="title">temp</span><span class="params">(w)</span></span>;</span><br><span class="line">        temp.normalize();</span><br><span class="line">        temp.swap(w);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>doSth现在变成了一个函数模板，对于doSth中的w，我们现在可以这样分析：</p>
+<ol>
+<li>w必须支持哪一种接口，由template function中执行于w身上的操作决定。以实例而言，size，copy构造函数，normalize等似乎是类型T必须支持的一组接口（其实不然）。<strong>这一组（必须能够编译）的表达式可以成为类型T必须支持的一组隐式接口。</strong></li>
+<li>凡涉及w的任何函数调用，例如<code>operator&gt;</code>等等，都有可能造成template具现化。这样的具现行为发生在编译期<strong>，“以不同的template参数具现化function templates”会导致调用不同的函数，此即为编译期多态。</strong></li>
+</ol>
+<hr>
+<h1 id="编译期多态与运行期多态的对比"><a href="#编译期多态与运行期多态的对比" class="headerlink" title="编译期多态与运行期多态的对比"></a>编译期多态与运行期多态的对比</h1><p>&nbsp;<br>编译期多态和运行期多态的差异，十分类似于“哪一个重载该被调用”（编译期）与“哪一个virtual函数该被绑定”（运行期）之间的差异。</p>
+<hr>
+<h1 id="显式接口与隐式接口的对比"><a href="#显式接口与隐式接口的对比" class="headerlink" title="显式接口与隐式接口的对比"></a>显式接口与隐式接口的对比</h1><h2 id="显式接口"><a href="#显式接口" class="headerlink" title="显式接口"></a>显式接口</h2><p>通常情况下<strong>显式接口由函数的签名式（函数名称、参数类型、返回类型）构成</strong>。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget();</span><br><span class="line">    <span class="keyword">virtual</span> ~Widget();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">size_t</span> <span class="title">size</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">normalize</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(WidgeT&amp; other)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>Widget的接口包括构造、析构函数，函数size,normalize,swap及其参数类型、返回类型、常量性。当然也包括编译器自动生成的函数，还有typedefs。</p>
+<h2 id="隐式接口"><a href="#隐式接口" class="headerlink" title="隐式接口"></a>隐式接口</h2><p><strong>隐式接口并不基于函数签名式，而是由有效表达式组成。</strong></p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(w.<span class="built_in">size</span>()&gt;<span class="number">10</span> &amp;&amp; w!=sth);</span><br></pre></td></tr></table></figure><br>T的隐式接口看起来好像有这些约束：</p>
+<ol>
+<li>必须提供一个size函数，该函数返回一个整数值。</li>
+<li>必须支持operator!=函数，用来比较两个T对象。</li>
+</ol>
+<p>然而，由于操作符重载带来的可能性，这两个约束都不需要满足。（手动滑稽）</p>
+<h2 id="实例剖析"><a href="#实例剖析" class="headerlink" title="实例剖析"></a>实例剖析</h2><p>T似乎必须要有一个size函数，但这个函数可能是从base class继承得到的。size也没必要返回一个整数，甚至不需要返回一个数值类型。它只要返回一个类型为X的对象，这个对象配合int内置类型可以调用<code>operator&gt;</code>即可。甚至。。。它都无需获取一个X对象，只要获取一个能够隐式转换为X对象的Y对象即可。<br>同理，T也没必要支持operator!=。因为下面的情况也是可能的：<code>operator!=</code>接受一对类型为X与Y的对象，我们只要T可以转为X型，sth可以转为Y型即可。<br>更有甚者，也许连<code>operator&amp;&amp;</code>也已经被重载，左右两边已经变成了不知道什么类型，执行什么操作的东西。</p>
+<h2 id="真正的约束条件"><a href="#真正的约束条件" class="headerlink" title="真正的约束条件"></a>真正的约束条件</h2><p>如果都按照上文的做法分析，似乎约束条件很难界定，但是实际上还是很简单的：<br>对于size之类的单个表达式可能约束条件很难界定，但对于整体约束条件却很好判断：</p>
+<ol>
+<li>if里面必须是一个bool.</li>
+<li>其他隐式接口，诸如copy构造函数之类，必须确保对T型对象有效。</li>
+</ol>
+<p>加诸于template参数身上的隐式接口如同加诸于class对象身上的显式接口一样真实，而且两者都在编译期通过检查。你无法以一种与显式接口矛盾的方法来使用对象，你也无法在template中使用不支持隐式接口的对象，二者都将导致无法编译。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>classes与templates都支持接口与多态</li>
+<li>classes的接口是显式的，以函数签名为中心，多态发生在运行期</li>
+<li>templates的接口是隐式的，奠基于有效表达式。多态的实现则基于templates具现化和函数重载解析，发生于运行期。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95%E4%BC%98%E4%BA%8E%E6%98%BE%E5%BC%8F%E5%BE%AA%E7%8E%AF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1681,154 +1857,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/18/%E7%A6%81%E6%AD%A2%E9%87%8D%E5%AE%9A%E4%B9%89%E7%BB%A7%E6%89%BF%E8%80%8C%E6%9D%A5%E7%9A%84non-virtual%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/18/%E7%A6%81%E6%AD%A2%E9%87%8D%E5%AE%9A%E4%B9%89%E7%BB%A7%E6%89%BF%E8%80%8C%E6%9D%A5%E7%9A%84non-virtual%E5%87%BD%E6%95%B0/" itemprop="url">37.禁止重定义继承而来的non-virtual函数</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-18T18:33:00+08:00">
-                2018-04-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>假设我们有base class与derived class如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>：</span></span><br><span class="line"><span class="class">    <span class="title">void</span> <span class="title">mf</span>();</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D</span>:</span><span class="keyword">public</span> B &#123;...&#125;</span><br></pre></td></tr></table></figure><br>我们应该确定：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">D x;</span><br><span class="line">B* pB = &amp;x;pB-&gt;mf();</span><br><span class="line">D* pD = &amp;x;pD-&gt;mf();</span><br></pre></td></tr></table></figure><br>两次函数调用的行为应当一致。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>仍以前文为例，如果我们在D中重定义了mf，也就是说造成了遮蔽名称的现象，那会有如下情况发生<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">D x;</span><br><span class="line">B* pb= &amp;x</span><br><span class="line">D * pd = &amp;x；</span><br><span class="line">pb-&gt;mf();<span class="comment">//调用B::mf();</span></span><br><span class="line">pd-&gt;mf();<span class="comment">//调用D::mf();</span></span><br></pre></td></tr></table></figure><br>造成如上行为的原因是因为<strong>non-virtual静态绑定</strong>，具体来说，如果pb是一个pointer to B，通过pb调用的non-virtual函数永远是B的版本。<br>但如果mf是一个动态绑定的virtual，那么无论通过pb还是pd调用得到的都是D::mf().</p>
-<hr>
-<h1 id="non-virtual被重定义的危害"><a href="#non-virtual被重定义的危害" class="headerlink" title="non-virtual被重定义的危害"></a>non-virtual被重定义的危害</h1><p>&nbsp;<br>上述实例表明，在发生了non-virtual重定义的情况下，D对象的行为出现了不一致性。具体来说，<strong>当mf被调用时，对象的行为可能表现为基类也可能表现为派生类，其决定因素不在于对象自身而在于“指向该对象的指针”的声明类型。</strong></p>
-<p>前文已述，public继承代表is-a，而non-virtual代表了class的某种不变性。如果derived class重定义了non-virtual函数，设计便出现了矛盾：如果D真的有必要实现出与B不同的non-virtual函数，也就表明其特异性超过了不变性，这也就违背了is-a关系。</p>
-<p>base class的析构函数之所以要声明为virtual也是如此，因为derived class绝不应该重新定义一个继承而来的non-virtual函数。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1879,7 +1907,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1901,7 +1929,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

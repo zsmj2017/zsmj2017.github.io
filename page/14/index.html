@@ -291,6 +291,159 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8C%E4%B8%8EC++/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/30/%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8C%E4%B8%8EC++/" itemprop="url">34.混合使用C与C++</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-30T07:12:00+08:00">
+                2018-04-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在混合编程前，首先确保你的C++编译器和C编译器兼容。确认兼容后，还有四个需要考虑的问题：名变换、静态初始化、内存动态分配、数据结构兼容。</p>
+<hr>
+<h1 id="名变换"><a href="#名变换" class="headerlink" title="名变换"></a>名变换</h1><p>&nbsp;<br>名变换，就是C++编译器给程序的每个函数换一个独一无二的名字。C没有函数重载，因此不需要该过程。重载不兼容于绝大部分链接程序，因为链接程序通常无法分辨同名的函数，它坚持函数名必须独一无二。名变换是C++对编译器的妥协。<br>在C++使用范围内用户无需考虑名变换，但在C运行库中，那么情况截然不同。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>举例而言，在Cpp包含的头文件中，drawline被声明为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br></pre></td></tr></table></figure><br>代码体中通常也是调用drawLine，每一个这样的调用都被编译器转换为调用名变换后的函数，所以写下的是<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drawLine(a, b, c, d);</span><br></pre></td></tr></table></figure><br>在obj中被调用的是：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xyzzy(a, b, c, d);<span class="comment">//编译器变换了名称</span></span><br></pre></td></tr></table></figure><br>但如果drawline是一个C函数，obj文件（或者是动态链接库之类的文件）中包含的编译后的drawline函数仍然叫drawline，不会发生名变换动作。这意味着链接时将发生错误，因为链接程序找不到xyzzy函数的存在。</p>
+<hr>
+<h2 id="解决方案（extern-“C”"><a href="#解决方案（extern-“C”" class="headerlink" title="解决方案（extern “C”)"></a>解决方案（extern “C”)</h2><p>我们需要某种方法告诉C++编译器不要在这个函数上进行名变换，就是使用C++的<code>extern &quot;C&quot;</code>关键词：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br></pre></td></tr></table></figure><br>不要以为有一个extern “C”，那么就应该同样有一个extern “Pascal”和extern “FORTRAN”之类。该关键词的意思是下述函数应该被当作C语言写的一样。所以汇编也是用extern “C”声明，甚至可以在C++函数上申明 extern “C”。（用C++写库给其他语言的客户使用），这样编译器就不会对你的函数执行名变换。<br>如果你需要批量地声明函数无需名变换，extern “C”可以对一组函数生效，只要将它们放入一对大括号中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">twiddleBits</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> bits)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">simulate</span><span class="params">(<span class="keyword">int</span> iterations)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种技巧普遍适用于头文件中。假设当前头文件可能被C++编译器编译也可能会被C语言编译器编译。当用C++编译时，你应该加 extern “C”，但用C编译时则不必。通过只在C++编译器下定义的宏__cplusplus，头文件的写法很简单：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span>&#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">drawLine</span><span class="params">(<span class="keyword">int</span> x1, <span class="keyword">int</span> y1, <span class="keyword">int</span> x2, <span class="keyword">int</span> y2)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">twiddleBits</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> bits)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">simulate</span><span class="params">(<span class="keyword">int</span> iterations)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> __cplusplus</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure><br>顺便提及一下，名变换没有标准规则，不同的编译器名变换不同。</p>
+<hr>
+<h1 id="静态初始化"><a href="#静态初始化" class="headerlink" title="静态初始化"></a>静态初始化</h1><p>&nbsp;<br>在C++中，main函数执行前和执行后都有大量代码被执行。具体来说，静态的类对象和定义在全局的、命名空间中的或文件体中的类对象的构造函数通常在main执行前就被调用。这个过程称为静态初始化。同样，通过静态初始化产生的对象也要在静态析构过程中调用其析构函数，这个过程通常发生在main结束<br>运行之后。<br>为了解决main应该首先被调用，而对象又需要在main执行前被构造的两难问题，许多编译器在main的最开始处插入了一个特别的函数，由它来负责静态初始化。同样地，编译器在main结束处插入了一个函数来析构静态对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123;</span><br><span class="line">    performStaticInitialization();</span><br><span class="line">    ...<span class="comment">//the statements you put in main go here;</span></span><br><span class="line">    performStaticDestruction();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>示例中函数的名称不需要在意，关注要点是：如果一个C++编译器采用这种方法来初始化和析构静态对象，那么除非你用C++写了main函数，否则这些对象既不会构造也不会析构。因此只要代码中有C++部分，就应该使用C++的main函数。<br>但有时似乎用C写main更有意义————比如当前程序的大部分都是用C写的，C++部分只是一个支持库。然而，这个C++库很可能含有静态对象（即使现在没有，以后也可能会有），所以仍然需要用C++写main函数。但我们并不需要改写C语言代码，只要将C写的main改名为realmain，然后用C++版本的main调用realMain：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">realMain</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123;<span class="comment">//in C++</span></span><br><span class="line">    <span class="keyword">return</span> realMain(argc, argv);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果不这么写，就无法确保确保静态对象是否已经构造和析构。 </p>
+<hr>
+<h1 id="动态内存分配"><a href="#动态内存分配" class="headerlink" title="动态内存分配"></a>动态内存分配</h1><p>&nbsp;<br>动态内存分配的规则很简单：C++部分使用new和delete，C部分使用malloc和free。用free释放new 分配的内存或用delete释放malloc分配的内存，其行为没有定义。<br>说起来容易，做起来未必简单。比如strdup函数，它并不存在于C和C++标准库中，却很常见：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">char</span> * <span class="title">strdup</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *ps)</span></span>; <span class="comment">// return a copy of the string pointed to by ps</span></span><br></pre></td></tr></table></figure><br>为了避免内存泄漏，strdup的调用者必须释放分配的内存。那是使用delete还是free呢？如果你调用的 strdup来自于C函数库中，使用free，否则使用delete.<br>在调用strdup后所需要做的操作，在不同的操作系统下不同，在不同的编译器下也不同。为了减少这种可移植性问题，应当尽可能避免调用那些既不在标准运行库中也没有固定形式的函数 。</p>
+<hr>
+<h1 id="数据结构兼容性"><a href="#数据结构兼容性" class="headerlink" title="数据结构兼容性"></a>数据结构兼容性</h1><p>&nbsp;<br>最后一个问题是在C++和C之间传递数据。<br>C与C++的交互必须限定在C可表示的概念上。因此，不可能传递给C语言对象或者成员函数指针。但C中存在着普通指针的概念，所以C和C++的函数可以安全地交换”指向对象的指针”和”指向非成员的函数或静态成员函数的指针”。同样，struct和内置类型的变量也可自由交换。<br>因为C++中struct兼容C中的规则，因此C编译器和C++编译器处理struct得到的结果一样。在C++ struct中增加非虚函数不会导致内存结构发生改变，因此，只有非虚函数的strcut的对象兼容于它们在C 中的孪生版本（C++成员函数并不在对象的内存布局中体现）。增加虚函数和加入继承体系会改变内存布局，此时无法完成C与C++的安全交换。<br>就数据结构而言，我们可以认为在C++和C之间相互传递数据结构是安全的（前提是结构式的定义在C和C++中都可编译）。在 C++版本中增加非虚成员函数或许不影响兼容性，但几乎其它的改变都将影响兼容。  </p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/29/%E5%B0%86%E9%9D%9E%E5%B0%BE%E7%AB%AF%E7%B1%BB%E8%AE%BE%E8%AE%A1%E4%B8%BA%E6%8A%BD%E8%B1%A1%E7%B1%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1810,213 +1963,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/27/%E4%BA%86%E8%A7%A3%E8%99%9A%E5%87%BD%E6%95%B0%E3%80%81%E5%A4%9A%E7%BB%A7%E6%89%BF%E3%80%81%E8%99%9A%E5%9F%BA%E7%B1%BB%E3%80%81RTTI%E6%89%80%E5%B8%A6%E6%9D%A5%E7%9A%84%E6%88%90%E6%9C%AC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/27/%E4%BA%86%E8%A7%A3%E8%99%9A%E5%87%BD%E6%95%B0%E3%80%81%E5%A4%9A%E7%BB%A7%E6%89%BF%E3%80%81%E8%99%9A%E5%9F%BA%E7%B1%BB%E3%80%81RTTI%E6%89%80%E5%B8%A6%E6%9D%A5%E7%9A%84%E6%88%90%E6%9C%AC/" itemprop="url">24.了解虚函数、多继承、虚基类、RTTI所带来的成本</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-27T14:17:00+08:00">
-                2018-04-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>C++编译器必须实现语言的每一个特性，其实现细节由编译器来决定，不同的编译器以不同的方式实现语言特性。在多数情况下，开发者无需理解这些隐藏于代码背后的操作。然而某些特性的实现对<strong>对象大小</strong>和其<strong>成员函数执行速度</strong>有很大的影响，所以对于这些特性有一个基本的了解，知道编译器可能执行的操作，就较为重要。 </p>
-<hr>
-<h1 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h1><p>&nbsp;<br>当调用虚函数时，所执行的代码必须与调用函数的对象的动态类型一致；指向对象的指针或引用的静态类型并不重要。<br>编译器为了高效地提供这种行为，通常会使用virtual table与virtual table pointers.此二者通常又被称为vtbl与vptr.</p>
-<hr>
-<h2 id="vbtl"><a href="#vbtl" class="headerlink" title="vbtl"></a>vbtl</h2><p>一个vbtl通常是一个函数指针数组（或链表）。只要某个类声明了虚函数或者继承了虚函数就会存在vtbl，vtbl中的元素是指向虚函数实现体的指针。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C1</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    C1();</span><br><span class="line">    <span class="keyword">virtual</span> ~C1();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">f2</span><span class="params">(<span class="keyword">char</span> c)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f3</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; s)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f4</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>C1的vtbl如下所示：<img src="http://static.zybuluo.com/zsmj2017/q161l1kwdi9q91p8fhojpmcb/image_1cc2pakm9rru1e2gtrp1p9016ob9.png" alt="image_1cc2pakm9rru1e2gtrp1p9016ob9.png-44.2kB"><br>显然，非虚函数不会存在于vtbl中。</p>
-<h3 id="继承下的vbtl"><a href="#继承下的vbtl" class="headerlink" title="继承下的vbtl"></a>继承下的vbtl</h3><p>现有C2继承自C1，并且重定义了部分虚函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C2</span>:</span> <span class="keyword">public</span> C1&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    C2();<span class="comment">//非虚函数</span></span><br><span class="line">    <span class="keyword">virtual</span> ~C2(); <span class="comment">//重定义函数</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span>;<span class="comment">//重定义函数virtual     void f5(char *str); //新的虚函数</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>C2的vtbl如下所示：<img src="http://static.zybuluo.com/zsmj2017/0kn6vjye3wr12rdt8ytt12p5/image_1cc2po1k51uvcejs1585tht199lm.png" alt="image_1cc2po1k51uvcejs1585tht199lm.png-40.6kB"><br>可以看出，C2的vbtl里面包括了没有被C2重定义的C1的虚函数的指针。</p>
-<p>vbtl体现了虚函数所需的第一个代价：<strong>每一个包含虚函数的类都需要空间来容纳vtbl，其大小与虚函数的数量成正比。</strong></p>
-<h3 id="vtbl的位置"><a href="#vtbl的位置" class="headerlink" title="vtbl的位置"></a>vtbl的位置</h3><p>因为每一个类只需要一个vbtl拷贝，那把它放在哪个obj里呢？编译器厂商有两种做法：</p>
-<ol>
-<li>为所有可能需要vbtl的obj生成一个vbtl拷贝，连接程序然后删除多余的拷贝。最后的可执行文件或者程序库里只有一个vbtl实例。</li>
-<li>采用启发式算法：只有obj包含该类的第一个非内联，非纯虚函数定义（也就是实现体）时才会生成vbtl.</li>
-</ol>
-<hr>
-<h2 id="vptr"><a href="#vptr" class="headerlink" title="vptr"></a>vptr</h2><p>单有vbtl并不能实现虚函数，还需要vptr.这是一个指向vbtl的指针，隐藏在对象中，其位置只有编译器知道。这是虚函数的第二个代价：对象内需要额外的空间开销来存储指针。对于较小的对象而言，这笔买卖很不划算。<br>假设我们有一些C1与C2的对象，对象、vbtl、vptr的关系大致如下图所示：<br><img src="http://static.zybuluo.com/zsmj2017/zop4fglkufcfy0pw2hjfyor0/image_1cc2qaquhtk915b82dqco71mde13.png" alt="image_1cc2qaquhtk915b82dqco71mde13.png-106.9kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">makeACall</span><span class="params">(C1 *pC1)</span></span>&#123;</span><br><span class="line">    pC1-&gt;f1();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>为了保证调用正确，编译器做出了如下操作：</p>
-<ol>
-<li>通过对象的vptr找到vtbl。</li>
-<li>找到vbtl里面的指向被调用函数的指针。</li>
-<li>调用该函数。</li>
-</ol>
-<p>假设存在索引i指向vbtl中的f1函数，那么上述代码的执行类似于：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(*pC1-&gt;vptr[i])(pC1);<span class="comment">//pC1作为this指针作为形参</span></span><br></pre></td></tr></table></figure><br>从上述过程可以看出调用虚函数并不是性能的瓶颈，因为虚函数调用所花费的成本相对于普通函数调用相差无几。在实际运行中虚函数成为性能瓶颈的原因是无法内联，原因很简单，inline是编译到此处时替换，而虚函数的确认需要到运行期，这就是虚函数的第三个不足：无法内联从而降低性能。</p>
-<hr>
-<h1 id="多继承与虚基类"><a href="#多继承与虚基类" class="headerlink" title="多继承与虚基类"></a>多继承与虚基类</h1><p>&nbsp;<br>一旦多继承被引入，在对象里为寻找vptr而进行的偏移量计算会变得更复杂。在单个对象中会存在多个vptr（每一个基类对应一个），此外，此外，针对base class而形成的vtbl也被生成。这直接导致了空间成本进一步扩大，并且运行期调用成本也有了轻微的增长。<br>多继承导致了对虚基类的需求。在不使用虚基类的情况下，如果一个派生类有一个以上从基类的继承路径，基类的数据成员将通过所有路径产生多个拷贝存在于派生类中。<br>但虚基类本身亦存在使用成本，因为虚基类的实现经常使用指向虚基类的指针做为避免复制的手段，从而导致一个或者更多的指针被存储在对象里。</p>
-<h2 id="钻石型继承体系（Effective-C-41）"><a href="#钻石型继承体系（Effective-C-41）" class="headerlink" title="钻石型继承体系（Effective C++ 41）"></a>钻石型继承体系（Effective C++ 41）</h2><p>考虑如下的继承关系：<br><img src="http://static.zybuluo.com/zsmj2017/2ayq58oo7nqcganao8f4x7ay/image_1cc2re6k51thn88j1av642r6351g.png" alt="image_1cc2re6k51thn88j1av642r6351g.png-35.1kB"><br>D对象的内部会呈现出这样的结构：<br><img src="http://static.zybuluo.com/zsmj2017/b91cwitnhk40eh3fzxobyddm/image_1cc2rods774enmju44g9s147g2d.png" alt="image_1cc2rods774enmju44g9s147g2d.png-79.7kB"><br>显然，对象内部有一个多余的指针，这也就是上文所说的虚基类的一大弊端。<br>当我们再加入vptr的概念，D对象的内部结构大概是这样：<br><img src="http://static.zybuluo.com/zsmj2017/3uscbl1vj2cpv228hmtdng4a/image_1cc2rrm7ap0hbc01a4819nj18pk3a.png" alt="image_1cc2rrm7ap0hbc01a4819nj18pk3a.png-166.3kB"><br>四个类只有3个vptr，这是因为编译器发现BD的vptr可以共享。</p>
-<hr>
-<h1 id="运行期类型识别（RTTI）"><a href="#运行期类型识别（RTTI）" class="headerlink" title="运行期类型识别（RTTI）"></a>运行期类型识别（RTTI）</h1><p>&nbsp;<br>RTTI能够让我们在运行时找到对象和类的相关信息，这样信息被存储在类型为type_info的对象里，我们可以通过typeid操作符来访问一个类的type_info对象.</p>
-<p>一个类仅仅只需要一个RTTI的拷贝，但是必须有办法得到任何对象的类型信息。从语言规范角度而言：如果一个类型至少有一个虚函数，那我们保证可以获得一个对象动态类型信息。这似乎类似于vbtl，实际上，RTTI就是基于vbtl实现的。<br>具体来说，vbtl的索引0处可以包含一个指针，指向type_info对象：<br><img src="http://static.zybuluo.com/zsmj2017/myendjr6k114f880zr1pbltn/image_1cc2s78hs1cho1rhb13vft1npt83n.png" alt="image_1cc2s78hs1cho1rhb13vft1npt83n.png-40.5kB"><br>也就是说vbtl又多了一个需要被占用的空间。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Feature</th>
-<th style="text-align:center">Increases Size of Objects</th>
-<th style="text-align:center">Increases Per-Class Data</th>
-<th style="text-align:center">Reduces Inlining</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">Virtual Functions</td>
-<td style="text-align:center">Yes</td>
-<td style="text-align:center">Yes</td>
-<td style="text-align:center">Yes</td>
-</tr>
-<tr>
-<td style="text-align:center">Multiple Inheritance</td>
-<td style="text-align:center">Yes</td>
-<td style="text-align:center">Yes</td>
-<td style="text-align:center">No</td>
-</tr>
-<tr>
-<td style="text-align:center">Virtual Base Classes</td>
-<td style="text-align:center">Often</td>
-<td style="text-align:center">Sometimes</td>
-<td style="text-align:center">No</td>
-</tr>
-<tr>
-<td style="text-align:center">RTTI</td>
-<td style="text-align:center">No</td>
-<td style="text-align:center">Yes</td>
-<td style="text-align:center">No</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>要记住理解是为了更好的使用，而非因噎废食。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2067,7 +2013,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2089,7 +2035,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/30/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94new%E4%B8%8Edelete%E8%BF%90%E7%AE%97%E7%AC%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/30/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94new%E4%B8%8Edelete%E8%BF%90%E7%AE%97%E7%AC%A6/" itemprop="url">执行期语义学——new与delete运算符</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-30T07:05:00+08:00">
+                2018-05-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;</p>
+<p>new operator看起来似乎是一个单一运算，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *pi = <span class="keyword">new</span> <span class="keyword">int</span>(<span class="number">5</span>);</span><br></pre></td></tr></table></figure><br>但实际上它由以下两个步骤组成：</p>
+<ol>
+<li>通过适当的new运算符函数实体，配置所有所需内存：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *pi = _new(<span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br></pre></td></tr></table></figure></li>
+<li>给配置得来的对象设立初值：<br>*pi = 5;</li>
+</ol>
+<p>当然，初始化操作应当在内存配置成功后才执行：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//重写声明</span></span><br><span class="line"><span class="keyword">int</span> *pi;</span><br><span class="line"><span class="keyword">if</span>(pi = _new(<span class="keyword">sizeof</span>(<span class="keyword">int</span>))) *pi=<span class="number">5</span>;</span><br></pre></td></tr></table></figure></p>
+<p>delete运算符性质类似，只是在使用前会判断一下参数是否为nullptr，并且需要注意的是，在执行完delete后，p并不会被置为nullptr。</p>
+<p>如果我们new或delete的是一个具备constructor或destructor的object，那么在执行new或delete时会触发对应的函数调用(其实一直说到这都是描述new operator与operator new）。</p>
+<hr>
+<h1 id="new运算符的小机巧"><a href="#new运算符的小机巧" class="headerlink" title="new运算符的小机巧"></a>new运算符的小机巧</h1><p>&nbsp;<br>new操作符的实现一般均很直截了当，但有两个精巧之处值得斟酌：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">void</span>*</span><br><span class="line"><span class="function"><span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>==<span class="number">0</span>) <span class="built_in">size</span> = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">void</span> *last_alloc;</span><br><span class="line">    <span class="keyword">while</span>(!(last_alloc = <span class="built_in">malloc</span>(<span class="built_in">size</span>))&#123;</span><br><span class="line">        <span class="keyword">if</span>(!_new_handler) (*_new_handler)();</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> last_alloc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>虽然<code>new T[0]</code>从语法层胶墩来说合法，但语言要求每一次对new的调用都必须传回一个独一无二的指针，这也就是每一次当size为0都将其置1的原因。此外，new允许开发者提供自己的_new_handler()函数，这也就是循环调用的原因。</p>
+<p>实际上，new运算符总是以标准的C malloc()完成，虽然这并不是强制要求。类似地，delete也总是以标准的C free()完成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">void</span> </span><br><span class="line"><span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span> *ptr)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(ptr) <span class="built_in">free</span>((<span class="keyword">char</span>*)ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="针对数组的new与delete语意"><a href="#针对数组的new与delete语意" class="headerlink" title="针对数组的new与delete语意"></a>针对数组的new与delete语意</h1><p>&nbsp;<br>当我们写下<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>* p_array = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">5</span>];</span><br></pre></td></tr></table></figure><br>时，vec_new并不会真正被调用，因为其主要功能是把default constructor施行于class objects所组成的数组的每一个元素身上，倒是new运算符函数会被调用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>* p_array = (<span class="keyword">int</span>*)_new(<span class="number">5</span>*<span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br></pre></td></tr></table></figure><br>对于strcut这种Plain OI’s Data，其执行类似于内置类型，因为其不具备constructor与destructor。new与delete运算符只需要获取或释放内存即可，vec_new()也不会被调用。</p>
+<p>但如果class定义有一个default constructor，那么某些版本的vec_new()将会被调用，举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Point3d *p_array = <span class="keyword">new</span> Point3d[<span class="number">10</span>];</span><br><span class="line"><span class="comment">//编译结果</span></span><br><span class="line">Point3d* p_array;</span><br><span class="line">p_array = vec_new(<span class="number">0</span>,<span class="keyword">sizeof</span>(Point3d),<span class="number">10</span>,&amp;Point3d::Point3d(),&amp;Point3d::~Point3d());</span><br></pre></td></tr></table></figure><br>需要注意的是，只有已经构造完毕的object才可以经过destructor处理，在发生异常时，vec_new释放所有资源。</p>
+<p>在很久之前，delete对象数组时必须要指定数组长度<code>delete[10] p_array</code>，当然现在不需要了,不过这种写法依然有效。有人会产生疑问，<code>delete[]</code>是如何了解当前所需要析构的元素数目？答案是vec_new所传回的内存区块内有一个word记录了数组长度。另外需要记住的是，在数组中使用多态性是非常不恰当的行为，我们在任何情况下都应当避免当一个base class 指针或引用指向derived class object组成的数组。</p>
+<hr>
+<h1 id="Placement-Operator-new的语意"><a href="#Placement-Operator-new的语意" class="headerlink" title="Placement Operator new的语意"></a>Placement Operator new的语意</h1><p>&nbsp;<br>new操作符可以重载，其最常见的一种形态我们称为placement operator new，它需要第二个参数，用来指定分配内存的位置：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span>,<span class="keyword">void</span>* p)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>有人认为如果其作用只是传回第二参数，那它的实际意义何在？事实上，placement operator new还负责调用constructor自动实施于所指地址：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point2w *ptw = (Point2w*) arena;</span><br><span class="line"><span class="keyword">if</span>(ptw!=<span class="number">0</span>) ptw-&gt;Point2w::Point2w();</span><br></pre></td></tr></table></figure><br>然而存在一些小问题：假若当前我们需要被构造的内存段已经存在了一个object，而这个object拥有一个destructor。在我们执行placement operator new时，该destructor并不会被调用，可能会有人想到使用delete从而触发destructor，然而这也释放掉了这一块内存，并不可，。较好的做法是直接在地址上执行destructor（在后来的C++ standrad中出现了placement perator delete，它可以析构且不释放内存）。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/29/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%9E%84%E9%80%A0%E4%B8%8E%E6%9E%90%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1719,174 +1879,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/16/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E6%8C%87%E5%90%91Member%20Function%E7%9A%84%E6%8C%87%E9%92%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/16/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E6%8C%87%E5%90%91Member%20Function%E7%9A%84%E6%8C%87%E9%92%88/" itemprop="url">Function语义学——指向Member Function的指针</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-16T10:52:00+08:00">
-                2018-05-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在第三章中我们已经看出，取一个nonstatic data member的地址，得到的结果是该member在class布局中的bytes位置（+1）。我们可以想象它是一个不完整的值，必须依附于某个class object才可以完成存取。</p>
-<hr>
-<h1 id="Nostatic-Nonvirtual-Member-Function的指针"><a href="#Nostatic-Nonvirtual-Member-Function的指针" class="headerlink" title="Nostatic Nonvirtual Member Function的指针"></a>Nostatic Nonvirtual Member Function的指针</h1><p>&nbsp;<br>取一个nonstatic nonvirtual member function的地址，得到的是该函数在内存中真正的地址，但这个值也是不完全的，它也需要被绑定到某个class object的地址上才能调用该函数。所有nonstatic member function都需要对象的地址（以参数this指出）。</p>
-<p>一个指向member function的指针其声明语法如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span>        <span class="comment">//return type</span></span><br><span class="line">( Point::*    <span class="comment">//class the function is member</span></span><br><span class="line">  pmf)        <span class="comment">//name of the pointer</span></span><br><span class="line">()            <span class="comment">//argument list</span></span><br></pre></td></tr></table></figure><br>member function指针使用如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> (Point::*coord)() = &amp;Point::x;<span class="comment">//定义、初始化</span></span><br><span class="line">coord = &amp;Point::y;<span class="comment">//赋值</span></span><br><span class="line">(origin.*coord)();<span class="comment">//调用 被编译器转为(coord)(&amp;origin)</span></span><br><span class="line">(ptr-&gt;*coord)();<span class="comment">//调用 被编译器转为(coord)(ptr)</span></span><br></pre></td></tr></table></figure></p>
-<p>指向member function的指针的声明语法，以及指向“member selection运算符”的指针，其作用是作为this指针的空间保留者。这也是static member functions的类型是函数指针，而非“指向member function的指针”的原因。</p>
-<p>我们可以认为，使用“指向member function的指针”，其成本并不高于使用一个“nonmember function指针”，这句话的前提是，当前并没有发生virtual function、多重继承、虚继承。</p>
-<hr>
-<h1 id="支持“指向Virtual-Member-Functions的指针”"><a href="#支持“指向Virtual-Member-Functions的指针”" class="headerlink" title="支持“指向Virtual Member Functions的指针”"></a>支持“指向Virtual Member Functions的指针”</h1><p>&nbsp;<br>考虑以下程序片段：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> (Point::*pmf)() = &amp;Point::z;</span><br><span class="line">Point *ptr = <span class="keyword">new</span> Point3d;</span><br></pre></td></tr></table></figure><br>显然，pmf指向了Point的一个member function，只不过这一次z()是一个virtual function。ptr指向了一个Point3d对象。<br>接下来我们执行调用操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();<span class="comment">//正确地调用Point3d::z()</span></span><br><span class="line">(ptr-&gt;*pmf)();<span class="comment">//仍然具备正确性</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="Poninter-to-virtual-Member-Function的实现"><a href="#Poninter-to-virtual-Member-Function的实现" class="headerlink" title="Poninter to virtual Member Function的实现"></a>Poninter to virtual Member Function的实现</h2><p>&nbsp;<br>在上文中我们已经明确，对一个nonstatic member function取址得到的是其在内存中的地址。但对于一个virtual function，其地址在编译期是未知的，我们所知道的只是virtual function在其相关vtbl中的索引值。因此，对一个virtual member function取址的时候，我们得到的是一个索引。</p>
-<h3 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h3><p>现有Point声明如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>现对各个member func分别取址：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&amp;Point::~Point();<span class="comment">//res==1;</span></span><br><span class="line">&amp;Point::x();<span class="comment">//内存中地址</span></span><br><span class="line">&amp;Point::y();<span class="comment">//内存中地址</span></span><br><span class="line">&amp;Point::z()<span class="comment">//res==2</span></span><br></pre></td></tr></table></figure><br>通过pmf来调用z()的话，编译器会将该调用语句转为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(*ptr-&gt;vptr[(<span class="keyword">int</span>)pmf])(ptr);</span><br></pre></td></tr></table></figure><br>显然地，pmf需要有两种含义：</p>
-<ol>
-<li>内存地址</li>
-<li>vtbl中的索引值</li>
-</ol>
-<p>关键在于我们应当如何区分它们。</p>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>在cfront编译器中，具体解决方案如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(((<span class="keyword">int</span>)pmf)&amp;~<span class="number">127</span>)?</span><br><span class="line">    (*pmf)(ptr):</span><br><span class="line">    (*ptr-&gt;vptr[(<span class="keyword">int</span>)pmf](ptr));</span><br></pre></td></tr></table></figure><br>这种设计策略要求继承体系中最多只能存在128个virtual functions。由于多重继承的导入，我们需要更一般化的实现方式，并趁机去除virtual functions的数目限制。</p>
-<hr>
-<h1 id="多重继承下，指向member-function的指针"><a href="#多重继承下，指向member-function的指针" class="headerlink" title="多重继承下，指向member function的指针"></a>多重继承下，指向member function的指针</h1><p>&nbsp;<br>为了保证支持多重继承与虚继承，cfront的作者设计了一个结构体：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">mptr</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> delta;</span><br><span class="line">    <span class="keyword">int</span> index;</span><br><span class="line">    <span class="keyword">union</span>&#123;</span><br><span class="line">        ptrtofunc faddr;</span><br><span class="line">        <span class="keyword">int</span> v_offset;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>index与faddr分别（不同时）带有vbtl索引与nonvirtual member function地址。在该模型下，调用操作<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(ptr-&gt;*pmf)();</span><br></pre></td></tr></table></figure><br>会变成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(pmf.index&lt;<span class="number">0</span>)</span><br><span class="line">    ?(*pmf.faddr)(ptr)<span class="comment">//non-virtual</span></span><br><span class="line">    :(*ptr-&gt;vptr[pmf.index](ptr));</span><br></pre></td></tr></table></figure><br>这种方法有两个缺点：</p>
-<ol>
-<li><strong>每一个调用操作都必须付出上述成本，检查其是否为virtual或non-virtual。</strong></li>
-<li><strong>当传递一个不变值的指针给member function时，它需要产生一个临时对象。</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> Point3d <span class="title">foo</span><span class="params">(<span class="keyword">const</span> Point3d&amp;,Point3d(Point3d::*)())</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">bar</span><span class="params">(<span class="keyword">const</span> Point3d&amp; p)</span></span>&#123;</span><br><span class="line">    Point3d pt = foo(p,&amp;Point3d::normal);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-假设，&amp;Point3d::normal的值类似于：<code>{0,-1,10727417}</code>,那么将会产生一个具有明确初值的临时对象：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_mptr temp=&#123;<span class="number">0</span>,<span class="number">-1</span>,<span class="number">10727417</span>&#125;;</span><br><span class="line">foo(p,temp);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>现在我们将目光再次拉回结构体。delta字段表示this指针的offset值，而v_offset字段存放的则是一个virtual base class的vptr位置。显然，如果vptr被置于class object的起始处，我们就可以不需要这个字段（当然这令我们丧失了与C语言的兼容性）。这些字段只有在多重继承或者虚拟继承的情况下才具备必要性。</p>
-<hr>
-<h1 id="“指向Member-Functions的指针”的效率"><a href="#“指向Member-Functions的指针”的效率" class="headerlink" title="“指向Member Functions的指针”的效率"></a>“指向Member Functions的指针”的效率</h1><p>&nbsp;<br>（下文详细测试了不同指针的读取效率。）</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1937,7 +1929,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1959,7 +1951,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

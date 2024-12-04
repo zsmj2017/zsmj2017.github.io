@@ -291,6 +291,174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/16/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E6%8C%87%E5%90%91Member%20Function%E7%9A%84%E6%8C%87%E9%92%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/16/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E6%8C%87%E5%90%91Member%20Function%E7%9A%84%E6%8C%87%E9%92%88/" itemprop="url">Function语义学——指向Member Function的指针</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-16T10:52:00+08:00">
+                2018-05-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在第三章中我们已经看出，取一个nonstatic data member的地址，得到的结果是该member在class布局中的bytes位置（+1）。我们可以想象它是一个不完整的值，必须依附于某个class object才可以完成存取。</p>
+<hr>
+<h1 id="Nostatic-Nonvirtual-Member-Function的指针"><a href="#Nostatic-Nonvirtual-Member-Function的指针" class="headerlink" title="Nostatic Nonvirtual Member Function的指针"></a>Nostatic Nonvirtual Member Function的指针</h1><p>&nbsp;<br>取一个nonstatic nonvirtual member function的地址，得到的是该函数在内存中真正的地址，但这个值也是不完全的，它也需要被绑定到某个class object的地址上才能调用该函数。所有nonstatic member function都需要对象的地址（以参数this指出）。</p>
+<p>一个指向member function的指针其声明语法如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span>        <span class="comment">//return type</span></span><br><span class="line">( Point::*    <span class="comment">//class the function is member</span></span><br><span class="line">  pmf)        <span class="comment">//name of the pointer</span></span><br><span class="line">()            <span class="comment">//argument list</span></span><br></pre></td></tr></table></figure><br>member function指针使用如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> (Point::*coord)() = &amp;Point::x;<span class="comment">//定义、初始化</span></span><br><span class="line">coord = &amp;Point::y;<span class="comment">//赋值</span></span><br><span class="line">(origin.*coord)();<span class="comment">//调用 被编译器转为(coord)(&amp;origin)</span></span><br><span class="line">(ptr-&gt;*coord)();<span class="comment">//调用 被编译器转为(coord)(ptr)</span></span><br></pre></td></tr></table></figure></p>
+<p>指向member function的指针的声明语法，以及指向“member selection运算符”的指针，其作用是作为this指针的空间保留者。这也是static member functions的类型是函数指针，而非“指向member function的指针”的原因。</p>
+<p>我们可以认为，使用“指向member function的指针”，其成本并不高于使用一个“nonmember function指针”，这句话的前提是，当前并没有发生virtual function、多重继承、虚继承。</p>
+<hr>
+<h1 id="支持“指向Virtual-Member-Functions的指针”"><a href="#支持“指向Virtual-Member-Functions的指针”" class="headerlink" title="支持“指向Virtual Member Functions的指针”"></a>支持“指向Virtual Member Functions的指针”</h1><p>&nbsp;<br>考虑以下程序片段：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> (Point::*pmf)() = &amp;Point::z;</span><br><span class="line">Point *ptr = <span class="keyword">new</span> Point3d;</span><br></pre></td></tr></table></figure><br>显然，pmf指向了Point的一个member function，只不过这一次z()是一个virtual function。ptr指向了一个Point3d对象。<br>接下来我们执行调用操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ptr-&gt;z();<span class="comment">//正确地调用Point3d::z()</span></span><br><span class="line">(ptr-&gt;*pmf)();<span class="comment">//仍然具备正确性</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Poninter-to-virtual-Member-Function的实现"><a href="#Poninter-to-virtual-Member-Function的实现" class="headerlink" title="Poninter to virtual Member Function的实现"></a>Poninter to virtual Member Function的实现</h2><p>&nbsp;<br>在上文中我们已经明确，对一个nonstatic member function取址得到的是其在内存中的地址。但对于一个virtual function，其地址在编译期是未知的，我们所知道的只是virtual function在其相关vtbl中的索引值。因此，对一个virtual member function取址的时候，我们得到的是一个索引。</p>
+<h3 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h3><p>现有Point声明如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">y</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">float</span> <span class="title">z</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>现对各个member func分别取址：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&amp;Point::~Point();<span class="comment">//res==1;</span></span><br><span class="line">&amp;Point::x();<span class="comment">//内存中地址</span></span><br><span class="line">&amp;Point::y();<span class="comment">//内存中地址</span></span><br><span class="line">&amp;Point::z()<span class="comment">//res==2</span></span><br></pre></td></tr></table></figure><br>通过pmf来调用z()的话，编译器会将该调用语句转为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(*ptr-&gt;vptr[(<span class="keyword">int</span>)pmf])(ptr);</span><br></pre></td></tr></table></figure><br>显然地，pmf需要有两种含义：</p>
+<ol>
+<li>内存地址</li>
+<li>vtbl中的索引值</li>
+</ol>
+<p>关键在于我们应当如何区分它们。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>在cfront编译器中，具体解决方案如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(((<span class="keyword">int</span>)pmf)&amp;~<span class="number">127</span>)?</span><br><span class="line">    (*pmf)(ptr):</span><br><span class="line">    (*ptr-&gt;vptr[(<span class="keyword">int</span>)pmf](ptr));</span><br></pre></td></tr></table></figure><br>这种设计策略要求继承体系中最多只能存在128个virtual functions。由于多重继承的导入，我们需要更一般化的实现方式，并趁机去除virtual functions的数目限制。</p>
+<hr>
+<h1 id="多重继承下，指向member-function的指针"><a href="#多重继承下，指向member-function的指针" class="headerlink" title="多重继承下，指向member function的指针"></a>多重继承下，指向member function的指针</h1><p>&nbsp;<br>为了保证支持多重继承与虚继承，cfront的作者设计了一个结构体：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">mptr</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> delta;</span><br><span class="line">    <span class="keyword">int</span> index;</span><br><span class="line">    <span class="keyword">union</span>&#123;</span><br><span class="line">        ptrtofunc faddr;</span><br><span class="line">        <span class="keyword">int</span> v_offset;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>index与faddr分别（不同时）带有vbtl索引与nonvirtual member function地址。在该模型下，调用操作<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(ptr-&gt;*pmf)();</span><br></pre></td></tr></table></figure><br>会变成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(pmf.index&lt;<span class="number">0</span>)</span><br><span class="line">    ?(*pmf.faddr)(ptr)<span class="comment">//non-virtual</span></span><br><span class="line">    :(*ptr-&gt;vptr[pmf.index](ptr));</span><br></pre></td></tr></table></figure><br>这种方法有两个缺点：</p>
+<ol>
+<li><strong>每一个调用操作都必须付出上述成本，检查其是否为virtual或non-virtual。</strong></li>
+<li><strong>当传递一个不变值的指针给member function时，它需要产生一个临时对象。</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> Point3d <span class="title">foo</span><span class="params">(<span class="keyword">const</span> Point3d&amp;,Point3d(Point3d::*)())</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">bar</span><span class="params">(<span class="keyword">const</span> Point3d&amp; p)</span></span>&#123;</span><br><span class="line">    Point3d pt = foo(p,&amp;Point3d::normal);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+假设，&amp;Point3d::normal的值类似于：<code>{0,-1,10727417}</code>,那么将会产生一个具有明确初值的临时对象：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_mptr temp=&#123;<span class="number">0</span>,<span class="number">-1</span>,<span class="number">10727417</span>&#125;;</span><br><span class="line">foo(p,temp);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>现在我们将目光再次拉回结构体。delta字段表示this指针的offset值，而v_offset字段存放的则是一个virtual base class的vptr位置。显然，如果vptr被置于class object的起始处，我们就可以不需要这个字段（当然这令我们丧失了与C语言的兼容性）。这些字段只有在多重继承或者虚拟继承的情况下才具备必要性。</p>
+<hr>
+<h1 id="“指向Member-Functions的指针”的效率"><a href="#“指向Member-Functions的指针”的效率" class="headerlink" title="“指向Member Functions的指针”的效率"></a>“指向Member Functions的指针”的效率</h1><p>&nbsp;<br>（下文详细测试了不同指针的读取效率。）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/16/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E7%9A%84%E6%95%88%E8%83%BD/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1761,156 +1929,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E7%BB%91%E5%AE%9A/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E7%BB%91%E5%AE%9A/" itemprop="url">Data语义学——Data Member的绑定</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-12T09:16:00+08:00">
-                2018-05-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>考虑以下程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">float</span> x;<span class="comment">//外部的x变量</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point3d(<span class="keyword">float</span>,<span class="keyword">float</span>,<span class="keyword">float</span>);</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">X</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> x;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">X</span><span class="params">(<span class="keyword">float</span> new_x)</span> <span class="keyword">const</span> </span>&#123;x=new_x;&#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>如果我们调用<code>Point3d::X()</code>,那么它返回的是<code>Point3d::x</code>还是<code>extern x</code>？熟悉C++的人都明白是前者，但并非一直以来都是前者。</p>
-<p>在C++最早的编译器上，如果在Point3d::X()的两个函数实例中对x进行参阅（取用）操作，这操作将会指向global x object。这种结果基本上不在开发者的预期之内，因此直接导致了C++早期的两种防御性程序设计风格：</p>
-<ol>
-<li><strong>将所有的data members放在class声明起头处，以确保正确的绑定：</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><strong>将所有的inline functions无论大小都置于声明之外</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  Point3d(<span class="keyword">float</span>,<span class="keyword">float</span>,<span class="keyword">float</span>);</span><br><span class="line">  <span class="function"><span class="keyword">float</span> <span class="title">X</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">X</span><span class="params">(<span class="keyword">float</span>)</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">float</span> <span class="title">Point3d::X</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">   <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>这些程序设计风格直至今日仍然存在，虽然已经不再具备必要性。这个古老的语言规则被称为“member scope resolution rules”，大意是“一个inline函数实体，在整个class声明未被完全看见之前，是不会被evaluated的”。C++ Standard以“member scope resolution rules”来精炼这个“rewriting rule”，其效果是，如果一个inline函数在class声明后立刻被定义的话，那么还是对其evaluate，也就是说，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">float</span> x;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//对函数的分析将延迟至class声明的右大括号出现才开始</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">X</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> x;&#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">float</span> x,y,z;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//分析在这里进行</span></span><br></pre></td></tr></table></figure><br>因此，在一个inline member function躯体内的一个data member绑定操作，会在整个class声明完成后才完成。</p>
-<p>然而，这对于member function的argument list并不为真。Argument list中的名称还是会在它们第一次遭遇时被适当地resloved。因此在extern与nested type names之间的非直觉操作绑定操作还是会发生。例如，在下面的程序段中，length的类型在两个member function signatures中都被reslove为global typedef，也就是int。当后续再有length的nested typedef声明出现时，C++<br>Standard就把之前的绑定标示为非法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">int</span> length;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//length被resloved为global</span></span><br><span class="line">    <span class="comment">//_val被resloved为Point3d::_val</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">mumble</span><span class="params">(length val)</span> </span>&#123;_val = val;&#125;</span><br><span class="line">    <span class="function">length <span class="title">mumble</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> _val;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">//length必须在“本class对它的第一个参考操作”之前被看见</span></span><br><span class="line">    <span class="comment">//该声明将使之前的参考操作不合法</span></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">float</span> length;</span><br><span class="line">    length _val;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>上述这种语言状况，仍然需要某种防御性编程风格：<strong>请始终将nested type声明放在class的起始处。</strong>在上述例子中，如果把length的nested type定义于“在class中被参考”之前，就可以确保非直觉绑定的正确性。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1961,7 +1979,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1983,7 +2001,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

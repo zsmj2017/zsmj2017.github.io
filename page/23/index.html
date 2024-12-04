@@ -291,6 +291,151 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E8%AF%A5%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%97%B6%E5%88%99%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/12/%E8%AF%A5%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%97%B6%E5%88%99%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1/" itemprop="url">22.该返回对象时则返回对象</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-12T13:12:00+08:00">
+                2018-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>pass-by-reference固然很好，但是实际应用时可能会发生一些很尴尬的场景，比如reference指向并不存在的对象。<br>具体而言，就是你试图用一个reference去绑定一个局部变量（local对象），这直接引发了雪崩。</p>
+<p>可能你会在函数内部定义一个static对象，并用一个reference去绑定它，最终返回一个指向static对象的reference。在多线程下这种操作极易导致安全问题，并且它还有更致命的错误。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Rational&amp; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,</span><br><span class="line">                          <span class="keyword">const</span> Rational&amp; rhs)&#123;</span><br><span class="line">        <span class="keyword">static</span> Rational res;</span><br><span class="line">        res = ...;<span class="comment">//乘法操作</span></span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当我们试图去使用operator<em>时：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Rational a,b,c,d;</span><br><span class="line"><span class="keyword">if</span>(a*b)==(c*d)&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>事实上if判定永远是true，因为​reference是static对象的别名，而那个对象和自己比对必然是相等的（虽然两次operator</em>的确各自改变了它的值，但最终仅返回了最终修改后的对象的reference）</p>
+<p>固执的人可能会试图去使用static array.. 这比使用static对象还要令人发指。首先无法判定array的大小，小了不够用，多了又浪费。而且n太大了还会造成效率低下（执行了n次构造与析构）。这个愚蠢的想法无法优化，就算把array换成vector也不会改善情况</p>
+<p>因此，不如就坦然地返回一个新对象，值得注意的是这里可以配合返回值优化使构造与析构的成本降到最低：(返回值优化详见 More Effective C++ 20)<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="keyword">const</span> Rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs)&#123;</span><br><span class="line">       <span class="keyword">return</span> Rational(...);<span class="comment">//返回值优化</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E7%A6%81%E6%AD%A2%E7%9B%B4%E6%8E%A5%E4%BF%AE%E6%94%B9set%E6%88%96mutiset%E7%9A%84key/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1702,165 +1847,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/new%E4%B8%8Edelete%E6%88%90%E5%AF%B9%E4%BD%BF%E7%94%A8%E6%97%B6%E5%BF%85%E9%A1%BB%E5%BD%A2%E5%BC%8F%E7%9B%B8%E5%90%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/11/new%E4%B8%8Edelete%E6%88%90%E5%AF%B9%E4%BD%BF%E7%94%A8%E6%97%B6%E5%BF%85%E9%A1%BB%E5%BD%A2%E5%BC%8F%E7%9B%B8%E5%90%8C/" itemprop="url">17.new与delete成对使用时必须形式相同</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T08:45:00+08:00">
-                2018-04-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">string</span> * stringarray = <span class="keyword">new</span> <span class="built_in">string</span>[<span class="number">100</span>];</span><br><span class="line"><span class="keyword">delete</span> stringarray;</span><br></pre></td></tr></table></figure>
-<p>在上述代码中我们成对地使用了<code>new</code>与<code>delete</code>，似乎避开了资源泄露，但其实并非如此。<br>上文动态分配了100个string对象，却只删除了第一个，其它string对象的析构函数根本没有被调用。</p>
-<hr>
-<h1 id="new与delete"><a href="#new与delete" class="headerlink" title="new与delete"></a>new与delete</h1><h2 id="调用new与delete时发生了什么？"><a href="#调用new与delete时发生了什么？" class="headerlink" title="调用new与delete时发生了什么？"></a>调用new与delete时发生了什么？</h2><p>当你使用new的时候，有两件事会发生：</p>
-<ol>
-<li>内存通过<code>operator new</code>被分配出来（new操作符详见Effective C++ 50 52）</li>
-<li>针对此内存有一个或多个构造函数被调用</li>
-</ol>
-<p>对应的，使用delete的时候也会发生两件事：</p>
-<ol>
-<li>一个或多个析构函数被调用</li>
-<li>通过<code>operator delete</code>释放内存</li>
-</ol>
-<h2 id="delete如何判定对象个数？"><a href="#delete如何判定对象个数？" class="headerlink" title="delete如何判定对象个数？"></a>delete如何判定对象个数？</h2><p>delete的最大问题在于：即将被删除的内存之内究竟存有多少对象？这决定了会调用多少次析构函数。换句话说<strong>，delete需要明确：被删除的指针究竟指向单一对象还是对象数组</strong>？<br>在编译器的具体实现中，单一对象的内存布局不同于数组的内存布局，数组的内存布局中记录了数组大小，这得以让delete函数知道需要调用多少次析构函数。它们的内存布局大概是这样：<br><img src="http://static.zybuluo.com/zsmj2017/q7o6hnu7bl6ol60j9te6o2yk/image_1cap38n6l1a205v11tnn1t9017gu9.png" alt="image_1cap38n6l1a205v11tnn1t9017gu9.png-11.9kB"></p>
-<h2 id="delete的正确使用"><a href="#delete的正确使用" class="headerlink" title="delete的正确使用"></a>delete的正确使用</h2><p>我们通过人为指定的方式让delete明确其操作：<strong>使用delete或delete[]</strong>;<br>前者认定当前指向的是单一对象，后者则认定当前指向数组：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">string</span>* pstr1 = <span class="keyword">new</span> <span class="built_in">string</span>；</span><br><span class="line"><span class="built_in">string</span>* pstr2 = <span class="keyword">new</span> <span class="built_in">string</span>[<span class="number">100</span>];</span><br><span class="line"><span class="keyword">delete</span> pstr1;</span><br><span class="line"><span class="keyword">delete</span>[] pstr2;</span><br></pre></td></tr></table></figure></p>
-<h2 id="误用delete形式的后果"><a href="#误用delete形式的后果" class="headerlink" title="误用delete形式的后果"></a>误用delete形式的后果</h2><p>如果我们对<code>pstr1</code>使用<code>delete[]</code>,结果未定义,可想而知它会误认为当前指向某一个对象数组，然后读取某块内存将其解释为数组大小，然后反复调用析构函数。</p>
-<p>如果我们对<code>pstr2</code>没有使用<code>delete[]</code>,结果亦未有定义，但肯定调用的析构函数不足。事实上，<strong>即使针对没有析构函数的内置类型，这种写法也是有害的。</strong></p>
-<h2 id="new、delete与typedef"><a href="#new、delete与typedef" class="headerlink" title="new、delete与typedef"></a>new、delete与typedef</h2><p>本节的规则十分简单，无非是<strong>成对使用new与delete时必须保证形式一致</strong>，读者想必会认为稍加注意不难做到。但对于某些重度typedef爱好者而言，还是要多加留心为是：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">string</span> AddressLines[<span class="number">4</span>];</span><br><span class="line"><span class="built_in">string</span>* pal = <span class="keyword">new</span> AddressLines;<span class="comment">//pal指向的是数组对象</span></span><br><span class="line"><span class="keyword">delete</span> pal;<span class="comment">//error!</span></span><br><span class="line"><span class="keyword">delete</span>[] pal;</span><br></pre></td></tr></table></figure><br>我认为C++语言应当尽量减少对数组使用typedef定义，在降低了可读性的同时还容易引发错误。在能够使用STL容器的地方坚决不使用动态数组。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1911,7 +1897,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1933,7 +1919,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

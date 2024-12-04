@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="velox operator,OrderBy,SortBuffer," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Xander's Wiki" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言orderBy是velox中的排序算子，其源码位置为12velox&amp;#x2F;exec&amp;#x2F;OrderBy.hvelox&amp;#x2F;exec&amp;#x2F;OrderBy.cpp其主要逻辑基本转交给了sortbuffer来处理，sortbuffer的源码位置为12velox&amp;#x2F;exec&amp;#x2F;SortBuffer.hvelox&amp;#x2F;exec&amp;#x2F;SortBuffer.">
+<meta name="keywords" content="velox operator,OrderBy,SortBuffer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从0开始学习velox源码（三）">
+<meta property="og:url" content="https://xander.wiki/2024/12/04/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0velox%E6%BA%90%E7%A0%81%EF%BC%88%E4%B8%89%EF%BC%89/index.html">
+<meta property="og:site_name" content="Xander&#39;s Wiki">
+<meta property="og:description" content="前言orderBy是velox中的排序算子，其源码位置为12velox&amp;#x2F;exec&amp;#x2F;OrderBy.hvelox&amp;#x2F;exec&amp;#x2F;OrderBy.cpp其主要逻辑基本转交给了sortbuffer来处理，sortbuffer的源码位置为12velox&amp;#x2F;exec&amp;#x2F;SortBuffer.hvelox&amp;#x2F;exec&amp;#x2F;SortBuffer.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://xander.wiki/images/SortBufferProcess.png">
+<meta property="og:updated_time" content="2024-12-04T14:15:25.772Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xander.wiki/images/SortBufferProcess.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xander.wiki/2024/12/04/从0开始学习velox源码（三）/"/>
+
+
+
+
+
+  <title>从0开始学习velox源码（三） | Xander's Wiki</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xander's Wiki</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/s" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2024/12/04/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0velox%E6%BA%90%E7%A0%81%EF%BC%88%E4%B8%89%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">从0开始学习velox源码（三）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2024-12-04T20:38:00+08:00">
+                2024-12-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/velox/" itemprop="url" rel="index">
+                    <span itemprop="name">velox</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>orderBy是velox中的排序算子，其源码位置为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">velox&#x2F;exec&#x2F;OrderBy.h</span><br><span class="line">velox&#x2F;exec&#x2F;OrderBy.cpp</span><br></pre></td></tr></table></figure><br>其主要逻辑基本转交给了<code>sortbuffer</code>来处理，<code>sortbuffer</code>的源码位置为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">velox&#x2F;exec&#x2F;SortBuffer.h</span><br><span class="line">velox&#x2F;exec&#x2F;SortBuffer.cpp</span><br></pre></td></tr></table></figure><br>本节我们将重点关注<code>sortbuffer</code>的实现。<br>按照先易后难的顺序，我们先关注无需考虑<code>spill</code>的情况，再在后续章节讨论包含<code>spill</code>的情况。</p>
+<a id="more"></a>
+<h1 id="算子流程图"><a href="#算子流程图" class="headerlink" title="算子流程图"></a>算子流程图</h1><p><img src="/images/SortBufferProcess.png" alt="orderBy"></p>
+<h1 id="Ctor"><a href="#Ctor" class="headerlink" title="Ctor"></a>Ctor</h1><p>调用方式：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// in velox/exec/OrderBy.cpp</span></span><br><span class="line">sortBuffer_ = <span class="built_in">std</span>::make_unique&lt;SortBuffer&gt;(</span><br><span class="line">      outputType_,</span><br><span class="line">      sortColumnIndices,</span><br><span class="line">      sortCompareFlags,</span><br><span class="line">      pool(),</span><br><span class="line">      &amp;nonReclaimableSection_,</span><br><span class="line">      driverCtx-&gt;prefixSortConfig(),</span><br><span class="line">      spillConfig_.has_value() ? &amp;(spillConfig_.value()) : <span class="literal">nullptr</span>,</span><br><span class="line">      &amp;spillStats_);</span><br></pre></td></tr></table></figure></p>
+<p>实现如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">SortBuffer::SortBuffer(</span><br><span class="line">    <span class="keyword">const</span> RowTypePtr&amp; input,</span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">column_index_t</span>&gt;&amp; sortColumnIndices,</span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;CompareFlags&gt;&amp; sortCompareFlags,</span><br><span class="line">    velox::memory::MemoryPool* pool,</span><br><span class="line">    tsan_atomic&lt;<span class="keyword">bool</span>&gt;* nonReclaimableSection,</span><br><span class="line">    common::PrefixSortConfig prefixSortConfig,</span><br><span class="line">    <span class="keyword">const</span> common::SpillConfig* spillConfig,</span><br><span class="line">    folly::Synchronized&lt;velox::common::SpillStats&gt;* spillStats)</span><br><span class="line">    : input_(input),</span><br><span class="line">      sortCompareFlags_(sortCompareFlags), <span class="comment">// 各列排序规则</span></span><br><span class="line">      pool_(pool),</span><br><span class="line">      nonReclaimableSection_(nonReclaimableSection), <span class="comment">// 当前是否处于nonReclaimableSection</span></span><br><span class="line">      prefixSortConfig_(prefixSortConfig),</span><br><span class="line">      spillConfig_(spillConfig),</span><br><span class="line">      spillStats_(spillStats),</span><br><span class="line">      sortedRows_(<span class="number">0</span>, memory::StlAllocator&lt;<span class="keyword">char</span>*&gt;(*pool)) &#123; <span class="comment">// sortbuffer排序时使用行数据，这里存储有序的行数据地址</span></span><br><span class="line">  VELOX_CHECK_GE(input_-&gt;size(), sortCompareFlags_.size());</span><br><span class="line">  VELOX_CHECK_GT(sortCompareFlags_.size(), <span class="number">0</span>);</span><br><span class="line">  VELOX_CHECK_EQ(sortColumnIndices.size(), sortCompareFlags_.size());</span><br><span class="line">  VELOX_CHECK_NOT_NULL(nonReclaimableSection_);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;TypePtr&gt; sortedColumnTypes;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;TypePtr&gt; nonSortedColumnTypes;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; sortedSpillColumnNames;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;TypePtr&gt; sortedSpillColumnTypes;</span><br><span class="line">  sortedColumnTypes.reserve(sortColumnIndices.size());</span><br><span class="line">  nonSortedColumnTypes.reserve(input-&gt;size() - sortColumnIndices.size());</span><br><span class="line">  sortedSpillColumnNames.reserve(input-&gt;size());</span><br><span class="line">  sortedSpillColumnTypes.reserve(input-&gt;size());</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unordered_set</span>&lt;<span class="keyword">column_index_t</span>&gt; sortedChannelSet;</span><br><span class="line">  <span class="comment">// Sorted key columns.</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">column_index_t</span> i = <span class="number">0</span>; i &lt; sortColumnIndices.size(); ++i) &#123;</span><br><span class="line">    columnMap_.emplace_back(IdentityProjection(i, sortColumnIndices.at(i)));</span><br><span class="line">    sortedColumnTypes.emplace_back(input_-&gt;childAt(sortColumnIndices.at(i)));</span><br><span class="line">    sortedSpillColumnTypes.emplace_back(</span><br><span class="line">        input_-&gt;childAt(sortColumnIndices.at(i)));</span><br><span class="line">    sortedSpillColumnNames.emplace_back(input-&gt;nameOf(sortColumnIndices.at(i)));</span><br><span class="line">    sortedChannelSet.emplace(sortColumnIndices.at(i));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// Non-sorted key columns.</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">column_index_t</span> i = <span class="number">0</span>, nonSortedIndex = sortCompareFlags_.size();</span><br><span class="line">       i &lt; input_-&gt;size();</span><br><span class="line">       ++i) &#123;</span><br><span class="line">    <span class="keyword">if</span> (sortedChannelSet.count(i) != <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    columnMap_.emplace_back(nonSortedIndex++, i); <span class="comment">// columnMap_存储了行存储-&gt;列存储的索引映射，在行存储中，key列将靠前存储</span></span><br><span class="line">    nonSortedColumnTypes.emplace_back(input_-&gt;childAt(i));</span><br><span class="line">    sortedSpillColumnTypes.emplace_back(input_-&gt;childAt(i));</span><br><span class="line">    sortedSpillColumnNames.emplace_back(input-&gt;nameOf(i));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  data_ = <span class="built_in">std</span>::make_unique&lt;RowContainer&gt;(</span><br><span class="line">      sortedColumnTypes, nonSortedColumnTypes, pool_); <span class="comment">// 构造RowContainer，后续用于存储行数据</span></span><br><span class="line">  spillerStoreType_ =</span><br><span class="line">      ROW(<span class="built_in">std</span>::move(sortedSpillColumnNames), <span class="built_in">std</span>::move(sortedSpillColumnTypes));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="AddInput"><a href="#AddInput" class="headerlink" title="AddInput"></a>AddInput</h1><p>将输入的列数据转为行数据存储，在存储前会进行内存评估。<br>实现方式：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SortBuffer::addInput</span><span class="params">(<span class="keyword">const</span> VectorPtr&amp; input)</span> </span>&#123;</span><br><span class="line">  velox::common::testutil::TestValue::adjust(</span><br><span class="line">      <span class="string">"facebook::velox::exec::SortBuffer::addInput"</span>, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">  VELOX_CHECK(!noMoreInput_);</span><br><span class="line">  ensureInputFits(input);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 开辟内存，存储行数据</span></span><br><span class="line">  <span class="function">SelectivityVector <span class="title">allRows</span><span class="params">(input-&gt;size())</span></span>;</span><br><span class="line">  <span class="function"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>*&gt; <span class="title">rows</span><span class="params">(input-&gt;size())</span></span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> row = <span class="number">0</span>; row &lt; input-&gt;size(); ++row) &#123;</span><br><span class="line">    rows[row] = data_-&gt;newRow();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">auto</span>* inputRow = input-&gt;as&lt;RowVector&gt;();</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; columnProjection : columnMap_) &#123;</span><br><span class="line">    <span class="function">DecodedVector <span class="title">decoded</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        *inputRow-&gt;childAt(columnProjection.outputChannel), allRows)</span></span>;</span><br><span class="line">    data_-&gt;store(</span><br><span class="line">        decoded,</span><br><span class="line">        folly::Range(rows.data(), input-&gt;size()),</span><br><span class="line">        columnProjection.inputChannel);</span><br><span class="line">  &#125;</span><br><span class="line">  numInputRows_ += allRows.size(); <span class="comment">// 更新输入行数</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中开辟内存，存储行数据的逻辑在<a href="https://xander.wiki/2024/12/02/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0velox%E6%BA%90%E7%A0%81%EF%BC%88%E4%BA%8C%EF%BC%89/">RowContainer</a><br>中有详细描述。</p>
+<p>我们把目光投向<code>ensureInputFits</code>函数，该函数用于评估内存是否足够存储输入数据。<br>若评估存在内存不足的风险，则会向pool申请更多内存。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SortBuffer::ensureInputFits</span><span class="params">(<span class="keyword">const</span> VectorPtr&amp; input)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Check if spilling is enabled or not.</span></span><br><span class="line">  <span class="keyword">if</span> (spillConfig_ == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int64_t</span> numRows = data_-&gt;numRows();</span><br><span class="line">  <span class="keyword">if</span> (numRows == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="comment">// 'data_' is empty. Nothing to spill.</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 定长区还能存储多少行 + 变长区还能存储多少字节（在不扩容的前提下）</span></span><br><span class="line">  <span class="keyword">auto</span> [freeRows, outOfLineFreeBytes] = data_-&gt;freeSpace();</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">auto</span> outOfLineBytes =</span><br><span class="line">      data_-&gt;stringAllocator().retainedSize() - outOfLineFreeBytes; <span class="comment">// 当前变长区已使用的内存</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int64_t</span> flatInputBytes = input-&gt;estimateFlatSize(); <span class="comment">// LX <span class="doctag">TODO:</span>:看逻辑很像获取变长数据大小</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Test-only spill path.</span></span><br><span class="line">  <span class="keyword">if</span> (numRows &gt; <span class="number">0</span> &amp;&amp; testingTriggerSpill(pool_-&gt;name())) &#123;</span><br><span class="line">    spill();</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">auto</span> currentMemoryUsage = pool_-&gt;usedBytes(); <span class="comment">// 当前内存池已使用大小</span></span><br><span class="line">  <span class="comment">// 若当前已使用大小为U, minSpillableReservationPct记作P, 当前内存池预留内存记作R</span></span><br><span class="line">  <span class="comment">// 经验认为，R &gt;= U * P 时才无需spill，否则很可能内存不足</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">auto</span> minReservationBytes =</span><br><span class="line">      currentMemoryUsage * spillConfig_-&gt;minSpillableReservationPct / <span class="number">100</span>;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">auto</span> availableReservationBytes = pool_-&gt;availableReservation();</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int64_t</span> estimatedIncrementalBytes =</span><br><span class="line">      data_-&gt;sizeIncrement(input-&gt;size(), outOfLineBytes ? flatInputBytes : <span class="number">0</span>);  <span class="comment">// 评估所需要的内存大小</span></span><br><span class="line">  <span class="keyword">if</span> (availableReservationBytes &gt; minReservationBytes) &#123; <span class="comment">// 经过评估，总内存足够</span></span><br><span class="line">    <span class="comment">// If we have enough free rows for input rows and enough variable length</span></span><br><span class="line">    <span class="comment">// free space for the vector's flat size, no need for spilling.</span></span><br><span class="line">    <span class="keyword">if</span> (freeRows &gt; input-&gt;size() &amp;&amp;</span><br><span class="line">        (outOfLineBytes == <span class="number">0</span> || outOfLineFreeBytes &gt;= flatInputBytes)) &#123; <span class="comment">// 定长区和变长区都够用</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the current available reservation in memory pool is 2X the</span></span><br><span class="line">    <span class="comment">// estimatedIncrementalBytes, no need to spill.</span></span><br><span class="line">    <span class="keyword">if</span> (availableReservationBytes &gt; <span class="number">2</span> * estimatedIncrementalBytes) &#123; <span class="comment">// 若当前预留内存大于缩小内存的两倍，也不spill</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Try reserving targetIncrementBytes more in memory pool, if succeeded, no</span></span><br><span class="line">  <span class="comment">// need to spill.</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">auto</span> targetIncrementBytes = <span class="built_in">std</span>::max&lt;<span class="keyword">int64_t</span>&gt;(</span><br><span class="line">      estimatedIncrementalBytes * <span class="number">2</span>,</span><br><span class="line">      currentMemoryUsage * spillConfig_-&gt;spillableReservationGrowthPct / <span class="number">100</span>); <span class="comment">// 向内存池申请max(2 * 预估值， 当前使用量 * H)大小的内存</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="function">memory::ReclaimableSectionGuard <span class="title">guard</span><span class="params">(nonReclaimableSection_)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (pool_-&gt;maybeReserve(targetIncrementBytes)) &#123; <span class="comment">// 能申请到，无需spill</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  LOG(WARNING) &lt;&lt; <span class="string">"Failed to reserve "</span> &lt;&lt; succinctBytes(targetIncrementBytes)</span><br><span class="line">               &lt;&lt; <span class="string">" for memory pool "</span> &lt;&lt; pool()-&gt;name()</span><br><span class="line">               &lt;&lt; <span class="string">", usage: "</span> &lt;&lt; succinctBytes(pool()-&gt;usedBytes())</span><br><span class="line">               &lt;&lt; <span class="string">", reservation: "</span> &lt;&lt; succinctBytes(pool()-&gt;reservedBytes());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="noMoreInput"><a href="#noMoreInput" class="headerlink" title="noMoreInput"></a>noMoreInput</h1><p>指示后续不再存在输入，此时将触发排序逻辑。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SortBuffer::noMoreInput</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  velox::common::testutil::TestValue::adjust(</span><br><span class="line">      <span class="string">"facebook::velox::exec::SortBuffer::noMoreInput"</span>, <span class="keyword">this</span>);</span><br><span class="line">  VELOX_CHECK(!noMoreInput_); <span class="comment">// 此前不存在重复调用</span></span><br><span class="line">  <span class="comment">// It may trigger spill, make sure it's triggered before noMoreInput_ is set.</span></span><br><span class="line">  ensureSortFits(); <span class="comment">// 评估进行排序时的内存是否足够，sortedRows_所需占用的内存 + prefix-sort encoding所需占用的内存</span></span><br><span class="line"></span><br><span class="line">  noMoreInput_ = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// No data.</span></span><br><span class="line">  <span class="keyword">if</span> (numInputRows_ == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (spiller_ == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">    VELOX_CHECK_EQ(numInputRows_, data_-&gt;numRows());</span><br><span class="line">    updateEstimatedOutputRowSize(); <span class="comment">// 评估输出时内存是否足够</span></span><br><span class="line">    <span class="comment">// Sort the pointers to the rows in RowContainer (data_) instead of sorting</span></span><br><span class="line">    <span class="comment">// the rows.</span></span><br><span class="line">    sortedRows_.resize(numInputRows_); <span class="comment">// 存储有行数据的地址</span></span><br><span class="line">    RowContainerIterator iter;</span><br><span class="line">    data_-&gt;listRows(&amp;iter, numInputRows_, sortedRows_.data()); <span class="comment">// 提取当前输入的行地址至sortedRows_</span></span><br><span class="line">    PrefixSort::sort(</span><br><span class="line">        data_.get(), sortCompareFlags_, prefixSortConfig_, pool_, sortedRows_); <span class="comment">// 执行prefix-sort排序或者std-sort, sortedRows_将存储排序完成后的行地址</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// Spill the remaining in-memory state to disk if spilling has been</span></span><br><span class="line">    <span class="comment">// triggered on this sort buffer. This is to simplify query OOM prevention</span></span><br><span class="line">    <span class="comment">// when producing output as we don't support to spill during that stage as</span></span><br><span class="line">    <span class="comment">// for now.</span></span><br><span class="line">    spill(); <span class="comment">// 如果此前触发过spill，把当前内存里的数据也执行spill（简化流程）</span></span><br><span class="line"></span><br><span class="line">    finishSpill();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Releases the unused memory reservation after procesing input.</span></span><br><span class="line">  pool_-&gt;release();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/velox-operator/" rel="tag"># velox operator</a>
+          
+            <a href="/tags/OrderBy/" rel="tag"># OrderBy</a>
+          
+            <a href="/tags/SortBuffer/" rel="tag"># SortBuffer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/12/02/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0velox%E6%BA%90%E7%A0%81%EF%BC%88%E4%BA%8C%EF%BC%89/" rel="next" title="从0开始学习velox源码（二）">
+                <i class="fa fa-chevron-left"></i> 从0开始学习velox源码（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xander.liu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/s">
+              
+                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zsmj2017" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lxiang2018@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#算子流程图"><span class="nav-number">2.</span> <span class="nav-text">算子流程图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ctor"><span class="nav-number">3.</span> <span class="nav-text">Ctor</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AddInput"><span class="nav-number">4.</span> <span class="nav-text">AddInput</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#noMoreInput"><span class="nav-number">5.</span> <span class="nav-text">noMoreInput</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xander.liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

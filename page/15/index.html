@@ -291,6 +291,213 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/27/%E4%BA%86%E8%A7%A3%E8%99%9A%E5%87%BD%E6%95%B0%E3%80%81%E5%A4%9A%E7%BB%A7%E6%89%BF%E3%80%81%E8%99%9A%E5%9F%BA%E7%B1%BB%E3%80%81RTTI%E6%89%80%E5%B8%A6%E6%9D%A5%E7%9A%84%E6%88%90%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/27/%E4%BA%86%E8%A7%A3%E8%99%9A%E5%87%BD%E6%95%B0%E3%80%81%E5%A4%9A%E7%BB%A7%E6%89%BF%E3%80%81%E8%99%9A%E5%9F%BA%E7%B1%BB%E3%80%81RTTI%E6%89%80%E5%B8%A6%E6%9D%A5%E7%9A%84%E6%88%90%E6%9C%AC/" itemprop="url">24.了解虚函数、多继承、虚基类、RTTI所带来的成本</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-27T14:17:00+08:00">
+                2018-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>C++编译器必须实现语言的每一个特性，其实现细节由编译器来决定，不同的编译器以不同的方式实现语言特性。在多数情况下，开发者无需理解这些隐藏于代码背后的操作。然而某些特性的实现对<strong>对象大小</strong>和其<strong>成员函数执行速度</strong>有很大的影响，所以对于这些特性有一个基本的了解，知道编译器可能执行的操作，就较为重要。 </p>
+<hr>
+<h1 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h1><p>&nbsp;<br>当调用虚函数时，所执行的代码必须与调用函数的对象的动态类型一致；指向对象的指针或引用的静态类型并不重要。<br>编译器为了高效地提供这种行为，通常会使用virtual table与virtual table pointers.此二者通常又被称为vtbl与vptr.</p>
+<hr>
+<h2 id="vbtl"><a href="#vbtl" class="headerlink" title="vbtl"></a>vbtl</h2><p>一个vbtl通常是一个函数指针数组（或链表）。只要某个类声明了虚函数或者继承了虚函数就会存在vtbl，vtbl中的元素是指向虚函数实现体的指针。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C1</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    C1();</span><br><span class="line">    <span class="keyword">virtual</span> ~C1();</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">f2</span><span class="params">(<span class="keyword">char</span> c)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f3</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; s)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f4</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>C1的vtbl如下所示：<img src="http://static.zybuluo.com/zsmj2017/q161l1kwdi9q91p8fhojpmcb/image_1cc2pakm9rru1e2gtrp1p9016ob9.png" alt="image_1cc2pakm9rru1e2gtrp1p9016ob9.png-44.2kB"><br>显然，非虚函数不会存在于vtbl中。</p>
+<h3 id="继承下的vbtl"><a href="#继承下的vbtl" class="headerlink" title="继承下的vbtl"></a>继承下的vbtl</h3><p>现有C2继承自C1，并且重定义了部分虚函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C2</span>:</span> <span class="keyword">public</span> C1&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    C2();<span class="comment">//非虚函数</span></span><br><span class="line">    <span class="keyword">virtual</span> ~C2(); <span class="comment">//重定义函数</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span>;<span class="comment">//重定义函数virtual     void f5(char *str); //新的虚函数</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>C2的vtbl如下所示：<img src="http://static.zybuluo.com/zsmj2017/0kn6vjye3wr12rdt8ytt12p5/image_1cc2po1k51uvcejs1585tht199lm.png" alt="image_1cc2po1k51uvcejs1585tht199lm.png-40.6kB"><br>可以看出，C2的vbtl里面包括了没有被C2重定义的C1的虚函数的指针。</p>
+<p>vbtl体现了虚函数所需的第一个代价：<strong>每一个包含虚函数的类都需要空间来容纳vtbl，其大小与虚函数的数量成正比。</strong></p>
+<h3 id="vtbl的位置"><a href="#vtbl的位置" class="headerlink" title="vtbl的位置"></a>vtbl的位置</h3><p>因为每一个类只需要一个vbtl拷贝，那把它放在哪个obj里呢？编译器厂商有两种做法：</p>
+<ol>
+<li>为所有可能需要vbtl的obj生成一个vbtl拷贝，连接程序然后删除多余的拷贝。最后的可执行文件或者程序库里只有一个vbtl实例。</li>
+<li>采用启发式算法：只有obj包含该类的第一个非内联，非纯虚函数定义（也就是实现体）时才会生成vbtl.</li>
+</ol>
+<hr>
+<h2 id="vptr"><a href="#vptr" class="headerlink" title="vptr"></a>vptr</h2><p>单有vbtl并不能实现虚函数，还需要vptr.这是一个指向vbtl的指针，隐藏在对象中，其位置只有编译器知道。这是虚函数的第二个代价：对象内需要额外的空间开销来存储指针。对于较小的对象而言，这笔买卖很不划算。<br>假设我们有一些C1与C2的对象，对象、vbtl、vptr的关系大致如下图所示：<br><img src="http://static.zybuluo.com/zsmj2017/zop4fglkufcfy0pw2hjfyor0/image_1cc2qaquhtk915b82dqco71mde13.png" alt="image_1cc2qaquhtk915b82dqco71mde13.png-106.9kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">makeACall</span><span class="params">(C1 *pC1)</span></span>&#123;</span><br><span class="line">    pC1-&gt;f1();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>为了保证调用正确，编译器做出了如下操作：</p>
+<ol>
+<li>通过对象的vptr找到vtbl。</li>
+<li>找到vbtl里面的指向被调用函数的指针。</li>
+<li>调用该函数。</li>
+</ol>
+<p>假设存在索引i指向vbtl中的f1函数，那么上述代码的执行类似于：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(*pC1-&gt;vptr[i])(pC1);<span class="comment">//pC1作为this指针作为形参</span></span><br></pre></td></tr></table></figure><br>从上述过程可以看出调用虚函数并不是性能的瓶颈，因为虚函数调用所花费的成本相对于普通函数调用相差无几。在实际运行中虚函数成为性能瓶颈的原因是无法内联，原因很简单，inline是编译到此处时替换，而虚函数的确认需要到运行期，这就是虚函数的第三个不足：无法内联从而降低性能。</p>
+<hr>
+<h1 id="多继承与虚基类"><a href="#多继承与虚基类" class="headerlink" title="多继承与虚基类"></a>多继承与虚基类</h1><p>&nbsp;<br>一旦多继承被引入，在对象里为寻找vptr而进行的偏移量计算会变得更复杂。在单个对象中会存在多个vptr（每一个基类对应一个），此外，此外，针对base class而形成的vtbl也被生成。这直接导致了空间成本进一步扩大，并且运行期调用成本也有了轻微的增长。<br>多继承导致了对虚基类的需求。在不使用虚基类的情况下，如果一个派生类有一个以上从基类的继承路径，基类的数据成员将通过所有路径产生多个拷贝存在于派生类中。<br>但虚基类本身亦存在使用成本，因为虚基类的实现经常使用指向虚基类的指针做为避免复制的手段，从而导致一个或者更多的指针被存储在对象里。</p>
+<h2 id="钻石型继承体系（Effective-C-41）"><a href="#钻石型继承体系（Effective-C-41）" class="headerlink" title="钻石型继承体系（Effective C++ 41）"></a>钻石型继承体系（Effective C++ 41）</h2><p>考虑如下的继承关系：<br><img src="http://static.zybuluo.com/zsmj2017/2ayq58oo7nqcganao8f4x7ay/image_1cc2re6k51thn88j1av642r6351g.png" alt="image_1cc2re6k51thn88j1av642r6351g.png-35.1kB"><br>D对象的内部会呈现出这样的结构：<br><img src="http://static.zybuluo.com/zsmj2017/b91cwitnhk40eh3fzxobyddm/image_1cc2rods774enmju44g9s147g2d.png" alt="image_1cc2rods774enmju44g9s147g2d.png-79.7kB"><br>显然，对象内部有一个多余的指针，这也就是上文所说的虚基类的一大弊端。<br>当我们再加入vptr的概念，D对象的内部结构大概是这样：<br><img src="http://static.zybuluo.com/zsmj2017/3uscbl1vj2cpv228hmtdng4a/image_1cc2rrm7ap0hbc01a4819nj18pk3a.png" alt="image_1cc2rrm7ap0hbc01a4819nj18pk3a.png-166.3kB"><br>四个类只有3个vptr，这是因为编译器发现BD的vptr可以共享。</p>
+<hr>
+<h1 id="运行期类型识别（RTTI）"><a href="#运行期类型识别（RTTI）" class="headerlink" title="运行期类型识别（RTTI）"></a>运行期类型识别（RTTI）</h1><p>&nbsp;<br>RTTI能够让我们在运行时找到对象和类的相关信息，这样信息被存储在类型为type_info的对象里，我们可以通过typeid操作符来访问一个类的type_info对象.</p>
+<p>一个类仅仅只需要一个RTTI的拷贝，但是必须有办法得到任何对象的类型信息。从语言规范角度而言：如果一个类型至少有一个虚函数，那我们保证可以获得一个对象动态类型信息。这似乎类似于vbtl，实际上，RTTI就是基于vbtl实现的。<br>具体来说，vbtl的索引0处可以包含一个指针，指向type_info对象：<br><img src="http://static.zybuluo.com/zsmj2017/myendjr6k114f880zr1pbltn/image_1cc2s78hs1cho1rhb13vft1npt83n.png" alt="image_1cc2s78hs1cho1rhb13vft1npt83n.png-40.5kB"><br>也就是说vbtl又多了一个需要被占用的空间。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Feature</th>
+<th style="text-align:center">Increases Size of Objects</th>
+<th style="text-align:center">Increases Per-Class Data</th>
+<th style="text-align:center">Reduces Inlining</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Virtual Functions</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">Yes</td>
+</tr>
+<tr>
+<td style="text-align:center">Multiple Inheritance</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">No</td>
+</tr>
+<tr>
+<td style="text-align:center">Virtual Base Classes</td>
+<td style="text-align:center">Often</td>
+<td style="text-align:center">Sometimes</td>
+<td style="text-align:center">No</td>
+</tr>
+<tr>
+<td style="text-align:center">RTTI</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">No</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>要记住理解是为了更好的使用，而非因噎废食。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/27/%E8%80%83%E8%99%91%E5%8F%98%E6%9B%B4%E7%A8%8B%E5%BA%8F%E5%BA%93/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1635,162 +1842,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/26/%E5%AE%A1%E6%85%8E%E4%BD%BF%E7%94%A8%E5%BC%82%E5%B8%B8%E6%98%8E%E7%BB%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/26/%E5%AE%A1%E6%85%8E%E4%BD%BF%E7%94%A8%E5%BC%82%E5%B8%B8%E6%98%8E%E7%BB%86/" itemprop="url">14.审慎使用异常明细</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-26T10:50:00+08:00">
-                2018-04-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>（本节内容在Effective C++ 30中亦有涉及）</p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>异常明细明确描述了一个函数可能抛出的异常，如果说函数抛出了一个不能存在于异常明细范围里的异常，系统将在运行时检测到该错误，并且自动地调用特殊函数unexpected。<br>unexpected默认机制是调用terminate，而terminate缺省行为是调用abort.也就是说，一旦违反了异常明细，程序将立刻终止，所有资源（甚至包括局部变量）都未得到释放。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>前言中描述的情况其实极易发生，因为编译器仅仅部分地检测异常的使用是否与异常明细保持一致。举例而言，假设函数A有一个明确的异常明细，并且调用了函数B，函数B抛出了违反函数A异常明细的异常，所以本次函数调用就违反了A的异常明细，程序将立即终止：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span></span>;<span class="comment">//可以抛出任意的异常</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f2</span><span class="params">()</span> <span class="title">throw</span><span class="params">(<span class="keyword">int</span>)</span></span>&#123;<span class="comment">//异常明细中只有int</span></span><br><span class="line">    ...</span><br><span class="line">    f1(); <span class="comment">//抛出非int型异常，程序终止</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="避免在带有类型参数的模板中使用异常"><a href="#避免在带有类型参数的模板中使用异常" class="headerlink" title="避免在带有类型参数的模板中使用异常"></a>避免在带有类型参数的模板中使用异常</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">bool</span> <span class="title">operator</span>==(<span class="title">const</span> <span class="title">T</span>&amp; <span class="title">lhs</span>, <span class="title">const</span> <span class="title">T</span>&amp; <span class="title">rhs</span>) <span class="title">throw</span>()&#123;</span></span><br><span class="line">    <span class="keyword">return</span> &amp;lhs == &amp;rhs;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个函数的意思是，如果类型相同的两个对象地址相同，则认为它们相等。看起来好像确实不会抛出异常，但实际上…万一某个类重载了operator &amp;，并且该函数还能抛异常，那我们就等着terminate吧。</p>
-<p>事实上，我们几乎不可能为一个模版提供一个有意义的异常明细，因为模版总是采用不同的方法使用类型参数，解决方法只能是模板和异常明细不要混用。</p>
-<hr>
-<h2 id="去除异常明细"><a href="#去除异常明细" class="headerlink" title="去除异常明细"></a>去除异常明细</h2><p>不触发terminate的另一个方法是：如果在一个具备异常明细的函数内调用其它没有异常明细的函数，那么我们应该去除该函数的异常明细。</p>
-<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>允许用户注册一个回调函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//一个 window 系统回调函数指针</span></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*CallBackPtr)</span><span class="params">(<span class="keyword">int</span> eventXLocation,<span class="keyword">int</span> eventYLocation,<span class="keyword">void</span> *dataToPassBack)</span></span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CallBack</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    CallBack(CallBackPtr fPtr, <span class="keyword">void</span> *dataToPassBack)</span><br><span class="line">        : func(fPtr), data(dataToPassBack) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">makeCallBack</span><span class="params">(<span class="keyword">int</span> eventXLocation,<span class="keyword">int</span> eventYLocation)</span> <span class="keyword">const</span> <span class="title">throw</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CallBackPtr func;<span class="comment">//需要调用的函数</span></span><br><span class="line">    <span class="keyword">void</span> *data;<span class="comment">//传递给回调函数的数据</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CallBack::makeCallBack</span><span class="params">(<span class="keyword">int</span> eventXLocation,<span class="keyword">int</span> eventYLocation)</span> <span class="keyword">const</span> <span class="title">throw</span><span class="params">()</span></span>&#123;</span><br><span class="line">    func(eventXLocation, eventYLocation, data);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然，func可能抛出异常，违反了第二种解决方案。</p>
-<hr>
-<h2 id="处理系统本身抛出的异常"><a href="#处理系统本身抛出的异常" class="headerlink" title="处理系统本身抛出的异常"></a>处理系统本身抛出的异常</h2><p>&nbsp;<br>有人说未雨绸缪强过临阵磨枪，但实际上对于unexpected而言，直接处理unexpected异常比防止它们被抛出更有效果。<br>虽然阻止抛出unexpected异常是不现实的，但是C++允许<strong>以其它不同的异常类型替换unexpected异常</strong>。比如我们可以将所有unexpected异常都被替换为UnexpectedException对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnexpectedException</span> &#123;</span>&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">convertUnexpected</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> UnexpectedException();</span><br><span class="line">&#125;</span><br><span class="line">set_unexpected(convertUnexpected);<span class="comment">//将unexpected替换掉</span></span><br></pre></td></tr></table></figure><br>当然还有一个更安全的方法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">convertUnexpected</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">throw</span>;</span><br><span class="line">&#125;</span><br><span class="line">set_unexpected(convertUnexpected);<span class="comment">//unexpected被抛出时只是重新抛出当前异常</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>异常明细是一个应被审慎使用的特性。在编写之前，确保你已经考虑了所有可能发生的情况。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1841,7 +1892,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1863,7 +1914,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

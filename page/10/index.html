@@ -291,6 +291,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/25/%E4%BA%86%E8%A7%A3%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8B%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D%E7%BB%93%E6%9E%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/%E4%BA%86%E8%A7%A3%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8B%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D%E7%BB%93%E6%9E%9C/" itemprop="url">4.了解如何查看类型推衍结果</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T17:10:00+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>一般来说有三个阶段可以进行类型推衍结果查看：撰写期、编译期、运行期。</p>
+<hr>
+<h1 id="IDE"><a href="#IDE" class="headerlink" title="IDE"></a>IDE</h1><p>&nbsp;<br>IDE通常可以在完成解析的前提下帮你判断当前类型推衍所得到的结果，但对于较为复杂的类型可能会失效。</p>
+<hr>
+<h1 id="编译期诊断"><a href="#编译期诊断" class="headerlink" title="编译期诊断"></a>编译期诊断</h1><p>&nbsp;<br>最有效的让编译器显示其推衍结果的方法是故意错用这些类型，编译器所给出的错误信息将清楚地告诉你哪里发生了错误。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>&nbsp;<br>现有需要作类型推衍的变量x、y:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> theAnswer = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">auto</span> x = theAnswer;</span><br><span class="line"><span class="keyword">auto</span> y = &amp;theAnswer;</span><br></pre></td></tr></table></figure><br>首先我们需要定义一个类以展示类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TD</span>;</span><span class="comment">//Type Displayer</span></span><br></pre></td></tr></table></figure><br>任何试图实例化该类的操作都将引发错误，因为TD并没有定义。如果需要查看x、y的推衍结果，我们只需要用其类型去实例化TD：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">TD&lt;<span class="keyword">decltype</span>(x)&gt; xType;</span><br><span class="line">TD&lt;<span class="keyword">decltype</span>(x)&gt; yType;</span><br></pre></td></tr></table></figure><br>以上操作会产生报错信息如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">error: aggregate &#39;TD&lt;int&gt; xType&#39; has incomplete type and cannot be defined</span><br><span class="line">error: aggregate &#39;TD&lt;const int *&gt; yType&#39; has incomplete type and cannot be defined</span><br></pre></td></tr></table></figure><br>至此完成了编译期类型判别。</p>
+<hr>
+<h1 id="运行期输出"><a href="#运行期输出" class="headerlink" title="运行期输出"></a>运行期输出</h1><p>&nbsp;<br>有人会想到使用typeid与std::type_info::name来输出对象格式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="keyword">typeid</span>(x).name() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="keyword">typeid</span>(y).name() &lt;&lt; <span class="string">'\n'</span>;</span><br></pre></td></tr></table></figure><br>但这种方法有一个缺陷，因为typeid必须作用于一个可以生成std::type_info对象的对象x或y，且type_info对象必须要有一个返回const char*的name成员函数。</p>
+<p>对std::type_info::name的调用并不保证返回能够令你读懂的消息，据本书作者所言，微软公司提供的反馈较为直白。</p>
+<p>即使已经得到了正确的类型，也可能会有一些其他问题存在。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Widget&gt; <span class="title">createVec</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> vw = createVec();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!vw.empty())&#123;</span><br><span class="line">    f(&amp;vw[<span class="number">0</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>为了在运行期明确T与param的类型，我们可以定义f如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="built_in">std</span>::<span class="built_in">cout</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"T = "</span> &lt;&lt; <span class="keyword">typeid</span>(T).name() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"param = "</span> &lt;&lt; <span class="keyword">typeid</span>(param).name() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>微软编译器将给出结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">T &#x3D; class Widget const *</span><br><span class="line">param &#x3D; class Widget const *</span><br></pre></td></tr></table></figure><br>显然，这并非正确的结果，假若T为int型，那么param必然为const int&amp;才对。发生这样错误的原因在于std::type_info::name规格认为模板参数以值传递的方式传递给模板函数，这导致了referenceness与constness、volatileness被丢失。</p>
+<p>此外，IDE所推衍得到的类型也未必可靠，至少有时候帮助不大，例如以下这个类型T：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::_Simple_types&lt;<span class="built_in">std</span>::_Wrap_alloc&lt;<span class="built_in">std</span>::_Vec_base_types&lt;Widget,</span><br><span class="line"><span class="built_in">std</span>::allocator&lt;Widget&gt; &gt;::_Alloc&gt;::value_type&gt;::value_type *</span><br></pre></td></tr></table></figure><br>但IDE却推断param的类型是：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::_Simple_types&lt;...&gt;::value_type *<span class="keyword">const</span> &amp;</span><br></pre></td></tr></table></figure><br>中间的…省略号省略了所有关于T类型。</p>
+<hr>
+<h1 id="Boost"><a href="#Boost" class="headerlink" title="Boost"></a>Boost</h1><p>&nbsp;<br>IDE与type_info::name可能会出错，但Boost不会出错，并且Boost库支持跨平台运行，使用它和使用标准库一样方便，以下将给出使用Boost完成类型推衍的过程：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;boost/type_index.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="built_in">std</span>::<span class="built_in">cout</span>;</span><br><span class="line">    <span class="keyword">using</span> boost::typeindex::type_id_with_cvr;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"T= "</span> &lt;&lt; type_id_with_cvr&lt;T&gt;().pretty_name() &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"param = "</span>&lt;&lt; type_id_with_cvr&lt;<span class="keyword">decltype</span>(param)&gt;().pretty_name() &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>它的工作方式是函数模板boost::typeindex::type_id_with_cvr接受一个类型参数并且在推衍结果中不移除const，volatile或reference（with_cvr）。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>你可以使用IDE、错误信息、Boost库来查看类型推衍。</strong></li>
+<li><strong>上述工具可能会产生错误，因此熟练Item1-3所描述的法则才是最重要的。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/25/%E4%BA%86%E8%A7%A3decltype%E6%8A%80%E6%9C%AF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1753,166 +1913,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/30/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94new%E4%B8%8Edelete%E8%BF%90%E7%AE%97%E7%AC%A6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/30/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94new%E4%B8%8Edelete%E8%BF%90%E7%AE%97%E7%AC%A6/" itemprop="url">执行期语义学——new与delete运算符</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-30T07:05:00+08:00">
-                2018-05-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;</p>
-<p>new operator看起来似乎是一个单一运算，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *pi = <span class="keyword">new</span> <span class="keyword">int</span>(<span class="number">5</span>);</span><br></pre></td></tr></table></figure><br>但实际上它由以下两个步骤组成：</p>
-<ol>
-<li>通过适当的new运算符函数实体，配置所有所需内存：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *pi = _new(<span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br></pre></td></tr></table></figure></li>
-<li>给配置得来的对象设立初值：<br>*pi = 5;</li>
-</ol>
-<p>当然，初始化操作应当在内存配置成功后才执行：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//重写声明</span></span><br><span class="line"><span class="keyword">int</span> *pi;</span><br><span class="line"><span class="keyword">if</span>(pi = _new(<span class="keyword">sizeof</span>(<span class="keyword">int</span>))) *pi=<span class="number">5</span>;</span><br></pre></td></tr></table></figure></p>
-<p>delete运算符性质类似，只是在使用前会判断一下参数是否为nullptr，并且需要注意的是，在执行完delete后，p并不会被置为nullptr。</p>
-<p>如果我们new或delete的是一个具备constructor或destructor的object，那么在执行new或delete时会触发对应的函数调用(其实一直说到这都是描述new operator与operator new）。</p>
-<hr>
-<h1 id="new运算符的小机巧"><a href="#new运算符的小机巧" class="headerlink" title="new运算符的小机巧"></a>new运算符的小机巧</h1><p>&nbsp;<br>new操作符的实现一般均很直截了当，但有两个精巧之处值得斟酌：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">void</span>*</span><br><span class="line"><span class="function"><span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>==<span class="number">0</span>) <span class="built_in">size</span> = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">void</span> *last_alloc;</span><br><span class="line">    <span class="keyword">while</span>(!(last_alloc = <span class="built_in">malloc</span>(<span class="built_in">size</span>))&#123;</span><br><span class="line">        <span class="keyword">if</span>(!_new_handler) (*_new_handler)();</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> last_alloc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>虽然<code>new T[0]</code>从语法层胶墩来说合法，但语言要求每一次对new的调用都必须传回一个独一无二的指针，这也就是每一次当size为0都将其置1的原因。此外，new允许开发者提供自己的_new_handler()函数，这也就是循环调用的原因。</p>
-<p>实际上，new运算符总是以标准的C malloc()完成，虽然这并不是强制要求。类似地，delete也总是以标准的C free()完成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">void</span> </span><br><span class="line"><span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span> *ptr)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(ptr) <span class="built_in">free</span>((<span class="keyword">char</span>*)ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="针对数组的new与delete语意"><a href="#针对数组的new与delete语意" class="headerlink" title="针对数组的new与delete语意"></a>针对数组的new与delete语意</h1><p>&nbsp;<br>当我们写下<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>* p_array = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">5</span>];</span><br></pre></td></tr></table></figure><br>时，vec_new并不会真正被调用，因为其主要功能是把default constructor施行于class objects所组成的数组的每一个元素身上，倒是new运算符函数会被调用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>* p_array = (<span class="keyword">int</span>*)_new(<span class="number">5</span>*<span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br></pre></td></tr></table></figure><br>对于strcut这种Plain OI’s Data，其执行类似于内置类型，因为其不具备constructor与destructor。new与delete运算符只需要获取或释放内存即可，vec_new()也不会被调用。</p>
-<p>但如果class定义有一个default constructor，那么某些版本的vec_new()将会被调用，举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Point3d *p_array = <span class="keyword">new</span> Point3d[<span class="number">10</span>];</span><br><span class="line"><span class="comment">//编译结果</span></span><br><span class="line">Point3d* p_array;</span><br><span class="line">p_array = vec_new(<span class="number">0</span>,<span class="keyword">sizeof</span>(Point3d),<span class="number">10</span>,&amp;Point3d::Point3d(),&amp;Point3d::~Point3d());</span><br></pre></td></tr></table></figure><br>需要注意的是，只有已经构造完毕的object才可以经过destructor处理，在发生异常时，vec_new释放所有资源。</p>
-<p>在很久之前，delete对象数组时必须要指定数组长度<code>delete[10] p_array</code>，当然现在不需要了,不过这种写法依然有效。有人会产生疑问，<code>delete[]</code>是如何了解当前所需要析构的元素数目？答案是vec_new所传回的内存区块内有一个word记录了数组长度。另外需要记住的是，在数组中使用多态性是非常不恰当的行为，我们在任何情况下都应当避免当一个base class 指针或引用指向derived class object组成的数组。</p>
-<hr>
-<h1 id="Placement-Operator-new的语意"><a href="#Placement-Operator-new的语意" class="headerlink" title="Placement Operator new的语意"></a>Placement Operator new的语意</h1><p>&nbsp;<br>new操作符可以重载，其最常见的一种形态我们称为placement operator new，它需要第二个参数，用来指定分配内存的位置：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span>,<span class="keyword">void</span>* p)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>有人认为如果其作用只是传回第二参数，那它的实际意义何在？事实上，placement operator new还负责调用constructor自动实施于所指地址：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point2w *ptw = (Point2w*) arena;</span><br><span class="line"><span class="keyword">if</span>(ptw!=<span class="number">0</span>) ptw-&gt;Point2w::Point2w();</span><br></pre></td></tr></table></figure><br>然而存在一些小问题：假若当前我们需要被构造的内存段已经存在了一个object，而这个object拥有一个destructor。在我们执行placement operator new时，该destructor并不会被调用，可能会有人想到使用delete从而触发destructor，然而这也释放掉了这一块内存，并不可，。较好的做法是直接在地址上执行destructor（在后来的C++ standrad中出现了placement perator delete，它可以析构且不释放内存）。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1963,7 +1963,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1985,7 +1985,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

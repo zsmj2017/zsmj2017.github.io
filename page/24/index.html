@@ -291,6 +291,165 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/new%E4%B8%8Edelete%E6%88%90%E5%AF%B9%E4%BD%BF%E7%94%A8%E6%97%B6%E5%BF%85%E9%A1%BB%E5%BD%A2%E5%BC%8F%E7%9B%B8%E5%90%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/11/new%E4%B8%8Edelete%E6%88%90%E5%AF%B9%E4%BD%BF%E7%94%A8%E6%97%B6%E5%BF%85%E9%A1%BB%E5%BD%A2%E5%BC%8F%E7%9B%B8%E5%90%8C/" itemprop="url">17.new与delete成对使用时必须形式相同</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T08:45:00+08:00">
+                2018-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">string</span> * stringarray = <span class="keyword">new</span> <span class="built_in">string</span>[<span class="number">100</span>];</span><br><span class="line"><span class="keyword">delete</span> stringarray;</span><br></pre></td></tr></table></figure>
+<p>在上述代码中我们成对地使用了<code>new</code>与<code>delete</code>，似乎避开了资源泄露，但其实并非如此。<br>上文动态分配了100个string对象，却只删除了第一个，其它string对象的析构函数根本没有被调用。</p>
+<hr>
+<h1 id="new与delete"><a href="#new与delete" class="headerlink" title="new与delete"></a>new与delete</h1><h2 id="调用new与delete时发生了什么？"><a href="#调用new与delete时发生了什么？" class="headerlink" title="调用new与delete时发生了什么？"></a>调用new与delete时发生了什么？</h2><p>当你使用new的时候，有两件事会发生：</p>
+<ol>
+<li>内存通过<code>operator new</code>被分配出来（new操作符详见Effective C++ 50 52）</li>
+<li>针对此内存有一个或多个构造函数被调用</li>
+</ol>
+<p>对应的，使用delete的时候也会发生两件事：</p>
+<ol>
+<li>一个或多个析构函数被调用</li>
+<li>通过<code>operator delete</code>释放内存</li>
+</ol>
+<h2 id="delete如何判定对象个数？"><a href="#delete如何判定对象个数？" class="headerlink" title="delete如何判定对象个数？"></a>delete如何判定对象个数？</h2><p>delete的最大问题在于：即将被删除的内存之内究竟存有多少对象？这决定了会调用多少次析构函数。换句话说<strong>，delete需要明确：被删除的指针究竟指向单一对象还是对象数组</strong>？<br>在编译器的具体实现中，单一对象的内存布局不同于数组的内存布局，数组的内存布局中记录了数组大小，这得以让delete函数知道需要调用多少次析构函数。它们的内存布局大概是这样：<br><img src="http://static.zybuluo.com/zsmj2017/q7o6hnu7bl6ol60j9te6o2yk/image_1cap38n6l1a205v11tnn1t9017gu9.png" alt="image_1cap38n6l1a205v11tnn1t9017gu9.png-11.9kB"></p>
+<h2 id="delete的正确使用"><a href="#delete的正确使用" class="headerlink" title="delete的正确使用"></a>delete的正确使用</h2><p>我们通过人为指定的方式让delete明确其操作：<strong>使用delete或delete[]</strong>;<br>前者认定当前指向的是单一对象，后者则认定当前指向数组：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">string</span>* pstr1 = <span class="keyword">new</span> <span class="built_in">string</span>；</span><br><span class="line"><span class="built_in">string</span>* pstr2 = <span class="keyword">new</span> <span class="built_in">string</span>[<span class="number">100</span>];</span><br><span class="line"><span class="keyword">delete</span> pstr1;</span><br><span class="line"><span class="keyword">delete</span>[] pstr2;</span><br></pre></td></tr></table></figure></p>
+<h2 id="误用delete形式的后果"><a href="#误用delete形式的后果" class="headerlink" title="误用delete形式的后果"></a>误用delete形式的后果</h2><p>如果我们对<code>pstr1</code>使用<code>delete[]</code>,结果未定义,可想而知它会误认为当前指向某一个对象数组，然后读取某块内存将其解释为数组大小，然后反复调用析构函数。</p>
+<p>如果我们对<code>pstr2</code>没有使用<code>delete[]</code>,结果亦未有定义，但肯定调用的析构函数不足。事实上，<strong>即使针对没有析构函数的内置类型，这种写法也是有害的。</strong></p>
+<h2 id="new、delete与typedef"><a href="#new、delete与typedef" class="headerlink" title="new、delete与typedef"></a>new、delete与typedef</h2><p>本节的规则十分简单，无非是<strong>成对使用new与delete时必须保证形式一致</strong>，读者想必会认为稍加注意不难做到。但对于某些重度typedef爱好者而言，还是要多加留心为是：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">string</span> AddressLines[<span class="number">4</span>];</span><br><span class="line"><span class="built_in">string</span>* pal = <span class="keyword">new</span> AddressLines;<span class="comment">//pal指向的是数组对象</span></span><br><span class="line"><span class="keyword">delete</span> pal;<span class="comment">//error!</span></span><br><span class="line"><span class="keyword">delete</span>[] pal;</span><br></pre></td></tr></table></figure><br>我认为C++语言应当尽量减少对数组使用typedef定义，在降低了可读性的同时还容易引发错误。在能够使用STL容器的地方坚决不使用动态数组。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/swap%E5%8E%BB%E9%99%A4%E5%A4%9A%E4%BD%99%E5%AE%B9%E9%87%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1689,158 +1848,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/%E5%9C%A8operator=%E4%B8%AD%E5%A4%84%E7%90%86%E8%87%AA%E8%B5%8B%E5%80%BC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/09/%E5%9C%A8operator=%E4%B8%AD%E5%A4%84%E7%90%86%E8%87%AA%E8%B5%8B%E5%80%BC/" itemprop="url">12. 在operator=中处理自赋值</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T11:23:00+08:00">
-                2018-04-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>我们在重载operator=时需要注意自我赋值的情况。可能有人会认为这种情况很少发生，因为很少有人会写诸如w=w的句子。但实际上,代码中出现a[i]=a[j]（i==j),或者<em>p=</em>q（指向同一对象）的例子屡见不鲜。<br>事实上，只要你使用了pointers或者references，而且它们被用来指向多个相同类型的对象，我们就需要考虑 是否会出现自赋值的情况。确切地说，<strong>只要有多个对象来自同一个继承体系</strong>，比如一个指针指向base class类型，而另一个指向derived class类型。<strong>它们完全可能指向的是同一个对象</strong>。</p>
-<hr>
-<h1 id="不处理自赋值情况的风险"><a href="#不处理自赋值情况的风险" class="headerlink" title="不处理自赋值情况的风险"></a>不处理自赋值情况的风险</h1><p>&nbsp;<br>如果我们在class中手动地进行了资源管理，那么自赋值的处理不当可能会带来一些问题。举例而言:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bitmap</span>&#123;</span>...&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Bitmap* pb;</span><br><span class="line">&#125;;</span><br><span class="line">Widget&amp;</span><br><span class="line">Widget::<span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">delete</span> pb;</span><br><span class="line">    pb = <span class="keyword">new</span> Bitmap(*rhs.pb);<span class="comment">//如果是自赋值，pb指向的对象已经释放</span></span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>上述程序<strong>既不具备异常安全性，也直接导致了“在停止使用资源前意外地释放了它”</strong>。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="证同测试"><a href="#证同测试" class="headerlink" title="证同测试"></a>证同测试</h2><p>其原理很简单：在函数最前端放上这样一句话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if(this&#x3D;&#x3D;&amp;rhs) return *this;</span><br></pre></td></tr></table></figure><br>这个解决方案保证了自赋值安全性，但是不具备异常安全性。在这句话中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pb=<span class="keyword">new</span> Bitmap(*rhs.pb);<span class="comment">//已通过证同测试，此时已经执行delete</span></span><br></pre></td></tr></table></figure><br>如果new导致了一个异常（内存不足或者copy构造函数抛出异常），那么pb始终会指向一块被删除的Bitmap。我们无法安全地删除pb,甚至读取它。</p>
-<h2 id="手动保证异常安全"><a href="#手动保证异常安全" class="headerlink" title="手动保证异常安全"></a>手动保证异常安全</h2><p>因为只要解决了异常安全性，那么自赋值安全性就会必然得到解决，所以我们倾向于使用足够完美的逻辑避免异常的发生，其原理也很简单：在赋值pb前别删pb<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bitnap * porig = pb；</span><br><span class="line">pb =<span class="keyword">new</span> bitmap(rhs.pb);</span><br><span class="line"><span class="keyword">delete</span> porig;</span><br><span class="line"><span class="keyword">return</span> *<span class="keyword">this</span>;</span><br></pre></td></tr></table></figure><br>这样的好处不言自明，如果pb没能正确赋值，其对象也没有被析构。（异常发生时跳出了operator=函数，因此没有执行delete porig）。如果正确赋值，pb指向的对象被释放。</p>
-<h2 id="copy-amp-amp-swap"><a href="#copy-amp-amp-swap" class="headerlink" title="copy&amp;&amp;swap"></a>copy&amp;&amp;swap</h2><p>还有一个十分灵巧的operator=撰写技巧：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(Widegt&amp; rhs)</span></span>;<span class="comment">//彻底交换数据</span></span><br><span class="line">&#125;</span><br><span class="line">Widget&amp;</span><br><span class="line">Widget::<span class="keyword">operator</span>=(<span class="keyword">const</span> Widget&amp; rhs)&#123;</span><br><span class="line">    Widget temp(rhs);</span><br><span class="line">    swap(temp);</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>如果operator=接受的参数是by value而非by reference，那我们连temp都可以省略:</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Widget&amp;</span><br><span class="line">Widget::<span class="keyword">operator</span>=(Widget rhs)&#123;</span><br><span class="line">    swap(rhs);</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></h2><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>确保自赋值安全性。其技术包括比较lhs与rhs的地址，先做backup，以及copy-and-swap</li>
-<li>确定任何操作一个以上的对象的函数，如果其操作对象是同一个对象时，还能保持正确性。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1891,7 +1898,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">263</span>
+                  <span class="site-state-item-count">264</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1913,7 +1920,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
