@@ -291,6 +291,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/16/%E4%BD%BF%E7%94%A8init%E6%8D%95%E8%8E%B7%E5%B0%86%E5%AF%B9%E8%B1%A1%E7%A7%BB%E5%8A%A8%E5%88%B0%E9%97%AD%E5%8C%85%E4%B8%AD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/16/%E4%BD%BF%E7%94%A8init%E6%8D%95%E8%8E%B7%E5%B0%86%E5%AF%B9%E8%B1%A1%E7%A7%BB%E5%8A%A8%E5%88%B0%E9%97%AD%E5%8C%85%E4%B8%AD/" itemprop="url">32.使用init捕获将对象移动到闭包中</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-16T15:41:00+08:00">
+                2018-07-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>可能在某时你会发现无论是按值捕获还是按引用捕获均非最佳选择。例如C++11无法将一个move-only对象（std::unique_ptr、std::future)移动进入闭包.又或者当前存在一个copy成本极高但move成本极低的对象（例如STL中的大部分容器），C++11也无法将其移动进入闭包。</p>
+<p>这项C++14引入的新功能被称为init capture，它几乎可以完成C++11捕获表单可以执行的所有操作，以及更多功能，唯一的缺点是它无法表现地如同默认捕获，但前一节我们介绍了最好不要使用它们。此外，init捕获的语法略显冗长，因此如果C++11中别的捕获模式已经能够完成任务，我们没有必要去使用init捕获。</p>
+<hr>
+<h1 id="init捕获"><a href="#init捕获" class="headerlink" title="init捕获"></a>init捕获</h1><p>&nbsp;<br>init捕获可以帮助我们指定</p>
+<ol>
+<li><strong>由lambda所生成的closure class中data meber的名称</strong></li>
+<li><strong>该data member的初始化表达式</strong></li>
+</ol>
+<p>下述实例将展示如何通过init捕获将std::unique_ptr移动入闭包：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> <span class="comment">// some useful type</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isValidated</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isProcessed</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isArchived</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">auto</span> pw = <span class="built_in">std</span>::make_unique&lt;Widget&gt;(); <span class="comment">// create Widget</span></span><br><span class="line">… <span class="comment">// configure *pw</span></span><br><span class="line"><span class="keyword">auto</span> func = [pw = <span class="built_in">std</span>::<span class="built_in">move</span>(pw)]&#123; <span class="keyword">return</span> pw-&gt;isValidated()&amp;&amp; pw-&gt;isArchived(); &#125;;</span><br></pre></td></tr></table></figure><br>其中<code>[pw = std::move(pw)]</code>即为init捕获。“=”左侧是指闭包类中data member的名称，右侧是其初始化表达式。有趣的是，“=”左侧与右侧具备不同的作用域，左侧的作用域为closure class，右侧为lambda定义区。在上述实例中，“=”左侧的名称pw为closure class中的data member，而右侧的名称pw意味着lambda上文中刚刚创建的std::unique_ptr。最终，利用std::move将上文中的std::unique_ptr初始化closure class中的data member。lambda体中的代码处于closure class的作用域内，因此pw代表闭包类数据成员。</p>
+<p>在以pw初始化data member之前，我们可能会对堆中的Widget作出修改，这也正对应着注释部分的configur *pw。如果我们当前无需修改，则可省去局部对象pw，直接以make_unique返回值初始化data member：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> func = [pw = <span class="built_in">std</span>::make_unique&lt;Widget&gt;()]&#123; <span class="keyword">return</span> pw-&gt;isValidated()&amp;&amp; pw-&gt;isArchived(); &#125;;</span><br></pre></td></tr></table></figure><br>init捕获又被称为广义捕获。</p>
+<hr>
+<h1 id="在C-11中实现移动捕获"><a href="#在C-11中实现移动捕获" class="headerlink" title="在C++11中实现移动捕获"></a>在C++11中实现移动捕获</h1><p>&nbsp;<br>我们明确的是，lambda是一种生成类的方法，那么我们自然可以在C++11中避开lambda直接生成自己需要的class，因此，刚才C++14所写的代码可以被转换为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IsValAndArch</span> &#123;</span> </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> DataType = <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">IsValAndArch</span><span class="params">(DataType&amp;&amp; ptr)</span>:<span class="title">pw</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">move</span>(ptr))</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span> <span class="keyword">const</span></span>&#123; <span class="keyword">return</span> pw-&gt;isValidated() &amp;&amp; pw-&gt;isArchived(); &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    DataType pw;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">auto</span> func = IsValAndArch(<span class="built_in">std</span>::make_unique&lt;Widget&gt;());</span><br></pre></td></tr></table></figure><br>虽然多打了很多字，但它至少证明了C++11也能支持移动捕获。</p>
+<p>如果你非要既使用C++11的lambda，又需要移动捕获，那你得按照以下步骤行事：</p>
+<ol>
+<li><strong>将要捕获的对象移动到std::bind生成的函数对象中</strong></li>
+<li><strong>给lambda一个对“捕获”对象的引用</strong></li>
+</ol>
+<p>假设当前我们需要创建一个局部对象std::vector，将一组适当的值放入其中，然后将其移动到闭包中。上述行为在C++14中很容易实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; data; <span class="comment">// object to be moved into closure</span></span><br><span class="line">… <span class="comment">// populate data</span></span><br><span class="line"><span class="keyword">auto</span> func = [data = <span class="built_in">std</span>::<span class="built_in">move</span>(data)]&#123; <span class="comment">/* uses of data */</span> &#125;;<span class="comment">// C++14 init capture</span></span><br></pre></td></tr></table></figure><br>在C++11中，同等的实现需要被写为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt; data; <span class="comment">// as above</span></span><br><span class="line">… <span class="comment">// as above</span></span><br><span class="line"><span class="keyword">auto</span> func =<span class="built_in">std</span>::bind([](<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt;&amp; data)&#123; <span class="comment">/* uses of data */</span> &#125;,<span class="built_in">std</span>::<span class="built_in">move</span>(data));</span><br></pre></td></tr></table></figure><br>类似于lambda表达式，std::bind生成函数对象。std :: bind的第一个参数是一个可调用对象，后续参数表示要传递给该对象的值。bind对象在传递参数给第一个可调用对象时，采用左值拷贝构造，右值移动构造的方式。需要注意的是，（）中是一个左值引用，原因在于bind将data传递至闭包后，data是一个左值。此外，为了防止修改数据，我们将一个const-refernce绑定至data，这是因为lambda生成的class默认operator()为const。</p>
+<p>由于bind对象内含其所有实参的副本，因此其生命周期与闭包的生命周期一致。总而言之，利用bind模拟移动捕获的要点有三：</p>
+<ol>
+<li><strong>在C++11中，无法将一个对象移动进入闭包，但可以将其移动进入一个bind对象。</strong></li>
+<li><strong>在模拟过程中，我们只需要把对象移动进入bind对象，然后以引用形式将其传递给闭包</strong></li>
+<li><strong>因为bind对象的生命周期与闭包的生命周期相同，所以可以将bind对象中的对象视为处于闭包中</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/16/%E9%81%BF%E5%85%8D%E9%BB%98%E8%AE%A4%E6%8D%95%E8%8E%B7%E6%A8%A1%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1745,173 +1910,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/11/%E7%90%86%E8%A7%A3stdmove%E4%B8%8Estdforward/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/11/%E7%90%86%E8%A7%A3stdmove%E4%B8%8Estdforward/" itemprop="url">23.理解std::move与std::forward</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-11T19:02:00+08:00">
-                2018-07-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在开始叙述之前，我们首先需要明确，std::move并不执行移动，std::forward也并不转发，它们在运行期并不执行任何操作，也不生成任何代码。<br>std::move和std::forward只是执行强制转换的函数（实际上是函数模板）。std::move无条件地将其参数转换为rvalue，而std::forward仅在满足特定条件时才执行此转换，这就是关于它们的全部解释。</p>
-<hr>
-<h1 id="std-move"><a href="#std-move" class="headerlink" title="std::move"></a>std::move</h1><p>&nbsp;<br>C++11中std::move的大致实现如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// in namespace std</span></span><br><span class="line"><span class="keyword">typename</span> remove_reference&lt;T&gt;::type&amp;&amp;</span><br><span class="line"><span class="built_in">move</span>(T&amp;&amp; param)&#123;</span><br><span class="line">    <span class="keyword">using</span> ReturnType = <span class="keyword">typename</span> remove_reference&lt;T&gt;::type&amp;&amp;;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;ReturnType&gt;(param);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>函数返回类型的“&amp;&amp;”部分意味着std::move返回一个右值引用，但正如Item28将要提及的，如果类型T碰巧是左值引用，则T&amp;&amp;将成为左值引用。为了防止这种情况发生，将type_traits（见Item9）std::remove_reference应用于T，从而确保将“&amp;&amp;”应用于不是引用的类型，这一操作保证std::move真正返回一个rvalue引用，这一点相当重要，因为函数返回的右值引用是一个右值，最终，move将其参数转为了一个右值。</p>
-<p>在C++14中，move的实现可以更加简单（多亏了返回类型推衍与type_traits的福）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// C++14</span></span><br><span class="line"><span class="function"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">move</span><span class="params">(T&amp;&amp; param)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> ReturnType = <span class="keyword">remove_reference_t</span>&lt;T&gt;&amp;&amp;;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;ReturnType&gt;(param);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="move问题实例"><a href="#move问题实例" class="headerlink" title="move问题实例"></a>move问题实例</h2><p>&nbsp;<br>假设我们正在撰写一个表示注释的类，其构造函数参数为string，按照Item41的要求，我们将其设定为pass-by-value：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Annotation</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Annotation</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这时候你想到构造函数不会改变text，于是你把它声明为const：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Annotation</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Annotation</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>)</span></span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>为了避免对data member作无谓的复制，你在构造函数中使用std::move(亦遵从Item 41）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Annotation</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Annotation</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>)</span>: <span class="title">value</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">move</span>(<span class="built_in">text</span>))</span></span>&#123; … &#125; <span class="comment">// doesn't do what it seems to!</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> value;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这段代码能跑，只是运行起来未必如你所愿，事实上它执行了copy而非move。text被强制转换为右值这一点没毛病，但由于text被声明为const string，因此在执行转换之前，text是一个左值const std::string,并且转换完成后它变成了一个右值const std::string,在转换过程中，const一直被保留着。</p>
-<p>编译器需要考虑使用哪种string构造函数，一般来说有两种选择：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">string</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="built_in">string</span>(<span class="keyword">const</span> <span class="built_in">string</span>&amp; rhs); <span class="comment">// copy ctor</span></span><br><span class="line">    <span class="built_in">string</span>(<span class="built_in">string</span>&amp;&amp; rhs); <span class="comment">// move ctor</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>在Annotation构造函数的member initialization list中，std::move（text）的结果是const std::string类型的rvalue。该rvalue无法传递给st::string的移动构造函数，因为移动构造函数形参必须是一个rvalue non-const std::string。但该rvalue可以传递给复制构造函数，因为允许将lvalue-reference-to-const绑定到const rvalue。 因此，成员初始化调用std::string中的复制构造函数。理解这一点十分重要，因为移动构造必然会破坏某些对象，因此移动构造的参数不具备const属性。</p>
-<p>从该实例中可以得出两条经验:</p>
-<ol>
-<li><strong>如果希望move某对象，不要将其声明为const，这将导致只会触发copy。</strong></li>
-<li><strong>std::move并不保证对象被移动，它只能保证传递回一个右值而已。</strong></li>
-</ol>
-<hr>
-<h1 id="std-forward"><a href="#std-forward" class="headerlink" title="std::forward"></a>std::forward</h1><p>&nbsp;<br>forward是一种条件式转换，仅仅在满足条件时才会将参数转为rvalue。要了解它何时进行转换以及何时不转换，只需要想想我们一般在何时使用std::forward。</p>
-<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>最常见的场景是一个函数模板，其形参为universal reference，该参数将被传递给另一个函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(<span class="keyword">const</span> Widget&amp; lvalArg)</span></span>; <span class="comment">// process lvalues</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(Widget&amp;&amp; rvalArg)</span></span>; <span class="comment">// process rvalues</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// template that passes</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">logAndProcess</span><span class="params">(T&amp;&amp; param)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> now = <span class="built_in">std</span>::chrono::system_clock::now();</span><br><span class="line">    makeLogEntry(<span class="string">"Calling 'process'"</span>, now);</span><br><span class="line">    <span class="built_in">process</span>(<span class="built_in">std</span>::forward&lt;T&gt;(param));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>考虑下述两个函数调用，其中一个实参是左值，另一个是右值：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line">logAndProcess(w); <span class="comment">// call with lvalue</span></span><br><span class="line">logAndProcess(<span class="built_in">std</span>::<span class="built_in">move</span>(w)); <span class="comment">// call with rvalue</span></span><br></pre></td></tr></table></figure><br>在logAndProcess中，参数param被传递给函数process。当我们使用左值调用logAndProcess时，我们自然希望将左值作为左值转发到process，当我们用rvalue调用logAndProcess时，我们期望调用process的rvalue重载版本。</p>
-<p>但是，与所有函数参数一样，param是一个左值。因此，对logAndProcess内的每个process调用都将调用左值重载版本。 为了防止这种情况，我们需要一种机制来将param强制转换为rvalue。这解释了为何forward是一种条件转换：只有当它的参数用rvalue初始化时才转换为rvalue。</p>
-<p>你可能想知道std::forward是如何知道它的参数是否用rvalue初始化。简单地来说，该信息在logAndProcess的模板参数T中被编码，该参数传递给std::forward，后者恢复编码信息，具体可见Item28。</p>
-<hr>
-<h1 id="move与forward"><a href="#move与forward" class="headerlink" title="move与forward"></a>move与forward</h1><p>&nbsp;<br>鉴于std::move和std::forward的本质均为强制转换，唯一的区别在于std::move总是执行强制转换，而std::forward则为条件式转换，似乎总可以用forward代替move，从技术层来说确实如此，但却并无必要，毕竟真要取消的话不如干脆都写cast好了。</p>
-<p>std::move的优势在于便捷，减少错误发生的可能性以及使代码更加清晰。假设当前我们需要跟踪移动构造函数的调用次数，那我们只需要增加一个static计数器。更进一步地，假设类中唯一的非静态数据是std::string，以std::move实现移动构造有如下实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(Widget&amp;&amp; rhs):s(<span class="built_in">std</span>::<span class="built_in">move</span>(rhs.s))&#123; ++moveCtorCalls; &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">std</span>::<span class="keyword">size_t</span> moveCtorCalls;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> s;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>如果以forward替换move，则代码将如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(Widget&amp;&amp; rhs):s(<span class="built_in">std</span>::forward&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;(rhs.s))&#123; ++moveCtorCalls;&#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>可以看出，std::move只需要一个函数参数（rhs.s），而std::forward需要一个函数参数（rhs.s）和一个模板类型参数（std::string）。此外，我们传递给std::forward的类型应当是non-reference，因为这是编码的约定（见Item28）。总之，这些意味着move比forward在某些场合更加好用。<br>总而言之，std::move表示将参数无条件转为rvalue，而std::forward仅表示在传递参数时保持参数原有的左右值属性，此二者完全不同，因此需要两种不同的名称加以区分。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>std::move表示将参数无条件转为rvalue，并不执行任何移动操作。</strong></li>
-<li><strong>std::forward将绑定至右值的参数转为右值。</strong></li>
-<li><strong>move与forward均不在运行期执行任何操作。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1962,7 +1960,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1973,7 +1971,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1984,7 +1982,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

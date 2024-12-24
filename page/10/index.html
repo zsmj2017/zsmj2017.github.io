@@ -291,6 +291,173 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/26/%E7%94%A8auto%E4%BB%A3%E6%9B%BF%E6%98%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/26/%E7%94%A8auto%E4%BB%A3%E6%9B%BF%E6%98%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E/" itemprop="url">5.用auto代替显式类型声明</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-26T11:10:00+08:00">
+                2018-06-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>通过使用auto技术，我们省下了打字的时间，但可能会带来一些手动声明类型所不会造成的错误或性能问题。作为C++开发者，我们应当尽力掌握auto以期获取正确结果。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>在C++11中未曾出现之前，声明一个变量可能会出现三种令人厌恶的情况：</p>
+<ol>
+<li><strong>忘记初始化</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x;<span class="comment">//x's value depends on the context</span></span><br></pre></td></tr></table></figure></li>
+<li><strong>类型名过长</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> It&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dwim</span><span class="params">(It b, It e)</span></span>&#123;</span><br><span class="line">   <span class="keyword">while</span> (b != e) &#123;</span><br><span class="line">       <span class="keyword">typename</span> <span class="built_in">std</span>::iterator_traits&lt;It&gt;::value_type currValue = *b;</span><br><span class="line">       …</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><strong>变量类型不确定（闭包），只有编译器知道具体类型</strong></li>
+</ol>
+<p>C++11引入的auto技术完美解决了上述三点问题。使用auto声明的变量会从初始化语句中推断类型，因此它们必然会被初始化，并且无需写出繁复的类型名称：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = <span class="number">0</span>;<span class="comment">//must be initialized</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> It&gt; <span class="comment">// as before</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dwim</span><span class="params">(It b, It e)</span></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (b != e) &#123;</span><br><span class="line">        <span class="keyword">auto</span> currValue = *b;</span><br><span class="line">        …</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> derefUPLess = []<span class="comment">//only compiler know return closure's type</span></span><br><span class="line">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p1,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p2)</span><br><span class="line">&#123; <span class="keyword">return</span> *p1 &lt; *p2; &#125;;</span><br></pre></td></tr></table></figure><br>C++14将这一特性再次升级，现在lambda表达式内部也可以使用auto了：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> derefLess = [](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p1,<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p2)</span><br><span class="line">&#123; <span class="keyword">return</span> *p1 &lt; *p2; &#125;; <span class="comment">// to by anythin</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="std-function"><a href="#std-function" class="headerlink" title="std::function"></a>std::function</h1><p>&nbsp;<br>有人认为我们没有必要使用auto来声明一个持有closure的变量，因为我们可以使用std::function对象。前提是你了解function object。</p>
+<p>std::function是C++11标准库中的一个模板，其类似于一个通用函数指针。函数只能指向一个函数，但std::function可以指向任何一个可调用对象。当你声明一个函数指针时你必须指出其指向函数的签名，function object亦是如此，其使用大致如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//C++11 signature for std::unique_ptr&lt;Widget&gt; comparison function</span></span><br><span class="line"><span class="keyword">bool</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::function&lt;<span class="keyword">bool</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;)&gt; func;</span><br></pre></td></tr></table></figure><br>由于lambda表达式生成了可调用对象，因此closure可以保存在std::function对象之中，因此我们在不使用auto技术的前提下可以将derefUPLess函数声明为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::function&lt;<span class="keyword">bool</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;)&gt;</span><br><span class="line">derefUPLess = [](<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p1,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p2)</span><br><span class="line">&#123; <span class="keyword">return</span> *p1 &lt; *p2; &#125;;</span><br></pre></td></tr></table></figure><br>即使不考虑语句冗长与类型反复撰写，使用std::function与使用auto也截然不同。一个持有closure由auto声明的变量与闭包具备同样的类型，因此其只需要与闭包一致的内存即可。但持有closure的function对象是一个template的实例化，因此其所占有的内存与签名式相关，但该内存可能并不足以存放closure，那么此时function将会分配heap内存以存储closure。这一特性导致function对象往往比auto对象使用更多的内存。此外，由于限制内联及函数简介调用，由一个function对象触发closure往往会慢于auto对象。</p>
+<p>总之，function对象往往占用较多的内存且慢于auto对象，并且可能会产生内存异常。使用function也没有auto简洁与直观。</p>
+<hr>
+<h1 id="auto的其他优点"><a href="#auto的其他优点" class="headerlink" title="auto的其他优点"></a>auto的其他优点</h1><p>&nbsp;<br>auto还有一个好处是可以避免”type shortcuts”，比如你可能看过甚至自己写过这样的程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">unsigned</span> sz = v.<span class="built_in">size</span>();<span class="comment">//其类型不应为unsigned，这里只是因为开发者偷懒</span></span><br></pre></td></tr></table></figure><br>有人认为unsigned类型与vector<int>::size_type一致，但实际上这是错误的，在64位电脑中vector<int>::size_type为64位，而unsigned只有32位，如果使用auto则可以避免这一问题。</p>
+<p>又有实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">int</span>&gt; m;</span><br><span class="line">…</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> <span class="built_in">std</span>::pair&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">int</span>&gt;&amp; p : m)&#123;</span><br><span class="line">    … <span class="comment">// do something with p</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这个程序看起来并没有什么不对（如果你没有读过Effective STL或类似书籍的话），但实际上，pair的类型并非pair&lt;std::string,int&gt;,而是pair&lt;const std::string,int&gt;。由于类型不一致，编译器将会生成一个临时对象绑定到p上，并且在每一次循环结束后析构该对象。这不仅仅付出了构造、析构的成本，你所有的操作最终都将作用于临时对象之上，对m中的元素并没有发挥任何作用，但使用auto则可避免这一问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p:m)&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="auto可读性"><a href="#auto可读性" class="headerlink" title="auto可读性"></a>auto可读性</h1><p>&nbsp;<br>当然，auto并非尽善尽美，原因在auto作类型推衍的根基在于其初始化表达式，而这可能会带来非你所想的类型推衍结果，在Item2与Item6中介绍了它们的产生原因与消除方案，因此本节不再赘述。接下来要讨论的是auto所带来的可读性问题。</p>
+<p>首先我们需要明确的是，auto只是一个可选项而非强制性措施。根据以往的编程经验，代码应当尽可能在简洁的同时做到可维护，但auto并没有破坏这些原则，实际上无论是静态语言（C#，VB等），还是动态语言（Haskell，F#等），类似的功能早已出现，类型推衍与传统编程原则并没有任何冲突。</p>
+<p>有些开发者会担心使用auto将导致他们无法快速了解某变量的类型，但实际上IDE会显示出这些变量的类型，并且在许多情况下，我们只需要知道对象的大概类型即可（例如只需要了解其是一个指针、迭代器、容器，而不需要知道具体类型）。一个好的变量名应当能够正确地反映出大致数据类型。</p>
+<p>事实上，显式类型说明几乎没有特别明显的优点，它可能会引入微妙的错误，又或者会对效率产生一定影响，甚至二者兼而有之。此外，使用auto完成声明的对象会在其初始化表达式发生改变时自动更改类型，这对重构有着莫大帮助。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>使用auto声明对象意味着必须初始化，并且能够规避类型匹配错误与可移植性、效率低下等问题。在此基础之上，auto还能够简化重构过程，节约大量不必要的类型声明代码。</strong></li>
+<li><strong>auto可能存在一些缺陷，这些在Item2与Item6中有所描述。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/25/%E4%BA%86%E8%A7%A3%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8B%E7%B1%BB%E5%9E%8B%E6%8E%A8%E8%A1%8D%E7%BB%93%E6%9E%9C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1762,157 +1929,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/30/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E4%B8%B4%E6%97%B6%E6%80%A7%E5%AF%B9%E8%B1%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/30/%E6%89%A7%E8%A1%8C%E6%9C%9F%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E4%B8%B4%E6%97%B6%E6%80%A7%E5%AF%B9%E8%B1%A1/" itemprop="url">执行期语义学——临时性对象</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-30T12:05:00+08:00">
-                2018-05-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="临时对象的生成"><a href="#临时对象的生成" class="headerlink" title="临时对象的生成"></a>临时对象的生成</h1><p>&nbsp;<br>如果我们有函数如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">T <span class="keyword">operator</span>+(<span class="keyword">const</span> T&amp;,<span class="keyword">const</span> T&amp;);</span><br></pre></td></tr></table></figure><br>那么在执行该函数时，可能会生成一个临时对象以存储需要传回的对象。是否会产生临时对象由很多因素决定，其中我们需要的知识点是NRV。</p>
-<p>由于市场竞争的关系，大多数编译器均采取了一系列优化策略，以至于如下表达式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">T c = a+b;</span><br></pre></td></tr></table></figure><br>几乎不可能产生临时对象。但值得注意的是下一种情况——与表达式意义相当的assignment statement：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c = a+b;</span><br></pre></td></tr></table></figure><br>它会直接导致临时对象的生成：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">T temp;</span><br><span class="line">temp.<span class="keyword">operator</span>+(a,b);</span><br><span class="line">c.<span class="keyword">operator</span>=(temp);</span><br><span class="line">temp.T::~T();</span><br></pre></td></tr></table></figure><br>我们可以认为，初始化操作总比赋值操作效率更高。<br>此外，还有一种生成临时对象的情况：没有出现目标对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a+b;</span><br></pre></td></tr></table></figure><br>这会产生一个临时对象，用以放置运算后的结果。</p>
-<hr>
-<h1 id="临时对象的生命期"><a href="#临时对象的生命期" class="headerlink" title="临时对象的生命期"></a>临时对象的生命期</h1><p>&nbsp;<br>在C++ standard之前，临时对象的生命期并没有明确指定，完全由各编译器生产厂商决定。而C++ standard定义如下：临时对象的被摧毁，应该是对full expression求值过程中的最后一个步骤，该表达式造成临时对象的产生。</p>
-<p>什么是full expression？你可以认为是被涵括的表达式中最外围的那个：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((objA&gt;<span class="number">1024</span>) &amp;&amp; (objB&gt;<span class="number">1024</span>))?objA+objB:foo(objA,objB);</span><br></pre></td></tr></table></figure><br>比如该三目运算符表达式即为full expression，任何一个子算式产生的任何一个临时对象，都应当在完整表达式被求值完成后销毁。</p>
-<p>此外，C++ standard又有两个特例：</p>
-<ol>
-<li><strong>凡含有表达式执行结果的临时对象，应该存留到object的初始化操作完成为止。</strong><br>这种做法提高了初始化效率，防止了另一个临时对象的生成。</li>
-<li><strong>如果一个临时性对象被绑定于一个reference，对象将会被残留，直到被初始化的reference声明结束，或临时对象的生命期结束。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1963,7 +1979,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1974,7 +1990,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1985,7 +2001,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

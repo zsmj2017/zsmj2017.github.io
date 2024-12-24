@@ -291,6 +291,174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/02/%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8constexpr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/02/%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8constexpr/" itemprop="url">15.尽量使用constexpr</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-02T18:42:00+08:00">
+                2018-07-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>constexpr应用于对象时，其类似于const的加强版，但其应用于函数时的意义却与此大相径庭。从概念而言，constexpr不仅仅表示一个常量，也表示该量在编译期即可明确。然而，在constexpr function中，constexpr未必代表着编译期取值，甚至未必能保证const。</p>
+<hr>
+<h1 id="constexpr-objects"><a href="#constexpr-objects" class="headerlink" title="constexpr objects"></a>constexpr objects</h1><p>&nbsp;<br>constexpr对象具备const属性，其值在编译期已知。（从技术层面来说，其值决定于translation时期，也就是编译期和链接期，但这一点并不重要，除非你需要自己写一个C++的编译器和链接器，不然你总可以认为constexpr对象的值在编译期即已确定）。</p>
+<p>编译期即被明确的值具有一定的特权，例如它们可能会被存于只读存储器中，对于嵌入式开发者来说这或许是一个非常重要的特性，但其更广泛适用于C++编译期需要整型常量表达式的环境中，例如数组长度说明、整型模板参数设定、枚举量设定、齐位说明符设定等等。当你需要将一个变量应用于上述环境时，将其声明为constexpr即等效于向编译器保证其可在编译期求值：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> sz; <span class="comment">// non-constexpr variable</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> arraySize1 = sz; <span class="comment">// error! sz's value not known at compilation</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, sz&gt; data1; <span class="comment">// error! same problem</span></span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> arraySize2 = <span class="number">10</span>; <span class="comment">// fine, 10 is a compile-time constant</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, arraySize2&gt; data2; <span class="comment">// fine, arraySize2 is constexpr</span></span><br></pre></td></tr></table></figure><br>需要注意的是const并不具备编译期明确其值的能力：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> sz; <span class="comment">// as before</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> arraySize = sz; <span class="comment">// fine, arraySize is const copy of sz</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, arraySize&gt; data; <span class="comment">// error! arraySize's value not known at compilation</span></span><br></pre></td></tr></table></figure><br>简而言之，所有的constexpr对象都是const的，但并不是所有的const对象都是constexpr。仅有constexpr对象具备编译期明确其值的能力。</p>
+<hr>
+<h1 id="constexpr-function"><a href="#constexpr-function" class="headerlink" title="constexpr function"></a>constexpr function</h1><p>&nbsp;<br>constexpr function的情况与其使用情境相关，如果你以一个compile-time constants调用constexpr function，该函数会产生一个compile-time constants，而如果你以一个runtime values调用它，它则会产生一个runtime value。</p>
+<h2 id="constexpr-function的用途"><a href="#constexpr-function的用途" class="headerlink" title="constexpr function的用途"></a>constexpr function的用途</h2><ol>
+<li><strong>用于必需compile-time constants的环境下（例如数组长度）</strong><br>如果你传入的参数可在编译期获得，那么constexpr function会在编译期产生结果，反之只要有一个参数不符合compile-time，则代码将无法通过编译。</li>
+<li><strong>减少代码重复</strong><br>当一个constexpr函数被一个或多个runtime values调用时，它会按照普通函数的形式运行。这意味着我们不需要在开发时区分compile-time value与runtime value。</li>
+</ol>
+<hr>
+<h3 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h3><p>&nbsp;<br>假设我们需要一个数据结构以保存各种实验条件下的运行结果，实验条件条件可能有光照等级、风扇速度、室内温度等等。如果可变的实验条件共有n个，每个实验条件又存在3种状态，那么本实验共有3^n种组合，因此我们需要一个可以容纳3^n个实验结果的数据结构。假定每一个结果均为int类型且n在编译期已知（或可被计算），那么std::array似乎可以适用于本次设计，但我们还需要一种方式以在编译期计算出3^n具体的大小。std::pow可以完成我们想要的计算，但它存在两个问题：1、工作于浮点数；2、不具备constexpr属性。因此我们无法使用它来在编译期计算std::array的大小。</p>
+<p>不过我们可以自己完成pow的编写。在定义它之前，我们先看看它应当被如何声明与使用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="title">pow</span><span class="params">(<span class="keyword">int</span> base, <span class="keyword">int</span> <span class="built_in">exp</span>)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    … <span class="comment">// impl is below</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> numConds = <span class="number">5</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, <span class="built_in">pow</span>(3, numConds)&gt; results;</span><br></pre></td></tr></table></figure><br>pow前面的constexpr并不表明pow返回一个const值，它表示如果base和exp是编译时常量，那么pow的结果可以用作编译时常量。 如果base或exp不是编译时常量，pow的结果将在运行时计算。这意味着pow不仅用于在编译期计算std::array的大小，还可以在运行时环境中调用它：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> base = readFromDB(<span class="string">"base"</span>); <span class="comment">// get these values</span></span><br><span class="line"><span class="keyword">auto</span> <span class="built_in">exp</span> = readFromDB(<span class="string">"exponent"</span>); <span class="comment">// at runtime</span></span><br><span class="line"><span class="keyword">auto</span> baseToExp = <span class="built_in">pow</span>(base, <span class="built_in">exp</span>); <span class="comment">// call pow function at runtime</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="constexpr的限制条件"><a href="#constexpr的限制条件" class="headerlink" title="constexpr的限制条件"></a>constexpr的限制条件</h2><p>&nbsp;<br>当传入参数是一个compile-time value时，constexpr function必然compile-time value，因此它的实现方式存在一些限制，并且在C++11与C++14中这些限制不尽相同。</p>
+<p>在C++11中，constexpr函数只允许包含一个可执行语句：return语句，但实际上我们可以用两种方法钻空子。首先，我们可以使用条件”?:”运算符来代替if-else语句；其次，我们可以使用递归来代替循环。因此，pow可被实现为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="title">pow</span><span class="params">(<span class="keyword">int</span> base, <span class="keyword">int</span> <span class="built_in">exp</span>)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="built_in">exp</span> == <span class="number">0</span> ? <span class="number">1</span> : base * <span class="built_in">pow</span>(base, <span class="built_in">exp</span> - <span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>想必除了函数式语言开发者之外没人会觉得上述代码比较优雅直观。C++14对于constexpr的限制较为宽泛，因此我们可以自由地写出这样的代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="title">pow</span><span class="params">(<span class="keyword">int</span> base, <span class="keyword">int</span> <span class="built_in">exp</span>)</span> <span class="keyword">noexcept</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> result = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">exp</span>; ++i) result *= base;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>constexpr函数的参数与返回值均限定为literal type，因为仅有该类型可在编译期确定。 在C++11中，除void之外的所有内置类型均为literal type，但用户自定义类型也可能是literal type，因为其构造函数和其他成员函数可能具备constexpr属性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    constexpr Point(double xVal = 0, double yVal = 0) noexcept: x(xVal), y(yVal)&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">double</span> <span class="title">xValue</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> </span>&#123; <span class="keyword">return</span> x; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">double</span> <span class="title">yValue</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> </span>&#123; <span class="keyword">return</span> y; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setX</span><span class="params">(<span class="keyword">double</span> newX)</span> <span class="keyword">noexcept</span> </span>&#123; x = newX; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setY</span><span class="params">(<span class="keyword">double</span> newY)</span> <span class="keyword">noexcept</span> </span>&#123; y = newY; &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">double</span> x, y;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>值得注意的是在上述定义中Point构造函数被声明为constexpr，原因在于如果在编译期间传给构造函数的参数已知，那么在编译期Point内部数据成员均已确定，那么这种初始化得到的point具备constexpr属性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p1</span><span class="params">(<span class="number">9.4</span>, <span class="number">27.7</span>)</span></span>; <span class="comment">// fine, "runs" constexpr ctor during compilation</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p2</span><span class="params">(<span class="number">28.8</span>, <span class="number">5.3</span>)</span></span>; <span class="comment">// also fine</span></span><br></pre></td></tr></table></figure><br>同样地，xValue和yValue也可以是constexpr，如果在constexpr Point对象上调用getter，则可以在编译期间知道数据成员x和y的值。如此则可以用这些函数的结果初始化constexpr对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">midpoint</span><span class="params">(<span class="keyword">const</span> Point&amp; p1, <span class="keyword">const</span> Point&amp; p2)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; (p1.xValue() + p2.xValue()) / <span class="number">2</span>,</span><br><span class="line">             (p1.yValue() + p2.yValue()) / <span class="number">2</span> &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> mid = midpoint(p1, p2);</span><br></pre></td></tr></table></figure><br>这种操作手法十分高妙，尽管mid的初始化操作涉及构造函数、getter函数、非成员函数，但最终我们在只读内存中完成了对它的创建。这种技法意味着编译期与运行期的界限开始趋于模糊，并且以往在运行期才能完成的操作如今可以提前至编译期完成。参与提前的代码越多，运行速度越快（当然编译速度会有所降低）。</p>
+<p>在C++11中，两个限制阻止了Point的成员函数setX和setY被声明为constexpr。首先，它们能够修改*this，而在C++11中，constexpr成员函数被隐式的认为具备const属性。 其次，它们具有void返回类型，而void在C++11中不属于literal type。这两个限制都在C++14中得到了解除，所以在C++14中，Point的setter也可被声明为constexpr：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">void</span> <span class="title">setX</span><span class="params">(<span class="keyword">double</span> newX)</span> <span class="keyword">noexcept</span> </span>&#123; x = newX; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">void</span> <span class="title">setY</span><span class="params">(<span class="keyword">double</span> newY)</span> <span class="keyword">noexcept</span> </span>&#123; y = newY; &#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>因此下述函数成为了可能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//return reflection of p with respect to the origin (C++14)</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">reflection</span><span class="params">(<span class="keyword">const</span> Point&amp; p)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    Point result; <span class="comment">// create non-const Point</span></span><br><span class="line">    result.setX(-p.xValue()); <span class="comment">// set its x and y values</span></span><br><span class="line">    result.setY(-p.yValue());</span><br><span class="line">    <span class="keyword">return</span> result; <span class="comment">// return copy of it</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>客户端程序看起来可能如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p1</span><span class="params">(<span class="number">9.4</span>, <span class="number">27.7</span>)</span></span>; <span class="comment">// as above</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p2</span><span class="params">(<span class="number">28.8</span>, <span class="number">5.3</span>)</span></span>;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> mid = midpoint(p1, p2);</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> reflectedMid = reflection(mid); <span class="comment">// known during compilation</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="constexpr的意义"><a href="#constexpr的意义" class="headerlink" title="constexpr的意义"></a>constexpr的意义</h1><p>&nbsp;<br>constexpr对象和constexpr函数的使用范围均大于non-constexpr对象与函数，通过尽可能使用constexpr，对象与函数的使用范围得到了扩大。</p>
+<p>constexpr类似于const、noexcept，是对象和函数接口的一部分，如果一个对象或函数被声明为constexpr，则意味着它可以在任何需要常量表达式的环境中使用。如果你将某个对象或函数声明为constexpr后又后会做出了这个决定，并且将constexpr撤销，那么可能会导致无数的客户端程序发生了雪崩。我们这里所说的尽可能，指的是在你愿意付出精力长期维系它们为constexpr的情况下。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>constexpr对象具有const属性，并且其值在编译期即可确定。</strong></li>
+<li><strong>constexpr函数在其调用对象为compile-time value时会产生compile-time value。</strong></li>
+<li><strong>constexpr对象与函数的使用范围大于non-constexpr。</strong></li>
+<li><strong>constexpr是对象或函数接口的一部分。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/01/14.%E8%8B%A5%E5%87%BD%E6%95%B0%E4%B8%8D%E4%BC%9A%E5%8F%91%E7%94%9F%E5%BC%82%E5%B8%B8%EF%BC%8C%E5%88%99%E5%B0%86%E5%85%B6%E5%A3%B0%E6%98%8E%E4%B8%BAnoexcept/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1744,173 +1912,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/26/%E7%94%A8auto%E4%BB%A3%E6%9B%BF%E6%98%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/26/%E7%94%A8auto%E4%BB%A3%E6%9B%BF%E6%98%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E/" itemprop="url">5.用auto代替显式类型声明</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-26T11:10:00+08:00">
-                2018-06-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>通过使用auto技术，我们省下了打字的时间，但可能会带来一些手动声明类型所不会造成的错误或性能问题。作为C++开发者，我们应当尽力掌握auto以期获取正确结果。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>在C++11中未曾出现之前，声明一个变量可能会出现三种令人厌恶的情况：</p>
-<ol>
-<li><strong>忘记初始化</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x;<span class="comment">//x's value depends on the context</span></span><br></pre></td></tr></table></figure></li>
-<li><strong>类型名过长</strong><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> It&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dwim</span><span class="params">(It b, It e)</span></span>&#123;</span><br><span class="line">   <span class="keyword">while</span> (b != e) &#123;</span><br><span class="line">       <span class="keyword">typename</span> <span class="built_in">std</span>::iterator_traits&lt;It&gt;::value_type currValue = *b;</span><br><span class="line">       …</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><strong>变量类型不确定（闭包），只有编译器知道具体类型</strong></li>
-</ol>
-<p>C++11引入的auto技术完美解决了上述三点问题。使用auto声明的变量会从初始化语句中推断类型，因此它们必然会被初始化，并且无需写出繁复的类型名称：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> x = <span class="number">0</span>;<span class="comment">//must be initialized</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> It&gt; <span class="comment">// as before</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dwim</span><span class="params">(It b, It e)</span></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (b != e) &#123;</span><br><span class="line">        <span class="keyword">auto</span> currValue = *b;</span><br><span class="line">        …</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> derefUPLess = []<span class="comment">//only compiler know return closure's type</span></span><br><span class="line">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p1,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p2)</span><br><span class="line">&#123; <span class="keyword">return</span> *p1 &lt; *p2; &#125;;</span><br></pre></td></tr></table></figure><br>C++14将这一特性再次升级，现在lambda表达式内部也可以使用auto了：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> derefLess = [](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p1,<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p2)</span><br><span class="line">&#123; <span class="keyword">return</span> *p1 &lt; *p2; &#125;; <span class="comment">// to by anythin</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="std-function"><a href="#std-function" class="headerlink" title="std::function"></a>std::function</h1><p>&nbsp;<br>有人认为我们没有必要使用auto来声明一个持有closure的变量，因为我们可以使用std::function对象。前提是你了解function object。</p>
-<p>std::function是C++11标准库中的一个模板，其类似于一个通用函数指针。函数只能指向一个函数，但std::function可以指向任何一个可调用对象。当你声明一个函数指针时你必须指出其指向函数的签名，function object亦是如此，其使用大致如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//C++11 signature for std::unique_ptr&lt;Widget&gt; comparison function</span></span><br><span class="line"><span class="keyword">bool</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::function&lt;<span class="keyword">bool</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;)&gt; func;</span><br></pre></td></tr></table></figure><br>由于lambda表达式生成了可调用对象，因此closure可以保存在std::function对象之中，因此我们在不使用auto技术的前提下可以将derefUPLess函数声明为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::function&lt;<span class="keyword">bool</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp;)&gt;</span><br><span class="line">derefUPLess = [](<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p1,<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Widget&gt;&amp; p2)</span><br><span class="line">&#123; <span class="keyword">return</span> *p1 &lt; *p2; &#125;;</span><br></pre></td></tr></table></figure><br>即使不考虑语句冗长与类型反复撰写，使用std::function与使用auto也截然不同。一个持有closure由auto声明的变量与闭包具备同样的类型，因此其只需要与闭包一致的内存即可。但持有closure的function对象是一个template的实例化，因此其所占有的内存与签名式相关，但该内存可能并不足以存放closure，那么此时function将会分配heap内存以存储closure。这一特性导致function对象往往比auto对象使用更多的内存。此外，由于限制内联及函数简介调用，由一个function对象触发closure往往会慢于auto对象。</p>
-<p>总之，function对象往往占用较多的内存且慢于auto对象，并且可能会产生内存异常。使用function也没有auto简洁与直观。</p>
-<hr>
-<h1 id="auto的其他优点"><a href="#auto的其他优点" class="headerlink" title="auto的其他优点"></a>auto的其他优点</h1><p>&nbsp;<br>auto还有一个好处是可以避免”type shortcuts”，比如你可能看过甚至自己写过这样的程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">unsigned</span> sz = v.<span class="built_in">size</span>();<span class="comment">//其类型不应为unsigned，这里只是因为开发者偷懒</span></span><br></pre></td></tr></table></figure><br>有人认为unsigned类型与vector<int>::size_type一致，但实际上这是错误的，在64位电脑中vector<int>::size_type为64位，而unsigned只有32位，如果使用auto则可以避免这一问题。</p>
-<p>又有实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">int</span>&gt; m;</span><br><span class="line">…</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> <span class="built_in">std</span>::pair&lt;<span class="built_in">std</span>::<span class="built_in">string</span>, <span class="keyword">int</span>&gt;&amp; p : m)&#123;</span><br><span class="line">    … <span class="comment">// do something with p</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这个程序看起来并没有什么不对（如果你没有读过Effective STL或类似书籍的话），但实际上，pair的类型并非pair&lt;std::string,int&gt;,而是pair&lt;const std::string,int&gt;。由于类型不一致，编译器将会生成一个临时对象绑定到p上，并且在每一次循环结束后析构该对象。这不仅仅付出了构造、析构的成本，你所有的操作最终都将作用于临时对象之上，对m中的元素并没有发挥任何作用，但使用auto则可避免这一问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p:m)&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="auto可读性"><a href="#auto可读性" class="headerlink" title="auto可读性"></a>auto可读性</h1><p>&nbsp;<br>当然，auto并非尽善尽美，原因在auto作类型推衍的根基在于其初始化表达式，而这可能会带来非你所想的类型推衍结果，在Item2与Item6中介绍了它们的产生原因与消除方案，因此本节不再赘述。接下来要讨论的是auto所带来的可读性问题。</p>
-<p>首先我们需要明确的是，auto只是一个可选项而非强制性措施。根据以往的编程经验，代码应当尽可能在简洁的同时做到可维护，但auto并没有破坏这些原则，实际上无论是静态语言（C#，VB等），还是动态语言（Haskell，F#等），类似的功能早已出现，类型推衍与传统编程原则并没有任何冲突。</p>
-<p>有些开发者会担心使用auto将导致他们无法快速了解某变量的类型，但实际上IDE会显示出这些变量的类型，并且在许多情况下，我们只需要知道对象的大概类型即可（例如只需要了解其是一个指针、迭代器、容器，而不需要知道具体类型）。一个好的变量名应当能够正确地反映出大致数据类型。</p>
-<p>事实上，显式类型说明几乎没有特别明显的优点，它可能会引入微妙的错误，又或者会对效率产生一定影响，甚至二者兼而有之。此外，使用auto完成声明的对象会在其初始化表达式发生改变时自动更改类型，这对重构有着莫大帮助。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>使用auto声明对象意味着必须初始化，并且能够规避类型匹配错误与可移植性、效率低下等问题。在此基础之上，auto还能够简化重构过程，节约大量不必要的类型声明代码。</strong></li>
-<li><strong>auto可能存在一些缺陷，这些在Item2与Item6中有所描述。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1961,7 +1962,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1972,7 +1973,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1983,7 +1984,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

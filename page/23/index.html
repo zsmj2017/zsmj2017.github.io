@@ -291,6 +291,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/13/%E8%80%83%E8%99%91%E7%94%A8%E6%9C%89%E5%BA%8Fvector%E4%BB%A3%E6%9B%BF%E5%85%B3%E8%81%94%E5%AE%B9%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/13/%E8%80%83%E8%99%91%E7%94%A8%E6%9C%89%E5%BA%8Fvector%E4%BB%A3%E6%9B%BF%E5%85%B3%E8%81%94%E5%AE%B9%E5%99%A8/" itemprop="url">23.考虑用有序vector代替关联容器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-13T10:35:00+08:00">
+                2018-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>（我认为本节内容强调的是底层数据结构的选择）</p>
+<h1 id="各容器的查找速度"><a href="#各容器的查找速度" class="headerlink" title="各容器的查找速度"></a>各容器的查找速度</h1><p>&nbsp;<br>理论上，散列容器可以提供常数时间的查找。如果你仅仅需要对数时间的查找，和直觉相悖的是，有序vector性能可能会优于关联容器。</p>
+<hr>
+<h1 id="有序vector的优越性"><a href="#有序vector的优越性" class="headerlink" title="有序vector的优越性"></a>有序vector的优越性</h1><h2 id="为何有序vector在性能上优于关联容器"><a href="#为何有序vector在性能上优于关联容器" class="headerlink" title="为何有序vector在性能上优于关联容器"></a>为何有序vector在性能上优于关联容器</h2><p>关联容器的底层数据结构是平衡搜索二叉树，其设计是综合了插入，删除，查找下的最优，但我们在实际应用中<strong>这三种操作并非像在测试条件那样随机执行</strong>。一般而言，都是某一段时间都在插入，另一段时间都是在查找等等…在这种情况下，<strong>有序</strong>vector可能会比关联容器在时间和空间上性能更好。</p>
+<h2 id="具体优越点"><a href="#具体优越点" class="headerlink" title="具体优越点"></a>具体优越点</h2><ol>
+<li>空间问题</li>
+<li>引用局部性问题</li>
+</ol>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><h3 id="空间优越性"><a href="#空间优越性" class="headerlink" title="空间优越性"></a>空间优越性</h3><p>假设关联容器元素类型为Widget，在底层数据结构平衡二叉树中不仅仅存着一个Widget，更是存着左子、右子、父节点这三个指针。<br>vector不需要存储指针，并且可以通过swap技术可以消除多余的内存需求。空间占用比关联容器少了许多。</p>
+<h3 id="引用局部性问题"><a href="#引用局部性问题" class="headerlink" title="引用局部性问题"></a>引用局部性问题</h3><p>假设我们有足够多数据结构，那么它们在存储时会分成多个内存页面，vector所占用的页面显然要少于关联容器（空间优越性），但这并不是最关键的。如果STL没有改进关联容器的引用局部性，二叉树节点会分散在各个页面，直接导致了更多的缺页中断。vector则不会如此，因为其内存连续，二分查找时不会发生太多的页面错误。</p>
+<h2 id="vector的缺陷"><a href="#vector的缺陷" class="headerlink" title="vector的缺陷"></a>vector的缺陷</h2><p>上述所说的查找高效性仅限于vector处于有序状态。此外，对于动态操作，是vector的花销惊人（可能还伴随着扩容），所以<strong>只有当查找操作几乎不与插入删除混用时，使用有序vector代替关联容器才有意义。</strong></p>
+<hr>
+<h1 id="有序vector与关联容器的替换"><a href="#有序vector与关联容器的替换" class="headerlink" title="有序vector与关联容器的替换"></a>有序vector与关联容器的替换</h1><h2 id="替换set"><a href="#替换set" class="headerlink" title="替换set"></a>替换set</h2><p>用vector替换set十分自然，仅有在针对mutiset时记住排序应该使用stable_sort.关于具体的查找算法选择，详见Effective STL 45；</p>
+<h2 id="替换map"><a href="#替换map" class="headerlink" title="替换map"></a>替换map</h2><h3 id="元素类型"><a href="#元素类型" class="headerlink" title="元素类型"></a>元素类型</h3><p>当我们试图用vector代替map或者mutimap时，需要注意的是，vector内部必须容纳pair对象。<br>当我们声明<code>map&lt;K,V&gt;</code>时，map内部其实存储的是<code>pair&lt;const K,V&gt;</code>,由于对vector排序时其值会通过赋值来移动，<strong>所以vector模拟map时内部只能是<code>pair&lt;K,V&gt;</code></strong>.</p>
+<h3 id="排序函数"><a href="#排序函数" class="headerlink" title="排序函数"></a>排序函数</h3><p>map在排序时仅仅使用key来作为排序的依据，那么vector中的pair也一样。这导致我们必须自定义一个pair的比较函数，因为默认版本根据pair的两个组件来排序。（我还没排序过pair)</p>
+<h3 id="查找函数"><a href="#查找函数" class="headerlink" title="查找函数"></a>查找函数</h3><p>用来排序的比较函数将作用于两个pair对象，但是查找只用到了key值，所以必须给用于查找的比较函数一个key类型的对象和一个pair，关键在于我们并不了解到底是<code>key</code>还是<code>pair</code>作为第一个实参传递，<strong>所以需要用两个用于查找的比较函数：一个key值先传递，另一个pair先传递。</strong></p>
+<h3 id="比较类型实例"><a href="#比较类型实例" class="headerlink" title="比较类型实例"></a>比较类型实例</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="built_in">string</span>, <span class="keyword">int</span>&gt; Data; </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DataCompare</span> &#123;</span><span class="comment">// 用于比较的类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> Data&amp; lhs,<span class="keyword">const</span> Data&amp; rhs)</span> <span class="keyword">const</span></span>&#123;<span class="comment">//用于排序的比较函数</span></span><br><span class="line">        <span class="keyword">return</span> keyLess(lhs.first, rhs.first);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//以下为基于查找的比较函数，因为无法确定是输入次序，因此构成重载</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> Data&amp; Ihs, <span class="keyword">const</span> Data::first_type&amp; k)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> keyLess(lhs.first, k);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> Data::first_type&amp; k,<span class="keyword">const</span> Data&amp; rhs)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> keyLess(k, rhs.first);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">//真正调用的比较函数</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">keyLess</span><span class="params">(<span class="keyword">const</span> Data::first_type&amp; k1,<span class="keyword">const</span> Data::first_type&amp; k2)</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> k1 &lt; k2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>只要数据结构的使用过程确实符合本章所述，并且没有误用比较函数设计，有序vector的效率几乎绝对优于关联容器。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/12/%E8%AF%A5%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%97%B6%E5%88%99%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1692,161 +1852,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8vector%20bool/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/11/%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8vector%20bool/" itemprop="url">18.避免使用vector&lt;bool></a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T09:26:00+08:00">
-                2018-04-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>vector&lt;bool&gt;只有两个问题：</p>
-<ol>
-<li>它不是一个STL容器</li>
-<li>它没有容纳bool</li>
-</ol>
-<hr>
-<h1 id="vector-lt-bool-gt-的特点"><a href="#vector-lt-bool-gt-的特点" class="headerlink" title="vector&lt;bool&gt;的特点"></a>vector&lt;bool&gt;的特点</h1><h2 id="STL的一个必要条件"><a href="#STL的一个必要条件" class="headerlink" title="STL的一个必要条件"></a>STL的一个必要条件</h2><p>STL容器的一个要求是：如果c是stl容器，且支持operator[],则以下代码可编译：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">T *p = &amp;c[<span class="number">0</span>]; <span class="comment">// 无论operator[]返回什么，都可以用这个地址初始化一个T*</span></span><br></pre></td></tr></table></figure><br>具体来说就是，<strong>如果你可以使用operator[]来得到Container&lt;T&gt;中的一个T对象，那你必然可以通过取它的地址而获得指向那个对象的指针</strong>。<br>看起来很正常的要求，但vector&lt;bool&gt;做不到。</p>
-<h2 id="vector-lt-bool-gt-的内存分布"><a href="#vector-lt-bool-gt-的内存分布" class="headerlink" title="vector&lt;bool&gt;的内存分布"></a>vector&lt;bool&gt;的内存分布</h2><p>vector<bool>是一个伪容器，并不保存真正的bool，而是打包bool以节约空间。确切的说，bool在vector内仅仅只占用了一个bit，我们无法创建指向单个bit的指针。</p>
-<p>同样的，也不可能存在单个bit引用.为了解决这个问题，vector&lt;bool&gt;使用了proxy class（详见More Effective C++ 30),从本质上来说，vector<bool>看起来像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Allocator&gt;</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">bool</span>, Allocator&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">reference</span> &#123;</span>...&#125;; <span class="comment">//proxy class</span></span><br><span class="line">    reference <span class="keyword">operator</span>[](size_type n); <span class="comment">//return a proxy object</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这也说明了为什么上面的代码无法编译，因为返回的并不是bool类型，而是一个代理对象。</p>
-<hr>
-<h1 id="使用deque-lt-bool-gt-与bitset来替换vector"><a href="#使用deque-lt-bool-gt-与bitset来替换vector" class="headerlink" title="使用deque&lt;bool&gt;与bitset来替换vector"></a>使用deque&lt;bool&gt;与bitset来替换vector<bool></h1><ol>
-<li>deque&lt;bool&gt;<br>deque提供了几乎所有vector所提供的成员函数（缺是reserve和capacity）。并且，deque&lt;bool&gt;是一个STL容器，它保存真正的bool值。</li>
-<li>bitset<br>bitset不是一个STL容器，但它是C++标准库的一部分。其内存分布和vector&lt;bool&gt;差不多，其具体实现与应用可参照数据结构·Bitamap篇。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1897,7 +1902,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1908,7 +1913,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1919,7 +1924,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

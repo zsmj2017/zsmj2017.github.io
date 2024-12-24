@@ -291,6 +291,172 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%AE%9A%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/24/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%AE%9A%E5%BC%8F/" itemprop="url">52.内存管理定式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T13:33:00+08:00">
+                2018-04-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>上一节描述了何时需要自定义operator new与operator delete，但并没有描述自定义时应当遵循何种规则。实际上这些规则并不难奉行，只是不太直观。</p>
+<hr>
+<h1 id="operator-new"><a href="#operator-new" class="headerlink" title="operator new"></a>operator new</h1><p>&nbsp;<br>operator new共有四个要求：</p>
+<ol>
+<li>返回正确的值</li>
+<li>内存不足时必须调用new-handling函数</li>
+<li>考虑0内存需求</li>
+<li>避免掩盖global new（虽然这更偏近class接口要求）。</li>
+</ol>
+<hr>
+<h2 id="operator-new-返回值"><a href="#operator-new-返回值" class="headerlink" title="operator new 返回值"></a>operator new 返回值</h2><p>一般而言，operator new返回值很简单，分配成功则返回一个指向那块内存的指针，反之则遵循Effective C++ 50的约定，并抛出一个bad_alloc异常。</p>
+<p>其实也不是特别简单，因为它实际上不只一次尝试分配内存，并在每一次失败后都调用new-handling函数。这里假设new-handling也许能够释放一些内存，当只有指向new-handling函数的指针是nullptr时，operator new才会抛出异常。</p>
+<hr>
+<h2 id="0内存需求"><a href="#0内存需求" class="headerlink" title="0内存需求"></a>0内存需求</h2><p>c++规定，<strong>即使客户需要0bytes，也必须提供合法指针而不得返回nullptr</strong>。为了满足约定，有伪代码实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>==<span class="number">0</span>) <span class="built_in">size</span>=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">        ...<span class="comment">//尝试分配内存</span></span><br><span class="line">        <span class="keyword">if</span>(分配成功）</span><br><span class="line">        <span class="keyword">return</span> （一个指向分配内存的指针）；</span><br><span class="line">        new_handler globalHandler = set_new_handler(<span class="literal">nullptr</span>);</span><br><span class="line">        set_new_handler(globalHandler);</span><br><span class="line">        <span class="keyword">if</span>(globalHandler)</span><br><span class="line">            *globalHandler();</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">throw</span> bad_alloc();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其中不太科学的地方就是将new-handling函数指针设置为nullptr后又迅速恢复了它，这是因为我们别无他法来获取当前的new-handling函数。这种操作技巧在单线程下拙劣且有效，多线程环境可能需要某种lock来确保new_handling函数背后的某种数据结构不遭破坏。</p>
+<hr>
+<h1 id="operator-new与继承体系"><a href="#operator-new与继承体系" class="headerlink" title="operator new与继承体系"></a>operator new与继承体系</h1><p>&nbsp;<br>在上述实例中我们没有考虑过继承。一般而言，定制内存管理器的常见理由是针对某个class的对象进行优化，而不是对其derived class对象作出优化。也就是说，针对class X而设计的operator new其行为只是刚好为sizeof（X）的对象而设计。众所周知，dc对象一般要大于bc对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span><span class="keyword">public</span> Base &#123;...&#125;;<span class="comment">//未声明operator new</span></span><br><span class="line">Derived* p = <span class="keyword">new</span> Derived;<span class="comment">//调用Base::operator new</span></span><br></pre></td></tr></table></figure><br>针对继承，我们有补救措施如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* Base::<span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>!=<span class="keyword">sizeof</span>(Base))</span><br><span class="line">        <span class="keyword">return</span> ::<span class="keyword">operator</span> <span class="keyword">new</span>(<span class="built_in">size</span>);<span class="comment">//std::operator new</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>看起来这种实现似乎没有考虑size==0的情况，但是实际上它考虑了，因为所有独立式对象必须有大小（见Effective C++ 40）因此sizeof(bc)无论如何都不会为0。</p>
+<hr>
+<h1 id="operator-new-1"><a href="#operator-new-1" class="headerlink" title="operator new[]"></a>operator new[]</h1><p>&nbsp;<br>如果我们需要实现new[],我们要做的事情只有一个：分配一块raw memory。因为我们既不知道这个array具体有多少元素，也不知道其元素的大小（因为dc的对象往往比bc的对象大），另外传递给new[]的size_t参数未必就是真正的元素个数，因为实际上array会有一部分负责存放其元素个数，它们也需要占据内存。</p>
+<hr>
+<h1 id="operator-delete"><a href="#operator-delete" class="headerlink" title="operator delete"></a>operator delete</h1><p>&nbsp;<br>operator delete的情况简单一些，你只需要记住“删除nullptr永远安全即可”：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>* rawMemory)</span> <span class="title">throw</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(rawMemory == <span class="literal">nullptr</span>) <span class="keyword">return</span>;</span><br><span class="line">    ...<span class="comment">//释放内存</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当其作为class的member函数时，它只需要像new操作一样，检查一下sizeof是否有误即可：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>* rawMemory,<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span>* Base::<span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>* rawMemory,<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="keyword">if</span>(rawMemory==<span class="literal">nullptr</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>!=<span class="keyword">sizeof</span>(Base))&#123;</span><br><span class="line">        ::<span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">(rawMemry)</span></span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...<span class="comment">//释放内存</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>operator new内部有一个死循环，并在其中尝试分配内存，如果它不能分配，则调用new-handler，同时它应该能够处理0 bytes申请。class member版本则应该处理“比正确大小大或者小的申请”。</li>
+<li>operator delete应该在收到nullptr时不做任何事，class版本还应该处理“比正确大小大或者小的申请”。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E8%87%AA%E5%A2%9E%EF%BC%8C%E8%87%AA%E5%87%8F%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%89%8D%E7%BD%AE%E4%B8%8E%E5%90%8E%E7%BD%AE%E7%9A%84%E5%8C%BA%E5%88%AB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1730,163 +1896,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/23/%E5%9C%A8%E9%9C%80%E8%A6%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%E8%AF%B7%E4%B8%BA%E6%A8%A1%E6%9D%BF%E5%AE%9A%E4%B9%89%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/23/%E5%9C%A8%E9%9C%80%E8%A6%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%E8%AF%B7%E4%B8%BA%E6%A8%A1%E6%9D%BF%E5%AE%9A%E4%B9%89%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0/" itemprop="url">47.在需要类型转换时请为模板定义非成员函数</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-23T07:59:00+08:00">
-                2018-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>Effective C++ 25已经描述过为何仅有non-member函数才有能力对所有实参执行隐式转换。本节我们将类型转换拓展到template范围。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>在上一次的实例中，我们以Rational class与<code>operator*</code>讨论了在所有实参身上执行隐式转换。本次实例则将它们模板化。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Rational(<span class="keyword">const</span> T&amp; numerator = <span class="number">0</span>,<span class="keyword">const</span> T&amp; denominator = <span class="number">1</span>);</span><br><span class="line">    <span class="function"><span class="keyword">const</span> T <span class="title">numerator</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">const</span> T <span class="title">denominator</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">const</span> rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> rational&lt;T&gt; &amp;lhs,<span class="keyword">const</span> rational&lt;T&gt; &amp;rhs) &#123;&#125;</span><br></pre></td></tr></table></figure><br>我们预期以下代码也会通过编译，因为它们在非模板时确实编译成功了：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational&lt;<span class="keyword">int</span>&gt; <span class="title">oneHalf</span><span class="params">(<span class="number">1</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line">Rational&lt;<span class="keyword">int</span>&gt; result = oneHalf *<span class="number">2</span>;<span class="comment">//error 编译失败</span></span><br></pre></td></tr></table></figure><br>我们应该能够意识到，模板化的Rational中的某些东西似乎与non-template版本不同。</p>
-<hr>
-<h1 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h1><p>&nbsp;<br>在非模板情况下，编译器知道我们尝试去调用接受两个Rational参数的operator*，但在这里，编译器不知道我们想调用哪个函数。<br>它在试图想出什么函数可以被名为operator*的template具现化出来。它知道它们应该可以具现出某个名为operator*且接受两个rational&lt;T&gt;参数的函数，但为了完成这一具现化行为，必须先算出T是什么。编译器无法做到。</p>
-<h2 id="实参推导"><a href="#实参推导" class="headerlink" title="实参推导"></a>实参推导</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational&lt;<span class="keyword">int</span>&gt; <span class="title">oneHalf</span><span class="params">(<span class="number">1</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line">Rational&lt;<span class="keyword">int</span>&gt; result = oneHalf *<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-<p>operator*的第一参数被声明为rational&lt;T&gt;,而传递给operator*的第一实参oneHalf是Rational&lt;int&gt;,那可以肯定T是int.关键在于第二实参接受的应该是一个Rational&lt;int&gt;,但实际传入的却是int。T的推导无法确定。<br>template实参推导过程中并不考虑隐式类型转换。这就是报错的关键。尽管隐式转换在函数调用过程中的确被使用，但在能调用一个函数之前，它必须已经存在（已被推导出并具现化）。</p>
-<hr>
-<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><h2 id="friend声明"><a href="#friend声明" class="headerlink" title="friend声明"></a>friend声明</h2><p>template class内的friend声明式可以指涉某个特定函数，那意味着class Rational&lt;T&gt;可以声明operator*是它的一个friend函数。class templates并不依赖于template实参推导（实参推导仅发生在function templates身上），所以编译器总是能在class rational&lt;T&gt;具现化时得知T.因此，令Rational&lt;T&gt; class 声明适当的operator*为其friend函数，可以简化整个问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">const</span> Rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&lt;T&gt;&amp;lhs,<span class="keyword">const</span> Rational&lt;T&gt;&amp;rhs);</span><br></pre></td></tr></table></figure><br>当oneHalf被声明为一个Rational&lt;T&gt;时，rational&lt;int&gt;则被具现化，而作为具现化的一部分，operator*也完成了自动声明,后者作为一个non-template function，编译器可以在调用时使用隐式转换。</p>
-<h2 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h2><p>friend声明帮助我们完成了编译，但上述代码并不能连接，原因很简单，只有声明是而没有定义式。我们也无法在class外部完成operator* template定义，因为既然在Rational template中声明，就必须在其中定义。因此必须把函数本体移动到声明式中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs)&#123;</span><br><span class="line">        <span class="keyword">return</span> Rational(lhs.numerator()*rhs.numerator(),</span><br><span class="line">                        lhs.denominator()*rhs.denominator());<span class="comment">//返回值优化</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>至此，编译并连接成功，混合式计算正常运行。</p>
-<hr>
-<h1 id="解决方案剖析"><a href="#解决方案剖析" class="headerlink" title="解决方案剖析"></a>解决方案剖析</h1><p>&nbsp;<br>这项技术的关键点在于：我们使用friend并不是因为我们想访问non-public成员。我们为了让类型转换可以用于所有实参，需要一个non-member函数。为了令它自动具现化，我们需要它位于class内部。综合二者，我们得到了friend.</p>
-<p>众所周知，定义在class内部的函数都申请inline，包括friend函数。为了避免可能带来的高成本，一般而言，我们会令它不做任何事情，只是调用class外的一个辅助函数。</p>
-<h2 id="辅助函数"><a href="#辅助函数" class="headerlink" title="辅助函数"></a>辅助函数</h2><p>Rational是一个template意味着上述的辅助函数通常也是一个template。我们定义了Rational的头文件代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">Rational</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">const</span> Rational&lt;T&gt; <span class="title">doMutiply</span><span class="params">(<span class="keyword">const</span> Rational&lt;T&gt; &amp;,......)</span></span>;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs)&#123;</span><br><span class="line">        <span class="keyword">return</span> doMutiply(lhs,rhs);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>当我们编写一个class template，而它提供的“与此template相关”函数需要“所有参数支持隐式转换时”，请将那些函数定义为friend函数,并在class template中定义它们。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1937,7 +1946,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1948,7 +1957,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1959,7 +1968,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

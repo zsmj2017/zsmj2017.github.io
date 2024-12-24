@@ -291,6 +291,156 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/26/%E4%BA%86%E8%A7%A3%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E6%88%90%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/26/%E4%BA%86%E8%A7%A3%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E6%88%90%E6%9C%AC/" itemprop="url">15.了解异常处理的成本</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-26T12:53:00+08:00">
+                2018-04-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>为了处理异常，程序必须做到：</p>
+<ul>
+<li>无论执行至何处，都应该明确此时如果抛出异常将释放哪个对象</li>
+<li>知晓每一个入口点，以便从try块退出</li>
+<li>对于每一个try，继续跟踪catch子句以及其能够捕获的异常类型</li>
+</ul>
+<p>如果你确保你的程序根本不使用异常，链接的程序库里也没有异常，那你可以使用不支持异常处理的方法进行编译，从而缩小程序尺寸和提高速度。</p>
+<p>一般来说，每一个try块都降低了速度并且增大代码尺寸，因此应该避免使用无用的try块。同样的，异常明细的成本和try块相差不大。</p>
+<p>总的来说，真正处理异常的开销仅仅发生于异常出现，（异常本身就是难于出现的）因此我们无需在效率上顾虑太多，遵循之前所提及的各项要求即可。（More Effective C++ 9~14）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/26/%E5%AE%A1%E6%85%8E%E4%BD%BF%E7%94%A8%E5%BC%82%E5%B8%B8%E6%98%8E%E7%BB%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1710,172 +1860,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/24/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%AE%9A%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/24/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%AE%9A%E5%BC%8F/" itemprop="url">52.内存管理定式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-24T13:33:00+08:00">
-                2018-04-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>上一节描述了何时需要自定义operator new与operator delete，但并没有描述自定义时应当遵循何种规则。实际上这些规则并不难奉行，只是不太直观。</p>
-<hr>
-<h1 id="operator-new"><a href="#operator-new" class="headerlink" title="operator new"></a>operator new</h1><p>&nbsp;<br>operator new共有四个要求：</p>
-<ol>
-<li>返回正确的值</li>
-<li>内存不足时必须调用new-handling函数</li>
-<li>考虑0内存需求</li>
-<li>避免掩盖global new（虽然这更偏近class接口要求）。</li>
-</ol>
-<hr>
-<h2 id="operator-new-返回值"><a href="#operator-new-返回值" class="headerlink" title="operator new 返回值"></a>operator new 返回值</h2><p>一般而言，operator new返回值很简单，分配成功则返回一个指向那块内存的指针，反之则遵循Effective C++ 50的约定，并抛出一个bad_alloc异常。</p>
-<p>其实也不是特别简单，因为它实际上不只一次尝试分配内存，并在每一次失败后都调用new-handling函数。这里假设new-handling也许能够释放一些内存，当只有指向new-handling函数的指针是nullptr时，operator new才会抛出异常。</p>
-<hr>
-<h2 id="0内存需求"><a href="#0内存需求" class="headerlink" title="0内存需求"></a>0内存需求</h2><p>c++规定，<strong>即使客户需要0bytes，也必须提供合法指针而不得返回nullptr</strong>。为了满足约定，有伪代码实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>==<span class="number">0</span>) <span class="built_in">size</span>=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">        ...<span class="comment">//尝试分配内存</span></span><br><span class="line">        <span class="keyword">if</span>(分配成功）</span><br><span class="line">        <span class="keyword">return</span> （一个指向分配内存的指针）；</span><br><span class="line">        new_handler globalHandler = set_new_handler(<span class="literal">nullptr</span>);</span><br><span class="line">        set_new_handler(globalHandler);</span><br><span class="line">        <span class="keyword">if</span>(globalHandler)</span><br><span class="line">            *globalHandler();</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">throw</span> bad_alloc();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>其中不太科学的地方就是将new-handling函数指针设置为nullptr后又迅速恢复了它，这是因为我们别无他法来获取当前的new-handling函数。这种操作技巧在单线程下拙劣且有效，多线程环境可能需要某种lock来确保new_handling函数背后的某种数据结构不遭破坏。</p>
-<hr>
-<h1 id="operator-new与继承体系"><a href="#operator-new与继承体系" class="headerlink" title="operator new与继承体系"></a>operator new与继承体系</h1><p>&nbsp;<br>在上述实例中我们没有考虑过继承。一般而言，定制内存管理器的常见理由是针对某个class的对象进行优化，而不是对其derived class对象作出优化。也就是说，针对class X而设计的operator new其行为只是刚好为sizeof（X）的对象而设计。众所周知，dc对象一般要大于bc对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span><span class="keyword">public</span> Base &#123;...&#125;;<span class="comment">//未声明operator new</span></span><br><span class="line">Derived* p = <span class="keyword">new</span> Derived;<span class="comment">//调用Base::operator new</span></span><br></pre></td></tr></table></figure><br>针对继承，我们有补救措施如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* Base::<span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>!=<span class="keyword">sizeof</span>(Base))</span><br><span class="line">        <span class="keyword">return</span> ::<span class="keyword">operator</span> <span class="keyword">new</span>(<span class="built_in">size</span>);<span class="comment">//std::operator new</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>看起来这种实现似乎没有考虑size==0的情况，但是实际上它考虑了，因为所有独立式对象必须有大小（见Effective C++ 40）因此sizeof(bc)无论如何都不会为0。</p>
-<hr>
-<h1 id="operator-new-1"><a href="#operator-new-1" class="headerlink" title="operator new[]"></a>operator new[]</h1><p>&nbsp;<br>如果我们需要实现new[],我们要做的事情只有一个：分配一块raw memory。因为我们既不知道这个array具体有多少元素，也不知道其元素的大小（因为dc的对象往往比bc的对象大），另外传递给new[]的size_t参数未必就是真正的元素个数，因为实际上array会有一部分负责存放其元素个数，它们也需要占据内存。</p>
-<hr>
-<h1 id="operator-delete"><a href="#operator-delete" class="headerlink" title="operator delete"></a>operator delete</h1><p>&nbsp;<br>operator delete的情况简单一些，你只需要记住“删除nullptr永远安全即可”：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>* rawMemory)</span> <span class="title">throw</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(rawMemory == <span class="literal">nullptr</span>) <span class="keyword">return</span>;</span><br><span class="line">    ...<span class="comment">//释放内存</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>当其作为class的member函数时，它只需要像new操作一样，检查一下sizeof是否有误即可：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">(bad_alloc)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>* rawMemory,<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span>* Base::<span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>* rawMemory,<span class="keyword">size_t</span> <span class="built_in">size</span>)</span> <span class="title">throw</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="keyword">if</span>(rawMemory==<span class="literal">nullptr</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">size</span>!=<span class="keyword">sizeof</span>(Base))&#123;</span><br><span class="line">        ::<span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">(rawMemry)</span></span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...<span class="comment">//释放内存</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>operator new内部有一个死循环，并在其中尝试分配内存，如果它不能分配，则调用new-handler，同时它应该能够处理0 bytes申请。class member版本则应该处理“比正确大小大或者小的申请”。</li>
-<li>operator delete应该在收到nullptr时不做任何事，class版本还应该处理“比正确大小大或者小的申请”。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1926,7 +1910,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1937,7 +1921,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1948,7 +1932,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

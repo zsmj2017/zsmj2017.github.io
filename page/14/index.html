@@ -291,6 +291,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/" itemprop="url">关于对象——前言</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-30T11:12:00+08:00">
+                2018-04-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="C语言"><a href="#C语言" class="headerlink" title="C语言"></a>C语言</h1><p>&nbsp;<br>在C语言中，“数据”及“处理数据的操作”是分开声明的，这种处理方式被称为procedural：一组“分布在各个以功能为导向的函数中”的算法驱动和处理外部数据。</p>
+<h2 id="C-struct实例"><a href="#C-struct实例" class="headerlink" title="C struct实例"></a>C struct实例</h2><p>假设我们当前存在一个struct Point3d：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">point3d</span>&#123;</span></span><br><span class="line">    <span class="keyword">float</span> x;</span><br><span class="line">    <span class="keyword">float</span> y;</span><br><span class="line">    <span class="keyword">float</span> z;</span><br><span class="line">&#125; Point3d;</span><br></pre></td></tr></table></figure><br>如果我们需要打印该Point3d，则必须定义这样一个函数：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d_print</span><span class="params">(<span class="keyword">const</span> Point3d *pd)</span></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>又或者为了追求效率，直接使用函数宏：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Point3d_print(pd)   printf(<span class="meta-string">"(%f,%f,%f)"</span>,pd-&gt;x,pd-&gt;y,pd-&gt;z);</span></span><br></pre></td></tr></table></figure><br>同样地，某个点的特定坐标可以直接存取：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Point3d pt;</span><br><span class="line">pt.x = <span class="number">0.0</span>;</span><br><span class="line"><span class="comment">//宏操作</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> SetX(p,xval) (p.x)=(xval);</span></span><br><span class="line">SetX(pt,<span class="number">0.0</span>);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h1><h2 id="ADT"><a href="#ADT" class="headerlink" title="ADT"></a>ADT</h2><p>C++中实现Point3d可能会使用独立的“抽象数据类型”（abstract data type,ADT)来实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">inline</span> </span><br><span class="line">ostream&amp; <span class="keyword">operator</span>&lt;&lt;(ostream &amp;os,<span class="keyword">const</span> Point3d &amp;pt)&#123;...&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="继承体系"><a href="#继承体系" class="headerlink" title="继承体系"></a>继承体系</h2><p>又或者以一个两层到三层的继承体系完成：<img src="http://static.zybuluo.com/zsmj2017/wqlsxrhsul1mirhq8dtrp1xk/image_1ccad3v788kbnc78s3bg4bfb9.png" alt="image_1ccad3v788kbnc78s3bg4bfb9.png-9.4kB"><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point2d</span>:</span><span class="keyword">public</span> Point&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point3d</span>:</span><span class="keyword">public</span> Point2d&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="模板化"><a href="#模板化" class="headerlink" title="模板化"></a>模板化</h2><p>我们甚至可以更进一步地抽象，将坐标值类型甚至坐标数量参数化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> type,<span class="keyword">int</span> dim&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...<span class="comment">//内含数组或容器</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>&nbsp;<br>仅从Point来看，C与C++处理问题的方式截然不同，这并非是语言间的区别，而是过程式与面向对象的差别。<br>从软件工程的角度而言，封装性比全局数据要好，但也付出了编写和使用上的代价。</p>
+<hr>
+<h1 id="封装的成本"><a href="#封装的成本" class="headerlink" title="封装的成本"></a>封装的成本</h1><p>&nbsp;<br>从Point的角度而言，封装并未带来任何成本：</p>
+<ol>
+<li>data<br>所有的数据均存储于Object内，就如同struct中的情况一样。</li>
+<li>member function<br>成员函数虽然包含于class的声明之内，但却不会出现在object中。每一个non-inline成员函数都只会生成一个函数实体。</li>
+</ol>
+<p>C++在内存布局以及存储时间上的额外负担主要由virtual引起：</p>
+<ul>
+<li>virtual function<br>实现函数执行期绑定。</li>
+<li>virtual base class<br>实现“多次出现在继承体系中的base class在派生类中只存在一个可共享的实体”。</li>
+</ul>
+<p>一般而言，我们没有理由认为C++就一定会比C庞大且迟缓。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8C%E4%B8%8EC++/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1807,162 +1968,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/28/%E8%99%9A%E6%8B%9F%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/28/%E8%99%9A%E6%8B%9F%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" itemprop="url">25.虚拟工厂模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-28T09:03:00+08:00">
-                2018-04-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>工厂模式在C++中体现为构造函数虚拟化，即针对不同的已知对象，调用不同的构造函数，生成不同的新对象。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设现有一个程序负责生成新闻报道，每篇报道由文字或者图片组成:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NLComponent</span> &#123;</span><span class="comment">//abstract class</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TextBlock</span>:</span><span class="keyword">public</span> NLComponent &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Graphic</span>:</span> <span class="keyword">public</span> NLComponent &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsLetter</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">list</span>&lt;NLComponent*&gt; components;<span class="comment">//以链表存储数据</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>classes之间的关系如下：<br><img src="http://static.zybuluo.com/zsmj2017/njkzzlzp8y80mgfnt7edyaqg/image_1cc4spmjh1ivl249m7r1o1jo3319.png" alt="image_1cc4spmjh1ivl249m7r1o1jo3319.png-107.4kB"><br>我们给NewsLetter class添加一个以istream作为参数的构造函数，其伪代码大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsLetter</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    NewsLetter(istream&amp; str);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">NewsLetter::NewsLetter(istream&amp; str)&#123;</span><br><span class="line">    <span class="keyword">while</span> (str) &#123;</span><br><span class="line">        ...<span class="comment">//从 str 读取下一个component对象;</span></span><br><span class="line">        ...<span class="comment">//将component对象加入链表</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>又或者，我们为此建立一个独立函数readComponent：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsLetter</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">//为建立下一个 NLComponent 对象从 str 读取数据,</span></span><br><span class="line">    <span class="comment">//建立 component 并返回一个指针。</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> NLComponent * <span class="title">readComponent</span><span class="params">(istream&amp; str)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">NewsLetter::NewsLetter(istream&amp; str)&#123;</span><br><span class="line">    <span class="keyword">while</span> (str) &#123;</span><br><span class="line">        components.push_back(readComponent(str));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然，readComponent根据str建立了一个新对象，其类型是text或者graphic.它的行为类似于构造函数，但又能构建不同的对象，因此被称为虚构造函数。其特性在于，根据不同的输入构造出不同的对象。（虚拟工厂模式）</p>
-<hr>
-<h1 id="虚拷贝构造函数"><a href="#虚拷贝构造函数" class="headerlink" title="虚拷贝构造函数"></a>虚拷贝构造函数</h1><p>&nbsp;<br>虚拷贝构造函数返回一个指针，指向调用该函数的对象的新拷贝，一般命名该函数为copyself或者clone，其大致实现细节如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NLComponent</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> NLComponent * <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TextBlock</span>:</span> <span class="keyword">public</span> NLComponent &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> TextBlock * <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>&#123; </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> TextBlock(*<span class="keyword">this</span>); </span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Graphic</span>:</span> <span class="keyword">public</span> NLComponent &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Graphic * <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span></span>&#123; </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Graphic(*<span class="keyword">this</span>); </span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>可以看出，虚拷贝构造完全调用了拷贝构造，因此具备其拥有的一切特性，诸如引用计数之类。<br>值得注意的是，虚拷贝构造的一大特点:<strong>派生类重定义的虚函数不必与基类对应函数具备一致的返回类型</strong>，这也就是我们上例中返回Text*的原因。</p>
-<p>这种虚拷贝构造函数让对象的正常拷贝构造变得很容易:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsLetter</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    NewsLetter(<span class="keyword">const</span> NewsLetter&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">list</span>&lt;NLComponent*&gt; components;</span><br><span class="line">&#125;;</span><br><span class="line">NewsLetter::NewsLetter(<span class="keyword">const</span> NewsLetter&amp; rhs)&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it =rhs.components.<span class="built_in">begin</span>();it != rhs.components.<span class="built_in">end</span>();++it) &#123;</span><br><span class="line">        components.push_back((*it)-&gt;clone());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>虚拷贝构造函数的最大特性在于，无论对象的真正类型是什么，它都能轻易地完成拷贝。</p>
-<hr>
-<h1 id="非成员函数虚拟化"><a href="#非成员函数虚拟化" class="headerlink" title="非成员函数虚拟化"></a>非成员函数虚拟化</h1><p>&nbsp;<br>我们可能希望存在这么一个非成员函数，能够根据参数的不同类型而执行不同的行为。<br>以上文中的NewsLetter为例，我希望为text或graphic实现一个输出操作符，但operator&lt;&lt;默认把ostream&amp;作为它的lhs，那注定了它无法变成成员函数。<br>解决方案是建立一个虚成员函数print，在operator&lt;&lt;中调用print函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NLComponent</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ostream&amp; <span class="title">print</span><span class="params">(ostream&amp; s)</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TextBlock</span>:</span> <span class="keyword">public</span> NLComponent &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ostream&amp; <span class="title">print</span><span class="params">(ostream&amp; s)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Graphic</span>:</span> <span class="keyword">public</span> NLComponent &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ostream&amp; <span class="title">print</span><span class="params">(ostream&amp; s)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">inline</span></span><br><span class="line">ostream&amp; <span class="keyword">operator</span>&lt;&lt;(ostream&amp; s, <span class="keyword">const</span> NLComponent&amp; c)&#123;</span><br><span class="line">    <span class="keyword">return</span> c.<span class="built_in">print</span>(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然，虚拟非成员函数的实现过程如下：</p>
-<ol>
-<li>完成一个虚成员函数</li>
-<li>在非成员函数中调用虚成员函数</li>
-<li>为了避免额外的调用开销，inline该虚非成员函数</li>
-</ol>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>以上均为以单一参数完成虚拟化的实例，根据多参数完成虚拟化详见More Effective C++ 31。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2013,7 +2018,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2024,7 +2029,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -2035,7 +2040,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

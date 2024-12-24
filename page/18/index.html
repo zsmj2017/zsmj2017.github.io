@@ -291,6 +291,163 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/23/%E5%9C%A8%E9%9C%80%E8%A6%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%E8%AF%B7%E4%B8%BA%E6%A8%A1%E6%9D%BF%E5%AE%9A%E4%B9%89%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/23/%E5%9C%A8%E9%9C%80%E8%A6%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%E8%AF%B7%E4%B8%BA%E6%A8%A1%E6%9D%BF%E5%AE%9A%E4%B9%89%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0/" itemprop="url">47.在需要类型转换时请为模板定义非成员函数</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-23T07:59:00+08:00">
+                2018-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>Effective C++ 25已经描述过为何仅有non-member函数才有能力对所有实参执行隐式转换。本节我们将类型转换拓展到template范围。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>在上一次的实例中，我们以Rational class与<code>operator*</code>讨论了在所有实参身上执行隐式转换。本次实例则将它们模板化。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Rational(<span class="keyword">const</span> T&amp; numerator = <span class="number">0</span>,<span class="keyword">const</span> T&amp; denominator = <span class="number">1</span>);</span><br><span class="line">    <span class="function"><span class="keyword">const</span> T <span class="title">numerator</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">const</span> T <span class="title">denominator</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">const</span> rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> rational&lt;T&gt; &amp;lhs,<span class="keyword">const</span> rational&lt;T&gt; &amp;rhs) &#123;&#125;</span><br></pre></td></tr></table></figure><br>我们预期以下代码也会通过编译，因为它们在非模板时确实编译成功了：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational&lt;<span class="keyword">int</span>&gt; <span class="title">oneHalf</span><span class="params">(<span class="number">1</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line">Rational&lt;<span class="keyword">int</span>&gt; result = oneHalf *<span class="number">2</span>;<span class="comment">//error 编译失败</span></span><br></pre></td></tr></table></figure><br>我们应该能够意识到，模板化的Rational中的某些东西似乎与non-template版本不同。</p>
+<hr>
+<h1 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h1><p>&nbsp;<br>在非模板情况下，编译器知道我们尝试去调用接受两个Rational参数的operator*，但在这里，编译器不知道我们想调用哪个函数。<br>它在试图想出什么函数可以被名为operator*的template具现化出来。它知道它们应该可以具现出某个名为operator*且接受两个rational&lt;T&gt;参数的函数，但为了完成这一具现化行为，必须先算出T是什么。编译器无法做到。</p>
+<h2 id="实参推导"><a href="#实参推导" class="headerlink" title="实参推导"></a>实参推导</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Rational&lt;<span class="keyword">int</span>&gt; <span class="title">oneHalf</span><span class="params">(<span class="number">1</span>,<span class="number">2</span>)</span></span>;</span><br><span class="line">Rational&lt;<span class="keyword">int</span>&gt; result = oneHalf *<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>operator*的第一参数被声明为rational&lt;T&gt;,而传递给operator*的第一实参oneHalf是Rational&lt;int&gt;,那可以肯定T是int.关键在于第二实参接受的应该是一个Rational&lt;int&gt;,但实际传入的却是int。T的推导无法确定。<br>template实参推导过程中并不考虑隐式类型转换。这就是报错的关键。尽管隐式转换在函数调用过程中的确被使用，但在能调用一个函数之前，它必须已经存在（已被推导出并具现化）。</p>
+<hr>
+<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><h2 id="friend声明"><a href="#friend声明" class="headerlink" title="friend声明"></a>friend声明</h2><p>template class内的friend声明式可以指涉某个特定函数，那意味着class Rational&lt;T&gt;可以声明operator*是它的一个friend函数。class templates并不依赖于template实参推导（实参推导仅发生在function templates身上），所以编译器总是能在class rational&lt;T&gt;具现化时得知T.因此，令Rational&lt;T&gt; class 声明适当的operator*为其friend函数，可以简化整个问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">const</span> Rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&lt;T&gt;&amp;lhs,<span class="keyword">const</span> Rational&lt;T&gt;&amp;rhs);</span><br></pre></td></tr></table></figure><br>当oneHalf被声明为一个Rational&lt;T&gt;时，rational&lt;int&gt;则被具现化，而作为具现化的一部分，operator*也完成了自动声明,后者作为一个non-template function，编译器可以在调用时使用隐式转换。</p>
+<h2 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h2><p>friend声明帮助我们完成了编译，但上述代码并不能连接，原因很简单，只有声明是而没有定义式。我们也无法在class外部完成operator* template定义，因为既然在Rational template中声明，就必须在其中定义。因此必须把函数本体移动到声明式中：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs)&#123;</span><br><span class="line">        <span class="keyword">return</span> Rational(lhs.numerator()*rhs.numerator(),</span><br><span class="line">                        lhs.denominator()*rhs.denominator());<span class="comment">//返回值优化</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>至此，编译并连接成功，混合式计算正常运行。</p>
+<hr>
+<h1 id="解决方案剖析"><a href="#解决方案剖析" class="headerlink" title="解决方案剖析"></a>解决方案剖析</h1><p>&nbsp;<br>这项技术的关键点在于：我们使用friend并不是因为我们想访问non-public成员。我们为了让类型转换可以用于所有实参，需要一个non-member函数。为了令它自动具现化，我们需要它位于class内部。综合二者，我们得到了friend.</p>
+<p>众所周知，定义在class内部的函数都申请inline，包括friend函数。为了避免可能带来的高成本，一般而言，我们会令它不做任何事情，只是调用class外的一个辅助函数。</p>
+<h2 id="辅助函数"><a href="#辅助函数" class="headerlink" title="辅助函数"></a>辅助函数</h2><p>Rational是一个template意味着上述的辅助函数通常也是一个template。我们定义了Rational的头文件代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">Rational</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keyword">const</span> Rational&lt;T&gt; <span class="title">doMutiply</span><span class="params">(<span class="keyword">const</span> Rational&lt;T&gt; &amp;,......)</span></span>;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rational</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs,<span class="keyword">const</span> Rational&amp; rhs)&#123;</span><br><span class="line">        <span class="keyword">return</span> doMutiply(lhs,rhs);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>当我们编写一个class template，而它提供的“与此template相关”函数需要“所有参数支持隐式转换时”，请将那些函数定义为friend函数,并在class template中定义它们。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/22/%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%95%E7%94%A8%E7%9A%84%E5%8C%BA%E5%88%AB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1668,154 +1825,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E4%BB%A5%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E4%BB%A3%E6%9B%BF%E5%90%8C%E5%90%8D%E7%AE%97%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/20/%E4%BB%A5%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E4%BB%A3%E6%9B%BF%E5%90%8C%E5%90%8D%E7%AE%97%E6%B3%95/" itemprop="url">44.以成员函数代替同名算法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T13:50:00+08:00">
-                2018-04-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>有些容器提供了与泛型算法相同名称的成员函数，比如关联容器提供了count、find、lower_bound、upper_bound和equal_range，<br>而list提供了remove、remove_if、unique、sort、merge、reverse。<br>我们提倡使用成员函数代替同名算法，第一是因为它们的结合性更好，第二是因为它们更快。</p>
-<hr>
-<h1 id="关联容器"><a href="#关联容器" class="headerlink" title="关联容器"></a>关联容器</h1><h2 id="set"><a href="#set" class="headerlink" title="set"></a>set</h2><p>假设我们需要在一个容纳了百万元素的set中查找727的位置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set&lt;int&gt; s; &#x2F;&#x2F; 建立set，放入1,000,000个数据</span><br><span class="line">auto i &#x3D; s.find(727); &#x2F;&#x2F;使用find成员函数</span><br><span class="line">auto i &#x3D; find(s.begin(), s.end(), 727); &#x2F;&#x2F; 使用find算法</span><br></pre></td></tr></table></figure><br>find成员函数消耗对数时间，而泛型算法消耗线性时间。原因在于set基于红黑树，红黑树的查找操作只需要对数时间。（完全平衡树所需要的时间更短，但总体效率差于红黑树）</p>
-<p>效率并不是唯一的差别，众所周知，<strong>STL算法判同基于相等，而关联容器是基于等价</strong>，因此查找算法可能会返回给你不同的结果。为了行为一致，我们应该更倾向于使用成员函数。</p>
-<h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2><p>泛型算法及其不适用于map与multimap，因为它们内部元素是pair，因此count成员函数只统计key匹配的pair数目，find等成员函数也是如此，但是泛型算法会使用相等性测试来统计具有相同键和值的pair对象的个数。如果你只希望检查key，那你只能在vector内部存pair代替关联容器。（Effective STL 23)</p>
-<hr>
-<h1 id="list"><a href="#list" class="headerlink" title="list"></a>list</h1><p>&nbsp;<br>对于list而言，使用成员函数最大的提升在于效率。list的成员函数不进行任何拷贝，它们只是简单地操纵连接list节点的指针。算法和它所使用的时间复杂度相同，但是算法需要拷贝。<br>另外，list成员函数的行为可能与算法并不一样，list的remove或unique等函数无需执行erase.<br>sort算法不能用于list的双向迭代器，merge算法不能修改源范围，但list的同名成员函数可以。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1866,7 +1875,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1877,7 +1886,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1888,7 +1897,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

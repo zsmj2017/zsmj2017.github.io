@@ -291,6 +291,155 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/vector%E4%B8%8Estring%E7%9B%B8%E8%BE%83%E4%BA%8E%E5%8A%A8%E6%80%81%E6%95%B0%E7%BB%84%E7%9A%84%E4%BC%98%E8%B6%8A%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/09/vector%E4%B8%8Estring%E7%9B%B8%E8%BE%83%E4%BA%8E%E5%8A%A8%E6%80%81%E6%95%B0%E7%BB%84%E7%9A%84%E4%BC%98%E8%B6%8A%E6%80%A7/" itemprop="url">13. vector与string相较于动态数组的优越性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T11:48:00+08:00">
+                2018-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>如果我们决定使用new进行动态分配，那么我们必须肩负以下责任：</p>
+<ol>
+<li>有new必然要delete</li>
+<li>new[]必然要对应着delete[]</li>
+<li>避免重复delete</li>
+</ol>
+<p>实际上上述操作总是很麻烦，所以我们应该尽可能使用vector或者string来代替动态数组。另外，这两大容器可以配合STL算法，效果绝佳。</p>
+<p>事实上除了在多线程中使用引用计数字符串会导致性能下降外，其他情况下vector与string都具有绝对优势。就算这样，我们也可以试图关闭引用计数，或者使用<code>vector&lt;char&gt;</code>,尽管那失去了一些string的专有成员函数。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/%E5%9C%A8operator=%E4%B8%AD%E5%A4%84%E7%90%86%E8%87%AA%E8%B5%8B%E5%80%BC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1672,149 +1821,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/08/%E5%88%87%E5%8B%BF%E5%88%9B%E5%BB%BA%E5%8C%85%E5%90%ABauto_ptr%E7%9A%84%E5%AE%B9%E5%99%A8%E5%AF%B9%E8%B1%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/08/%E5%88%87%E5%8B%BF%E5%88%9B%E5%BB%BA%E5%8C%85%E5%90%ABauto_ptr%E7%9A%84%E5%AE%B9%E5%99%A8%E5%AF%B9%E8%B1%A1/" itemprop="url">8.切勿创建包含auto_ptr的容器对象</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-08T09:00:00+08:00">
-                2018-04-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Contain of auto_ptr (COAP)被禁止使用，其代码无法编译。原因很简单，COAP无法移植，再究其根本，在于auto_ptr被复制后，它所指向的对象的所有权被移交给lhs，而自身被置为nullptr,其特性可以用代码表述如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">auto_ptr</span>&lt;Widget&gt; <span class="title">pw1</span><span class="params">(<span class="keyword">new</span> Widget)</span></span>; <span class="comment">// pw1指向一个Widget</span></span><br><span class="line"><span class="function"><span class="built_in">auto_ptr</span>&lt;Widget&gt; <span class="title">pw2</span><span class="params">(pw1)</span></span>; <span class="comment">// pw2指向pw1的Widget,pw1被设为nullptr</span></span><br><span class="line">pw1 = pw2; <span class="comment">// pw1现在再次指向Widget，pw2被设为nullptr</span></span><br></pre></td></tr></table></figure><br>举一个COAP的例子，它建立一个包含auto_ptr&lt;Widget&gt;的vector,然后对这个vector内部元素排序，其排序指标是一个谓词：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">widgetAPCompare</span><span class="params">(<span class="keyword">const</span> <span class="built_in">auto_ptr</span>&lt;Widget&gt;&amp; lhs,<span class="keyword">const</span> <span class="built_in">auto_ptr</span>&lt;Widget&gt;&amp; rhs)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> *lhs &lt; *rhs; </span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="built_in">auto_ptr</span>&lt;Widget&gt; &gt; widgets; </span><br><span class="line">sort(widgets.<span class="built_in">begin</span>(), widgets.<span class="built_in">end</span>(),widgetAPCompare);<span class="comment">//无法编译</span></span><br></pre></td></tr></table></figure><br>这段代码看起来很合理，但实际上不行，原因在于在排序过程中widget中的一个或多个auto_ptr被置为null.之所以会这样，是快排的锅。快排的基本思想在于把容器内的某个元素作为pivot elements，然后对大于和小于等于该元素的其他元素递归调用排序。其方法看起来像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">RandomAccessIterator</span>，<span class="title">class</span> <span class="title">Compare</span>&gt; </span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">sort</span>(<span class="title">RandomAccessIterator</span> <span class="title">first</span>,<span class="title">RandomAccessIterator</span> <span class="title">last</span>,<span class="title">Compare</span> <span class="title">comp</span>)&#123;</span></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> iterator_traits&lt;RandomAccessIterator&gt;::value_type ElementType;</span><br><span class="line">    RandomAccessIterator i;</span><br><span class="line">    ... <span class="comment">// 让i指向主元</span></span><br><span class="line">    <span class="function">ElementType <span class="title">pivotValue</span><span class="params">(*i)</span></span>;<span class="comment">//将主元拷贝到一个局部变量中</span></span><br><span class="line">    ...<span class="comment">//接着排序</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这个typename挺有讲究，强调了后面是一个类型，但我们不管，重点在于那个拷贝，它把auto_ptr的值放到了一个局部临时中，随着临时对象生命周期结束，对象也被析构了，真是倒了血霉。</p>
-<p>所以说，不要搞包含auto_ptr的容器，其他智能指针配合容器倒是可以用用。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1865,7 +1871,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1876,7 +1882,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1887,7 +1893,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

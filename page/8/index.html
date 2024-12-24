@@ -291,6 +291,173 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/11/%E7%90%86%E8%A7%A3stdmove%E4%B8%8Estdforward/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/11/%E7%90%86%E8%A7%A3stdmove%E4%B8%8Estdforward/" itemprop="url">23.理解std::move与std::forward</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-11T19:02:00+08:00">
+                2018-07-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在开始叙述之前，我们首先需要明确，std::move并不执行移动，std::forward也并不转发，它们在运行期并不执行任何操作，也不生成任何代码。<br>std::move和std::forward只是执行强制转换的函数（实际上是函数模板）。std::move无条件地将其参数转换为rvalue，而std::forward仅在满足特定条件时才执行此转换，这就是关于它们的全部解释。</p>
+<hr>
+<h1 id="std-move"><a href="#std-move" class="headerlink" title="std::move"></a>std::move</h1><p>&nbsp;<br>C++11中std::move的大致实现如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// in namespace std</span></span><br><span class="line"><span class="keyword">typename</span> remove_reference&lt;T&gt;::type&amp;&amp;</span><br><span class="line"><span class="built_in">move</span>(T&amp;&amp; param)&#123;</span><br><span class="line">    <span class="keyword">using</span> ReturnType = <span class="keyword">typename</span> remove_reference&lt;T&gt;::type&amp;&amp;;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;ReturnType&gt;(param);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>函数返回类型的“&amp;&amp;”部分意味着std::move返回一个右值引用，但正如Item28将要提及的，如果类型T碰巧是左值引用，则T&amp;&amp;将成为左值引用。为了防止这种情况发生，将type_traits（见Item9）std::remove_reference应用于T，从而确保将“&amp;&amp;”应用于不是引用的类型，这一操作保证std::move真正返回一个rvalue引用，这一点相当重要，因为函数返回的右值引用是一个右值，最终，move将其参数转为了一个右值。</p>
+<p>在C++14中，move的实现可以更加简单（多亏了返回类型推衍与type_traits的福）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// C++14</span></span><br><span class="line"><span class="function"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">move</span><span class="params">(T&amp;&amp; param)</span></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> ReturnType = <span class="keyword">remove_reference_t</span>&lt;T&gt;&amp;&amp;;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;ReturnType&gt;(param);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="move问题实例"><a href="#move问题实例" class="headerlink" title="move问题实例"></a>move问题实例</h2><p>&nbsp;<br>假设我们正在撰写一个表示注释的类，其构造函数参数为string，按照Item41的要求，我们将其设定为pass-by-value：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Annotation</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Annotation</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这时候你想到构造函数不会改变text，于是你把它声明为const：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Annotation</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Annotation</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>)</span></span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>为了避免对data member作无谓的复制，你在构造函数中使用std::move(亦遵从Item 41）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Annotation</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Annotation</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> <span class="built_in">text</span>)</span>: <span class="title">value</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">move</span>(<span class="built_in">text</span>))</span></span>&#123; … &#125; <span class="comment">// doesn't do what it seems to!</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> value;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这段代码能跑，只是运行起来未必如你所愿，事实上它执行了copy而非move。text被强制转换为右值这一点没毛病，但由于text被声明为const string，因此在执行转换之前，text是一个左值const std::string,并且转换完成后它变成了一个右值const std::string,在转换过程中，const一直被保留着。</p>
+<p>编译器需要考虑使用哪种string构造函数，一般来说有两种选择：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">string</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="built_in">string</span>(<span class="keyword">const</span> <span class="built_in">string</span>&amp; rhs); <span class="comment">// copy ctor</span></span><br><span class="line">    <span class="built_in">string</span>(<span class="built_in">string</span>&amp;&amp; rhs); <span class="comment">// move ctor</span></span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>在Annotation构造函数的member initialization list中，std::move（text）的结果是const std::string类型的rvalue。该rvalue无法传递给st::string的移动构造函数，因为移动构造函数形参必须是一个rvalue non-const std::string。但该rvalue可以传递给复制构造函数，因为允许将lvalue-reference-to-const绑定到const rvalue。 因此，成员初始化调用std::string中的复制构造函数。理解这一点十分重要，因为移动构造必然会破坏某些对象，因此移动构造的参数不具备const属性。</p>
+<p>从该实例中可以得出两条经验:</p>
+<ol>
+<li><strong>如果希望move某对象，不要将其声明为const，这将导致只会触发copy。</strong></li>
+<li><strong>std::move并不保证对象被移动，它只能保证传递回一个右值而已。</strong></li>
+</ol>
+<hr>
+<h1 id="std-forward"><a href="#std-forward" class="headerlink" title="std::forward"></a>std::forward</h1><p>&nbsp;<br>forward是一种条件式转换，仅仅在满足条件时才会将参数转为rvalue。要了解它何时进行转换以及何时不转换，只需要想想我们一般在何时使用std::forward。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>最常见的场景是一个函数模板，其形参为universal reference，该参数将被传递给另一个函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(<span class="keyword">const</span> Widget&amp; lvalArg)</span></span>; <span class="comment">// process lvalues</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(Widget&amp;&amp; rvalArg)</span></span>; <span class="comment">// process rvalues</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// template that passes</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">logAndProcess</span><span class="params">(T&amp;&amp; param)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> now = <span class="built_in">std</span>::chrono::system_clock::now();</span><br><span class="line">    makeLogEntry(<span class="string">"Calling 'process'"</span>, now);</span><br><span class="line">    <span class="built_in">process</span>(<span class="built_in">std</span>::forward&lt;T&gt;(param));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>考虑下述两个函数调用，其中一个实参是左值，另一个是右值：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line">logAndProcess(w); <span class="comment">// call with lvalue</span></span><br><span class="line">logAndProcess(<span class="built_in">std</span>::<span class="built_in">move</span>(w)); <span class="comment">// call with rvalue</span></span><br></pre></td></tr></table></figure><br>在logAndProcess中，参数param被传递给函数process。当我们使用左值调用logAndProcess时，我们自然希望将左值作为左值转发到process，当我们用rvalue调用logAndProcess时，我们期望调用process的rvalue重载版本。</p>
+<p>但是，与所有函数参数一样，param是一个左值。因此，对logAndProcess内的每个process调用都将调用左值重载版本。 为了防止这种情况，我们需要一种机制来将param强制转换为rvalue。这解释了为何forward是一种条件转换：只有当它的参数用rvalue初始化时才转换为rvalue。</p>
+<p>你可能想知道std::forward是如何知道它的参数是否用rvalue初始化。简单地来说，该信息在logAndProcess的模板参数T中被编码，该参数传递给std::forward，后者恢复编码信息，具体可见Item28。</p>
+<hr>
+<h1 id="move与forward"><a href="#move与forward" class="headerlink" title="move与forward"></a>move与forward</h1><p>&nbsp;<br>鉴于std::move和std::forward的本质均为强制转换，唯一的区别在于std::move总是执行强制转换，而std::forward则为条件式转换，似乎总可以用forward代替move，从技术层来说确实如此，但却并无必要，毕竟真要取消的话不如干脆都写cast好了。</p>
+<p>std::move的优势在于便捷，减少错误发生的可能性以及使代码更加清晰。假设当前我们需要跟踪移动构造函数的调用次数，那我们只需要增加一个static计数器。更进一步地，假设类中唯一的非静态数据是std::string，以std::move实现移动构造有如下实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(Widget&amp;&amp; rhs):s(<span class="built_in">std</span>::<span class="built_in">move</span>(rhs.s))&#123; ++moveCtorCalls; &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">std</span>::<span class="keyword">size_t</span> moveCtorCalls;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> s;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>如果以forward替换move，则代码将如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(Widget&amp;&amp; rhs):s(<span class="built_in">std</span>::forward&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;(rhs.s))&#123; ++moveCtorCalls;&#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>可以看出，std::move只需要一个函数参数（rhs.s），而std::forward需要一个函数参数（rhs.s）和一个模板类型参数（std::string）。此外，我们传递给std::forward的类型应当是non-reference，因为这是编码的约定（见Item28）。总之，这些意味着move比forward在某些场合更加好用。<br>总而言之，std::move表示将参数无条件转为rvalue，而std::forward仅表示在传递参数时保持参数原有的左右值属性，此二者完全不同，因此需要两种不同的名称加以区分。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>std::move表示将参数无条件转为rvalue，并不执行任何移动操作。</strong></li>
+<li><strong>std::forward将绑定至右值的参数转为右值。</strong></li>
+<li><strong>move与forward均不在运行期执行任何操作。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/11/%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E3%80%81%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89%E3%80%81%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1810,174 +1977,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/02/%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8constexpr/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/02/%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8constexpr/" itemprop="url">15.尽量使用constexpr</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-02T18:42:00+08:00">
-                2018-07-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>constexpr应用于对象时，其类似于const的加强版，但其应用于函数时的意义却与此大相径庭。从概念而言，constexpr不仅仅表示一个常量，也表示该量在编译期即可明确。然而，在constexpr function中，constexpr未必代表着编译期取值，甚至未必能保证const。</p>
-<hr>
-<h1 id="constexpr-objects"><a href="#constexpr-objects" class="headerlink" title="constexpr objects"></a>constexpr objects</h1><p>&nbsp;<br>constexpr对象具备const属性，其值在编译期已知。（从技术层面来说，其值决定于translation时期，也就是编译期和链接期，但这一点并不重要，除非你需要自己写一个C++的编译器和链接器，不然你总可以认为constexpr对象的值在编译期即已确定）。</p>
-<p>编译期即被明确的值具有一定的特权，例如它们可能会被存于只读存储器中，对于嵌入式开发者来说这或许是一个非常重要的特性，但其更广泛适用于C++编译期需要整型常量表达式的环境中，例如数组长度说明、整型模板参数设定、枚举量设定、齐位说明符设定等等。当你需要将一个变量应用于上述环境时，将其声明为constexpr即等效于向编译器保证其可在编译期求值：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> sz; <span class="comment">// non-constexpr variable</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> arraySize1 = sz; <span class="comment">// error! sz's value not known at compilation</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, sz&gt; data1; <span class="comment">// error! same problem</span></span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> arraySize2 = <span class="number">10</span>; <span class="comment">// fine, 10 is a compile-time constant</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, arraySize2&gt; data2; <span class="comment">// fine, arraySize2 is constexpr</span></span><br></pre></td></tr></table></figure><br>需要注意的是const并不具备编译期明确其值的能力：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> sz; <span class="comment">// as before</span></span><br><span class="line">…</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> arraySize = sz; <span class="comment">// fine, arraySize is const copy of sz</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, arraySize&gt; data; <span class="comment">// error! arraySize's value not known at compilation</span></span><br></pre></td></tr></table></figure><br>简而言之，所有的constexpr对象都是const的，但并不是所有的const对象都是constexpr。仅有constexpr对象具备编译期明确其值的能力。</p>
-<hr>
-<h1 id="constexpr-function"><a href="#constexpr-function" class="headerlink" title="constexpr function"></a>constexpr function</h1><p>&nbsp;<br>constexpr function的情况与其使用情境相关，如果你以一个compile-time constants调用constexpr function，该函数会产生一个compile-time constants，而如果你以一个runtime values调用它，它则会产生一个runtime value。</p>
-<h2 id="constexpr-function的用途"><a href="#constexpr-function的用途" class="headerlink" title="constexpr function的用途"></a>constexpr function的用途</h2><ol>
-<li><strong>用于必需compile-time constants的环境下（例如数组长度）</strong><br>如果你传入的参数可在编译期获得，那么constexpr function会在编译期产生结果，反之只要有一个参数不符合compile-time，则代码将无法通过编译。</li>
-<li><strong>减少代码重复</strong><br>当一个constexpr函数被一个或多个runtime values调用时，它会按照普通函数的形式运行。这意味着我们不需要在开发时区分compile-time value与runtime value。</li>
-</ol>
-<hr>
-<h3 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h3><p>&nbsp;<br>假设我们需要一个数据结构以保存各种实验条件下的运行结果，实验条件条件可能有光照等级、风扇速度、室内温度等等。如果可变的实验条件共有n个，每个实验条件又存在3种状态，那么本实验共有3^n种组合，因此我们需要一个可以容纳3^n个实验结果的数据结构。假定每一个结果均为int类型且n在编译期已知（或可被计算），那么std::array似乎可以适用于本次设计，但我们还需要一种方式以在编译期计算出3^n具体的大小。std::pow可以完成我们想要的计算，但它存在两个问题：1、工作于浮点数；2、不具备constexpr属性。因此我们无法使用它来在编译期计算std::array的大小。</p>
-<p>不过我们可以自己完成pow的编写。在定义它之前，我们先看看它应当被如何声明与使用：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="title">pow</span><span class="params">(<span class="keyword">int</span> base, <span class="keyword">int</span> <span class="built_in">exp</span>)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    … <span class="comment">// impl is below</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> numConds = <span class="number">5</span>;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">array</span>&lt;<span class="keyword">int</span>, <span class="built_in">pow</span>(3, numConds)&gt; results;</span><br></pre></td></tr></table></figure><br>pow前面的constexpr并不表明pow返回一个const值，它表示如果base和exp是编译时常量，那么pow的结果可以用作编译时常量。 如果base或exp不是编译时常量，pow的结果将在运行时计算。这意味着pow不仅用于在编译期计算std::array的大小，还可以在运行时环境中调用它：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> base = readFromDB(<span class="string">"base"</span>); <span class="comment">// get these values</span></span><br><span class="line"><span class="keyword">auto</span> <span class="built_in">exp</span> = readFromDB(<span class="string">"exponent"</span>); <span class="comment">// at runtime</span></span><br><span class="line"><span class="keyword">auto</span> baseToExp = <span class="built_in">pow</span>(base, <span class="built_in">exp</span>); <span class="comment">// call pow function at runtime</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="constexpr的限制条件"><a href="#constexpr的限制条件" class="headerlink" title="constexpr的限制条件"></a>constexpr的限制条件</h2><p>&nbsp;<br>当传入参数是一个compile-time value时，constexpr function必然compile-time value，因此它的实现方式存在一些限制，并且在C++11与C++14中这些限制不尽相同。</p>
-<p>在C++11中，constexpr函数只允许包含一个可执行语句：return语句，但实际上我们可以用两种方法钻空子。首先，我们可以使用条件”?:”运算符来代替if-else语句；其次，我们可以使用递归来代替循环。因此，pow可被实现为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="title">pow</span><span class="params">(<span class="keyword">int</span> base, <span class="keyword">int</span> <span class="built_in">exp</span>)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="built_in">exp</span> == <span class="number">0</span> ? <span class="number">1</span> : base * <span class="built_in">pow</span>(base, <span class="built_in">exp</span> - <span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>想必除了函数式语言开发者之外没人会觉得上述代码比较优雅直观。C++14对于constexpr的限制较为宽泛，因此我们可以自由地写出这样的代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="title">pow</span><span class="params">(<span class="keyword">int</span> base, <span class="keyword">int</span> <span class="built_in">exp</span>)</span> <span class="keyword">noexcept</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> result = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">exp</span>; ++i) result *= base;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>constexpr函数的参数与返回值均限定为literal type，因为仅有该类型可在编译期确定。 在C++11中，除void之外的所有内置类型均为literal type，但用户自定义类型也可能是literal type，因为其构造函数和其他成员函数可能具备constexpr属性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    constexpr Point(double xVal = 0, double yVal = 0) noexcept: x(xVal), y(yVal)&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">double</span> <span class="title">xValue</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> </span>&#123; <span class="keyword">return</span> x; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">double</span> <span class="title">yValue</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> </span>&#123; <span class="keyword">return</span> y; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setX</span><span class="params">(<span class="keyword">double</span> newX)</span> <span class="keyword">noexcept</span> </span>&#123; x = newX; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setY</span><span class="params">(<span class="keyword">double</span> newY)</span> <span class="keyword">noexcept</span> </span>&#123; y = newY; &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">double</span> x, y;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>值得注意的是在上述定义中Point构造函数被声明为constexpr，原因在于如果在编译期间传给构造函数的参数已知，那么在编译期Point内部数据成员均已确定，那么这种初始化得到的point具备constexpr属性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p1</span><span class="params">(<span class="number">9.4</span>, <span class="number">27.7</span>)</span></span>; <span class="comment">// fine, "runs" constexpr ctor during compilation</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p2</span><span class="params">(<span class="number">28.8</span>, <span class="number">5.3</span>)</span></span>; <span class="comment">// also fine</span></span><br></pre></td></tr></table></figure><br>同样地，xValue和yValue也可以是constexpr，如果在constexpr Point对象上调用getter，则可以在编译期间知道数据成员x和y的值。如此则可以用这些函数的结果初始化constexpr对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">midpoint</span><span class="params">(<span class="keyword">const</span> Point&amp; p1, <span class="keyword">const</span> Point&amp; p2)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123; (p1.xValue() + p2.xValue()) / <span class="number">2</span>,</span><br><span class="line">             (p1.yValue() + p2.yValue()) / <span class="number">2</span> &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> mid = midpoint(p1, p2);</span><br></pre></td></tr></table></figure><br>这种操作手法十分高妙，尽管mid的初始化操作涉及构造函数、getter函数、非成员函数，但最终我们在只读内存中完成了对它的创建。这种技法意味着编译期与运行期的界限开始趋于模糊，并且以往在运行期才能完成的操作如今可以提前至编译期完成。参与提前的代码越多，运行速度越快（当然编译速度会有所降低）。</p>
-<p>在C++11中，两个限制阻止了Point的成员函数setX和setY被声明为constexpr。首先，它们能够修改*this，而在C++11中，constexpr成员函数被隐式的认为具备const属性。 其次，它们具有void返回类型，而void在C++11中不属于literal type。这两个限制都在C++14中得到了解除，所以在C++14中，Point的setter也可被声明为constexpr：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">void</span> <span class="title">setX</span><span class="params">(<span class="keyword">double</span> newX)</span> <span class="keyword">noexcept</span> </span>&#123; x = newX; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="keyword">void</span> <span class="title">setY</span><span class="params">(<span class="keyword">double</span> newY)</span> <span class="keyword">noexcept</span> </span>&#123; y = newY; &#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>因此下述函数成为了可能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//return reflection of p with respect to the origin (C++14)</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">reflection</span><span class="params">(<span class="keyword">const</span> Point&amp; p)</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">    Point result; <span class="comment">// create non-const Point</span></span><br><span class="line">    result.setX(-p.xValue()); <span class="comment">// set its x and y values</span></span><br><span class="line">    result.setY(-p.yValue());</span><br><span class="line">    <span class="keyword">return</span> result; <span class="comment">// return copy of it</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>客户端程序看起来可能如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p1</span><span class="params">(<span class="number">9.4</span>, <span class="number">27.7</span>)</span></span>; <span class="comment">// as above</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> Point <span class="title">p2</span><span class="params">(<span class="number">28.8</span>, <span class="number">5.3</span>)</span></span>;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> mid = midpoint(p1, p2);</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> reflectedMid = reflection(mid); <span class="comment">// known during compilation</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="constexpr的意义"><a href="#constexpr的意义" class="headerlink" title="constexpr的意义"></a>constexpr的意义</h1><p>&nbsp;<br>constexpr对象和constexpr函数的使用范围均大于non-constexpr对象与函数，通过尽可能使用constexpr，对象与函数的使用范围得到了扩大。</p>
-<p>constexpr类似于const、noexcept，是对象和函数接口的一部分，如果一个对象或函数被声明为constexpr，则意味着它可以在任何需要常量表达式的环境中使用。如果你将某个对象或函数声明为constexpr后又后会做出了这个决定，并且将constexpr撤销，那么可能会导致无数的客户端程序发生了雪崩。我们这里所说的尽可能，指的是在你愿意付出精力长期维系它们为constexpr的情况下。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>constexpr对象具有const属性，并且其值在编译期即可确定。</strong></li>
-<li><strong>constexpr函数在其调用对象为compile-time value时会产生compile-time value。</strong></li>
-<li><strong>constexpr对象与函数的使用范围大于non-constexpr。</strong></li>
-<li><strong>constexpr是对象或函数接口的一部分。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2028,7 +2027,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2039,7 +2038,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -2050,7 +2049,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,154 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E4%BB%A5%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E4%BB%A3%E6%9B%BF%E5%90%8C%E5%90%8D%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/%E4%BB%A5%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E4%BB%A3%E6%9B%BF%E5%90%8C%E5%90%8D%E7%AE%97%E6%B3%95/" itemprop="url">44.以成员函数代替同名算法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T13:50:00+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>有些容器提供了与泛型算法相同名称的成员函数，比如关联容器提供了count、find、lower_bound、upper_bound和equal_range，<br>而list提供了remove、remove_if、unique、sort、merge、reverse。<br>我们提倡使用成员函数代替同名算法，第一是因为它们的结合性更好，第二是因为它们更快。</p>
+<hr>
+<h1 id="关联容器"><a href="#关联容器" class="headerlink" title="关联容器"></a>关联容器</h1><h2 id="set"><a href="#set" class="headerlink" title="set"></a>set</h2><p>假设我们需要在一个容纳了百万元素的set中查找727的位置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set&lt;int&gt; s; &#x2F;&#x2F; 建立set，放入1,000,000个数据</span><br><span class="line">auto i &#x3D; s.find(727); &#x2F;&#x2F;使用find成员函数</span><br><span class="line">auto i &#x3D; find(s.begin(), s.end(), 727); &#x2F;&#x2F; 使用find算法</span><br></pre></td></tr></table></figure><br>find成员函数消耗对数时间，而泛型算法消耗线性时间。原因在于set基于红黑树，红黑树的查找操作只需要对数时间。（完全平衡树所需要的时间更短，但总体效率差于红黑树）</p>
+<p>效率并不是唯一的差别，众所周知，<strong>STL算法判同基于相等，而关联容器是基于等价</strong>，因此查找算法可能会返回给你不同的结果。为了行为一致，我们应该更倾向于使用成员函数。</p>
+<h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2><p>泛型算法及其不适用于map与multimap，因为它们内部元素是pair，因此count成员函数只统计key匹配的pair数目，find等成员函数也是如此，但是泛型算法会使用相等性测试来统计具有相同键和值的pair对象的个数。如果你只希望检查key，那你只能在vector内部存pair代替关联容器。（Effective STL 23)</p>
+<hr>
+<h1 id="list"><a href="#list" class="headerlink" title="list"></a>list</h1><p>&nbsp;<br>对于list而言，使用成员函数最大的提升在于效率。list的成员函数不进行任何拷贝，它们只是简单地操纵连接list节点的指针。算法和它所使用的时间复杂度相同，但是算法需要拷贝。<br>另外，list成员函数的行为可能与算法并不一样，list的remove或unique等函数无需执行erase.<br>sort算法不能用于list的双向迭代器，merge算法不能修改源范围，但list的同名成员函数可以。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E4%BA%86%E8%A7%A3%E9%9A%90%E5%BC%8F%E6%8E%A5%E5%8F%A3%E4%B8%8E%E7%BC%96%E8%AF%91%E6%9C%9F%E5%A4%9A%E6%80%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1705,158 +1853,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/19/%E5%88%A4%E6%96%AD%E5%BC%8F%E5%BF%85%E9%A1%BB%E4%B8%BA%E7%BA%AF%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/19/%E5%88%A4%E6%96%AD%E5%BC%8F%E5%BF%85%E9%A1%BB%E4%B8%BA%E7%BA%AF%E5%87%BD%E6%95%B0/" itemprop="url">39.判断式必须为纯函数</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-19T07:03:00+08:00">
-                2018-04-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><p>&nbsp;<br>在开始本节内容之前，有基础概念如下：</p>
-<ul>
-<li>判断式是返回bool或者返回值可以隐式转化为bool的东西.举例而言，默认谓词即为判断式.</li>
-<li>纯函数是返回值只依赖参数的函数，参数不改变则返回值不变（不具备状态），<strong>纯函数中所有的数据只有两种：参数、常量。</strong></li>
-<li>一个判断式类是一个仿函数类，它的成员函数operator()返回0或者1，STL算法可以接受一个真正的判断式或一个判断式对象作为谓词。</li>
-</ul>
-<hr>
-<h1 id="为什么判断式必须为纯函数"><a href="#为什么判断式必须为纯函数" class="headerlink" title="为什么判断式必须为纯函数"></a>为什么判断式必须为纯函数</h1><p>&nbsp;<br>前文说过，函数对象在STL算法中pass-by-value。判断式作为一个函数对象，存在另一个设计特性：<strong>STL可能会先拷贝它们，然后在需要的时候使用它们的拷贝。</strong>这个设计特性的直接反映就是：判别式函数必须是纯函数。</p>
-<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>下述的判断式类功能为：仅在第三次调用时返回true.<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BadPredicate</span>:</span><span class="keyword">public</span> unary_function&lt;Widget, <span class="keyword">bool</span>&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    BadPredicate(): timesCalled(<span class="number">0</span>) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">const</span> Widget&amp;)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ++timesCalled == <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">size_t</span> timesCalled;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>看起来似乎没毛病。于是我们用它来作为谓词抹除容器内的第三个元素：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;Widget&gt; vw;</span><br><span class="line">vw.erase(remove_if(vw.<span class="built_in">begin</span>(),vw.<span class="built_in">end</span>(),BadPredicate()), vw.<span class="built_in">end</span>());</span><br></pre></td></tr></table></figure><br>事实上调用完成后不仅仅会抹除第三个元素，第六个元素也会被抹除。</p>
-<h2 id="问题剖析"><a href="#问题剖析" class="headerlink" title="问题剖析"></a>问题剖析</h2><p>上述问题的产生原因在于remove_if的实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> FwdIterator, <span class="keyword">typename</span> Predicate&gt;</span><br><span class="line"><span class="function">FwdIterator <span class="title">remove_if</span><span class="params">(FwdIterator <span class="built_in">begin</span>, FwdIterator <span class="built_in">end</span>, Predicate p)</span></span>&#123;</span><br><span class="line">    <span class="built_in">begin</span> = find_if(<span class="built_in">begin</span>, <span class="built_in">end</span>, p);</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">begin</span> == <span class="built_in">end</span>) <span class="keyword">return</span> <span class="built_in">begin</span>;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        FwdIterator next = <span class="built_in">begin</span>;</span><br><span class="line">        <span class="keyword">return</span> remove_copy_if(++next, <span class="built_in">end</span>, <span class="built_in">begin</span>, p);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显然，判断式p的copy先被传递给find_if，再被传递给remove_copy_if.<br>首先，我们构造了一个匿名判断类对象，并用它初始化了判断类对象p,然后p被拷贝到findif中（time被初始化为0），然后调用了3次以后，<strong>p的拷贝</strong>的time增长为3，返回true.控制权回归remove_if，然后remove_copy_if拷贝了p，此时time为0，（而不是3），因此到第六个元素的时候又触发了true。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>最简单的方法是把operator()函数声明为const，如此一来，你的编译器不会通过任何改变任何数据成员的指令。<br>但这是不够的，因为const成员函数还是能改变mutable成员，非const局部静态对象，非const类静态对象、命名空间中的非const对象，以及非const的全局对象。<br>总的来说，<strong>一个行为正常的判断类operator()必然是const的，但还有更严格的要求：必须是纯函数。</strong></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1907,7 +1903,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1918,7 +1914,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1929,7 +1925,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

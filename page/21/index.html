@@ -291,6 +291,172 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/16/%E4%BA%86%E8%A7%A3%E7%AE%97%E6%B3%95%E5%AF%B9%E5%AE%B9%E5%99%A8%E7%9A%84%E8%A6%81%E6%B1%82/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/16/%E4%BA%86%E8%A7%A3%E7%AE%97%E6%B3%95%E5%AF%B9%E5%AE%B9%E5%99%A8%E7%9A%84%E8%A6%81%E6%B1%82/" itemprop="url">34.了解算法对容器的要求</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-16T12:31:00+08:00">
+                2018-04-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>并非所有算法都可以用于任意区间。如果你违背了算法要求，编译器会提供给你一个复杂且难以理解的报错信息。</p>
+<hr>
+<h1 id="有序区间算法"><a href="#有序区间算法" class="headerlink" title="有序区间算法"></a>有序区间算法</h1><p>&nbsp;<br>以下算法只能作用于有序区间:</p>
+<ul>
+<li>binary_serach</li>
+<li>lower_bound  upper_bound equal_range</li>
+<li>set_union    set_intersection    set_difference  seT_symmetric_difference</li>
+<li>merge    inplace_merge</li>
+<li>includes</li>
+</ul>
+<p>另外，<code>unique</code>与<code>unique_copy</code>一般作用于有序区间，虽然它们对此不作要求。</p>
+<h2 id="为何需要有序区间"><a href="#为何需要有序区间" class="headerlink" title="为何需要有序区间"></a>为何需要有序区间</h2><p>（建议阅读数据结构·向量篇，其练习几乎解答了下述所有问题）</p>
+<ul>
+<li>binary_search，lower_bound，upper_bound以及equal_range<br>上述算法均基于二分查找，因此必须提供有序区间。<br>其具体效率实际上取决于迭代器。如果不支持随机访问，其效率会由对数时间退化至线性时间。</li>
+<li>set_union，set_intersection，set_difference，set_symmetric_difference<br>如果不提供有序区间，则它们无法在线性时间内完成工作。</li>
+<li>merge与inplace_merge<br>提供了单遍合并排序。</li>
+<li>includes<br>检测是否一个区间的所有对象也在另一个区间中，有序保证了其线性时间的效率</li>
+<li>unique<br>其功能是去重，但为了保证元素值唯一，你必须保证这些相似的元素一个接着一个，这也就是排序的一种弱化形式。（22211333）</li>
+</ul>
+<hr>
+<h1 id="确保算法的排序方式与容器的排序方式相同"><a href="#确保算法的排序方式与容器的排序方式相同" class="headerlink" title="确保算法的排序方式与容器的排序方式相同"></a>确保算法的排序方式与容器的排序方式相同</h1><h2 id="反例"><a href="#反例" class="headerlink" title="反例"></a>反例</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; v;</span><br><span class="line">sort(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), greater&lt;<span class="keyword">int</span>&gt;());<span class="comment">//降序排列</span></span><br><span class="line"><span class="keyword">bool</span> a5Exists = binary_search(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), <span class="number">5</span>);<span class="comment">//binary_search默认升序排列</span></span><br></pre></td></tr></table></figure>
+<p>这段代码将直接导致未定义行为。</p>
+<h2 id="正确使用方式"><a href="#正确使用方式" class="headerlink" title="正确使用方式"></a>正确使用方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> a5Exists =binary_search(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), <span class="number">5.</span> greater&lt;<span class="keyword">int</span>&gt;());</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="判同验证"><a href="#判同验证" class="headerlink" title="判同验证"></a>判同验证</h1><p>&nbsp;<br><strong>所有需要有序区间的算法通过等价来判断两个值是否相同，类似于关联容器。unique系列通过相等来判断。</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/16/%E9%99%8D%E4%BD%8E%E6%96%87%E4%BB%B6%E9%97%B4%E7%9A%84%E7%BC%96%E8%AF%91%E4%BE%9D%E5%AD%98%E5%85%B3%E7%B3%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1774,150 +1940,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/%E9%9C%80%E8%A6%81%E4%BE%9D%E6%AC%A1%E5%BD%95%E5%85%A5%E5%AD%97%E7%AC%A6%E6%97%B6%E8%80%83%E8%99%91%E4%BD%BF%E7%94%A8istreambuf_iterator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/14/%E9%9C%80%E8%A6%81%E4%BE%9D%E6%AC%A1%E5%BD%95%E5%85%A5%E5%AD%97%E7%AC%A6%E6%97%B6%E8%80%83%E8%99%91%E4%BD%BF%E7%94%A8istreambuf_iterator/" itemprop="url">29.需要依次录入字符时考虑使用istreambuf_iterator</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-14T13:24:00+08:00">
-                2018-04-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设我们需要拷贝一个文本文件到一个字符串：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该程序仅作示例，实际编译效果与设想不符，原因见Effective STL 6）</span></span><br><span class="line"><span class="function">ifstream <span class="title">inputFile</span><span class="params">(<span class="string">"interestingData.txt"</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="built_in">string</span> <span class="title">fileData</span><span class="params">((istream_iterator&lt;<span class="keyword">char</span>&gt;(inputFile)), </span></span></span><br><span class="line"><span class="function"><span class="params">                 istream_iterator&lt;<span class="keyword">char</span>&gt;())</span></span>;</span><br></pre></td></tr></table></figure><br>实际上这并没有完全copy文本，因为istream_iterator使用<code>operator&gt;&gt;</code>，该操作符在默认情况下忽略空格。<br>如果你不想所有空格都莫名消失，那你应该覆盖默认情况：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ifstream <span class="title">inputFile</span><span class="params">(<span class="string">"interestingData.txt"</span>)</span></span>;</span><br><span class="line">inputFile.unset(ios::skipws); <span class="comment">// 关闭inputFile的忽略空格标志</span></span><br><span class="line"><span class="function"><span class="built_in">string</span> <span class="title">fileData</span><span class="params">((istream_iterator&lt;<span class="keyword">char</span>&gt;(inputFile)), istream_iterator&lt;<span class="keyword">char</span>&gt;())</span></span>;</span><br></pre></td></tr></table></figure><br>然而你会发现这种拷贝速度很慢，因为operator&gt;&gt;采取格式化输入，它需要建立sentry对象（为每个<code>operator&gt;&gt;</code>调用进行建立和清除活动的特殊的iostream对象），必须检查流标志位，以及是否需要抛出异常等等操作，这些操固然很重要，但当我们需要的只是从输入流中抓取下一个字符时，这一切都是不必要的。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&nbsp;<br>istreambuf_iterator的特性是直接进入输入流缓冲区读取字符，使用方法如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//再次重申这个没法正常运行，只是示例</span></span><br><span class="line"><span class="function">ifstream <span class="title">inputFile</span><span class="params">(<span class="string">"interestingData.txt"</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="built_in">string</span> <span class="title">fileData</span><span class="params">((istreambuf_iterator&lt;<span class="keyword">char</span>&gt;(inputFile)),</span></span></span><br><span class="line"><span class="function"><span class="params">                 istreambuf_iterator&lt;<span class="keyword">char</span>&gt;())</span></span>;</span><br></pre></td></tr></table></figure><br>istreambuf_iterator也无需考虑空格的因素，因为空格不会被输入流摒弃。<br>同样的，逐个输出字符时也应该使用ostreambuf_iterator.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1968,7 +1990,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1979,7 +2001,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1990,7 +2012,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

@@ -291,6 +291,161 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8vector%20bool/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/11/%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8vector%20bool/" itemprop="url">18.避免使用vector&lt;bool></a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T09:26:00+08:00">
+                2018-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective STL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>vector&lt;bool&gt;只有两个问题：</p>
+<ol>
+<li>它不是一个STL容器</li>
+<li>它没有容纳bool</li>
+</ol>
+<hr>
+<h1 id="vector-lt-bool-gt-的特点"><a href="#vector-lt-bool-gt-的特点" class="headerlink" title="vector&lt;bool&gt;的特点"></a>vector&lt;bool&gt;的特点</h1><h2 id="STL的一个必要条件"><a href="#STL的一个必要条件" class="headerlink" title="STL的一个必要条件"></a>STL的一个必要条件</h2><p>STL容器的一个要求是：如果c是stl容器，且支持operator[],则以下代码可编译：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">T *p = &amp;c[<span class="number">0</span>]; <span class="comment">// 无论operator[]返回什么，都可以用这个地址初始化一个T*</span></span><br></pre></td></tr></table></figure><br>具体来说就是，<strong>如果你可以使用operator[]来得到Container&lt;T&gt;中的一个T对象，那你必然可以通过取它的地址而获得指向那个对象的指针</strong>。<br>看起来很正常的要求，但vector&lt;bool&gt;做不到。</p>
+<h2 id="vector-lt-bool-gt-的内存分布"><a href="#vector-lt-bool-gt-的内存分布" class="headerlink" title="vector&lt;bool&gt;的内存分布"></a>vector&lt;bool&gt;的内存分布</h2><p>vector<bool>是一个伪容器，并不保存真正的bool，而是打包bool以节约空间。确切的说，bool在vector内仅仅只占用了一个bit，我们无法创建指向单个bit的指针。</p>
+<p>同样的，也不可能存在单个bit引用.为了解决这个问题，vector&lt;bool&gt;使用了proxy class（详见More Effective C++ 30),从本质上来说，vector<bool>看起来像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Allocator&gt;</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">bool</span>, Allocator&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">reference</span> &#123;</span>...&#125;; <span class="comment">//proxy class</span></span><br><span class="line">    reference <span class="keyword">operator</span>[](size_type n); <span class="comment">//return a proxy object</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这也说明了为什么上面的代码无法编译，因为返回的并不是bool类型，而是一个代理对象。</p>
+<hr>
+<h1 id="使用deque-lt-bool-gt-与bitset来替换vector"><a href="#使用deque-lt-bool-gt-与bitset来替换vector" class="headerlink" title="使用deque&lt;bool&gt;与bitset来替换vector"></a>使用deque&lt;bool&gt;与bitset来替换vector<bool></h1><ol>
+<li>deque&lt;bool&gt;<br>deque提供了几乎所有vector所提供的成员函数（缺是reserve和capacity）。并且，deque&lt;bool&gt;是一个STL容器，它保存真正的bool值。</li>
+<li>bitset<br>bitset不是一个STL容器，但它是C++标准库的一部分。其内存分布和vector&lt;bool&gt;差不多，其具体实现与应用可参照数据结构·Bitamap篇。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/new%E4%B8%8Edelete%E6%88%90%E5%AF%B9%E4%BD%BF%E7%94%A8%E6%97%B6%E5%BF%85%E9%A1%BB%E5%BD%A2%E5%BC%8F%E7%9B%B8%E5%90%8C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1699,155 +1854,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/vector%E4%B8%8Estring%E7%9B%B8%E8%BE%83%E4%BA%8E%E5%8A%A8%E6%80%81%E6%95%B0%E7%BB%84%E7%9A%84%E4%BC%98%E8%B6%8A%E6%80%A7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/09/vector%E4%B8%8Estring%E7%9B%B8%E8%BE%83%E4%BA%8E%E5%8A%A8%E6%80%81%E6%95%B0%E7%BB%84%E7%9A%84%E4%BC%98%E8%B6%8A%E6%80%A7/" itemprop="url">13. vector与string相较于动态数组的优越性</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T11:48:00+08:00">
-                2018-04-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-STL/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective STL</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>如果我们决定使用new进行动态分配，那么我们必须肩负以下责任：</p>
-<ol>
-<li>有new必然要delete</li>
-<li>new[]必然要对应着delete[]</li>
-<li>避免重复delete</li>
-</ol>
-<p>实际上上述操作总是很麻烦，所以我们应该尽可能使用vector或者string来代替动态数组。另外，这两大容器可以配合STL算法，效果绝佳。</p>
-<p>事实上除了在多线程中使用引用计数字符串会导致性能下降外，其他情况下vector与string都具有绝对优势。就算这样，我们也可以试图关闭引用计数，或者使用<code>vector&lt;char&gt;</code>,尽管那失去了一些string的专有成员函数。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1898,7 +1904,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">264</span>
+                  <span class="site-state-item-count">265</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1909,7 +1915,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -1920,7 +1926,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">36</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
