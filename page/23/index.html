@@ -291,6 +291,158 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/13/%E5%B0%86%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E4%B8%BAprivate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/13/%E5%B0%86%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E4%B8%BAprivate/" itemprop="url">23.将成员变量声明为private</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-13T12:13:00+08:00">
+                2018-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="为什么不使用public成员变量"><a href="#为什么不使用public成员变量" class="headerlink" title="为什么不使用public成员变量"></a>为什么不使用public成员变量</h1><ol>
+<li>语义一致性<br>如果成员变量都不是public，那我们必然是通过成员函数来访问对象，所以再也不用担心什么时候用接口，什么时候用属性了。<br>另外，使用函数可以对变量进行更加精准的控制，你完全可以实现只读，读写，或者不予读写，甚至只写操作。举例而言：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AccessLevels</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getReadOnly</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="keyword">return</span> readOnly;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setReadWrite</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;readWrite=value;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getReadWrite</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> readWrite;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setWriteOnly</span><span class="params">(writeOnly=value;&#125;</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">private</span>:</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> noAccess;<span class="comment">//禁止访问</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> readOnly;<span class="comment">//只读</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> readWrite;<span class="comment">//读写</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> writeOnly;<span class="comment">//只写</span></span></span></span><br><span class="line"><span class="function"><span class="params">&#125;</span></span></span><br></pre></td></tr></table></figure></li>
+<li>封装性<br>将成员变量隐藏在函数接口之后，可以为“所有实现的可能”提供弹性，我们可以在不改变接口的同时更改实现，从而保证了用户只需要在重新编译后即可享有与原先不同的体验。（Effective C++ 31 甚至提出了编译分离）<br>封装的重要程度可能比你想的还要更加高一些，如果你对客户隐藏了成员变量，那么至少可以保证class的约束条件总能获得维护，因为只有成员函数可以影响它们，并且开发者保留了日后变更实现的权利。如果不进行封装，那么客户码中将充斥着大量的成员变量，这也意味着我们无法随意地更改原有程序，因为每一次改动都可能造成客户端失效。public意味着不封装，不封装意味着不可改变，因为你一变用户也要跟着变。</li>
+</ol>
+<hr>
+<h1 id="protected的封装性"><a href="#protected的封装性" class="headerlink" title="protected的封装性"></a>protected的封装性</h1><p>&lt;/br&gt;<br>可能你会认为protected的封装性要高于public，但事实并非如此。因为所有使用了该变量的derived classes都遭到了破坏。一旦你将某个成员变量设为public或protected，并且随后交付客户使用，那你在今后就很难改变该变量所涉及的一切，除非你愿意付出重写、重新测试、重新编文档、重新编译的代价。<br>从封装的角度而言，访问权限只有两种：private（提供封装）和其他（不提供封装）。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>将成员变量声明为privte。这可赋予客户语义一致性，访问权限控制，并且令class作者拥有充分的实现弹性。</li>
+<li>protected并不比public更具封装性</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/13/%E8%80%83%E8%99%91%E7%94%A8%E6%9C%89%E5%BA%8Fvector%E4%BB%A3%E6%9B%BF%E5%85%B3%E8%81%94%E5%AE%B9%E5%99%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1692,166 +1844,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/%E4%BB%A5%E7%8B%AC%E7%AB%8B%E8%AF%AD%E5%8F%A5%E5%B0%86newed%E5%AF%B9%E8%B1%A1%E7%BD%AE%E5%85%A5%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/11/%E4%BB%A5%E7%8B%AC%E7%AB%8B%E8%AF%AD%E5%8F%A5%E5%B0%86newed%E5%AF%B9%E8%B1%A1%E7%BD%AE%E5%85%A5%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" itemprop="url">18.以独立语句将newed对象置入智能指针</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T09:45:00+08:00">
-                2018-04-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&lt;/br&gt;<br>假设我们有一个函数用来揭示处理程序的优先权，另一个用来在根据优先级处理某个动态分配的对象。很自然地，我们认为需要使用RAII管理资源：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">priority</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processWidget</span><span class="params">(<span class="built_in">shared_ptr</span>&lt;Widget&gt; pw,<span class="keyword">int</span> priority)</span></span>;</span><br></pre></td></tr></table></figure><br>其执行操作如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="keyword">new</span> Widget,priority());</span><br></pre></td></tr></table></figure><br>上述代码不能通过编译，因为到<strong>shared_ptr的构造函数是explict构造函数</strong>，无法通过隐式转换构造，因此必须写为如下类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="built_in">shared_ptr</span>&lt;Widget&gt;(<span class="keyword">new</span> Widget),priority());</span><br></pre></td></tr></table></figure><br><strong>遗憾的是，尽管我们使用了RAII,但它照样可能导致资源泄漏。</strong></p>
-<hr>
-<h1 id="问题说明"><a href="#问题说明" class="headerlink" title="问题说明"></a>问题说明</h1><p>&lt;/br&gt;<br>在调用process函数之前，编译器必须完成以下三件事：</p>
-<ol>
-<li>调用priorty()；</li>
-<li>执行new Object；</li>
-<li>调用shared_ptr构造函数</li>
-</ol>
-<p>毫无疑问，2必然在3之前发生，关键在于<strong>无法确定1何时发生，也无法确定其是否会抛出异常</strong>。<br>举例而言，如果发生的顺序是213，并且在调用priorty()的时候抛出了一个异常，那new Widget返回的指针会遗失，因为在资源被创建和资源被转换为资源管理对象两个时间点间发生了异常干扰。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&lt;/br&gt;<br>解决方法很简单，就是分开执行：</p>
-<ol>
-<li>以独立语句初始化RAII对象</li>
-<li>将RAII对象作为参数传入函数</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">pw</span><span class="params">(<span class="keyword">new</span> Widget)</span></span>;</span><br><span class="line">processWidget(pw,priority());</span><br></pre></td></tr></table></figure>
-<p>其能够正确实现的根本原因在于：编译器仅在单一语句内拥有决定执行先后次序的自由度。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&lt;/br&gt;<br>以独立语句将newed对象存入智能指针中,否则抛出的异常可能会导致资源泄漏。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1902,7 +1894,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

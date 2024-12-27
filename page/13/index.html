@@ -291,6 +291,165 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E5%AD%98%E5%8F%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E5%AD%98%E5%8F%96/" itemprop="url">Data语义学——Data Member的存取</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-12T14:01:00+08:00">
+                2018-05-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point3d origin;</span><br><span class="line">origin.x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure>
+<p>可能会有人好奇x的存取成本有多大，答案是视Point3d与x如何声明而定，x可能是一个static member或者nonstatic。Point3d可能是一个独立的class，也可能从另一个单一的base class派生而来，甚至可能是从多重继承或虚拟继承而来，下面将依次介绍这几种情况。<br>在探究之前，我们再次抛出一个问题：从object本身存取data member与从指向object的指针存取data member有何差异：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point3d origin,*pt = &amp;origin;</span><br><span class="line">origin.x = <span class="number">0.0</span>;pt-&gt;x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure><br>在本节结束前我们将回答这个问题。</p>
+<hr>
+<h1 id="static-data-members"><a href="#static-data-members" class="headerlink" title="static data members"></a>static data members</h1><p>&nbsp;<br>Static data members被编译器提出于class之外，并被视为一个global变量（只在class生命范围之内可见）。每一个member的存取access level，以及与class的关联性，并不会导致任何空间或时间的额外负担。</p>
+<h2 id="指针存取与对象存取"><a href="#指针存取与对象存取" class="headerlink" title="指针存取与对象存取"></a>指针存取与对象存取</h2><p>每一个static data member仅具备一个实体，存放于程序的data segment之中，每次程序存取static member都会被编译器视为该extern实体的存取操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">origin.chunkSize=<span class="number">250</span>;<span class="comment">//Point3d::chunkSize=250;</span></span><br><span class="line">pt-&gt;chunkSize=<span class="number">250</span>;<span class="comment">//Point3d::chunkSize=250;</span></span><br></pre></td></tr></table></figure><br>这是C++语言中“通过一个指针与直接操作对象存取member，效果完全一样”的唯一情况。造成这种情况的原因在于<code>.操作符</code>根本并没有进入object内部获取数据。如果该static data member从复杂继承关系中继承而来，并不影响这个结论的正确性，因为static data member仅仅具备一个实体，其存取路径不受任何继承关系影响。</p>
+<h2 id="函数调用存取"><a href="#函数调用存取" class="headerlink" title="函数调用存取"></a>函数调用存取</h2><p>如果static data member的存取经由函数调用而被存取，如果我们写：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">foobar().chunkize=<span class="number">250</span>;</span><br></pre></td></tr></table></figure><br>调用foobar()时会发生什么？（foobar()的结果并不能改变static member，作者的意思在于查看编译器在此处是否存在优化）<br>在C++ pre-Standard规格中，ARM（Annotated Reference Manual）并未指定foobar()是否必须被evaluated。但C++ Standard明确要求foobar()必须被evaluated，虽然其结果并无用处：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">void</span>) foobar();<span class="comment">//evaluate expression,discarding result</span></span><br><span class="line">Point3d.chunkSize()=<span class="number">250</span>;</span><br></pre></td></tr></table></figure></p>
+<h2 id="名变换"><a href="#名变换" class="headerlink" title="名变换"></a>名变换</h2><p>若取一个static data member的地址，会得到一个指向其数据类型的指针，而不是一个指向其class member的指针，因为static member并不内含在一个class object之中,这一点十分显然。<br>但如果有两个classes，每一个都声明了一个static member freeList，那么当它们都置于程序的data segment内部时会出现名称冲突。编译器的解决方法是暗中对每一个static data member编码（name-mangling，名变换）。名变换具备两个特点：</p>
+<ol>
+<li>每一种算法对应一种独一无二的名字</li>
+<li>编译系统如果需要与开发者进行交互，这些名称可以被轻易推导回原有名称。</li>
+</ol>
+<hr>
+<h1 id="Nonstatic-Data-Members"><a href="#Nonstatic-Data-Members" class="headerlink" title="Nonstatic Data Members"></a>Nonstatic Data Members</h1><p>&nbsp;</p>
+<h2 id="Nonstatic-Data-Members与object"><a href="#Nonstatic-Data-Members与object" class="headerlink" title="Nonstatic Data Members与object"></a>Nonstatic Data Members与object</h2><p>Nonstatic Data Members存在于class object内部，除非经由explicit/implicit class object，没有办法直接存取它们。只要我们试图在某个member function中直接处理一个nonstatic data member，那么implicit class object就一定会发生：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d::translate</span><span class="params">(<span class="keyword">const</span> Point3d &amp;pt)</span></span>&#123;</span><br><span class="line">    x+=pt.x;</span><br><span class="line">    y+=pt.y;</span><br><span class="line">    z+=pt.z;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>实质上这一系列操作都是通过this指针完成，其函数的真正表示形式大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d::translate</span><span class="params">(point3d *<span class="keyword">const</span> <span class="keyword">this</span>,<span class="keyword">const</span> Point3d &amp;pt)</span></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;x+=pt.x;</span><br><span class="line">    <span class="keyword">this</span>-&gt;y+=pt.y;</span><br><span class="line">    <span class="keyword">this</span>-&gt;z+=pt.z;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="nonstatic-data-members的存取"><a href="#nonstatic-data-members的存取" class="headerlink" title="nonstatic data members的存取"></a>nonstatic data members的存取</h2><p>如果需要对一个nonstatic data member进行存取操作，那么编译器需要获取当前object的地址，然后通过偏移量计算出data member的地址，举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;origin+(&amp;Point3d::_y<span class="number">-1</span>);</span><br></pre></td></tr></table></figure><br>-1操作是其中的重点。指向data member的指针，其offset的值总是被加上1，这样就可以让编译器区分出“一个指向data member的指针，用以指出class的第一个member”，以及“一个指向class object的指针”两种情况。</p>
+<h2 id="nonstatic-data-member与继承"><a href="#nonstatic-data-member与继承" class="headerlink" title="nonstatic data member与继承"></a>nonstatic data member与继承</h2><p>每一个nonstatic data member的offset在编译期间便已得知，甚至如果member属于一个base class subobject也是一样，因此，存取一个nonstatic data member的效率等价于存取一个C struct member或一个nonderived class的member。</p>
+<h3 id="虚继承"><a href="#虚继承" class="headerlink" title="虚继承"></a>虚继承</h3><p>虚继承为数据的存取导入了一层间接性，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point3d *pt3d;</span><br><span class="line">pt3d-&gt;_x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure><br>如果_x是一个virtual base class的member，存取速度相较于其他情况要慢一点，其具体原因可见后续章节（继承对于对象布局的影响）。</p>
+<p>我们回到本节一开始时提出的问题：通过对象存取与通过指针存取有多大的差别？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">origin.x = <span class="number">0.0</span>;</span><br><span class="line">pt-&gt;x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure><br>如果继承体系中存在一个virtual base class，且被存取的member是一个从virtual base class继承得到的member时，上述两种写法存在较大差异。因为在此时我们无法确定pt必然指向哪一种class type（因此我们也就不知道编译期这个member真正的offset），因此该存取操作必然需要被延后到执行期，经由一个额外的间接引导。但如果使用对象则不存在这种问题，因为静态类型早已绑定，其offset也早已在编译期确定。一个优秀的编译器甚至能够静态地经由origin解决对x的存取。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E5%B8%83%E5%B1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1763,184 +1922,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94C++%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94C++%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%BC%8F/" itemprop="url">关于对象——C++对象模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-30T11:12:00+08:00">
-                2018-04-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在C++对象中，data member分为两种：</p>
-<ol>
-<li>static</li>
-<li>non-static</li>
-</ol>
-<p>function member分为三种：</p>
-<ol>
-<li>static</li>
-<li>non-static</li>
-<li>virtual</li>
-</ol>
-<p>已知Point class声明如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point(<span class="keyword">float</span> xval);</span><br><span class="line">    virtaul ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">PointCount</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ostream&amp; <span class="title">print</span><span class="params">(ostream &amp;os)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="keyword">float</span> _x;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> _point_count;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>我们应该以何种策略塑模出data member及function member？</p>
-<hr>
-<h1 id="简单对象模型"><a href="#简单对象模型" class="headerlink" title="简单对象模型"></a>简单对象模型</h1><p>&nbsp;<br>简单对象模型是了尽量降低C++编译器的复杂程度而开发出来的，并且因此付出了空间损耗增加与执行效率降低的代价。在这个简单模型中，一个object是一组slots，每一个slot指向了一个memeber：<img src="http://static.zybuluo.com/zsmj2017/dcq0fkabxo9wlkwm4ha9hdjl/image_1ccagmliuke41hre8hg1ru1dcb9.png" alt="image_1ccagmliuke41hre8hg1ru1dcb9.png-64.7kB"><br>在该简单对象模型中，member本身不并在对象内，仅有指向member的指针才位于对象内，这样保证了对象内部只需要存放一种数据类型：指针。显然，对象的大小等于member数量*指针大小。<br>尽管这种模型并不应用于实际生产，不过这种理念倒是被做成了某种设计手法：pimpl，或者Bridge设计模式。</p>
-<hr>
-<h1 id="表格驱动式对象模型"><a href="#表格驱动式对象模型" class="headerlink" title="表格驱动式对象模型"></a>表格驱动式对象模型</h1><p>&nbsp;<br>为了保证所有classes的objects均具有一致的表达方式，另一种对象模型的做法是：将所有与members相关的信息抽离出来，放在一个member data table与member function table之中。member data table直接持有数据，member function table则是一系列slots，每一个slots指向一个member function：<img src="http://static.zybuluo.com/zsmj2017/dh59t0dveor3rkm4k7qozymg/image_1ccahehmvd6eeqqsd01qc18um.png" alt="image_1ccahehmvd6eeqqsd01qc18um.png-49.9kB"><br>虽然这种模型也没有应用于直接生产，但member function table的观念却成为了支撑virtual function的一个有效方案。</p>
-<hr>
-<h1 id="C-对象模型"><a href="#C-对象模型" class="headerlink" title="C++对象模型"></a>C++对象模型</h1><p>&nbsp;</p>
-<h2 id="不考虑继承"><a href="#不考虑继承" class="headerlink" title="不考虑继承"></a>不考虑继承</h2><p>C++对象模型由简单对象模型演化而来，并对内存空间及存储时间做出了优化。<br>在此模型中，non-static data members被配置于object之内，static data members则被存储于所有objects之外。static or non-static function members也都被存储于objects之外。<br>virtual function以两个步骤实现：</p>
-<ol>
-<li>每一个clss产生一堆指向virtual functions的指针，用一个表格存放之，该表格也被成为虚函数表（vtbl）。虚函数表的第一个slot存放着当前class所对应的type_info object。（RTTI）</li>
-<li>每一个object内部都存有指向vtbl的指针vptr，vptr的setting与resetting由构造、析构、拷贝赋值运算符自动完成。</li>
-</ol>
-<p><img src="http://static.zybuluo.com/zsmj2017/wrecuasind275og00uan84nb/image_1ccaikqsb150q9tr18s6e7gh0t13.png" alt="image_1ccaikqsb150q9tr18s6e7gh0t13.png-58.5kB"><br>该模型的优势主要在于空间与存储时间的效率，但缺陷也很明显：non-static data members一旦有所修改，应用程序就需要重新编译。在编译弹性方面，上一小节所提及的双表格模型就做的很好。</p>
-<hr>
-<h2 id="加入继承"><a href="#加入继承" class="headerlink" title="加入继承"></a>加入继承</h2><p>C++支持单一继承与多重继承，甚至，继承关系也可以指定为virtual（可以理解为共享）：<br><img src="http://static.zybuluo.com/zsmj2017/3d4qvzmzr7i73j3o5ib9maag/image_1ccaj89ql1qrvmpd1f0v1bmk14a61g.png" alt="image_1ccaj89ql1qrvmpd1f0v1bmk14a61g.png-14.6kB"><br>在虚继承的情况下，base class无论在继承体系中被派生多少次，其永远只会存在一个实体（subobject），例如iostream中就只有一个virtual ios base class的实体。</p>
-<h2 id="derived-class塑模base-class实体"><a href="#derived-class塑模base-class实体" class="headerlink" title="derived class塑模base class实体"></a>derived class塑模base class实体</h2><p>在简单对象模型中，每一个base class可以被derived class object内的slot指出，该体系的缺点是：因为间接性导致空间和存取时间需要额外开销，优点在于class object不会因其base class发生改变而受到影响。</p>
-<p>base class table模型：base class table被产出后，表中的每一个slot内含一个base class地址，就如同vtbl内含virtual function的地址一般。每一个class含有一个bptr，指向其base class table。该体系的缺点在于：因为间接性导致空间和存取时间需要额外开销。优点在于每一个class object对于继承都有一致的表现方式：每一个class object的固定位置都有一个base table指针，与base classes的大小或数目无关。此外，无需改变class objects本身，就可以放大、缩小、或更改base class table。</p>
-<p>下图展示了ios继承体系在base class table下的对象模型：<img src="http://static.zybuluo.com/zsmj2017/9u4zcjj5hfkph5cda9aje9c1/image_1ccb2lsns1aulp3q1dth1dh0d299.png" alt="image_1ccb2lsns1aulp3q1dth1dh0d299.png-228.8kB"><br>不管哪一种对象模型，“间接性”总是随着继承体系深度的增长而增加，也就是存取操作的时间会增长。当然，derived class可以多放置一些指针，指向继承体系中的每一个base class，但这付出了空间成本。</p>
-<p>C++最初采用的对象模型不具备任何间接性：base class subobject的data member被直接置于derived class中，这保证了高效存取，缺点在于base class一旦发生改动，整个继承体系都必须重新编译。<br>virtual base class的导入增加了间接性，其原始模型是在class objects中为每一个有关联的virtual base class加上一个指针。其他模型无非是两种情况：导入一个virtual base class table，又或者扩充vtbl，在其中放入virtual base class的地址。</p>
-<hr>
-<h1 id="对象模型如何影响程序"><a href="#对象模型如何影响程序" class="headerlink" title="对象模型如何影响程序"></a>对象模型如何影响程序</h1><p>&nbsp;<br>不同对象模型，会导致如下两个结果：</p>
-<ol>
-<li>现有程序必须修改</li>
-<li>必须加入新的程序</li>
-</ol>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>假设现有class X，定义有copy constructor，virtual destructor，以及一个virtual function foo，考虑如下函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">X <span class="title">foobar</span><span class="params">()</span></span>&#123;</span><br><span class="line">    X xx;</span><br><span class="line">    X *px = <span class="keyword">new</span> X;</span><br><span class="line">    xx.foo();</span><br><span class="line">    px-&gt;foo();</span><br><span class="line">    <span class="keyword">delete</span> px;</span><br><span class="line">    <span class="keyword">return</span> xx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>该函数可能会在内部被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foobar</span><span class="params">(X &amp;_result)</span></span>&#123;</span><br><span class="line">    <span class="comment">//构造_result并取代local xx</span></span><br><span class="line">    _result.X::X();</span><br><span class="line">    <span class="comment">//转化new语句</span></span><br><span class="line">    px = _new(<span class="keyword">sizeof</span>(X));</span><br><span class="line">    <span class="keyword">if</span>(px)</span><br><span class="line">        px-&gt;X::X();</span><br><span class="line">    <span class="comment">//执行非虚函数</span></span><br><span class="line">    foo(&amp;_result);</span><br><span class="line">    <span class="comment">//执行虚函数</span></span><br><span class="line">    （*px-&gt;vtbl[<span class="number">2</span>])(px);</span><br><span class="line">    <span class="comment">//转化delete语句</span></span><br><span class="line">    <span class="keyword">if</span>(px)&#123;</span><br><span class="line">        (*px-&gt;vtbl[<span class="number">1</span>](px));</span><br><span class="line">        _delete(px);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//不需要摧毁local object xx</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这就是对象模型将实际代码转化后的一个可能实例，其解释可见后续诸章，下图给出了部分注解：<img src="http://static.zybuluo.com/zsmj2017/u26nsqg4ilx8hibbk83hobft/image_1ccb4gg0fogo1ee2fm6k1enrmm.png" alt="image_1ccb4gg0fogo1ee2fm6k1enrmm.png-250.6kB"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1991,7 +1972,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

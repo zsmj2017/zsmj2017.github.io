@@ -291,6 +291,184 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94C++%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94C++%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%BC%8F/" itemprop="url">关于对象——C++对象模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-30T11:12:00+08:00">
+                2018-04-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在C++对象中，data member分为两种：</p>
+<ol>
+<li>static</li>
+<li>non-static</li>
+</ol>
+<p>function member分为三种：</p>
+<ol>
+<li>static</li>
+<li>non-static</li>
+<li>virtual</li>
+</ol>
+<p>已知Point class声明如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Point(<span class="keyword">float</span> xval);</span><br><span class="line">    virtaul ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">x</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">PointCount</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ostream&amp; <span class="title">print</span><span class="params">(ostream &amp;os)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="keyword">float</span> _x;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> _point_count;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>我们应该以何种策略塑模出data member及function member？</p>
+<hr>
+<h1 id="简单对象模型"><a href="#简单对象模型" class="headerlink" title="简单对象模型"></a>简单对象模型</h1><p>&nbsp;<br>简单对象模型是了尽量降低C++编译器的复杂程度而开发出来的，并且因此付出了空间损耗增加与执行效率降低的代价。在这个简单模型中，一个object是一组slots，每一个slot指向了一个memeber：<img src="http://static.zybuluo.com/zsmj2017/dcq0fkabxo9wlkwm4ha9hdjl/image_1ccagmliuke41hre8hg1ru1dcb9.png" alt="image_1ccagmliuke41hre8hg1ru1dcb9.png-64.7kB"><br>在该简单对象模型中，member本身不并在对象内，仅有指向member的指针才位于对象内，这样保证了对象内部只需要存放一种数据类型：指针。显然，对象的大小等于member数量*指针大小。<br>尽管这种模型并不应用于实际生产，不过这种理念倒是被做成了某种设计手法：pimpl，或者Bridge设计模式。</p>
+<hr>
+<h1 id="表格驱动式对象模型"><a href="#表格驱动式对象模型" class="headerlink" title="表格驱动式对象模型"></a>表格驱动式对象模型</h1><p>&nbsp;<br>为了保证所有classes的objects均具有一致的表达方式，另一种对象模型的做法是：将所有与members相关的信息抽离出来，放在一个member data table与member function table之中。member data table直接持有数据，member function table则是一系列slots，每一个slots指向一个member function：<img src="http://static.zybuluo.com/zsmj2017/dh59t0dveor3rkm4k7qozymg/image_1ccahehmvd6eeqqsd01qc18um.png" alt="image_1ccahehmvd6eeqqsd01qc18um.png-49.9kB"><br>虽然这种模型也没有应用于直接生产，但member function table的观念却成为了支撑virtual function的一个有效方案。</p>
+<hr>
+<h1 id="C-对象模型"><a href="#C-对象模型" class="headerlink" title="C++对象模型"></a>C++对象模型</h1><p>&nbsp;</p>
+<h2 id="不考虑继承"><a href="#不考虑继承" class="headerlink" title="不考虑继承"></a>不考虑继承</h2><p>C++对象模型由简单对象模型演化而来，并对内存空间及存储时间做出了优化。<br>在此模型中，non-static data members被配置于object之内，static data members则被存储于所有objects之外。static or non-static function members也都被存储于objects之外。<br>virtual function以两个步骤实现：</p>
+<ol>
+<li>每一个clss产生一堆指向virtual functions的指针，用一个表格存放之，该表格也被成为虚函数表（vtbl）。虚函数表的第一个slot存放着当前class所对应的type_info object。（RTTI）</li>
+<li>每一个object内部都存有指向vtbl的指针vptr，vptr的setting与resetting由构造、析构、拷贝赋值运算符自动完成。</li>
+</ol>
+<p><img src="http://static.zybuluo.com/zsmj2017/wrecuasind275og00uan84nb/image_1ccaikqsb150q9tr18s6e7gh0t13.png" alt="image_1ccaikqsb150q9tr18s6e7gh0t13.png-58.5kB"><br>该模型的优势主要在于空间与存储时间的效率，但缺陷也很明显：non-static data members一旦有所修改，应用程序就需要重新编译。在编译弹性方面，上一小节所提及的双表格模型就做的很好。</p>
+<hr>
+<h2 id="加入继承"><a href="#加入继承" class="headerlink" title="加入继承"></a>加入继承</h2><p>C++支持单一继承与多重继承，甚至，继承关系也可以指定为virtual（可以理解为共享）：<br><img src="http://static.zybuluo.com/zsmj2017/3d4qvzmzr7i73j3o5ib9maag/image_1ccaj89ql1qrvmpd1f0v1bmk14a61g.png" alt="image_1ccaj89ql1qrvmpd1f0v1bmk14a61g.png-14.6kB"><br>在虚继承的情况下，base class无论在继承体系中被派生多少次，其永远只会存在一个实体（subobject），例如iostream中就只有一个virtual ios base class的实体。</p>
+<h2 id="derived-class塑模base-class实体"><a href="#derived-class塑模base-class实体" class="headerlink" title="derived class塑模base class实体"></a>derived class塑模base class实体</h2><p>在简单对象模型中，每一个base class可以被derived class object内的slot指出，该体系的缺点是：因为间接性导致空间和存取时间需要额外开销，优点在于class object不会因其base class发生改变而受到影响。</p>
+<p>base class table模型：base class table被产出后，表中的每一个slot内含一个base class地址，就如同vtbl内含virtual function的地址一般。每一个class含有一个bptr，指向其base class table。该体系的缺点在于：因为间接性导致空间和存取时间需要额外开销。优点在于每一个class object对于继承都有一致的表现方式：每一个class object的固定位置都有一个base table指针，与base classes的大小或数目无关。此外，无需改变class objects本身，就可以放大、缩小、或更改base class table。</p>
+<p>下图展示了ios继承体系在base class table下的对象模型：<img src="http://static.zybuluo.com/zsmj2017/9u4zcjj5hfkph5cda9aje9c1/image_1ccb2lsns1aulp3q1dth1dh0d299.png" alt="image_1ccb2lsns1aulp3q1dth1dh0d299.png-228.8kB"><br>不管哪一种对象模型，“间接性”总是随着继承体系深度的增长而增加，也就是存取操作的时间会增长。当然，derived class可以多放置一些指针，指向继承体系中的每一个base class，但这付出了空间成本。</p>
+<p>C++最初采用的对象模型不具备任何间接性：base class subobject的data member被直接置于derived class中，这保证了高效存取，缺点在于base class一旦发生改动，整个继承体系都必须重新编译。<br>virtual base class的导入增加了间接性，其原始模型是在class objects中为每一个有关联的virtual base class加上一个指针。其他模型无非是两种情况：导入一个virtual base class table，又或者扩充vtbl，在其中放入virtual base class的地址。</p>
+<hr>
+<h1 id="对象模型如何影响程序"><a href="#对象模型如何影响程序" class="headerlink" title="对象模型如何影响程序"></a>对象模型如何影响程序</h1><p>&nbsp;<br>不同对象模型，会导致如下两个结果：</p>
+<ol>
+<li>现有程序必须修改</li>
+<li>必须加入新的程序</li>
+</ol>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>假设现有class X，定义有copy constructor，virtual destructor，以及一个virtual function foo，考虑如下函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">X <span class="title">foobar</span><span class="params">()</span></span>&#123;</span><br><span class="line">    X xx;</span><br><span class="line">    X *px = <span class="keyword">new</span> X;</span><br><span class="line">    xx.foo();</span><br><span class="line">    px-&gt;foo();</span><br><span class="line">    <span class="keyword">delete</span> px;</span><br><span class="line">    <span class="keyword">return</span> xx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>该函数可能会在内部被转化为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">foobar</span><span class="params">(X &amp;_result)</span></span>&#123;</span><br><span class="line">    <span class="comment">//构造_result并取代local xx</span></span><br><span class="line">    _result.X::X();</span><br><span class="line">    <span class="comment">//转化new语句</span></span><br><span class="line">    px = _new(<span class="keyword">sizeof</span>(X));</span><br><span class="line">    <span class="keyword">if</span>(px)</span><br><span class="line">        px-&gt;X::X();</span><br><span class="line">    <span class="comment">//执行非虚函数</span></span><br><span class="line">    foo(&amp;_result);</span><br><span class="line">    <span class="comment">//执行虚函数</span></span><br><span class="line">    （*px-&gt;vtbl[<span class="number">2</span>])(px);</span><br><span class="line">    <span class="comment">//转化delete语句</span></span><br><span class="line">    <span class="keyword">if</span>(px)&#123;</span><br><span class="line">        (*px-&gt;vtbl[<span class="number">1</span>](px));</span><br><span class="line">        _delete(px);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//不需要摧毁local object xx</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这就是对象模型将实际代码转化后的一个可能实例，其解释可见后续诸章，下图给出了部分注解：<img src="http://static.zybuluo.com/zsmj2017/u26nsqg4ilx8hibbk83hobft/image_1ccb4gg0fogo1ee2fm6k1enrmm.png" alt="image_1ccb4gg0fogo1ee2fm6k1enrmm.png-250.6kB"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/30/%E5%85%B3%E4%BA%8E%E5%AF%B9%E8%B1%A1%E2%80%94%E2%80%94%E5%89%8D%E8%A8%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1792,182 +1970,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/28/%E9%99%90%E5%88%B6%E6%9F%90%E4%B8%AA%E7%B1%BB%E6%89%80%E8%83%BD%E4%BA%A7%E7%94%9F%E7%9A%84%E5%AF%B9%E8%B1%A1%E6%95%B0%E9%87%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/28/%E9%99%90%E5%88%B6%E6%9F%90%E4%B8%AA%E7%B1%BB%E6%89%80%E8%83%BD%E4%BA%A7%E7%94%9F%E7%9A%84%E5%AF%B9%E8%B1%A1%E6%95%B0%E9%87%8F/" itemprop="url">26.限制某个类所能产生的对象数量</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-28T10:03:00+08:00">
-                2018-04-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">More Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>本节内容的极端情况即为禁止建立对象与单例模式。</p>
-<hr>
-<h1 id="禁止对象实例化"><a href="#禁止对象实例化" class="headerlink" title="禁止对象实例化"></a>禁止对象实例化</h1><p>&nbsp;<br>如果我们需要阻止建立某个类的对象，应该把它的构造函数设为private:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CantBeInstantiated</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CantBeInstantiated();</span><br><span class="line">    CantBeInstantiated(<span class="keyword">const</span> CantBeInstantiated&amp;);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><p>&nbsp;<br>假设我们现在只允许生成一个打印机对象，我们应当把这个对象封装置入某个函数，允许所有人访问，但只有一个对象存在：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PrintJob</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">friend</span> Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Printer p; <span class="comment">// 单个打印机对象</span></span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这个设计有三部分：</p>
-<ol>
-<li>printer无法构造</li>
-<li>全局函数thePrinter被设为friend，因此可以调用private构造函数。</li>
-<li>thePrinter包含一个静态Printer对象，这意味着只有一个对象被建立。我们只能通过thePrinter函数来使用这个对象。</li>
-</ol>
-<hr>
-<h2 id="静态函数"><a href="#静态函数" class="headerlink" title="静态函数"></a>静态函数</h2><p>有人会认为thePrinter没必要污染全局命名空间，为此解决方法是把thePrinter声明为printer内部的静态函数，那顺便去除了friend属性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Printer&amp; <span class="title">Printer::thePrinter</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Printer p;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>就是调用函数的时候麻烦了一些：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Printer::thePrinter().reset();</span><br><span class="line">Printer::thePrinter().submitJob(<span class="built_in">buffer</span>);</span><br></pre></td></tr></table></figure></p>
-<h2 id="新建命名空间"><a href="#新建命名空间" class="headerlink" title="新建命名空间"></a>新建命名空间</h2><p>另一种做法是将class与thePrinter移出全局域，放入专属namespace，防止命名冲突：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> PrintingStuff&#123;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;<span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">friend</span> Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Printer&amp; <span class="title">thePrinter</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Printer p;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>只不过这样一来调用每一次调用都必须提及命名空间：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PrintingStuff::thePrinter().reset();</span><br><span class="line">PrintingStuff::thePrinter().submitJob(<span class="built_in">buffer</span>);</span><br></pre></td></tr></table></figure><br>又或者使用using：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> PrintingStuff::thePrinter; </span><br><span class="line">thePrinter().reset();</span><br><span class="line">thePrinter().submitJob(<span class="built_in">buffer</span>);</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="单例模式实现细节"><a href="#单例模式实现细节" class="headerlink" title="单例模式实现细节"></a>单例模式实现细节</h2><p>thePrinter的实现有两个微妙之处：</p>
-<ol>
-<li>p是函数中的静态对象而非类中的静态对象<br>如果是类中的静态对象，则该对象总是会被构造和析构。（即使你根本没有试图去使用）函数中的则不同，只有第一次调用函数时才会被构造。当然，我们也为此付出了代价：每一次都必须检查是否需要建立对象。<br>如果对象是类中的静态成员，它的初始化时间难以确定，我们清楚的了解函数的静态对象初始化于函数的第一次调用，而类则说不准。</li>
-<li>关注内联与函数内静态对象的关系<br>我们看得出thePrinter的函数体非常简短，很适合内联，但我们不能内联它。因为对于非成员函数，内联会导致复制obj中的代码，简单来说，就连静态对象也被复制了。所以不要<strong>内联包含局部静态数据的非成员对象。</strong></li>
-</ol>
-<hr>
-<h1 id="多例模式-限制数目）"><a href="#多例模式-限制数目）" class="headerlink" title="多例模式(限制数目）"></a>多例模式(限制数目）</h1><p>&nbsp;<br>一般来说，限制对象数目的核心思想在于：实时跟踪当前已生成的对象数目，如果超出则抛出异常：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;<span class="comment">//异常类</span></span><br><span class="line">    Printer();</span><br><span class="line">    ~Printer();</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">size_t</span> numObjects;</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);<span class="comment">//禁止拷贝</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">size_t</span> Printer::numObjects = <span class="number">0</span>;</span><br><span class="line">Printer::Printer()&#123;</span><br><span class="line">    <span class="keyword">if</span> (numObjects &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> TooManyObjects();</span><br><span class="line">    &#125;</span><br><span class="line">    ...<span class="comment">//执行构造</span></span><br><span class="line">    ++numObjects;</span><br><span class="line">&#125;</span><br><span class="line">Printer::~Printer()&#123;</span><br><span class="line">    ...<span class="comment">//执行析构;</span></span><br><span class="line">    --numObjects;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这种方法相当直观，就是设计起来存在些许小小的问题。</p>
-<hr>
-<h2 id="建立对象的环境"><a href="#建立对象的环境" class="headerlink" title="建立对象的环境"></a>建立对象的环境</h2><p>假设我们有一个彩色打印机，继承自printer：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ColorPrinter</span>:</span> <span class="keyword">public</span> Printer &#123;...&#125;;</span><br><span class="line">Printer p;</span><br><span class="line">ColorPrinter cp;</span><br></pre></td></tr></table></figure><br>上述定义产生了两个Printer对象,于是，在构造cp的基类部分时抛出了异常（More Effective C++ 33提出设计时避免非尾端类为具象类）。<br>如果有其他对象包含Printer对象，也会有同样的问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CPFMachine</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer p;<span class="comment">//有打印能力</span></span><br><span class="line">    FaxMachine f;<span class="comment">//有传真能力</span></span><br><span class="line">    CopyMachine c;<span class="comment">//有复印能力</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line">CPFMachine m1;<span class="comment">//运行正常</span></span><br><span class="line">CPFMachine m2;<span class="comment">//抛出异常</span></span><br></pre></td></tr></table></figure><br>这些问题的根源在于Pointer对象可以在3种不同状态下生存：</p>
-<ol>
-<li>仅有自身</li>
-<li>作为派生对象的base成分</li>
-<li>内嵌于较大对象</li>
-</ol>
-<p>这直接导致了我们心目中的“目标个数”与编译器看到的目标个数不一致。</p>
-<h3 id="private构造函数"><a href="#private构造函数" class="headerlink" title="private构造函数"></a>private构造函数</h3><p>通常情况下我们只对状态1感兴趣，那把构造函数设为private可以很有效地满足我们。<strong>带有private构造函数的类无法作为基类，也无法内嵌到其他对象中。</strong><br>private构造函数是一种阻止产生派生类的好手段，具体来说，假如你有一个类FSA（finite state automata），我们允许它产生多个对象，但禁止从它派生出新类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FSA</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> FSA * <span class="title">makeFSA</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> FSA * <span class="title">makeFSA</span><span class="params">(<span class="keyword">const</span> FSA&amp; rhs)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    FSA();</span><br><span class="line">    FSA(<span class="keyword">const</span> FSA&amp; rhs);</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">FSA* <span class="title">FSA::makeFSA</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FSA(); </span><br><span class="line">&#125;</span><br><span class="line"><span class="function">FSA* <span class="title">FSA::makeFSA</span><span class="params">(<span class="keyword">const</span> FSA&amp; rhs)</span></span>&#123; </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FSA(rhs); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>不同于thePrinter函数总是返回一个对象的引用（引用的对象是固定的），每个 makeFSA的伪构造函数则是返回一个指向对象的指针，也就是说允许建立的 FSA 对象数量没有限制。<br>为了防止资源泄漏，最佳方案自然是RAII：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">auto_ptr</span>&lt;FSA&gt; <span class="title">pfsa1</span><span class="params">(FSA::makeFSA())</span></span>;</span><br><span class="line"><span class="function"><span class="built_in">auto_ptr</span>&lt;FSA&gt; <span class="title">pfsa2</span><span class="params">(FSA::makeFSA(*pfsa1))</span></span>;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="允许对象自由生灭"><a href="#允许对象自由生灭" class="headerlink" title="允许对象自由生灭"></a>允许对象自由生灭</h2><p>在之前的设计手法中，首次我们调用thePrinter时，对象被构造，但我们无法控制对象的销毁，也就是说无法达成这样的功能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">建立Printer对象 p1;</span><br><span class="line">使用p1;</span><br><span class="line">释放p1;</span><br><span class="line">建立Printer对象 p2;</span><br><span class="line">使用p2;</span><br><span class="line">释放p2;</span><br></pre></td></tr></table></figure></p>
-<p>解决方法就是把对象计数和伪构造函数合并：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    ~Printer();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">size_t</span> numObjects;</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">size_t</span> Printer::numObjects = <span class="number">0</span>;</span><br><span class="line">Printer::Printer()&#123;</span><br><span class="line">    <span class="keyword">if</span> (numObjects &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> TooManyObjects();</span><br><span class="line">    &#125;</span><br><span class="line">    ...<span class="comment">//执行构造</span></span><br><span class="line">    ++numObjects;</span><br><span class="line">&#125;</span><br><span class="line">Printer::~Printer()&#123;</span><br><span class="line">    ...<span class="comment">//执行析构;</span></span><br><span class="line">    --numObjects;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>除了用户必须调用伪构造函数之外，这一切使用起来就如同其他类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Printer p1;<span class="comment">//error 构造函数为private</span></span><br><span class="line">Printer *p2 =Printer::makePrinter();</span><br><span class="line">Printer p3 = *p2; <span class="comment">//error 禁止拷贝</span></span><br><span class="line">p2-&gt;performSelfTest();</span><br><span class="line">p2-&gt;reset();</span><br><span class="line">...</span><br><span class="line"><span class="keyword">delete</span> p2;<span class="comment">//避免资源泄漏</span></span><br></pre></td></tr></table></figure><br>如果我们需要制定最多生成N个，那只要在class中定义一个static const maxsize=N就ok：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">(<span class="keyword">const</span> Printer&amp; rhs)</span></span>;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">size_t</span> numObjects;<span class="comment">//声明</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">size_t</span> maxObjects = <span class="number">10</span>;<span class="comment">//内置static类型可以直接在class中声明时定义</span></span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">size_t</span> Printer::numObjects = <span class="number">0</span>;<span class="comment">//在类外定义</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">size_t</span> Printer::maxObjects;<span class="comment">//定义</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="建立具有计数功能的基类"><a href="#建立具有计数功能的基类" class="headerlink" title="建立具有计数功能的基类"></a>建立具有计数功能的基类</h2><p>如果我们需要大量这种限制产出对象数量的class，难道我们要一遍一遍地重复编写？当然不是。<br>理想做法是编写一个具有实例计数功能的基类，然后让产出受限的类继承该类。我们使用一种方法封装计数功能，这种做法不但封装维护实例计数器的函数，也封装实例计数器本身。<br>下面给出该类的具体实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Counted</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TooManyObjects</span>&#123;</span>&#125;;<span class="comment">//异常类</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">objectCount</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> numObjects;&#125;</span><br><span class="line"><span class="keyword">protected</span>:<span class="comment">//仅作为基类使用</span></span><br><span class="line">    Counted();</span><br><span class="line">    Counted(<span class="keyword">const</span> Counted&amp; rhs);</span><br><span class="line">    ~Counted() &#123;--numObjects;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> numObjects;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">size_t</span> maxObjects;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span>;<span class="comment">//避免代码重复</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:Counted()&#123;</span><br><span class="line">    init(); </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:Counted(<span class="keyword">const</span> Counted&lt;BeingCounted&gt;&amp;)&#123;</span><br><span class="line">    init();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:init()&#123;</span><br><span class="line">    <span class="keyword">if</span> (numObjects &gt;= maxObjects) <span class="keyword">throw</span> TooManyObjects();</span><br><span class="line">    ++numObjects;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>于是最终的Printer类如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Printer</span>:</span><span class="keyword">private</span> Counted&lt;Printer&gt;&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Printer * <span class="title">makePrinter</span><span class="params">(<span class="keyword">const</span> Printer&amp; rhs)</span></span>;</span><br><span class="line">    ~Printer();</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">submitJob</span><span class="params">(<span class="keyword">const</span> PrintJob&amp; job)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performSelfTest</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">using</span> Counted&lt;Printer&gt;::objectCount;</span><br><span class="line">    <span class="keyword">using</span> Counted&lt;Printer&gt;::TooManyObjects;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Printer();</span><br><span class="line">    Printer(<span class="keyword">const</span> Printer&amp; rhs);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>用户有权得知当前的对象数目以及最大数目，private继承使得它们被隐藏，因此需要在public中使用using来获取他们。<br>最后需要注意的就是定义counted内部的静态成员，对于numobject，我们只需要在counted的实现中定义：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">BeingCounted</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">int</span> <span class="title">Counted</span>&lt;BeingCounted&gt;:</span>:numObjects;<span class="comment">//自动初始化为0</span></span><br></pre></td></tr></table></figure><br>max的定义则略微麻烦，我们不初始化它，而是留待客户进行初始化。以Printer举例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">size_t</span> Counted&lt;Printer&gt;::maxObjects = <span class="number">10</span>;</span><br></pre></td></tr></table></figure><br>如果客户没写，那么在连接时会报错。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2018,7 +2020,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

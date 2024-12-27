@@ -291,6 +291,154 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/23/C++%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/23/C++%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" itemprop="url">2.C++式类型转换</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-23T11:04:00+08:00">
+                2018-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/More-Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">More Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>(本节内容在Effective C++ 28中亦有涉及）</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>类型转换这种东西c语言就有，但是过于粗鲁(允许任何类型之间的相互转换）也难以识别（因为它用圆括号和标识符）<br>c++引入了四种类型转换，分别是static_cast，const_cast，dynamic_cast以及reinterpret_cast.</p>
+<hr>
+<h1 id="四种类型转换的作用"><a href="#四种类型转换的作用" class="headerlink" title="四种类型转换的作用"></a>四种类型转换的作用</h1><h2 id="static-cast"><a href="#static-cast" class="headerlink" title="static_cast"></a>static_cast</h2><p>强制隐式类型转换，其特点在于无法去除const属性。</p>
+<h2 id="const-cast"><a href="#const-cast" class="headerlink" title="const_cast"></a>const_cast</h2><p>const_cast用于去除表达式的const或volatileness属性。</p>
+<h2 id="dynamic-cast"><a href="#dynamic-cast" class="headerlink" title="dynamic_cast"></a>dynamic_cast</h2><p>dynamic_cast可以把指向bc的指针或者引用改为指向dc的，转换失败则返回空指针（转换指针）或者抛出异常（转换引用）实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span> ... &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWidget</span>:</span> <span class="keyword">public</span> Widget &#123; ... &#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(SpecialWidget *psw)</span></span>;</span><br><span class="line">Widget *pw;</span><br><span class="line">...<span class="comment">//指向某个SpecialWidget对象</span></span><br><span class="line">update(<span class="keyword">dynamic_cast</span>&lt;SpecialWidget*&gt;(pw));</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">updateViaRef</span><span class="params">(SpecialWidget&amp; rsw)</span></span>;</span><br><span class="line">updateViaRef(<span class="keyword">dynamic_cast</span>&lt;SpecialWidget&amp;&gt;(*pw));</span><br></pre></td></tr></table></figure></p>
+<h2 id="reinterpret-cast"><a href="#reinterpret-cast" class="headerlink" title="reinterpret_cast"></a>reinterpret_cast</h2><p>reinterpret_cast的操作结果几乎都是执行期定义（很难移植），一般用作函数指针类型之间的切换，实例如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*FuncPtr)</span><span class="params">()</span></span>; <span class="comment">//一个函数指针，该函数没有参数 返回值类型为void</span></span><br><span class="line">FuncPtr funcPtrArray[<span class="number">10</span>]; <span class="comment">// funcPtrArray 是一个能容纳10个FuncPtrs指针的数组</span></span><br></pre></td></tr></table></figure><br>当前我们希望把下面这个函数指针放入数组内：<code>int dosth()</code>当然这必须要使用类型转换，于是有：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">funcPtrArray[<span class="number">0</span>] = <span class="keyword">reinterpret_cast</span>&lt;FuncPtr&gt;(&amp;doSomething);</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/23/%E5%9C%A8%E9%9C%80%E8%A6%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E6%97%B6%E8%AF%B7%E4%B8%BA%E6%A8%A1%E6%9D%BF%E5%AE%9A%E4%B9%89%E9%9D%9E%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1670,161 +1818,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E4%BA%86%E8%A7%A3typename/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/20/%E4%BA%86%E8%A7%A3typename/" itemprop="url">43.了解typename</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T14:12:00+08:00">
-                2018-04-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="template声明式"><a href="#template声明式" class="headerlink" title="template声明式"></a>template声明式</h1><p>&nbsp;<br>在template声明式中使用class与typename有什么不同吗？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt; <span class="title">class</span> <span class="title">Widget</span>;</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">Widget</span>;</span></span><br></pre></td></tr></table></figure><br>答案是没有不同。有的人喜欢用class，因为少打了字，有的人则习惯于使用typename，因为这暗示了用户参数并非一定要是一个class类型。<br>但这种相同仅仅只是在template声明式内，c++并不总是把class与template视为等价,有时候我们非得使用typename不可。</p>
-<hr>
-<h1 id="template内refer-to的名称"><a href="#template内refer-to的名称" class="headerlink" title="template内refer to的名称"></a>template内refer to的名称</h1><p>&nbsp;<br>假设有一个template function，接受一个STL容器为参数，容器内持有的对象可被赋值为int。进一步假设这个函数只是打印其第二元素值。我们暂且不去管这个函数有多么地无聊甚至不能编译，其实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> C&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print2nd</span> <span class="params">(<span class="keyword">const</span> C&amp; container)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(container.<span class="built_in">size</span>()&gt;=<span class="number">2</span>)&#123;</span><br><span class="line">        <span class="function">C::const_iterator <span class="title">iter</span><span class="params">(container.<span class="built_in">begin</span>())</span></span>;</span><br><span class="line">        ++iter;</span><br><span class="line">        <span class="keyword">int</span> value = *iter;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显而易见，这段代码中有两个local变量iter和value。</p>
-<h2 id="嵌套从属名称"><a href="#嵌套从属名称" class="headerlink" title="嵌套从属名称"></a>嵌套从属名称</h2><p>iter的类型是C::const_iterator,实际上它是什么取决于template参数C.<strong>template内出现的名字如果依赖于某个template参数，则称为从属名称。如果从属名称在class内程嵌套状(::)则称之为嵌套从属名称。</strong><br>value是一个int，不依赖于任何template参数，于是它叫做非从属名称。</p>
-<hr>
-<h3 id="嵌套从属名称的风险"><a href="#嵌套从属名称的风险" class="headerlink" title="嵌套从属名称的风险"></a>嵌套从属名称的风险</h3><p>嵌套从属名称可能会导致解析(parsing)困难。举例而言，我们如果写了一个比刚才那个更加愚蠢的程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> C&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print2nd</span><span class="params">(<span class="keyword">const</span> C&amp; container)</span></span>&#123;</span><br><span class="line">    C::const_iterator * x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>可能有人对这种写法并无异议:我们声明了一个local变量x，它是一个指针，指向C::const_iterator。但如果C中有一个static成员恰好被命名为const_iterator，又或者x恰好是一个global变量。那这个代码就是执行了一次相乘操作。这简直丧心病狂。</p>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>C++对于这种歧义状态有一种解析规则：<strong>如果编译器在template中遭遇了一个嵌套从属名称，它便假设该名称并非类型，除非你主动告诉它这是类型。</strong>（这个情况有一个小小的例外）。<br>想要程序正确运行，上文中的实例应该改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typename</span> C::const_iterator iter;</span><br></pre></td></tr></table></figure><br>任何时候你想在template内指涉一个嵌套从属类型名称，就必须在它之前放上一个typename.（再说一次，有一个小例外）另外，typename只被用来验明嵌套从属类型名称，其它名称没必要用它。</p>
-<h3 id="例外情况"><a href="#例外情况" class="headerlink" title="例外情况"></a>例外情况</h3><p>typename不可以出现在base classes list内的嵌套从属类型名称之前，也不可以在member initialization list中作为base class修饰符。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span><span class="keyword">public</span> Base&lt;T&gt;::Nested&#123;<span class="comment">// base classes list中禁止出现typename</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Derived</span><span class="params">(<span class="keyword">int</span> x)</span></span></span><br><span class="line"><span class="function">        :Base&lt;T&gt;::<span class="title">Nested</span><span class="params">(x)</span></span>&#123;<span class="comment">//member initialization list中禁止出现typename</span></span><br><span class="line">            <span class="keyword">typename</span> Base&lt;T&gt;::Nested temp;<span class="comment">//需要typename</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="typename与typedef"><a href="#typename与typedef" class="headerlink" title="typename与typedef"></a>typename与typedef</h3><p>由于某些声明式实在太长，所以讲typedef与typename相结合可能是一种不错的主意：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> IterT&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">workWithIterator</span><span class="params">(IterT iter)</span></span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::iterator_traits&lt;IterT&gt;::value_type value_type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>声明template参数时，class与typename意义相同。</li>
-<li>必须用typename标识嵌套从属类型名称，但在base class lists &amp;&amp; member initialization list中禁止使用。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1875,7 +1868,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

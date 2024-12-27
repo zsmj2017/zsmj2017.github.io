@@ -291,6 +291,157 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/17/%E6%9E%84%E9%80%A0%E3%80%81%E6%9E%90%E6%9E%84%E3%80%81%E6%8B%B7%E8%B4%9D%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%AF%BC%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/17/%E6%9E%84%E9%80%A0%E3%80%81%E6%9E%90%E6%9E%84%E3%80%81%E6%8B%B7%E8%B4%9D%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94%E5%AF%BC%E8%AF%BB/" itemprop="url">构造、析构、拷贝语义学——导读</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-17T13:27:00+08:00">
+                2018-05-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
+                    <span itemprop="name">Inside the C++ object model</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>现有abstract base class声明如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Abstract_base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Abstract_base() = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">interface</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">mumble</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> _mumble;&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">char</span> *_mumble;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>我们可以看出，即使该class不会具象出一个实体，但它仍然需要一个明确的构造函数以初始化其data member _mumble。如果没有这个初始化操作，其derived class的局部性对象_mumble将无法决定初值。</p>
+<p>可能会有人认为这是abstract_base的设计者试图让其每一个derived class提供_mumble初值，然而如果是这样，abstract_base必须提供一个带有唯一参数的protected constructor：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Abstract_base::</span><br><span class="line">Abstract_base(<span class="keyword">char</span> *mumble_value = <span class="number">0</span>):_mumble(mumble_value) &#123;&#125;</span><br></pre></td></tr></table></figure><br>一般而言，class的data member应当在自身的constructor或其他member functions中被初始化，其他任何操作都将破坏封装性，使class的维护和修改变得更加困难。<br>当然，你也可以认为该设计并不合理，因为不应当将在abstract class中设定data member，这种思想体现了interface与implementation分离。但在base class中放置共有的data member也是行之有效的真理。</p>
+<hr>
+<h1 id="纯虚函数"><a href="#纯虚函数" class="headerlink" title="纯虚函数"></a>纯虚函数</h1><p>&nbsp;<br>在学习了长时间的C++后我们已经了解，即使是纯虚函数，也可以被定义和调用。只不过它们只能被静态地调用，无法通过虚拟机制调用，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Abstract::interface</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="comment">//定义纯虚函数</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">inline</span> </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Concrete_derived::interface</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">    Abstract_base::interface();<span class="comment">//静态调用</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>具体是否需要定义和调用纯虚函数只看开发者是否需要，唯一的例外是pure virtual destructor 一定需要被定义。原因在于每一个derived class destructor会被编译器加以扩展，以静态调用的方式调用其“每一个virtual base class”以及“上一层base class”的destructor。在缺乏定义的情况下，会导致链接失败。</p>
+<hr>
+<h1 id="虚拟规格"><a href="#虚拟规格" class="headerlink" title="虚拟规格"></a>虚拟规格</h1><p>&nbsp;<br>把Abstract::base::mumble()设计为一个virtual function是不明智的，因为其函数定义内容并不与类型有关（并不因为class的类型而形成不同的操作），因而几乎不会被后继的derived class override。此外，由于它的non-virtual函数实体是一个inline函数，如果常常被调用，效率上恐怕会出现问题。<br>我们认为，无需对不必要声明为virtual的函数实行虚拟化，其弊端在Effective C++中亦有提及。</p>
+<hr>
+<h1 id="虚拟规格中const的存在"><a href="#虚拟规格中const的存在" class="headerlink" title="虚拟规格中const的存在"></a>虚拟规格中const的存在</h1><p>&nbsp;<br>考虑virtual function的const属性很麻烦，因为我们也无法了解未来的需求。如果不把函数声明为const，则意味着该函数不能够获得一个const reference或const pointer，这似乎也不是什么缺点，所以我们提倡将所有的virtual function设置为const。</p>
+<hr>
+<h1 id="重新考虑class的声明"><a href="#重新考虑class的声明" class="headerlink" title="重新考虑class的声明"></a>重新考虑class的声明</h1><p>&nbsp;<br>经过前面的讨论，我们将Abstarct_base重新定义如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Abstract_base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Abstract_base();<span class="comment">//放弃纯虚</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">interface</span><span class="params">()</span> </span>= <span class="number">0</span>;<span class="comment">//不再是const</span></span><br><span class="line">    <span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">mumble</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> _mumble;&#125;<span class="comment">//不再是virtual</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Abstract_base(<span class="keyword">char</span> *pc=<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">char</span> *_mumble;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/16/Function%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Inline%20Function/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1781,165 +1932,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E5%AD%98%E5%8F%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/12/Data%E8%AF%AD%E4%B9%89%E5%AD%A6%E2%80%94%E2%80%94Data%20Member%E7%9A%84%E5%AD%98%E5%8F%96/" itemprop="url">Data语义学——Data Member的存取</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-12T14:01:00+08:00">
-                2018-05-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point3d origin;</span><br><span class="line">origin.x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure>
-<p>可能会有人好奇x的存取成本有多大，答案是视Point3d与x如何声明而定，x可能是一个static member或者nonstatic。Point3d可能是一个独立的class，也可能从另一个单一的base class派生而来，甚至可能是从多重继承或虚拟继承而来，下面将依次介绍这几种情况。<br>在探究之前，我们再次抛出一个问题：从object本身存取data member与从指向object的指针存取data member有何差异：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point3d origin,*pt = &amp;origin;</span><br><span class="line">origin.x = <span class="number">0.0</span>;pt-&gt;x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure><br>在本节结束前我们将回答这个问题。</p>
-<hr>
-<h1 id="static-data-members"><a href="#static-data-members" class="headerlink" title="static data members"></a>static data members</h1><p>&nbsp;<br>Static data members被编译器提出于class之外，并被视为一个global变量（只在class生命范围之内可见）。每一个member的存取access level，以及与class的关联性，并不会导致任何空间或时间的额外负担。</p>
-<h2 id="指针存取与对象存取"><a href="#指针存取与对象存取" class="headerlink" title="指针存取与对象存取"></a>指针存取与对象存取</h2><p>每一个static data member仅具备一个实体，存放于程序的data segment之中，每次程序存取static member都会被编译器视为该extern实体的存取操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">origin.chunkSize=<span class="number">250</span>;<span class="comment">//Point3d::chunkSize=250;</span></span><br><span class="line">pt-&gt;chunkSize=<span class="number">250</span>;<span class="comment">//Point3d::chunkSize=250;</span></span><br></pre></td></tr></table></figure><br>这是C++语言中“通过一个指针与直接操作对象存取member，效果完全一样”的唯一情况。造成这种情况的原因在于<code>.操作符</code>根本并没有进入object内部获取数据。如果该static data member从复杂继承关系中继承而来，并不影响这个结论的正确性，因为static data member仅仅具备一个实体，其存取路径不受任何继承关系影响。</p>
-<h2 id="函数调用存取"><a href="#函数调用存取" class="headerlink" title="函数调用存取"></a>函数调用存取</h2><p>如果static data member的存取经由函数调用而被存取，如果我们写：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">foobar().chunkize=<span class="number">250</span>;</span><br></pre></td></tr></table></figure><br>调用foobar()时会发生什么？（foobar()的结果并不能改变static member，作者的意思在于查看编译器在此处是否存在优化）<br>在C++ pre-Standard规格中，ARM（Annotated Reference Manual）并未指定foobar()是否必须被evaluated。但C++ Standard明确要求foobar()必须被evaluated，虽然其结果并无用处：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">void</span>) foobar();<span class="comment">//evaluate expression,discarding result</span></span><br><span class="line">Point3d.chunkSize()=<span class="number">250</span>;</span><br></pre></td></tr></table></figure></p>
-<h2 id="名变换"><a href="#名变换" class="headerlink" title="名变换"></a>名变换</h2><p>若取一个static data member的地址，会得到一个指向其数据类型的指针，而不是一个指向其class member的指针，因为static member并不内含在一个class object之中,这一点十分显然。<br>但如果有两个classes，每一个都声明了一个static member freeList，那么当它们都置于程序的data segment内部时会出现名称冲突。编译器的解决方法是暗中对每一个static data member编码（name-mangling，名变换）。名变换具备两个特点：</p>
-<ol>
-<li>每一种算法对应一种独一无二的名字</li>
-<li>编译系统如果需要与开发者进行交互，这些名称可以被轻易推导回原有名称。</li>
-</ol>
-<hr>
-<h1 id="Nonstatic-Data-Members"><a href="#Nonstatic-Data-Members" class="headerlink" title="Nonstatic Data Members"></a>Nonstatic Data Members</h1><p>&nbsp;</p>
-<h2 id="Nonstatic-Data-Members与object"><a href="#Nonstatic-Data-Members与object" class="headerlink" title="Nonstatic Data Members与object"></a>Nonstatic Data Members与object</h2><p>Nonstatic Data Members存在于class object内部，除非经由explicit/implicit class object，没有办法直接存取它们。只要我们试图在某个member function中直接处理一个nonstatic data member，那么implicit class object就一定会发生：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d::translate</span><span class="params">(<span class="keyword">const</span> Point3d &amp;pt)</span></span>&#123;</span><br><span class="line">    x+=pt.x;</span><br><span class="line">    y+=pt.y;</span><br><span class="line">    z+=pt.z;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>实质上这一系列操作都是通过this指针完成，其函数的真正表示形式大致如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Point3d::translate</span><span class="params">(point3d *<span class="keyword">const</span> <span class="keyword">this</span>,<span class="keyword">const</span> Point3d &amp;pt)</span></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;x+=pt.x;</span><br><span class="line">    <span class="keyword">this</span>-&gt;y+=pt.y;</span><br><span class="line">    <span class="keyword">this</span>-&gt;z+=pt.z;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="nonstatic-data-members的存取"><a href="#nonstatic-data-members的存取" class="headerlink" title="nonstatic data members的存取"></a>nonstatic data members的存取</h2><p>如果需要对一个nonstatic data member进行存取操作，那么编译器需要获取当前object的地址，然后通过偏移量计算出data member的地址，举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;origin+(&amp;Point3d::_y<span class="number">-1</span>);</span><br></pre></td></tr></table></figure><br>-1操作是其中的重点。指向data member的指针，其offset的值总是被加上1，这样就可以让编译器区分出“一个指向data member的指针，用以指出class的第一个member”，以及“一个指向class object的指针”两种情况。</p>
-<h2 id="nonstatic-data-member与继承"><a href="#nonstatic-data-member与继承" class="headerlink" title="nonstatic data member与继承"></a>nonstatic data member与继承</h2><p>每一个nonstatic data member的offset在编译期间便已得知，甚至如果member属于一个base class subobject也是一样，因此，存取一个nonstatic data member的效率等价于存取一个C struct member或一个nonderived class的member。</p>
-<h3 id="虚继承"><a href="#虚继承" class="headerlink" title="虚继承"></a>虚继承</h3><p>虚继承为数据的存取导入了一层间接性，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Point3d *pt3d;</span><br><span class="line">pt3d-&gt;_x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure><br>如果_x是一个virtual base class的member，存取速度相较于其他情况要慢一点，其具体原因可见后续章节（继承对于对象布局的影响）。</p>
-<p>我们回到本节一开始时提出的问题：通过对象存取与通过指针存取有多大的差别？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">origin.x = <span class="number">0.0</span>;</span><br><span class="line">pt-&gt;x = <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure><br>如果继承体系中存在一个virtual base class，且被存取的member是一个从virtual base class继承得到的member时，上述两种写法存在较大差异。因为在此时我们无法确定pt必然指向哪一种class type（因此我们也就不知道编译期这个member真正的offset），因此该存取操作必然需要被延后到执行期，经由一个额外的间接引导。但如果使用对象则不存在这种问题，因为静态类型早已绑定，其offset也早已在编译期确定。一个优秀的编译器甚至能够静态地经由origin解决对x的存取。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1990,7 +1982,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

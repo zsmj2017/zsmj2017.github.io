@@ -291,6 +291,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/%E4%BB%A5%E7%8B%AC%E7%AB%8B%E8%AF%AD%E5%8F%A5%E5%B0%86newed%E5%AF%B9%E8%B1%A1%E7%BD%AE%E5%85%A5%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/11/%E4%BB%A5%E7%8B%AC%E7%AB%8B%E8%AF%AD%E5%8F%A5%E5%B0%86newed%E5%AF%B9%E8%B1%A1%E7%BD%AE%E5%85%A5%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" itemprop="url">18.以独立语句将newed对象置入智能指针</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T09:45:00+08:00">
+                2018-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&lt;/br&gt;<br>假设我们有一个函数用来揭示处理程序的优先权，另一个用来在根据优先级处理某个动态分配的对象。很自然地，我们认为需要使用RAII管理资源：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">priority</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processWidget</span><span class="params">(<span class="built_in">shared_ptr</span>&lt;Widget&gt; pw,<span class="keyword">int</span> priority)</span></span>;</span><br></pre></td></tr></table></figure><br>其执行操作如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="keyword">new</span> Widget,priority());</span><br></pre></td></tr></table></figure><br>上述代码不能通过编译，因为到<strong>shared_ptr的构造函数是explict构造函数</strong>，无法通过隐式转换构造，因此必须写为如下类型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processWidget(<span class="built_in">shared_ptr</span>&lt;Widget&gt;(<span class="keyword">new</span> Widget),priority());</span><br></pre></td></tr></table></figure><br><strong>遗憾的是，尽管我们使用了RAII,但它照样可能导致资源泄漏。</strong></p>
+<hr>
+<h1 id="问题说明"><a href="#问题说明" class="headerlink" title="问题说明"></a>问题说明</h1><p>&lt;/br&gt;<br>在调用process函数之前，编译器必须完成以下三件事：</p>
+<ol>
+<li>调用priorty()；</li>
+<li>执行new Object；</li>
+<li>调用shared_ptr构造函数</li>
+</ol>
+<p>毫无疑问，2必然在3之前发生，关键在于<strong>无法确定1何时发生，也无法确定其是否会抛出异常</strong>。<br>举例而言，如果发生的顺序是213，并且在调用priorty()的时候抛出了一个异常，那new Widget返回的指针会遗失，因为在资源被创建和资源被转换为资源管理对象两个时间点间发生了异常干扰。</p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&lt;/br&gt;<br>解决方法很简单，就是分开执行：</p>
+<ol>
+<li>以独立语句初始化RAII对象</li>
+<li>将RAII对象作为参数传入函数</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">shared_ptr</span>&lt;Widget&gt; <span class="title">pw</span><span class="params">(<span class="keyword">new</span> Widget)</span></span>;</span><br><span class="line">processWidget(pw,priority());</span><br></pre></td></tr></table></figure>
+<p>其能够正确实现的根本原因在于：编译器仅在单一语句内拥有决定执行先后次序的自由度。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&lt;/br&gt;<br>以独立语句将newed对象存入智能指针中,否则抛出的异常可能会导致资源泄漏。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/11/%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8vector%20bool/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1698,162 +1858,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/%E5%A4%8D%E5%88%B6%E5%AF%B9%E8%B1%A1%E5%8A%A1%E5%BF%85%E5%B0%BD%E5%96%84%E5%B0%BD%E7%BE%8E/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/09/%E5%A4%8D%E5%88%B6%E5%AF%B9%E8%B1%A1%E5%8A%A1%E5%BF%85%E5%B0%BD%E5%96%84%E5%B0%BD%E7%BE%8E/" itemprop="url">13. 复制对象务必尽善尽美</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T12:01:00+08:00">
-                2018-04-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>设计良好的OO System一般只留有两个函数负责对象拷贝，那就是copy构造函数和copy assignment操作符，暂称它们为copying函数。正如前文所说，编译器会在必要的时候为我们的classes创建copying函数，其行为是：将被copy对象的所有成员变量都做一份拷贝。</p>
-<hr>
-<h1 id="手动处理拷贝可能存在的风险"><a href="#手动处理拷贝可能存在的风险" class="headerlink" title="手动处理拷贝可能存在的风险"></a>手动处理拷贝可能存在的风险</h1><p>&lt;/br&gt;<br>如果我们自己声明和实现了copying函数，但却并没有完全拷贝成员变量，造成<strong>了partial copy，此时编译器根本不会报错</strong>，所以需要仔细地排查：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">const</span> Widget&amp; rhs)</span><br><span class="line">        :name(rhs.name) &#123;&#125;;<span class="comment">//忘记了copy age 不会报错</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> name;</span><br><span class="line">    <span class="keyword">int</span> age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>由于这种特性，<strong>每一次新的成员变量的加入，copying函数，构造函数，以及任何重载的operator=都必须要做出修改。</strong>你就不用指望编译器会提醒你了。</p>
-<hr>
-<h1 id="继承体系下的partial-copy"><a href="#继承体系下的partial-copy" class="headerlink" title="继承体系下的partial copy"></a>继承体系下的partial copy</h1><h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>假设我们的继承体系中存在着Customer与PCustomer两个类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Customer</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> name;</span><br><span class="line">    Date lastTransaction;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PCustomer</span>:</span><span class="keyword">public</span> Customer&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    PCustomer(<span class="keyword">const</span> PCustomer &amp;rhs);</span><br><span class="line">    PCustomer&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> PCustomer &amp;rhs);</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> priority;</span><br><span class="line">&#125;;</span><br><span class="line">PCustomer::PCustomer(<span class="keyword">const</span> PCustomer &amp;rhs)</span><br><span class="line">    :priority(rhs.priority) &#123;&#125;</span><br></pre></td></tr></table></figure><br>看起来确实执行了copy，但实际上dc内部的bc成分并未被copy。在这种情况下，<strong>bc成分将会被默认初始化。</strong><br>如果是operator=，则仅仅复制了dc成分，bc成分保持不变。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>在任何时候我们一旦承担起为derived class编写copying函数的责任，必须要注意一定要记得复制base class的成员变量 ，一般情况下它们是private，所以我们<strong>调用base class的copying函数</strong>来完成它们。针对上面的实例，两个copying函数的正确写法如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PCustomer::PCustomer(<span class="keyword">const</span> PCustomer &amp;rhs)</span><br><span class="line">    :Customer(rhs),priority(rhs.priority) &#123;&#125;</span><br><span class="line">PCustomer&amp;</span><br><span class="line">PCustomer::<span class="keyword">operator</span>=(<span class="keyword">const</span> PCustomer &amp;rhs)&#123;</span><br><span class="line">    Customer::<span class="keyword">operator</span>=(rhs);</span><br><span class="line">    priority=rhs.priority;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="copy构造函数与copy-assignment运算符之间的关系"><a href="#copy构造函数与copy-assignment运算符之间的关系" class="headerlink" title="copy构造函数与copy assignment运算符之间的关系"></a>copy构造函数与copy assignment运算符之间的关系</h1><p>&lt;/br&gt;<br>一般来说，copying 函数往往有近似的实现本体，这可能会让我们想到在一个中调用另一个。但这并不可取。</p>
-<p>令copy assignment调用copy construct函数并不科学，原因很简单，你在试图构造一个已经存在的对象。<br>令copy construct函数调用copy assignment同样毫无意义。构造函数用来初始化新对象，而assignment操作符只施行于已经被初始化的对象。对还没构造好的对象赋值完全毫无意义。</p>
-<p>如果它们两个之间真的存在相近的代码，那应该编写一个private的init函数，给他们两个调用，这样就完美消除了代码重复的问题。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>copying函数应该确保复制对象内所有成员，以及所有base class成分（调用bc对应的copying函数）</li>
-<li>不要尝试以某个copying函数实现另一个copying 函数。应该新建一个private init函数给二者调用。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1904,7 +1908,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

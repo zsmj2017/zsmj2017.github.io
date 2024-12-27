@@ -291,6 +291,165 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/06/%E5%B0%BD%E9%87%8F%E4%BB%A5const%EF%BC%8Cenum%EF%BC%8Cinline%E6%9B%BF%E6%8D%A2#define/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/06/%E5%B0%BD%E9%87%8F%E4%BB%A5const%EF%BC%8Cenum%EF%BC%8Cinline%E6%9B%BF%E6%8D%A2#define/" itemprop="url">3.尽量以const，enum，inline替换#define</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-06T19:21:00+08:00">
+                2018-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>众所周知，使用const来替换#define定义的常量是一个不错的选择，当我们以常量替换预处理时，有两点值得注意：</p>
+<blockquote>
+<p>1.常量指针<br>在定义常量指针时，由于常量定义式通常置于头文件内，同时在多次调用时为了避免不必要的修改，因此有必要将指针声明为const，而非指针所指的对象。如果你需要将指向对象也声明为const，则需要两个const.举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> authorname = “mie”； </span><br></pre></td></tr></table></figure></p>
+<p>当然，这里使用string比使用char<em>-based字符串更合适。<br>2.class的专属常量<br>在定义class的专属常量时，为了将变量的作用域仅仅局限在class内，我们将其作为class的一个成员。为了确保此常量至多只有一份实体，我们将其设为static。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> sc = <span class="number">5</span>； </span><br></pre></td></tr></table></figure><br>值得注意的是，此处只是sc的声明而非定义。通常意义下，c++需要你对你所使用的任何东西提供一个定义式。<br><em>*但如果它是一个class的static const member且为intergral type(int,char,bool)，则需要特殊处理。</em></em><br>如果你无需获取地址，那你可以只声明不定义。但如果你需要使用地址或者你的编译器非要看到一个定义式，则应该另外提供定义式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> GamePlayer::NumTurns； </span><br></pre></td></tr></table></figure><br>由于const class member在声明时获得了初值，因此在定义时不可再设初值。</p>
+</blockquote>
+<hr>
+<p>如果class在编译期间需要一个class常量，比如说数组声明式。那么我们也没必要非要用#define。<br>我们可以使用enum hack来提供一个整形数据，因为<strong>一个枚举类型的数值总可以充当int被使用</strong>，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> &#123;NumTurns = <span class="number">5</span>&#125;; </span><br><span class="line"><span class="keyword">int</span> scores[NumTurns];</span><br></pre></td></tr></table></figure><br>这样写有两个好处：</p>
+<ol>
+<li>enum的行为比较像#define而不是const，比如你无法对它取址，也无法有一个pointer或者reference指向它。同时，避免使用了额外的内存空间以存储const int.</li>
+<li>实用主义 很多代码使用了它</li>
+</ol>
+<hr>
+<p>#define还有一个作用就是有人喜欢用它写宏。实际上这样根本不方便而且难于维护。我们有更好的替代方法：<strong>template inline函数</strong></p>
+<hr>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><ol>
+<li>对于单纯常量，最好用const对象与enum替换#define</li>
+<li>对于形似函数的宏，最好使用inline函数替代</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/06/%E7%A1%AE%E4%BF%9D%E5%AE%B9%E5%99%A8%E4%B8%AD%E7%9A%84%E5%AF%B9%E8%B1%A1%E5%89%AF%E6%9C%AC%E6%AD%A3%E7%A1%AE%E4%B8%94%E9%AB%98%E6%95%88/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1101,7 +1260,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

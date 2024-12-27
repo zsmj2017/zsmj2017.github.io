@@ -291,6 +291,163 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/08/%E4%B8%BA%E5%A4%9A%E6%80%81%E5%9F%BA%E7%B1%BB%E7%94%9F%E6%88%90virtual%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/08/%E4%B8%BA%E5%A4%9A%E6%80%81%E5%9F%BA%E7%B1%BB%E7%94%9F%E6%88%90virtual%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/" itemprop="url">8.为多态基类生成virtual析构函数</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-08T09:33:00+08:00">
+                2018-04-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>假设我们定义了一个base class，并随之延伸出一些derived class。用户只需要在程序中使用某个功能，并不关心其实现。因此，我们可以设计一个factory函数。(工厂模式详见More Effective C++ 25）<br>factory函数返回一个base clsss指针，指向新生成的derived class对象。 返回的对象必须位于heap，因此为了避免泄漏内存和其他资源，factory返回的每一个对象都应该被适当的delete。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeKeeper</span>&#123;</span><span class="comment">//计时器基类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    TimeKeeper();</span><br><span class="line">    ~TimeKeeper();<span class="comment">//此处不应该使用non-virtual析构函数</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AtomicClock</span>:</span><span class="keyword">public</span> TimeKeeper&#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WaterClock</span>:</span><span class="keyword">public</span> TimeKeeper&#123;...&#125;;</span><br><span class="line"></span><br><span class="line">TimeKeeper* ptk=getTimeKeeper();<span class="comment">//factory函数</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">delete</span> ptk;释放以避免资源泄露</span><br></pre></td></tr></table></figure><br>问题在于factory返回的指针指向一个derived class对象，而那个对象却经由一个base class指针被删除。如果base class的析构函数是non-virtual，则我们再次雪崩。</p>
+<hr>
+<h1 id="多态基类不使用virtual析构的后果"><a href="#多态基类不使用virtual析构的后果" class="headerlink" title="多态基类不使用virtual析构的后果"></a>多态基类不使用virtual析构的后果</h1><p>c++明确指出，当derived class对象由一个base class指针被删除，而base class带着一个non-virtual析构函数，<strong>其结果未定义</strong> — 一般来说，实际执行时对象的derived成分没被销毁，derived class的析构函数也没执行。也就是说我们得到了一个诡异的<strong>局部销毁对象</strong>。</p>
+<hr>
+<h1 id="何时需要virtual析构函数？"><a href="#何时需要virtual析构函数？" class="headerlink" title="何时需要virtual析构函数？"></a>何时需要virtual析构函数？</h1><p>一般来说，base class都会有那么一个virtual function。我们在这里指出，<strong>只要一个class有virtual function，我们都应该把它的析构函数定义为virtual。</strong></p>
+<p><strong>如果一个class不被用作base class，那给他定义一个virtual 析构函数非常愚蠢</strong>。原因是这样的：<br>欲实现出virtual函数，对象必须携带某些信息，要来指出在运行期哪个virtual函数被调用。这份信息一般由一个virtual table pointer指出。vtp指向一个vbtl(virtual table)每一个带virtual函数的class都会有一个vtbl，当函数调用某个virtual函数，实际被调用的函数取决于对象的vptr所指向的vtbl—编译器在其中寻找函数指针。（关于虚函数的使用成本，详见More Effective C++ 24）<br>总之，虚函数的引入增加了class的大小，并且破坏了原有的内存结构。</p>
+<p>另外，<strong>STL所有的类都不能作为base class，它们也没有virtual析构函数</strong>。</p>
+<hr>
+<h1 id="virtual析构函数在abstract-class中的用法"><a href="#virtual析构函数在abstract-class中的用法" class="headerlink" title="virtual析构函数在abstract class中的用法"></a>virtual析构函数在abstract class中的用法</h1><p>有时我们希望定义一个abstract class，但是手头上并没有pure virtual function，那解决方法很简单：<strong>声明一个pure virtual 析构函数</strong>。<br>但事情还没完，我们<strong>不仅仅需要声明，还需要定义</strong>这个析构函数。可能你会诧异于pure function居然还需要实现，但实际上pure function和有没有实现并没有任何联系。（该论述详见More Effective C++ 33）,具体声明和定义如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">c</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>:</span></span><br><span class="line">    <span class="keyword">virtual</span> ～c() = <span class="number">0</span>;<span class="comment">//声明式</span></span><br><span class="line">&#125;;</span><br><span class="line">c::~c() &#123;&#125;<span class="comment">//定义式</span></span><br></pre></td></tr></table></figure><br>因为析构函数的运作规则是是从最深层派生的class开始调用其析构，然后是每一个base class。在derived class的析构动作中编译器会创建一个对其基类析构函数的调用动作，如果没有定义，连接器会报错。</p>
+<hr>
+<h1 id="是否只要是base-class就需要析构函数？"><a href="#是否只要是base-class就需要析构函数？" class="headerlink" title="是否只要是base class就需要析构函数？"></a>是否只要是base class就需要析构函数？</h1><p>正如标题所说，<strong>只有使用了多态性的base class（具备虚函数）才需要virtual析构</strong>。<br>诸如上节提到的uncopyable类，其根本不需要使用virtual 析构函数。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>polymorphic base class应该声明一个virtual析构。如果一个类至少有一个virtual function，把它也应该拥有一个virtual析构函数</li>
+<li>class 不具有多态性或者根本不作为base class，那就不要搞virtual析构。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/08/%E5%88%87%E5%8B%BF%E5%88%9B%E5%BB%BA%E5%8C%85%E5%90%ABauto_ptr%E7%9A%84%E5%AE%B9%E5%99%A8%E5%AF%B9%E8%B1%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1653,165 +1810,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/06/%E5%B0%BD%E9%87%8F%E4%BB%A5const%EF%BC%8Cenum%EF%BC%8Cinline%E6%9B%BF%E6%8D%A2#define/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/06/%E5%B0%BD%E9%87%8F%E4%BB%A5const%EF%BC%8Cenum%EF%BC%8Cinline%E6%9B%BF%E6%8D%A2#define/" itemprop="url">3.尽量以const，enum，inline替换#define</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-06T19:21:00+08:00">
-                2018-04-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>众所周知，使用const来替换#define定义的常量是一个不错的选择，当我们以常量替换预处理时，有两点值得注意：</p>
-<blockquote>
-<p>1.常量指针<br>在定义常量指针时，由于常量定义式通常置于头文件内，同时在多次调用时为了避免不必要的修改，因此有必要将指针声明为const，而非指针所指的对象。如果你需要将指向对象也声明为const，则需要两个const.举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> authorname = “mie”； </span><br></pre></td></tr></table></figure></p>
-<p>当然，这里使用string比使用char<em>-based字符串更合适。<br>2.class的专属常量<br>在定义class的专属常量时，为了将变量的作用域仅仅局限在class内，我们将其作为class的一个成员。为了确保此常量至多只有一份实体，我们将其设为static。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> sc = <span class="number">5</span>； </span><br></pre></td></tr></table></figure><br>值得注意的是，此处只是sc的声明而非定义。通常意义下，c++需要你对你所使用的任何东西提供一个定义式。<br><em>*但如果它是一个class的static const member且为intergral type(int,char,bool)，则需要特殊处理。</em></em><br>如果你无需获取地址，那你可以只声明不定义。但如果你需要使用地址或者你的编译器非要看到一个定义式，则应该另外提供定义式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> GamePlayer::NumTurns； </span><br></pre></td></tr></table></figure><br>由于const class member在声明时获得了初值，因此在定义时不可再设初值。</p>
-</blockquote>
-<hr>
-<p>如果class在编译期间需要一个class常量，比如说数组声明式。那么我们也没必要非要用#define。<br>我们可以使用enum hack来提供一个整形数据，因为<strong>一个枚举类型的数值总可以充当int被使用</strong>，例如：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> &#123;NumTurns = <span class="number">5</span>&#125;; </span><br><span class="line"><span class="keyword">int</span> scores[NumTurns];</span><br></pre></td></tr></table></figure><br>这样写有两个好处：</p>
-<ol>
-<li>enum的行为比较像#define而不是const，比如你无法对它取址，也无法有一个pointer或者reference指向它。同时，避免使用了额外的内存空间以存储const int.</li>
-<li>实用主义 很多代码使用了它</li>
-</ol>
-<hr>
-<p>#define还有一个作用就是有人喜欢用它写宏。实际上这样根本不方便而且难于维护。我们有更好的替代方法：<strong>template inline函数</strong></p>
-<hr>
-<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><ol>
-<li>对于单纯常量，最好用const对象与enum替换#define</li>
-<li>对于形似函数的宏，最好使用inline函数替代</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1862,7 +1860,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

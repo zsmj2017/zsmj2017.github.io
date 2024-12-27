@@ -291,6 +291,161 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/16/public%E7%BB%A7%E6%89%BF%EF%BC%9Ais-a%E5%85%B3%E7%B3%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/16/public%E7%BB%A7%E6%89%BF%EF%BC%9Ais-a%E5%85%B3%E7%B3%BB/" itemprop="url">33.public继承：is-a关系</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-16T12:59:00+08:00">
+                2018-04-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>以c++进行面向对象编程时，最重要的一条规则是<strong>：public inheritance意味着is-a的关系</strong>。</p>
+<hr>
+<h1 id="is-a关系"><a href="#is-a关系" class="headerlink" title="is-a关系"></a>is-a关系</h1><p>&nbsp;<br>如果你令class d public derived from class b，你等于在同时告诉c++编译器以及代码读者，<strong>每一个类型为d的对象同时也是一个类型为b的对象，反之不成立。</strong><br>这也可以表示为“<strong>每一个需要b对象的地方，d对象也同样适用</strong>”，因为每一个d对象也是一个b对象。<br>该定义只对public继承有效，private继承的意义与此完全不同（详见Effective C++ 40),至于protected继承，其意义十分暧昧。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>大多数人都认为is-a关系十分简单，但实际并非如此,因为直觉容易误导我们。</p>
+<h2 id="鸟与企鹅"><a href="#鸟与企鹅" class="headerlink" title="鸟与企鹅"></a>鸟与企鹅</h2><p>企鹅是一种鸟，这是再自然不过的。鸟可以飞，这也是符合直觉的。于是…<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bird</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fly</span><span class="params">()</span></span>;<span class="comment">//鸟会飞</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Penguin</span>:</span><span class="keyword">public</span> Bird&#123;<span class="comment">//企鹅是一种鸟</span></span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>实际上企鹅不会飞，但企鹅却继承了fly接口，这明确表明当前继承体系存在问题。</p>
+<h3 id="重塑继承体系"><a href="#重塑继承体系" class="headerlink" title="重塑继承体系"></a>重塑继承体系</h3><p>你或许会意识到这是因为不严谨的语言表述导致我们吃了大亏。实际上是这样的：企鹅是鸟，但不是所有鸟都会飞，有的会有的不会。所以这才是正确的继承体系：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">bird</span> &#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">flyingbird</span>:</span><span class="keyword">public</span> bird&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">flying</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">penguin</span>:</span><span class="keyword">public</span> bird &#123;&#125;;</span><br></pre></td></tr></table></figure><br>这种写法针对fly这个接口无疑是成功的，但实际上对于某些软件系统而言，它根本不用去关心鸟会不会飞，此时建立一个flyingbird无疑是不明智的。这引出了一个事实：<br><strong>世界上并不存在一个完美适用于所有软件的完美设计。所谓的最佳设计，取决于系统现在以及未来所关注的重点。</strong></p>
+<h3 id="运行期报错处理"><a href="#运行期报错处理" class="headerlink" title="运行期报错处理"></a>运行期报错处理</h3><p>有人会为企鹅重新定义一个fly函数，令其产生一个运行期错误：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">​<span class="class"><span class="keyword">class</span> <span class="title">penguin</span>：<span class="title">public</span> <span class="title">bird</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>：</span></span><br><span class="line"><span class="class">    <span class="title">virtual</span> <span class="title">void</span> <span class="title">fly</span>()&#123;</span></span><br><span class="line">        error(“can <span class="keyword">not</span> fly”);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这种写法是失败的，它等于在说：企鹅会飞，但是一飞就报错。这违背了我们的设计理念：让接口易于使用，不被误用。（Effective C++ 19）</p>
+<hr>
+<h2 id="矩形与正方形"><a href="#矩形与正方形" class="headerlink" title="矩形与正方形"></a>矩形与正方形</h2><p>squre应该public derived from rectangle吗？也许你会毫不犹豫地肯定这一观点，“正方形必然是矩形，但反之不成立”。请考虑如下程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rectangle</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">setHeight</span><span class="params">(<span class="keyword">int</span> newHeight)</span></span>;</span><br><span class="line">    ...<span class="comment">//setWidth</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Square</span>:</span><span class="keyword">public</span> Rectangle &#123;...&#125;;</span><br></pre></td></tr></table></figure><br>Square继承了<code>setHeight</code>等接口，也就是说，我们可以通过调用成员函数，导致正方形长宽不等，那这种对象还能被称为正方形吗。（实际上，在正方形的接口中我们必须确保setHeight之后必须执行setWidth）</p>
+<hr>
+<h1 id="classes之间的关系"><a href="#classes之间的关系" class="headerlink" title="classes之间的关系"></a>classes之间的关系</h1><p>&nbsp;<br>is-a并非是classes之间唯一的关系，另外两个常见的是has-a与is-implemented-in-terms-of。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>public继承意味着is-a，is-a意味着适用于base对象身上的每一件事情一定也适用于derived对象身上，因为每一个derived对象也一定是一个base对象。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/16/%E4%BA%86%E8%A7%A3%E7%AE%97%E6%B3%95%E5%AF%B9%E5%AE%B9%E5%99%A8%E7%9A%84%E8%A6%81%E6%B1%82/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1760,186 +1915,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/%E5%B0%BD%E9%87%8F%E9%81%BF%E5%85%8D%E8%BD%AC%E5%9E%8B%E6%93%8D%E4%BD%9C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/14/%E5%B0%BD%E9%87%8F%E9%81%BF%E5%85%8D%E8%BD%AC%E5%9E%8B%E6%93%8D%E4%BD%9C/" itemprop="url">28.尽量避免转型操作</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-14T14:49:00+08:00">
-                2018-04-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>（本节内容联系More Effective C++ 5 效果更佳）</p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>c++规则的设计目标之一就是：保证类型错误绝不可能发生。理论上而言，如果你的程序能很干净地通过编译，就说明了它并不企图在任何对象身上执行任何不安全、无意义、荒谬的操作。<br>但转型（cast)破坏了类型系统。在Java，C#，或C中，转型操作必要且较为安全（当然，安全是相对的），C++的转型则充斥着风险。</p>
-<hr>
-<h1 id="转型语法"><a href="#转型语法" class="headerlink" title="转型语法"></a>转型语法</h1><h2 id="旧式转型"><a href="#旧式转型" class="headerlink" title="旧式转型"></a>旧式转型</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(T)expression;<span class="comment">//将expression转为T</span></span><br><span class="line">T(expression);<span class="comment">//将expression转为T</span></span><br></pre></td></tr></table></figure>
-<p>两者并无差别，无非是小括号的位置不同。</p>
-<h2 id="C-转型"><a href="#C-转型" class="headerlink" title="C++转型"></a>C++转型</h2><p>C++提供了四种新式转型操作符：</p>
-<ul>
-<li>const_cast<T>(expression)</li>
-<li>dynamic_cast<T>(expression)</li>
-<li>reinterpret_cast<T>(expression)</li>
-<li>static_cast<T>(expression)</li>
-</ul>
-<h3 id="C-转型操作符介绍"><a href="#C-转型操作符介绍" class="headerlink" title="C++转型操作符介绍"></a>C++转型操作符介绍</h3><ul>
-<li>const_cast：能够将对象的const属性去除，也只有它拥有该能力</li>
-<li>dynamic_cast：主要用来执行“安全向下转型”，也就是用来决定某对象是否归属继承体系的某个类型。它是唯一一个无法由旧式语句转换的新类型转换，也是唯一一个可能耗费大量运行成本的转型操作。</li>
-<li>reinterpret_cast：意图执行低级转型，实际动作可能取决于编译器，这一特性也就意味着不可移植。比如将一个pointer to int转为int，该转型操作在低级代码以外相当少见。</li>
-<li>static_cast：强迫隐式转换，比如把non-const转为const，int转为double。它也可以作上述转换的反向转换，例如把pointer-to-base转为pointer-to-derived，或者把void*指针转为typed指针。但是没法把const转为non-const。</li>
-</ul>
-<h2 id="新旧转型的优劣以及使用时机"><a href="#新旧转型的优劣以及使用时机" class="headerlink" title="新旧转型的优劣以及使用时机"></a>新旧转型的优劣以及使用时机</h2><h3 id="新式转型的优点"><a href="#新式转型的优点" class="headerlink" title="新式转型的优点"></a>新式转型的优点</h3><p>尽管旧式转型依然合法，但新式转型更受青睐。原因在于：</p>
-<ol>
-<li>易于辨识</li>
-<li>转型动作明确</li>
-</ol>
-<h3 id="何时采用旧式转型"><a href="#何时采用旧式转型" class="headerlink" title="何时采用旧式转型"></a>何时采用旧式转型</h3><p>一般来说，仅在需要调用一个explicit构造函数将一个对象传递给一个函数时使用旧式转型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Widget</span><span class="params">(<span class="keyword">int</span> <span class="built_in">size</span>)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSth</span><span class="params">(<span class="keyword">const</span> Widget&amp; w)</span></span>;</span><br><span class="line">doSth(Widget(<span class="number">15</span>));</span><br><span class="line">doSth(<span class="keyword">static_cast</span>&lt;Widget&gt;(<span class="number">15</span>));</span><br></pre></td></tr></table></figure><br>然而这种风格并不像是转型，更像是一种构造。但必须明确，这里其实执行的类型转换操作。</p>
-<hr>
-<h1 id="类型转换的意义"><a href="#类型转换的意义" class="headerlink" title="类型转换的意义"></a>类型转换的意义</h1><p>&nbsp;<br>有人认为转型只不过告诉编译器把某种类型视为另一种类型，其他什么都没做，实际上这是不可能的<br>。将int转为double的时候编译器肯定生成了一些代码，因为int的底层描述与double的底层描述并不相同。再比如说：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span><span class="keyword">public</span> Base&#123;...&#125;;</span><br><span class="line">Derived d;</span><br><span class="line">Base* pb = &amp;d;<span class="comment">//暗中将Derived*转为了Base*</span></span><br></pre></td></tr></table></figure><br>我们建立了一个base指针指向derived class对象，但有时上述的两个指针值并不相同，这时会有一个偏移量在运行期间被施行于derived*指针，以取得正确的base*值。</p>
-<p>上述案例表明，<strong>单一对象可能拥有多个地址</strong>（这在C，Java，C#中是不可能发生的）。如果在C++中使用多重继承，单一对象必然拥有多个地址，并且在单一继承下也可能存在多个地址。<strong>我们应该避免做出“对象在c++中如何布局”的假设，更不应该以某种假设为基础执行任何转型操作。</strong></p>
-<hr>
-<h1 id="类型转换的误区"><a href="#类型转换的误区" class="headerlink" title="类型转换的误区"></a>类型转换的误区</h1><p>&nbsp;<br>类型转换可能会导致我们易写出一些似是而非的代码，（它们在其他语言中可能是正确的）。</p>
-<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>许多应用框架都要求derived classes内的virtual函数第一件事就是调用base class的对应函数。下面给出一个具体实例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Window</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span> </span>&#123;...&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWindows</span>:</span><span class="keyword">public</span> Window&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;<span class="comment">//要求首先调用base class的对应函数</span></span><br><span class="line">        <span class="keyword">static_cast</span>&lt;Window&gt;(*<span class="keyword">this</span>).onResize();<span class="comment">//error！</span></span><br><span class="line">        ...<span class="comment">//执行专有操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>我们确实成功地将它转为了Window对象，也确实调用了Window::onResize。但值得注意的是，调用的并不是当前对象上的函数，而是稍早转型动作建立的一个“*this对象之base class成分”的<strong>暂时副本</strong>身上的onResize(),也就是说当前对象内部的数据并没有改变，改变的是一个副本。(这个原理很简单，就是转型操作导致了一个临时Window对象被生成，我们在该临时对象身上调用了onResize，伴随着它的析构，这个操作就像没做一样，（*this)的bc成分根本没有改变）</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>解决方案就是直接调用，不要使用转型操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWindows</span>:</span><span class="keyword">public</span> Window&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Window::onResize();</span><br><span class="line">        ...<span class="comment">//执行专有操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="dynamic-cast探究"><a href="#dynamic-cast探究" class="headerlink" title="dynamic_cast探究"></a>dynamic_cast探究</h1><p>&nbsp;<br>首先需要强调的是，dynamic_cast执行速度相当缓慢，如果继承层次很深或者存在多继承的情况下使用dynamic_cast，可能对性能的冲击极大，请谨慎使用！</p>
-<h2 id="dynamic-cast功能"><a href="#dynamic-cast功能" class="headerlink" title="dynamic_cast功能"></a>dynamic_cast功能</h2><p>之所以需要使用dynamic_cast，主要是因为我们需要在一个derived class对象身上执行derived class专属操作，但偏偏我们目前只有一个指向base的pointer或reference.</p>
-<h2 id="如何避免使用dynamic-cast"><a href="#如何避免使用dynamic-cast" class="headerlink" title="如何避免使用dynamic_cast"></a>如何避免使用dynamic_cast</h2><h3 id="使用容器-并指定其存储的元素类型为指向derived-class对象的指针"><a href="#使用容器-并指定其存储的元素类型为指向derived-class对象的指针" class="headerlink" title="使用容器,并指定其存储的元素类型为指向derived class对象的指针"></a>使用容器,并指定其存储的元素类型为指向derived class对象的指针</h3><p>举例而言，假设在之前的体系中，SpecialWindow有一个特有操作：闪烁<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Window</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWindows</span>:</span><span class="keyword">public</span> Window&#123;</span><br><span class="line"><span class="keyword">public</span>: </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">blink</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//需要闪烁所有可以闪烁的窗口</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">vector</span>&lt;<span class="built_in">shared_ptr</span>&lt;Window&gt; &gt; VPW;</span><br><span class="line">VPW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="comment">//使用dynamic_cast</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> it=winPtrs.<span class="built_in">begin</span>();it!=winPtrs.<span class="built_in">end</span>();++it)&#123;</span><br><span class="line">    <span class="comment">//赋值，检测其返回值不为nullptr</span></span><br><span class="line">    <span class="keyword">if</span>(SpecialWindow *psw = <span class="keyword">dynamic_cast</span>&lt;SpecialWindows*&gt;(iter-&gt;<span class="built_in">get</span>()))</span><br><span class="line">        psw-&gt;<span class="built_in">blink</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>应该改为在容器内存在指向dc的smart_ptr:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">vector</span>&lt;<span class="built_in">shared_ptr</span>&lt;SpecialWindow&gt; &gt; VPSW;</span><br><span class="line">VPSW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> it=winPtrs.<span class="built_in">begin</span>();it!=winPtrs.<span class="built_in">end</span>();++it)&#123;</span><br><span class="line">    (*iter)-&gt;<span class="built_in">blink</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>不过，这种做法无法在同一个容器内存储指向所有派生类的指针。</p>
-<h3 id="通过base接口处理所有可能的派生类"><a href="#通过base接口处理所有可能的派生类" class="headerlink" title="通过base接口处理所有可能的派生类"></a>通过base接口处理所有可能的派生类</h3><p>具体来说，就是在基类中声明所有派生类所具备的特殊函数，然后提供一份空白实现。（这种方法十分恶劣，违背了面向对象准则）</p>
-<h2 id="dynamic-cast禁区"><a href="#dynamic-cast禁区" class="headerlink" title="dynamic_cast禁区"></a>dynamic_cast禁区</h2><p>绝对必须避免的是连锁式使用dynamic_cast，其运行效率极低且缺乏维护性。这种程序总应该被某种基于virtual函数调用的方法取而代之。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>优秀的c++代码很少使用转型，但完全摆脱它们也不切实际。我们要做的只能是<strong>尽可能隔绝转型动作，把他们隐藏在某个函数内。</strong></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1990,7 +1965,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

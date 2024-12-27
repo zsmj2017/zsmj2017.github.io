@@ -291,6 +291,172 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/03/%E7%A1%AE%E4%BF%9Dconst%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/03/%E7%A1%AE%E4%BF%9Dconst%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/" itemprop="url">16.确保const成员函数线程安全</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-03T20:42:00+08:00">
+                2018-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>假设当前存在一个类以表征多项式，且该类存在一个成员函数以完成多项值求根功能。显然此类函数不可能对多项式造成任何修改，因此可将其声明为const:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Polynomial</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> RootsType = <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt;;</span><br><span class="line">    … </span><br><span class="line">    <span class="function">RootsType <span class="title">roots</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>一般而言，求根操作成本高昂，我们理应避免重复计算，因此我们在某次计算完成后将其值作为缓存，每一次求根都从缓存中取值（此思想可见More Effective C++ Item18）：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Polynomial</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="keyword">using</span> RootsType = <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt;;</span><br><span class="line"><span class="function">RootsType <span class="title">roots</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!rootsAreValid) &#123; <span class="comment">// if cache not valid</span></span><br><span class="line">        … <span class="comment">// compute roots,store them in rootVals</span></span><br><span class="line">        rootsAreValid = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> rootVals;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">mutable</span> <span class="keyword">bool</span> rootsAreValid&#123; <span class="literal">false</span> &#125;;</span><br><span class="line">    <span class="keyword">mutable</span> RootsType rootVals&#123;&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>roots成员函数不可能修改Polynomial对象，但它可能会修改rootVals和rootsAreValid，此二者被声明为mutable，其本意便在于方便const函数修改。<br>假设当前存在两个线程同时在Polynomial对象上调用roots：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Polynomial p;</span><br><span class="line">…</span><br><span class="line"><span class="comment">/*-----  Thread 1 ----- */</span>       <span class="comment">/*-------  Thread 2 ------- */</span></span><br><span class="line"><span class="keyword">auto</span> rootsOfP = p.roots();      <span class="keyword">auto</span> valsGivingZero = p.roots();</span><br></pre></td></tr></table></figure><br>在客户端执行上述程序十分合理，因为roots具备const属性，客户可以认为其执行读操作，而多线程在无同步的条件下执行读取操作在概念上是安全的。但实际上我们知道，roots可能会改变对象内部的data member，这意味着可能存在不同的线程在无同步的条件下对同一块内存进行读取与写入操作，这就是data race的标准定义。因此，该程序可能会导致未定义行为。</p>
+<p>关键问题在于roots的const属性。C++98中的const成员函数仅仅表示不会修改对象，但C++11中它需要在此基础之上更进一步：保证线程安全性。</p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&nbsp;<br>解决此问题最简单的方法（或许也是最常见的方法）是使用互斥锁：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Polynomial</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="keyword">using</span> RootsType = <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">double</span>&gt;;</span><br><span class="line"><span class="function">RootsType <span class="title">roots</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">g</span><span class="params">(m)</span></span>; <span class="comment">// lock mutex</span></span><br><span class="line">    <span class="keyword">if</span> (!rootsAreValid) &#123; <span class="comment">// if cache not valid</span></span><br><span class="line">        … <span class="comment">// compute and store roots</span></span><br><span class="line">        rootsAreValid = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> rootVals;</span><br><span class="line">&#125; <span class="comment">// unlock mutex</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">mutable</span> <span class="built_in">std</span>::mutex m;</span><br><span class="line">    <span class="keyword">mutable</span> <span class="keyword">bool</span> rootsAreValid&#123; <span class="literal">false</span> &#125;;</span><br><span class="line">    <span class="keyword">mutable</span> RootsType rootVals&#123;&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>我们将std::mutex声明为mutable，因为锁定与解锁操作均在const成员函数中进行。此外需要注意的是，mutex是一种move-only type(无法被复制，仅能被移动），因此mutex的加入导致多项式对象也变成了一个move-only object，从此失去了被复制的能力。</p>
+<hr>
+<h1 id="std-atomic"><a href="#std-atomic" class="headerlink" title="std::atomic"></a>std::atomic</h1><p>&nbsp;<br>在某些情况下，使用mutex可能有些小题大做。例如我们当前正关注于一个成员函数被调用的次数，那么使用一个std::atomic计数器（见Item40）可能更加恰当（实际上是否比mutex更加好用取决于硬件与你所使用的mutex的实现）。下述实例展示了如何使用std::atomic计算成员函数被调用的次数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">double</span> <span class="title">distanceFromOrigin</span><span class="params">()</span> <span class="keyword">const</span> <span class="keyword">noexcept</span></span>&#123;</span><br><span class="line">        ++callCount; <span class="comment">// atomic increment</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">std</span>::<span class="built_in">sqrt</span>((x * x) + (y * y));</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">mutable</span> <span class="built_in">std</span>::atomic&lt;<span class="keyword">unsigned</span>&gt; callCount&#123; <span class="number">0</span> &#125;;</span><br><span class="line">    <span class="keyword">double</span> x, y;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>类似于mutex，atomic也属于move-only type，因此Point对象也必将是一个move-only object。</p>
+<hr>
+<h1 id="atomic的不足"><a href="#atomic的不足" class="headerlink" title="atomic的不足"></a>atomic的不足</h1><p>&nbsp;<br>由于atomic的使用成本相较于mutex较为低廉，因此我们可能会更倾向于使用atomic。举例而言，如果当前有一个很消耗计算量的int值需要被缓存，我们可能会倾向于使用一对atomic而非mutex来确保线程安全性：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">magicValue</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cacheValid) <span class="keyword">return</span> cachedValue;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">auto</span> val1 = expensiveComputation1();</span><br><span class="line">            <span class="keyword">auto</span> val2 = expensiveComputation2();</span><br><span class="line">            cachedValue = val1 + val2; <span class="comment">// part 1</span></span><br><span class="line">            cacheValid = <span class="literal">true</span>; <span class="comment">// part 2</span></span><br><span class="line">            <span class="keyword">return</span> cachedValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">mutable</span> <span class="built_in">std</span>::atomic&lt;<span class="keyword">bool</span>&gt; cacheValid&#123; <span class="literal">false</span> &#125;;</span><br><span class="line">    <span class="keyword">mutable</span> <span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; cachedValue;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>上述程序能够运行，只是运行流程未必如你所想，试考虑如下情形：</p>
+<ol>
+<li>某线程调用magicValue，发现当前cacheValid处于false状态，于是默默计算了一遍。</li>
+<li>就在此时，第二个（或者其他）也调用了magicValue，也发现当前cacheValid处于false状态，于是进行了一次无意义的重复计算。</li>
+</ol>
+<p>这种行为与我们设定缓存的目标背道而驰。将颠倒cacheValid与cachedValue的赋值顺序可以解决上述问题，但你会发现我们将得到一个更糟的结果：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">magicValue</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cacheValid) <span class="keyword">return</span> cachedValue;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">auto</span> val1 = expensiveComputation1();</span><br><span class="line">            <span class="keyword">auto</span> val2 = expensiveComputation2();</span><br><span class="line">            cacheValid = <span class="literal">true</span>; <span class="comment">// part 1</span></span><br><span class="line">            <span class="keyword">return</span> cachedValue = val1 + val2; <span class="comment">// part 2</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    …</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>假设当前cacheValid为false，此后：</p>
+<ol>
+<li>莫线程调用了Widget::magicValue 并且通过Point对象将caheValid设置为1；</li>
+<li>就在此时，另一个线程发现当前cacheValid为1，于是直接把cachedValue拿去用了（此时第一个线程尚未完成计算）。</li>
+</ol>
+<p>由此我们可以发现，对于需要同步的单个变量或内存位置，std::atomic足以应对，但如果需要操作的两个或多个变量或内存位置，则应当使用mutex完成相关任务。因此，magicValue的正确实现应当为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    …</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">magicValue</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; <span class="title">guard</span><span class="params">(m)</span></span>; <span class="comment">// lock m</span></span><br><span class="line">        <span class="keyword">if</span> (cacheValid) <span class="keyword">return</span> cachedValue;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">auto</span> val1 = expensiveComputation1();</span><br><span class="line">            <span class="keyword">auto</span> val2 = expensiveComputation2();</span><br><span class="line">            cachedValue = val1 + val2;</span><br><span class="line">            cacheValid = <span class="literal">true</span>;</span><br><span class="line">            <span class="keyword">return</span> cachedValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="comment">// unlock m</span></span><br><span class="line">    …</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">mutable</span> <span class="built_in">std</span>::mutex m;</span><br><span class="line">    <span class="keyword">mutable</span> <span class="keyword">int</span> cachedValue; <span class="comment">// no longer atomic</span></span><br><span class="line">    <span class="keyword">mutable</span> <span class="keyword">bool</span> cacheValid&#123; <span class="literal">false</span> &#125;; <span class="comment">// no longer atomic</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="const成员函数的线程安全性"><a href="#const成员函数的线程安全性" class="headerlink" title="const成员函数的线程安全性"></a>const成员函数的线程安全性</h1><p>&nbsp;<br>本节内容的前提是可能存在多个线程同时在某对象上执行const成员函数，并且该const函数试图修改data member。如果你确保自己的程序不会应用于多线程环境下，那么const成员函数的线程安全性并不重要。随着多线程的普及度越来越高，这种可能性似乎越来越小。可以肯定的是，const成员函数必将受到并发编程的影响，这就是我们应当确保const成员函数是线程安全的原因所在。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>开发者应当致力于保证const成员函数的线程安全性，除非你的程序永不涉及并发编程。</strong></li>
+<li><strong>std：：atomic变量可以提供相对于mutex更加优良的性能，但其仅适用于操作单个变量或内存位置。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/07/02/%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8constexpr/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1754,164 +1920,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/26/%E5%BD%93auto%E6%8E%A8%E8%A1%8D%E7%B1%BB%E5%9E%8B%E9%94%99%E8%AF%AF%E6%97%B6%EF%BC%8C%E4%BD%BF%E7%94%A8%E6%98%BE%E5%BC%8F%E5%88%9D%E5%A7%8B%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/26/%E5%BD%93auto%E6%8E%A8%E8%A1%8D%E7%B1%BB%E5%9E%8B%E9%94%99%E8%AF%AF%E6%97%B6%EF%BC%8C%E4%BD%BF%E7%94%A8%E6%98%BE%E5%BC%8F%E5%88%9D%E5%A7%8B%E5%8C%96/" itemprop="url">6.当auto推衍类型错误时，使用显式初始化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-26T19:10:00+08:00">
-                2018-06-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective Modern C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在Item5中曾经提及，使用auto声明变量相较于显式类型声明有许多优势，但有时也会带来问题。</p>
-<hr>
-<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>举例而言，假若我们当前有一个函数，其形参为一个Widget切返回一个std::vector&lt;bool&gt;,每一个bool表征当前Widget是否提供某项功能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; <span class="title">features</span><span class="params">(<span class="keyword">const</span> Widget&amp; w)</span></span></span><br></pre></td></tr></table></figure><br>进一步地，我们假定bit5代表Widget是否具备权限，因此我们可能会写出如下程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line"><span class="keyword">bool</span> highPriority = features(w)[<span class="number">5</span>];<span class="comment">//is w high priority?</span></span><br><span class="line">processWidget(w, highPriority);<span class="comment">//process w in accord with its priority</span></span><br></pre></td></tr></table></figure><br>上述代码将会运行正常，但如果我们使用auto代替显式的类型声明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> highPriority = features(w)[<span class="number">5</span>];</span><br><span class="line">processWidget(w, highPriority);</span><br></pre></td></tr></table></figure><br>上述代码仍然能够通过编译，只是其行为不可预料。原因很简单，vector&lt;bool&gt;返回的并不是一个bool类型，而是一个代理类对象的引用，从而导致上述函数无法被正确运行（详见Effective STL Item18）。<br>在原始程序中，highPriority发生了一次隐式类型转换，而auto只会如实推衍类型（一个reference-to-bit），不会发生任何类型转换。除此之外，我们在进一步剖析上述程序时会发现，feature(w)生成了一个临时的Vector，highPriority作为其内部元素的一个引用，在语句结束后不可避免地成为了空悬指针，这也就是函数行为不可预料的原因所在。 </p>
-<hr>
-<h1 id="proxy-class"><a href="#proxy-class" class="headerlink" title="proxy class"></a>proxy class</h1><p>&nbsp;<br>不仅仅vector&lt;bool&gt;存在着代理类的情况，标准库中的智能指针类型在某种意义上也是负责管理内存资源的代理类。事实上，设计模式中的代理模式在程序设计中十分流行，有些代理类对于用户而言是显然的，例如std::shared_ptr与std::unique_ptr，但有一些被设计为对用户不可见，例如std::vector&lt;bool&gt;::reference。</p>
-<p>除此之外，某些C++库中的class使用了一种名为”expression template”的技术，这项技术的目的主要在于提高数学计算效率。举例而言，现有矩阵计算表达式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Matrix sum = m1 + m2 + m3 + m4;</span><br></pre></td></tr></table></figure><br>如果使用了”expression template”技术，那么operator+返回的并非是计算结果，而是一个代理类，例如Sum&lt;Matrix,Matrix&gt;之类（此技术的详细说明详见More Effective C++ Item17）。operator=执行了一次隐式类型转换，但如果我们采用auto声明变量，恐怕会得出sum的类型为Sum&lt;Sum&lt;Sum&lt;Matrix, Matrix&gt;,Matrix&gt;, Matrix&gt;。</p>
-<p>隐性代理类与auto配合不甚默契，因为它们的生存期往往十分短暂（语句结束即完成析构），因此创建这些类型的变量往往会违反基本设计原则，其往往带来未定义后果。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> someVar = expression of <span class="string">"invisible"</span> proxy class type;</span><br></pre></td></tr></table></figure>
-<p>这种写法固然不可取，但如何避免出现这类表达式呢？</p>
-<p>首先，我们应当学习如何找到隐性代理类。尽管它们难以被开发者所察觉，但库通常会记录下它们的行为，你对库越熟，那么你越不可能忽视这些代理类的使用。即使文档中没有给出介绍，头文件也会忠实地反应出代理类的使用情况，例如vector&lt;bool&gt; operator[]声明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span> &#123; <span class="comment">// from C++ Standards</span></span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Allocator</span>&gt;</span></span><br><span class="line"><span class="class">    <span class="title">class</span> <span class="title">vector</span>&lt;bool, Allocator&gt; &#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        …</span><br><span class="line">        <span class="class"><span class="keyword">class</span> <span class="title">reference</span> &#123;</span> … &#125;;</span><br><span class="line">        reference <span class="keyword">operator</span>[](size_type n);</span><br><span class="line">        …</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>我们可以一目了然地发现vector&lt;bool&gt;返回了一个代理类。</p>
-<p>在实际开发过程中，许多人只有在他们试图追踪编译问题或不正确的单元测试结果时才会发现使用代理类的存在。但不管你是怎么找到它们的，即使auto推衍得到了某个代理类类型，但我们仍然没有放弃使用auto的理由。auto本身并不是问题，问题是auto无法推衍出我们想要的类型，因此解决方案很简单：我们强制auto推衍为正确的类型，这种手法被本书作者称为“the explicitly typed initializer”。 idiom”。其基本表现形式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> highPriority = <span class="keyword">static_cast</span>&lt;<span class="keyword">bool</span>&gt;(features(w)[<span class="number">5</span>]);</span><br><span class="line"><span class="keyword">auto</span> sum = <span class="keyword">static_cast</span>&lt;Matrix&gt;(m1 + m2 + m3 + m4);</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li><strong>隐性代理类可能会导致auto推衍出“错误”的类型。</strong></li>
-<li><strong>我们可以使用the explicitly typed initializer加以修正。</strong></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1962,7 +1970,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

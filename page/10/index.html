@@ -291,6 +291,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/26/%E5%BD%93auto%E6%8E%A8%E8%A1%8D%E7%B1%BB%E5%9E%8B%E9%94%99%E8%AF%AF%E6%97%B6%EF%BC%8C%E4%BD%BF%E7%94%A8%E6%98%BE%E5%BC%8F%E5%88%9D%E5%A7%8B%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/26/%E5%BD%93auto%E6%8E%A8%E8%A1%8D%E7%B1%BB%E5%9E%8B%E9%94%99%E8%AF%AF%E6%97%B6%EF%BC%8C%E4%BD%BF%E7%94%A8%E6%98%BE%E5%BC%8F%E5%88%9D%E5%A7%8B%E5%8C%96/" itemprop="url">6.当auto推衍类型错误时，使用显式初始化</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-26T19:10:00+08:00">
+                2018-06-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-Modern-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective Modern C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>在Item5中曾经提及，使用auto声明变量相较于显式类型声明有许多优势，但有时也会带来问题。</p>
+<hr>
+<h1 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h1><p>&nbsp;<br>举例而言，假若我们当前有一个函数，其形参为一个Widget切返回一个std::vector&lt;bool&gt;,每一个bool表征当前Widget是否提供某项功能：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; <span class="title">features</span><span class="params">(<span class="keyword">const</span> Widget&amp; w)</span></span></span><br></pre></td></tr></table></figure><br>进一步地，我们假定bit5代表Widget是否具备权限，因此我们可能会写出如下程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Widget w;</span><br><span class="line"><span class="keyword">bool</span> highPriority = features(w)[<span class="number">5</span>];<span class="comment">//is w high priority?</span></span><br><span class="line">processWidget(w, highPriority);<span class="comment">//process w in accord with its priority</span></span><br></pre></td></tr></table></figure><br>上述代码将会运行正常，但如果我们使用auto代替显式的类型声明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> highPriority = features(w)[<span class="number">5</span>];</span><br><span class="line">processWidget(w, highPriority);</span><br></pre></td></tr></table></figure><br>上述代码仍然能够通过编译，只是其行为不可预料。原因很简单，vector&lt;bool&gt;返回的并不是一个bool类型，而是一个代理类对象的引用，从而导致上述函数无法被正确运行（详见Effective STL Item18）。<br>在原始程序中，highPriority发生了一次隐式类型转换，而auto只会如实推衍类型（一个reference-to-bit），不会发生任何类型转换。除此之外，我们在进一步剖析上述程序时会发现，feature(w)生成了一个临时的Vector，highPriority作为其内部元素的一个引用，在语句结束后不可避免地成为了空悬指针，这也就是函数行为不可预料的原因所在。 </p>
+<hr>
+<h1 id="proxy-class"><a href="#proxy-class" class="headerlink" title="proxy class"></a>proxy class</h1><p>&nbsp;<br>不仅仅vector&lt;bool&gt;存在着代理类的情况，标准库中的智能指针类型在某种意义上也是负责管理内存资源的代理类。事实上，设计模式中的代理模式在程序设计中十分流行，有些代理类对于用户而言是显然的，例如std::shared_ptr与std::unique_ptr，但有一些被设计为对用户不可见，例如std::vector&lt;bool&gt;::reference。</p>
+<p>除此之外，某些C++库中的class使用了一种名为”expression template”的技术，这项技术的目的主要在于提高数学计算效率。举例而言，现有矩阵计算表达式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Matrix sum = m1 + m2 + m3 + m4;</span><br></pre></td></tr></table></figure><br>如果使用了”expression template”技术，那么operator+返回的并非是计算结果，而是一个代理类，例如Sum&lt;Matrix,Matrix&gt;之类（此技术的详细说明详见More Effective C++ Item17）。operator=执行了一次隐式类型转换，但如果我们采用auto声明变量，恐怕会得出sum的类型为Sum&lt;Sum&lt;Sum&lt;Matrix, Matrix&gt;,Matrix&gt;, Matrix&gt;。</p>
+<p>隐性代理类与auto配合不甚默契，因为它们的生存期往往十分短暂（语句结束即完成析构），因此创建这些类型的变量往往会违反基本设计原则，其往往带来未定义后果。</p>
+<hr>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> someVar = expression of <span class="string">"invisible"</span> proxy class type;</span><br></pre></td></tr></table></figure>
+<p>这种写法固然不可取，但如何避免出现这类表达式呢？</p>
+<p>首先，我们应当学习如何找到隐性代理类。尽管它们难以被开发者所察觉，但库通常会记录下它们的行为，你对库越熟，那么你越不可能忽视这些代理类的使用。即使文档中没有给出介绍，头文件也会忠实地反应出代理类的使用情况，例如vector&lt;bool&gt; operator[]声明：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="built_in">std</span> &#123; <span class="comment">// from C++ Standards</span></span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">Allocator</span>&gt;</span></span><br><span class="line"><span class="class">    <span class="title">class</span> <span class="title">vector</span>&lt;bool, Allocator&gt; &#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        …</span><br><span class="line">        <span class="class"><span class="keyword">class</span> <span class="title">reference</span> &#123;</span> … &#125;;</span><br><span class="line">        reference <span class="keyword">operator</span>[](size_type n);</span><br><span class="line">        …</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>我们可以一目了然地发现vector&lt;bool&gt;返回了一个代理类。</p>
+<p>在实际开发过程中，许多人只有在他们试图追踪编译问题或不正确的单元测试结果时才会发现使用代理类的存在。但不管你是怎么找到它们的，即使auto推衍得到了某个代理类类型，但我们仍然没有放弃使用auto的理由。auto本身并不是问题，问题是auto无法推衍出我们想要的类型，因此解决方案很简单：我们强制auto推衍为正确的类型，这种手法被本书作者称为“the explicitly typed initializer”。 idiom”。其基本表现形式如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> highPriority = <span class="keyword">static_cast</span>&lt;<span class="keyword">bool</span>&gt;(features(w)[<span class="number">5</span>]);</span><br><span class="line"><span class="keyword">auto</span> sum = <span class="keyword">static_cast</span>&lt;Matrix&gt;(m1 + m2 + m3 + m4);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>隐性代理类可能会导致auto推衍出“错误”的类型。</strong></li>
+<li><strong>我们可以使用the explicitly typed initializer加以修正。</strong></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/06/26/%E7%94%A8auto%E4%BB%A3%E6%9B%BF%E6%98%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1742,193 +1900,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/05/30/%E7%AB%99%E5%9C%A8%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%A1%B6%E7%AB%AF%E2%80%94%E2%80%94Template/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/30/%E7%AB%99%E5%9C%A8%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%A1%B6%E7%AB%AF%E2%80%94%E2%80%94Template/" itemprop="url">站在对象模型的顶端——Template</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-30T13:05:00+08:00">
-                2018-05-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Inside-the-C-object-model/" itemprop="url" rel="index">
-                    <span itemprop="name">Inside the C++ object model</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>原本Template被视为对container的一项重要支持，但其现在已经成为了通用程序设计的基石。它也被用于属性混合或互斥机制的参数化技术中，此外，TMU的发现，使得程序效率得到了巨大的提升。</p>
-<p>然而，template也是C++最为困难的主题。本节将重点描述template，以下是三个主要讨论方向：</p>
-<ol>
-<li><strong>template声明</strong><br>可以理解为当你声明一个template class或template class member function时会发生什么。</li>
-<li><strong>如何具现出class object以及inline nonmember，以及member template function</strong><br>上述的这些每一个编译单位都将拥有一份实体</li>
-<li><strong>如何具现出nonmember以及static template class members</strong><br>上述的这些每一个可执行文件中仅会存在一个实体。</li>
-</ol>
-<hr>
-<h1 id="Template的具现行为"><a href="#Template的具现行为" class="headerlink" title="Template的具现行为"></a>Template的具现行为</h1><p>&nbsp;<br>现有Template Point class如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">enum</span> Status &#123;unallocated,normalized&#125;;</span><br><span class="line">    Point(Type x=<span class="number">0.0</span>,Type y=<span class="number">0.0</span>,Type z=<span class="number">0.0</span>);</span><br><span class="line">    ~Point();</span><br><span class="line">    <span class="function"><span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>*,<span class="keyword">size_t</span>)</span></span>;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">static</span> Point&lt;Type&gt; *freeList;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> chunkSize;</span><br><span class="line">    Type _x,_y,_z;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>当编译器看到template class声明时，不会执行任何操作。因此，上述的static data members并不可用。虽然enum Status的真正类型在所有Point instantiations中都一样，但它们只能通过template Point class的某个实体来存取或操作，因此我们可以这样写：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Point&lt;<span class="keyword">float</span>&gt;::Status s;</span><br></pre></td></tr></table></figure><br>而不能写为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Point::Status s;</span><br></pre></td></tr></table></figure><br>static data member亦是如此。</p>
-<p>如果我们定义一个指针指向特定的实体：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Point&lt;<span class="keyword">float</span>&gt; *ptr =<span class="literal">nullptr</span>;</span><br></pre></td></tr></table></figure><br>也不会生成或执行任何操作。我们需要明确，一个指向class object的指针，本身并不是一个class object，编译器不需要知道任何与class相关的任何members数据或object布局数据，因此没有将某个template具现的必要。C++ standard禁止编译器对此情况作出具现化操作。<br>但如果是一个reference，那它真的会具现化出一个class，原因在于reference必须要绑定某个真正存在的对象。</p>
-<p>假若我们明确定义表达式导致某个template class发生具现化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Point&lt;<span class="keyword">float</span>&gt; origin;</span><br></pre></td></tr></table></figure><br>在此情况下，float instantiation的真正对象布局被产生出来，回顾之前的声明我们可以得知，origin的配置空间需要足够容纳3个float成员。<br>然而，member functions（未使用过的）不应该被具现化，它们应当仅仅在被使用时才会发生具现化。之所以需要这个规则，主要出于两个原因：</p>
-<ol>
-<li><strong>时间与空间效率</strong><br>如果某个class存在大量的member functions，而真正具现化出的某些class只使用了其中的一部分，那么全部具现化会造成一种性能上的浪费。</li>
-<li><strong>尚未实现的机能</strong><br>template class中定义的所有member functions并不一定适用于所有的Type，如果只具现那些真正使用到的member functions，那么template就能支持那些原本可能会造成编译器错误的类型。</li>
-</ol>
-<hr>
-<h1 id="Template的错误报告"><a href="#Template的错误报告" class="headerlink" title="Template的错误报告"></a>Template的错误报告</h1><p>&nbsp;<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Mumble</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Mumble(T t=<span class="number">1024</span>):tt(t)&#123;</span><br><span class="line">        <span class="keyword">if</span>(tt!=t) <span class="keyword">throw</span> ex;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T tt;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这个Template的声明存在下述错误：</p>
-<ol>
-<li>t被初始化为整数常量1024，其可行程度视真实类型而定。</li>
-<li>!=运算符可能尚未被定义，需要视实际使用情况而定。</li>
-</ol>
-<p>上述的两个潜在错误只能在具现操作完成后才能被发现，就目前的编译器而言，面对template声明只能执行有限的错误检查。Nonemember与member template functions在具现行为发生之前一样没有完全的类型检验，这直接导致了一些十分露骨的template错误声明居然能够通过编译，例如:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> type&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Foo();</span><br><span class="line">    <span class="function">type <span class="title">val</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">val</span><span class="params">(type v)</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    type _val;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//以下内容不会触发报错</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> type&gt;</span><br><span class="line"><span class="keyword">double</span> Foo&lt;type&gt;::bogus_member() &#123;<span class="keyword">return</span> <span class="keyword">this</span>-&gt;dbx;&#125;<span class="comment">//即使Foo并没有member function与data</span></span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="Template中的名称决议方式"><a href="#Template中的名称决议方式" class="headerlink" title="Template中的名称决议方式"></a>Template中的名称决议方式</h1><p>&nbsp;<br>在讲本小节之前，我们首先需要明确两种定义：</p>
-<ol>
-<li><strong>scope of the template defintion</strong><br>定义出template的程序，有实例如下：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">extern</span> <span class="keyword">double</span> <span class="title">foo</span><span class="params">(<span class="keyword">double</span>)</span></span>;</span><br><span class="line"> <span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">type</span>&gt;</span></span><br><span class="line"><span class="class"> <span class="title">class</span> <span class="title">ScopeRules</span>&#123;</span></span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">invariant</span><span class="params">()</span></span>&#123;</span><br><span class="line">        _member = foo(_val);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">type <span class="title">type_dependent</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> foo(_member);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> _val;</span><br><span class="line">    type _member;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
-<li><strong>scope of the template instantiation</strong><br>具现出template的程序:<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">int</span> <span class="title">foo</span><span class="params">(<span class="keyword">int</span>)</span></span>;</span><br><span class="line"><span class="comment">//...</span></span><br><span class="line">ScopeRule&lt;<span class="keyword">int</span>&gt; sr0;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>在ScopeRules template中有两个foo()调用操作，在”scope of template definition”中，只有一个foo()函数声明位于scope内，然而在”scope of template instantiation”中，两个foo()函数声明都位于scope之内，如果我们使用了一个函数调用操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sr0.invariant();<span class="comment">//调用哪一个foo()?</span></span><br></pre></td></tr></table></figure><br>本次调用操作存在两个函数可以调用，分别为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//scope of the template declaration</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">double</span> <span class="title">foo</span><span class="params">(<span class="keyword">double</span>)</span></span>;</span><br><span class="line"><span class="comment">//scope of the template instantiation</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">int</span> <span class="title">foo</span><span class="params">(<span class="keyword">int</span>)</span></span>;</span><br></pre></td></tr></table></figure><br>因为_val的类型是int，那么很多人会认为实际调用的是int，然而，调用的是double。</p>
-<p>Template中，对于一个nonmember name的决议结果是根据这个name的使用与否与“用以具现出该template的参数类型”有关而决定的。如果其使用互不相关，那么就以“scope of the template declaration”来决定name，反之则使用“scope of the template instantiation”。</p>
-<p>在刚才的实例中，foo()与用以具现ScopeRules的参数类型无关，因为_val是一个int，一个类型不会根据不同的具现化而发生改变的数据，因此，member的类型并不会影响哪一个foo()被选中，所以编译器会选择double（在该scope中，只有一个foo()候选者）。</p>
-<p>我们再次给出一个实例，该实例内容为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sr0.type_dependent();<span class="comment">//调用哪一个foo()?</span></span><br></pre></td></tr></table></figure><br>这一次由于参数类型相关，当前候选域内有2个foo()候选者，int类型与当前类型一致，因此得以被选中。</p>
-<p>上述两个实例表明编译器必须保持两个scope contexts：</p>
-<ol>
-<li><strong>“scope of the template declaration”，用以专注于一般的template class。</strong></li>
-<li><strong>“scope of the template instantiation”，用以专注于特定的实体。</strong></li>
-</ol>
-<hr>
-<h1 id="Member-Function的具现行为"><a href="#Member-Function的具现行为" class="headerlink" title="Member Function的具现行为"></a>Member Function的具现行为</h1><p>&nbsp;<br>template的具现化大致来说有两种策略：</p>
-<ol>
-<li><strong>编译时期策略，程序代码必须在program text file中备妥可用。</strong></li>
-<li><p><strong>链接时期策略，通过某些工具导引编译器的具现化行为。</strong></p>
-<p>接下来作者描述了如何具现化template function。</p>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1979,7 +1950,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

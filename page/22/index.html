@@ -291,6 +291,186 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/%E5%B0%BD%E9%87%8F%E9%81%BF%E5%85%8D%E8%BD%AC%E5%9E%8B%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/14/%E5%B0%BD%E9%87%8F%E9%81%BF%E5%85%8D%E8%BD%AC%E5%9E%8B%E6%93%8D%E4%BD%9C/" itemprop="url">28.尽量避免转型操作</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-14T14:49:00+08:00">
+                2018-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>（本节内容联系More Effective C++ 5 效果更佳）</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>c++规则的设计目标之一就是：保证类型错误绝不可能发生。理论上而言，如果你的程序能很干净地通过编译，就说明了它并不企图在任何对象身上执行任何不安全、无意义、荒谬的操作。<br>但转型（cast)破坏了类型系统。在Java，C#，或C中，转型操作必要且较为安全（当然，安全是相对的），C++的转型则充斥着风险。</p>
+<hr>
+<h1 id="转型语法"><a href="#转型语法" class="headerlink" title="转型语法"></a>转型语法</h1><h2 id="旧式转型"><a href="#旧式转型" class="headerlink" title="旧式转型"></a>旧式转型</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(T)expression;<span class="comment">//将expression转为T</span></span><br><span class="line">T(expression);<span class="comment">//将expression转为T</span></span><br></pre></td></tr></table></figure>
+<p>两者并无差别，无非是小括号的位置不同。</p>
+<h2 id="C-转型"><a href="#C-转型" class="headerlink" title="C++转型"></a>C++转型</h2><p>C++提供了四种新式转型操作符：</p>
+<ul>
+<li>const_cast<T>(expression)</li>
+<li>dynamic_cast<T>(expression)</li>
+<li>reinterpret_cast<T>(expression)</li>
+<li>static_cast<T>(expression)</li>
+</ul>
+<h3 id="C-转型操作符介绍"><a href="#C-转型操作符介绍" class="headerlink" title="C++转型操作符介绍"></a>C++转型操作符介绍</h3><ul>
+<li>const_cast：能够将对象的const属性去除，也只有它拥有该能力</li>
+<li>dynamic_cast：主要用来执行“安全向下转型”，也就是用来决定某对象是否归属继承体系的某个类型。它是唯一一个无法由旧式语句转换的新类型转换，也是唯一一个可能耗费大量运行成本的转型操作。</li>
+<li>reinterpret_cast：意图执行低级转型，实际动作可能取决于编译器，这一特性也就意味着不可移植。比如将一个pointer to int转为int，该转型操作在低级代码以外相当少见。</li>
+<li>static_cast：强迫隐式转换，比如把non-const转为const，int转为double。它也可以作上述转换的反向转换，例如把pointer-to-base转为pointer-to-derived，或者把void*指针转为typed指针。但是没法把const转为non-const。</li>
+</ul>
+<h2 id="新旧转型的优劣以及使用时机"><a href="#新旧转型的优劣以及使用时机" class="headerlink" title="新旧转型的优劣以及使用时机"></a>新旧转型的优劣以及使用时机</h2><h3 id="新式转型的优点"><a href="#新式转型的优点" class="headerlink" title="新式转型的优点"></a>新式转型的优点</h3><p>尽管旧式转型依然合法，但新式转型更受青睐。原因在于：</p>
+<ol>
+<li>易于辨识</li>
+<li>转型动作明确</li>
+</ol>
+<h3 id="何时采用旧式转型"><a href="#何时采用旧式转型" class="headerlink" title="何时采用旧式转型"></a>何时采用旧式转型</h3><p>一般来说，仅在需要调用一个explicit构造函数将一个对象传递给一个函数时使用旧式转型：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Widget</span><span class="params">(<span class="keyword">int</span> <span class="built_in">size</span>)</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSth</span><span class="params">(<span class="keyword">const</span> Widget&amp; w)</span></span>;</span><br><span class="line">doSth(Widget(<span class="number">15</span>));</span><br><span class="line">doSth(<span class="keyword">static_cast</span>&lt;Widget&gt;(<span class="number">15</span>));</span><br></pre></td></tr></table></figure><br>然而这种风格并不像是转型，更像是一种构造。但必须明确，这里其实执行的类型转换操作。</p>
+<hr>
+<h1 id="类型转换的意义"><a href="#类型转换的意义" class="headerlink" title="类型转换的意义"></a>类型转换的意义</h1><p>&nbsp;<br>有人认为转型只不过告诉编译器把某种类型视为另一种类型，其他什么都没做，实际上这是不可能的<br>。将int转为double的时候编译器肯定生成了一些代码，因为int的底层描述与double的底层描述并不相同。再比如说：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span><span class="keyword">public</span> Base&#123;...&#125;;</span><br><span class="line">Derived d;</span><br><span class="line">Base* pb = &amp;d;<span class="comment">//暗中将Derived*转为了Base*</span></span><br></pre></td></tr></table></figure><br>我们建立了一个base指针指向derived class对象，但有时上述的两个指针值并不相同，这时会有一个偏移量在运行期间被施行于derived*指针，以取得正确的base*值。</p>
+<p>上述案例表明，<strong>单一对象可能拥有多个地址</strong>（这在C，Java，C#中是不可能发生的）。如果在C++中使用多重继承，单一对象必然拥有多个地址，并且在单一继承下也可能存在多个地址。<strong>我们应该避免做出“对象在c++中如何布局”的假设，更不应该以某种假设为基础执行任何转型操作。</strong></p>
+<hr>
+<h1 id="类型转换的误区"><a href="#类型转换的误区" class="headerlink" title="类型转换的误区"></a>类型转换的误区</h1><p>&nbsp;<br>类型转换可能会导致我们易写出一些似是而非的代码，（它们在其他语言中可能是正确的）。</p>
+<h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>许多应用框架都要求derived classes内的virtual函数第一件事就是调用base class的对应函数。下面给出一个具体实例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Window</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span> </span>&#123;...&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWindows</span>:</span><span class="keyword">public</span> Window&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;<span class="comment">//要求首先调用base class的对应函数</span></span><br><span class="line">        <span class="keyword">static_cast</span>&lt;Window&gt;(*<span class="keyword">this</span>).onResize();<span class="comment">//error！</span></span><br><span class="line">        ...<span class="comment">//执行专有操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>我们确实成功地将它转为了Window对象，也确实调用了Window::onResize。但值得注意的是，调用的并不是当前对象上的函数，而是稍早转型动作建立的一个“*this对象之base class成分”的<strong>暂时副本</strong>身上的onResize(),也就是说当前对象内部的数据并没有改变，改变的是一个副本。(这个原理很简单，就是转型操作导致了一个临时Window对象被生成，我们在该临时对象身上调用了onResize，伴随着它的析构，这个操作就像没做一样，（*this)的bc成分根本没有改变）</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>解决方案就是直接调用，不要使用转型操作：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWindows</span>:</span><span class="keyword">public</span> Window&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Window::onResize();</span><br><span class="line">        ...<span class="comment">//执行专有操作</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="dynamic-cast探究"><a href="#dynamic-cast探究" class="headerlink" title="dynamic_cast探究"></a>dynamic_cast探究</h1><p>&nbsp;<br>首先需要强调的是，dynamic_cast执行速度相当缓慢，如果继承层次很深或者存在多继承的情况下使用dynamic_cast，可能对性能的冲击极大，请谨慎使用！</p>
+<h2 id="dynamic-cast功能"><a href="#dynamic-cast功能" class="headerlink" title="dynamic_cast功能"></a>dynamic_cast功能</h2><p>之所以需要使用dynamic_cast，主要是因为我们需要在一个derived class对象身上执行derived class专属操作，但偏偏我们目前只有一个指向base的pointer或reference.</p>
+<h2 id="如何避免使用dynamic-cast"><a href="#如何避免使用dynamic-cast" class="headerlink" title="如何避免使用dynamic_cast"></a>如何避免使用dynamic_cast</h2><h3 id="使用容器-并指定其存储的元素类型为指向derived-class对象的指针"><a href="#使用容器-并指定其存储的元素类型为指向derived-class对象的指针" class="headerlink" title="使用容器,并指定其存储的元素类型为指向derived class对象的指针"></a>使用容器,并指定其存储的元素类型为指向derived class对象的指针</h3><p>举例而言，假设在之前的体系中，SpecialWindow有一个特有操作：闪烁<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Window</span>&#123;</span>...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpecialWindows</span>:</span><span class="keyword">public</span> Window&#123;</span><br><span class="line"><span class="keyword">public</span>: </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">blink</span><span class="params">()</span></span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//需要闪烁所有可以闪烁的窗口</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">vector</span>&lt;<span class="built_in">shared_ptr</span>&lt;Window&gt; &gt; VPW;</span><br><span class="line">VPW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="comment">//使用dynamic_cast</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> it=winPtrs.<span class="built_in">begin</span>();it!=winPtrs.<span class="built_in">end</span>();++it)&#123;</span><br><span class="line">    <span class="comment">//赋值，检测其返回值不为nullptr</span></span><br><span class="line">    <span class="keyword">if</span>(SpecialWindow *psw = <span class="keyword">dynamic_cast</span>&lt;SpecialWindows*&gt;(iter-&gt;<span class="built_in">get</span>()))</span><br><span class="line">        psw-&gt;<span class="built_in">blink</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>应该改为在容器内存在指向dc的smart_ptr:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">vector</span>&lt;<span class="built_in">shared_ptr</span>&lt;SpecialWindow&gt; &gt; VPSW;</span><br><span class="line">VPSW winPtrs;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> it=winPtrs.<span class="built_in">begin</span>();it!=winPtrs.<span class="built_in">end</span>();++it)&#123;</span><br><span class="line">    (*iter)-&gt;<span class="built_in">blink</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>不过，这种做法无法在同一个容器内存储指向所有派生类的指针。</p>
+<h3 id="通过base接口处理所有可能的派生类"><a href="#通过base接口处理所有可能的派生类" class="headerlink" title="通过base接口处理所有可能的派生类"></a>通过base接口处理所有可能的派生类</h3><p>具体来说，就是在基类中声明所有派生类所具备的特殊函数，然后提供一份空白实现。（这种方法十分恶劣，违背了面向对象准则）</p>
+<h2 id="dynamic-cast禁区"><a href="#dynamic-cast禁区" class="headerlink" title="dynamic_cast禁区"></a>dynamic_cast禁区</h2><p>绝对必须避免的是连锁式使用dynamic_cast，其运行效率极低且缺乏维护性。这种程序总应该被某种基于virtual函数调用的方法取而代之。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>优秀的c++代码很少使用转型，但完全摆脱它们也不切实际。我们要做的只能是<strong>尽可能隔绝转型动作，把他们隐藏在某个函数内。</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/14/%E9%9C%80%E8%A6%81%E4%BE%9D%E6%AC%A1%E5%BD%95%E5%85%A5%E5%AD%97%E7%AC%A6%E6%97%B6%E8%80%83%E8%99%91%E4%BD%BF%E7%94%A8istreambuf_iterator/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1649,158 +1829,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/13/%E5%B0%86%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E4%B8%BAprivate/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/13/%E5%B0%86%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E4%B8%BAprivate/" itemprop="url">23.将成员变量声明为private</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-13T12:13:00+08:00">
-                2018-04-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="为什么不使用public成员变量"><a href="#为什么不使用public成员变量" class="headerlink" title="为什么不使用public成员变量"></a>为什么不使用public成员变量</h1><ol>
-<li>语义一致性<br>如果成员变量都不是public，那我们必然是通过成员函数来访问对象，所以再也不用担心什么时候用接口，什么时候用属性了。<br>另外，使用函数可以对变量进行更加精准的控制，你完全可以实现只读，读写，或者不予读写，甚至只写操作。举例而言：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AccessLevels</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getReadOnly</span><span class="params">()</span> <span class="keyword">const</span></span>&#123;<span class="keyword">return</span> readOnly;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setReadWrite</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;readWrite=value;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getReadWrite</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;<span class="keyword">return</span> readWrite;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setWriteOnly</span><span class="params">(writeOnly=value;&#125;</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">private</span>:</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> noAccess;<span class="comment">//禁止访问</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> readOnly;<span class="comment">//只读</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> readWrite;<span class="comment">//读写</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> writeOnly;<span class="comment">//只写</span></span></span></span><br><span class="line"><span class="function"><span class="params">&#125;</span></span></span><br></pre></td></tr></table></figure></li>
-<li>封装性<br>将成员变量隐藏在函数接口之后，可以为“所有实现的可能”提供弹性，我们可以在不改变接口的同时更改实现，从而保证了用户只需要在重新编译后即可享有与原先不同的体验。（Effective C++ 31 甚至提出了编译分离）<br>封装的重要程度可能比你想的还要更加高一些，如果你对客户隐藏了成员变量，那么至少可以保证class的约束条件总能获得维护，因为只有成员函数可以影响它们，并且开发者保留了日后变更实现的权利。如果不进行封装，那么客户码中将充斥着大量的成员变量，这也意味着我们无法随意地更改原有程序，因为每一次改动都可能造成客户端失效。public意味着不封装，不封装意味着不可改变，因为你一变用户也要跟着变。</li>
-</ol>
-<hr>
-<h1 id="protected的封装性"><a href="#protected的封装性" class="headerlink" title="protected的封装性"></a>protected的封装性</h1><p>&lt;/br&gt;<br>可能你会认为protected的封装性要高于public，但事实并非如此。因为所有使用了该变量的derived classes都遭到了破坏。一旦你将某个成员变量设为public或protected，并且随后交付客户使用，那你在今后就很难改变该变量所涉及的一切，除非你愿意付出重写、重新测试、重新编文档、重新编译的代价。<br>从封装的角度而言，访问权限只有两种：private（提供封装）和其他（不提供封装）。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>将成员变量声明为privte。这可赋予客户语义一致性，访问权限控制，并且令class作者拥有充分的实现弹性。</li>
-<li>protected并不比public更具封装性</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1851,7 +1879,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

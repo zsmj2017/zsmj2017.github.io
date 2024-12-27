@@ -291,6 +291,161 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E4%BA%86%E8%A7%A3typename/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/%E4%BA%86%E8%A7%A3typename/" itemprop="url">43.了解typename</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-20T14:12:00+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="template声明式"><a href="#template声明式" class="headerlink" title="template声明式"></a>template声明式</h1><p>&nbsp;<br>在template声明式中使用class与typename有什么不同吗？<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt; <span class="title">class</span> <span class="title">Widget</span>;</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">Widget</span>;</span></span><br></pre></td></tr></table></figure><br>答案是没有不同。有的人喜欢用class，因为少打了字，有的人则习惯于使用typename，因为这暗示了用户参数并非一定要是一个class类型。<br>但这种相同仅仅只是在template声明式内，c++并不总是把class与template视为等价,有时候我们非得使用typename不可。</p>
+<hr>
+<h1 id="template内refer-to的名称"><a href="#template内refer-to的名称" class="headerlink" title="template内refer to的名称"></a>template内refer to的名称</h1><p>&nbsp;<br>假设有一个template function，接受一个STL容器为参数，容器内持有的对象可被赋值为int。进一步假设这个函数只是打印其第二元素值。我们暂且不去管这个函数有多么地无聊甚至不能编译，其实现如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> C&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print2nd</span> <span class="params">(<span class="keyword">const</span> C&amp; container)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(container.<span class="built_in">size</span>()&gt;=<span class="number">2</span>)&#123;</span><br><span class="line">        <span class="function">C::const_iterator <span class="title">iter</span><span class="params">(container.<span class="built_in">begin</span>())</span></span>;</span><br><span class="line">        ++iter;</span><br><span class="line">        <span class="keyword">int</span> value = *iter;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>显而易见，这段代码中有两个local变量iter和value。</p>
+<h2 id="嵌套从属名称"><a href="#嵌套从属名称" class="headerlink" title="嵌套从属名称"></a>嵌套从属名称</h2><p>iter的类型是C::const_iterator,实际上它是什么取决于template参数C.<strong>template内出现的名字如果依赖于某个template参数，则称为从属名称。如果从属名称在class内程嵌套状(::)则称之为嵌套从属名称。</strong><br>value是一个int，不依赖于任何template参数，于是它叫做非从属名称。</p>
+<hr>
+<h3 id="嵌套从属名称的风险"><a href="#嵌套从属名称的风险" class="headerlink" title="嵌套从属名称的风险"></a>嵌套从属名称的风险</h3><p>嵌套从属名称可能会导致解析(parsing)困难。举例而言，我们如果写了一个比刚才那个更加愚蠢的程序：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> C&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print2nd</span><span class="params">(<span class="keyword">const</span> C&amp; container)</span></span>&#123;</span><br><span class="line">    C::const_iterator * x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>可能有人对这种写法并无异议:我们声明了一个local变量x，它是一个指针，指向C::const_iterator。但如果C中有一个static成员恰好被命名为const_iterator，又或者x恰好是一个global变量。那这个代码就是执行了一次相乘操作。这简直丧心病狂。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>C++对于这种歧义状态有一种解析规则：<strong>如果编译器在template中遭遇了一个嵌套从属名称，它便假设该名称并非类型，除非你主动告诉它这是类型。</strong>（这个情况有一个小小的例外）。<br>想要程序正确运行，上文中的实例应该改为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typename</span> C::const_iterator iter;</span><br></pre></td></tr></table></figure><br>任何时候你想在template内指涉一个嵌套从属类型名称，就必须在它之前放上一个typename.（再说一次，有一个小例外）另外，typename只被用来验明嵌套从属类型名称，其它名称没必要用它。</p>
+<h3 id="例外情况"><a href="#例外情况" class="headerlink" title="例外情况"></a>例外情况</h3><p>typename不可以出现在base classes list内的嵌套从属类型名称之前，也不可以在member initialization list中作为base class修饰符。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span>:</span><span class="keyword">public</span> Base&lt;T&gt;::Nested&#123;<span class="comment">// base classes list中禁止出现typename</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">Derived</span><span class="params">(<span class="keyword">int</span> x)</span></span></span><br><span class="line"><span class="function">        :Base&lt;T&gt;::<span class="title">Nested</span><span class="params">(x)</span></span>&#123;<span class="comment">//member initialization list中禁止出现typename</span></span><br><span class="line">            <span class="keyword">typename</span> Base&lt;T&gt;::Nested temp;<span class="comment">//需要typename</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="typename与typedef"><a href="#typename与typedef" class="headerlink" title="typename与typedef"></a>typename与typedef</h3><p>由于某些声明式实在太长，所以讲typedef与typename相结合可能是一种不错的主意：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> IterT&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">workWithIterator</span><span class="params">(IterT iter)</span></span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::iterator_traits&lt;IterT&gt;::value_type value_type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>声明template参数时，class与typename意义相同。</li>
+<li>必须用typename标识嵌套从属类型名称，但在base class lists &amp;&amp; member initialization list中禁止使用。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/20/%E4%BB%A5%E6%88%90%E5%91%98%E5%87%BD%E6%95%B0%E4%BB%A3%E6%9B%BF%E5%90%8C%E5%90%8D%E7%AE%97%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1700,159 +1855,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/19/%E7%A6%81%E6%AD%A2%E9%87%8D%E5%AE%9A%E4%B9%89%E7%BB%A7%E6%89%BF%E8%80%8C%E6%9D%A5%E7%9A%84%E9%BB%98%E8%AE%A4%E5%AE%9E%E5%8F%82/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/19/%E7%A6%81%E6%AD%A2%E9%87%8D%E5%AE%9A%E4%B9%89%E7%BB%A7%E6%89%BF%E8%80%8C%E6%9D%A5%E7%9A%84%E9%BB%98%E8%AE%A4%E5%AE%9E%E5%8F%82/" itemprop="url">38.禁止重定义继承而来的默认实参</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-19T09:09:00+08:00">
-                2018-04-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&nbsp;<br>我们只能继承virtual和non-virtual函数，而重新定义一个non-virtual函数永远是错误的。所以本节讨论只基于”继承一个带有默认实参的virtual函数”。之所以需要讨论它，是因为<strong>virtual函数动态绑定，但默认实参静态绑定。</strong></p>
-<hr>
-<h1 id="静态绑定与动态绑定"><a href="#静态绑定与动态绑定" class="headerlink" title="静态绑定与动态绑定"></a>静态绑定与动态绑定</h1><h2 id="静态类型与动态类型"><a href="#静态类型与动态类型" class="headerlink" title="静态类型与动态类型"></a>静态类型与动态类型</h2><p>对象所谓的静态类型(static type)，就是它在程序中<strong>被声明为的类型</strong>。举例而言:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">shape</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>：</span></span><br><span class="line"><span class="class">    <span class="title">enum</span> <span class="title">color</span>｛<span class="title">red</span>，<span class="title">green</span>，<span class="title">blue</span>｝；</span></span><br><span class="line"><span class="class">    <span class="title">virtual</span> <span class="title">void</span> <span class="title">draw</span>（<span class="title">color</span> <span class="title">c</span> = <span class="title">red</span>) <span class="title">const</span> = 0;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">rectangle</span>:</span><span class="keyword">public</span> shape&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(color c = green)</span> <span class="keyword">const</span></span>;<span class="comment">//重定义了默认实参</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">circle</span>:</span><span class="keyword">public</span> shape&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(color c)</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="comment">//当客户通过对象调用此函数时必须使用实参，因为静态绑定不从base继承默认实参</span></span><br><span class="line">    <span class="comment">//但若以指针或引用调用则无需如此，因为动态绑定下该函数会从其base获取默认实参</span></span><br><span class="line">｝</span><br></pre></td></tr></table></figure><br>此继承体系如图所示：<br><img src="http://static.zybuluo.com/zsmj2017/qw9s0ez5i1aspkgcjpo7r1fi/image_1cbdnpjs21jto1c72j5f1verkd09.png" alt="image_1cbdnpjs21jto1c72j5f1verkd09.png-13.2kB"><br>那么考虑这些指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shape* ps；<span class="comment">//静态类型为shape*</span></span><br><span class="line">shape* pc = <span class="keyword">new</span> <span class="built_in">circle</span>；<span class="comment">//同上</span></span><br><span class="line">shape* pr = <span class="keyword">new</span> rectangle;<span class="comment">//同上</span></span><br></pre></td></tr></table></figure><br>它们都被<strong>声明为</strong>pointer-to-shape类型，所以他们的静态类型都是shape*。</p>
-<p><strong>动态类型则是指目前所指对象的类型，也就是说，动态类型可以表现出一个对象将会有怎样的行为。</strong><br>动态类型一如其名，可以在程序执行过程中改变:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ps=pc;<span class="comment">//ps的动态类型改为Circle*</span></span><br><span class="line">ps=pr;<span class="comment">//ps的动态类型改为Rectangle*</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="动态绑定与静态绑定"><a href="#动态绑定与静态绑定" class="headerlink" title="动态绑定与静态绑定"></a>动态绑定与静态绑定</h2><p>virtual函数本身通过动态绑定来执行（也就是说如何执行取决于对象的动态类型），但如果遇到了带有默认实参的virtual函数，这个时候问题来了。<br>virtual是动态绑定，而缺省参数值却是静态绑定。也就是说，你<strong>可能会在调用“一个定义于derived class内的virtual函数”的同时却使用了base class为它指定的缺省参数</strong>，举例而言，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pr-&gt;draw();<span class="comment">//以为此时的默认实参是green</span></span><br><span class="line"><span class="comment">//但其实等价于调用rectangle::draw(shape::red);</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="何种原因造成了这种分裂机制"><a href="#何种原因造成了这种分裂机制" class="headerlink" title="何种原因造成了这种分裂机制"></a>何种原因造成了这种分裂机制</h2><p><strong>C++将默认实参设为静态绑定的原因在于运行期效率</strong>。如果缺省参数设置为动态绑定，那么编译器就必须在<strong>运行期</strong>为virtual函数决定适当的参数缺省值，而静态绑定在编译期就完成了决定。动态绑定默认实参过于缓慢和复杂。</p>
-<hr>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>&nbsp;<br>就算严格遵守了本节所讲的内容，也未必就称得上最佳设计：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">shape</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>：</span></span><br><span class="line"><span class="class">    <span class="title">enum</span> <span class="title">color</span>｛<span class="title">red</span>，<span class="title">green</span>，<span class="title">blue</span>｝；</span></span><br><span class="line"><span class="class">    <span class="title">virtual</span> <span class="title">void</span> <span class="title">draw</span>（<span class="title">color</span> <span class="title">c</span> = <span class="title">red</span>) <span class="title">const</span> = 0;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">rectangle</span>:</span><span class="keyword">public</span> shape&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(color c = red)</span> <span class="keyword">const</span></span>;<span class="comment">//不再重定义</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>这种写法无疑造成了代码重复。更为重要的是，代码重复造成了<strong>相依性</strong>：一旦作为base class的Shape内的默认实参需要改变，则所有derived class都必须发生改变，否则就造成了重定义默认实参。因此我们必须考虑某种替代手法。</p>
-<h2 id="NVI"><a href="#NVI" class="headerlink" title="NVI"></a>NVI</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Shape</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>：</span><br><span class="line">    <span class="keyword">enum</span> color｛red，green，blue｝；</span><br><span class="line">    <span class="keyword">void</span> draw（color c = red) <span class="keyword">const</span>&#123;</span><br><span class="line">        doDraw(c);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">doDraw</span><span class="params">(color c)</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">rectangle</span>:</span><span class="keyword">public</span> shape&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span><span class="params">(color c)</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>由于non-virtual不会被覆写，所以derived class继承得到的函数必然具备与base class相同的默认实参。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&nbsp;<br>禁止重定义默认实参，因为它们是静态绑定，而virtual函数是动态绑定。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1903,7 +1905,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

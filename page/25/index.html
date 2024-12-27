@@ -291,6 +291,162 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/%E5%A4%8D%E5%88%B6%E5%AF%B9%E8%B1%A1%E5%8A%A1%E5%BF%85%E5%B0%BD%E5%96%84%E5%B0%BD%E7%BE%8E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xander.liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xander's Wiki">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/09/%E5%A4%8D%E5%88%B6%E5%AF%B9%E8%B1%A1%E5%8A%A1%E5%BF%85%E5%B0%BD%E5%96%84%E5%B0%BD%E7%BE%8E/" itemprop="url">13. 复制对象务必尽善尽美</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T12:01:00+08:00">
+                2018-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&lt;/br&gt;<br>设计良好的OO System一般只留有两个函数负责对象拷贝，那就是copy构造函数和copy assignment操作符，暂称它们为copying函数。正如前文所说，编译器会在必要的时候为我们的classes创建copying函数，其行为是：将被copy对象的所有成员变量都做一份拷贝。</p>
+<hr>
+<h1 id="手动处理拷贝可能存在的风险"><a href="#手动处理拷贝可能存在的风险" class="headerlink" title="手动处理拷贝可能存在的风险"></a>手动处理拷贝可能存在的风险</h1><p>&lt;/br&gt;<br>如果我们自己声明和实现了copying函数，但却并没有完全拷贝成员变量，造成<strong>了partial copy，此时编译器根本不会报错</strong>，所以需要仔细地排查：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Widget(<span class="keyword">const</span> Widget&amp; rhs)</span><br><span class="line">        :name(rhs.name) &#123;&#125;;<span class="comment">//忘记了copy age 不会报错</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> name;</span><br><span class="line">    <span class="keyword">int</span> age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>由于这种特性，<strong>每一次新的成员变量的加入，copying函数，构造函数，以及任何重载的operator=都必须要做出修改。</strong>你就不用指望编译器会提醒你了。</p>
+<hr>
+<h1 id="继承体系下的partial-copy"><a href="#继承体系下的partial-copy" class="headerlink" title="继承体系下的partial copy"></a>继承体系下的partial copy</h1><h2 id="问题实例"><a href="#问题实例" class="headerlink" title="问题实例"></a>问题实例</h2><p>假设我们的继承体系中存在着Customer与PCustomer两个类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Customer</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">string</span> name;</span><br><span class="line">    Date lastTransaction;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PCustomer</span>:</span><span class="keyword">public</span> Customer&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ...</span><br><span class="line">    PCustomer(<span class="keyword">const</span> PCustomer &amp;rhs);</span><br><span class="line">    PCustomer&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> PCustomer &amp;rhs);</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> priority;</span><br><span class="line">&#125;;</span><br><span class="line">PCustomer::PCustomer(<span class="keyword">const</span> PCustomer &amp;rhs)</span><br><span class="line">    :priority(rhs.priority) &#123;&#125;</span><br></pre></td></tr></table></figure><br>看起来确实执行了copy，但实际上dc内部的bc成分并未被copy。在这种情况下，<strong>bc成分将会被默认初始化。</strong><br>如果是operator=，则仅仅复制了dc成分，bc成分保持不变。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>在任何时候我们一旦承担起为derived class编写copying函数的责任，必须要注意一定要记得复制base class的成员变量 ，一般情况下它们是private，所以我们<strong>调用base class的copying函数</strong>来完成它们。针对上面的实例，两个copying函数的正确写法如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PCustomer::PCustomer(<span class="keyword">const</span> PCustomer &amp;rhs)</span><br><span class="line">    :Customer(rhs),priority(rhs.priority) &#123;&#125;</span><br><span class="line">PCustomer&amp;</span><br><span class="line">PCustomer::<span class="keyword">operator</span>=(<span class="keyword">const</span> PCustomer &amp;rhs)&#123;</span><br><span class="line">    Customer::<span class="keyword">operator</span>=(rhs);</span><br><span class="line">    priority=rhs.priority;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="copy构造函数与copy-assignment运算符之间的关系"><a href="#copy构造函数与copy-assignment运算符之间的关系" class="headerlink" title="copy构造函数与copy assignment运算符之间的关系"></a>copy构造函数与copy assignment运算符之间的关系</h1><p>&lt;/br&gt;<br>一般来说，copying 函数往往有近似的实现本体，这可能会让我们想到在一个中调用另一个。但这并不可取。</p>
+<p>令copy assignment调用copy construct函数并不科学，原因很简单，你在试图构造一个已经存在的对象。<br>令copy construct函数调用copy assignment同样毫无意义。构造函数用来初始化新对象，而assignment操作符只施行于已经被初始化的对象。对还没构造好的对象赋值完全毫无意义。</p>
+<p>如果它们两个之间真的存在相近的代码，那应该编写一个private的init函数，给他们两个调用，这样就完美消除了代码重复的问题。</p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>copying函数应该确保复制对象内所有成员，以及所有base class成分（调用bc对应的copying函数）</li>
+<li>不要尝试以某个copying函数实现另一个copying 函数。应该新建一个private init函数给二者调用。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/09/vector%E4%B8%8Estring%E7%9B%B8%E8%BE%83%E4%BA%8E%E5%8A%A8%E6%80%81%E6%95%B0%E7%BB%84%E7%9A%84%E4%BC%98%E8%B6%8A%E6%80%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1664,163 +1820,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://xander.wiki/2018/04/08/%E4%B8%BA%E5%A4%9A%E6%80%81%E5%9F%BA%E7%B1%BB%E7%94%9F%E6%88%90virtual%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="xander.liu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xander's Wiki">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/08/%E4%B8%BA%E5%A4%9A%E6%80%81%E5%9F%BA%E7%B1%BB%E7%94%9F%E6%88%90virtual%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/" itemprop="url">8.为多态基类生成virtual析构函数</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-08T09:33:00+08:00">
-                2018-04-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-C/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective C++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>假设我们定义了一个base class，并随之延伸出一些derived class。用户只需要在程序中使用某个功能，并不关心其实现。因此，我们可以设计一个factory函数。(工厂模式详见More Effective C++ 25）<br>factory函数返回一个base clsss指针，指向新生成的derived class对象。 返回的对象必须位于heap，因此为了避免泄漏内存和其他资源，factory返回的每一个对象都应该被适当的delete。举例而言：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeKeeper</span>&#123;</span><span class="comment">//计时器基类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    TimeKeeper();</span><br><span class="line">    ~TimeKeeper();<span class="comment">//此处不应该使用non-virtual析构函数</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AtomicClock</span>:</span><span class="keyword">public</span> TimeKeeper&#123;...&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WaterClock</span>:</span><span class="keyword">public</span> TimeKeeper&#123;...&#125;;</span><br><span class="line"></span><br><span class="line">TimeKeeper* ptk=getTimeKeeper();<span class="comment">//factory函数</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">delete</span> ptk;释放以避免资源泄露</span><br></pre></td></tr></table></figure><br>问题在于factory返回的指针指向一个derived class对象，而那个对象却经由一个base class指针被删除。如果base class的析构函数是non-virtual，则我们再次雪崩。</p>
-<hr>
-<h1 id="多态基类不使用virtual析构的后果"><a href="#多态基类不使用virtual析构的后果" class="headerlink" title="多态基类不使用virtual析构的后果"></a>多态基类不使用virtual析构的后果</h1><p>c++明确指出，当derived class对象由一个base class指针被删除，而base class带着一个non-virtual析构函数，<strong>其结果未定义</strong> — 一般来说，实际执行时对象的derived成分没被销毁，derived class的析构函数也没执行。也就是说我们得到了一个诡异的<strong>局部销毁对象</strong>。</p>
-<hr>
-<h1 id="何时需要virtual析构函数？"><a href="#何时需要virtual析构函数？" class="headerlink" title="何时需要virtual析构函数？"></a>何时需要virtual析构函数？</h1><p>一般来说，base class都会有那么一个virtual function。我们在这里指出，<strong>只要一个class有virtual function，我们都应该把它的析构函数定义为virtual。</strong></p>
-<p><strong>如果一个class不被用作base class，那给他定义一个virtual 析构函数非常愚蠢</strong>。原因是这样的：<br>欲实现出virtual函数，对象必须携带某些信息，要来指出在运行期哪个virtual函数被调用。这份信息一般由一个virtual table pointer指出。vtp指向一个vbtl(virtual table)每一个带virtual函数的class都会有一个vtbl，当函数调用某个virtual函数，实际被调用的函数取决于对象的vptr所指向的vtbl—编译器在其中寻找函数指针。（关于虚函数的使用成本，详见More Effective C++ 24）<br>总之，虚函数的引入增加了class的大小，并且破坏了原有的内存结构。</p>
-<p>另外，<strong>STL所有的类都不能作为base class，它们也没有virtual析构函数</strong>。</p>
-<hr>
-<h1 id="virtual析构函数在abstract-class中的用法"><a href="#virtual析构函数在abstract-class中的用法" class="headerlink" title="virtual析构函数在abstract class中的用法"></a>virtual析构函数在abstract class中的用法</h1><p>有时我们希望定义一个abstract class，但是手头上并没有pure virtual function，那解决方法很简单：<strong>声明一个pure virtual 析构函数</strong>。<br>但事情还没完，我们<strong>不仅仅需要声明，还需要定义</strong>这个析构函数。可能你会诧异于pure function居然还需要实现，但实际上pure function和有没有实现并没有任何联系。（该论述详见More Effective C++ 33）,具体声明和定义如下所示：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">c</span>｛</span></span><br><span class="line"><span class="class"><span class="title">public</span>:</span></span><br><span class="line">    <span class="keyword">virtual</span> ～c() = <span class="number">0</span>;<span class="comment">//声明式</span></span><br><span class="line">&#125;;</span><br><span class="line">c::~c() &#123;&#125;<span class="comment">//定义式</span></span><br></pre></td></tr></table></figure><br>因为析构函数的运作规则是是从最深层派生的class开始调用其析构，然后是每一个base class。在derived class的析构动作中编译器会创建一个对其基类析构函数的调用动作，如果没有定义，连接器会报错。</p>
-<hr>
-<h1 id="是否只要是base-class就需要析构函数？"><a href="#是否只要是base-class就需要析构函数？" class="headerlink" title="是否只要是base class就需要析构函数？"></a>是否只要是base class就需要析构函数？</h1><p>正如标题所说，<strong>只有使用了多态性的base class（具备虚函数）才需要virtual析构</strong>。<br>诸如上节提到的uncopyable类，其根本不需要使用virtual 析构函数。</p>
-<hr>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>polymorphic base class应该声明一个virtual析构。如果一个类至少有一个virtual function，把它也应该拥有一个virtual析构函数</li>
-<li>class 不具有多态性或者根本不作为base class，那就不要搞virtual析构。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1871,7 +1870,7 @@
               
                 <a href="/archives/s">
               
-                  <span class="site-state-item-count">265</span>
+                  <span class="site-state-item-count">266</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
